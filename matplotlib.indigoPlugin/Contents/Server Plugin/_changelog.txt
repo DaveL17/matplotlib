@@ -1,0 +1,42 @@
+v0.2.05
+- Fixes bug where certain combinations of temperatures would cause below zero
+  temperatures to be plotted outside the boundaries of the plot.
+- Fixes (?) all instances where the plugin will save a CSV value of 'None'
+  would be saved to the file (changes it to 'NaN').
+- Refines annotations to increase readability -- especially during annotation
+  collisions.
+- Refines plotting of 10 Day weather forecast devices to always place higher
+  display   priority on high temperature line.
+- Simplifies code used to plot max, min and custom line segments (minor speed
+  improvement). Affects bar and line charts.
+
+v0.2.04
+- Adds dropdown to CSV Engine to show available data sources (device states
+  or variable value).
+- Adds device-specific custom font sizes to support retina/non-retina displays.
+- Tweaks weather forecast device to increase separation between low temperature
+  line and precipitation bar annotations.
+- Fixes bug in Matplotlib Action item.
+- CSV Engine: changed "Source Title" to "Title",  changed "Source Device" to
+  "ID", changed "Source State" to "Data" to be more descriptive of devices and
+  variable data sources).
+
+v0.2.03
+- Added additional X Axis bins:
+  - Every 15 minutes
+  - Every 30 minutes
+- Links "About Matplotlib" menu item to the new forum.
+- Fixes bug when using variables for Multiline Text.
+- Fixes bug in CSV Engine that would not allow the assignment of an 11th data
+  element.
+
+v0.2.02
+- Implements Indigo Version Update Checker.
+- Fixes a bug where the CSV engine spawned a None type data element which kept
+  some installs from creating CSV data successfully.
+- Attempts to fix a bug where the plugin would randomly restart during a sleep
+  cycle.
+- Fixes a bug where plugin would log inability to import pydevd.
+- Fixes a bug where custom color values were not recognized as valid for some
+  settings.
+

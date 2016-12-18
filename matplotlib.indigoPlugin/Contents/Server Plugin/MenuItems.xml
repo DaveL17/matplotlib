@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<MenuItems>
+
+    <MenuItem id="advancedSettings">
+        <!--The advanced settings menu is used to manage more obscure plugin preferences. Adding an element here will require hooks in
+            most, if not all of the following methods in the plugin.py file:
+            pluginConfig.xml (a hidden control to store the setting)
+            getMenuActionConfigUiValues
+            advancedSettingsMenu
+            advancedSettingsExecuted-->
+        <Name>Advanced Settings...</Name>
+        <CallbackMethod>advancedSettingsExecuted</CallbackMethod>
+        <ButtonTitle>Save</ButtonTitle>
+		<ConfigUI>
+
+			<Field id="instructionsLabel" type="label" fontColor="black" fontSize="regular">
+				<Label>Advanced Plugin Settings</Label>
+			</Field>
+
+            <Field id="enableCustomColorsSeparator" type="separator"/>
+
+            <Field id="enableCustomColorsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Custom Colors</Label>
+            </Field>
+
+			<Field id="enableCustomColors" type="checkbox" defaultValue="false">
+				<Label/>
+                <Description>Enable Custom Colors</Description>
+		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
+			</Field>
+
+			<Field id="enableCustomColorsLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>Adds controls to plot with user-defined colors. If later disabled, previously defined colors will still be used until a new color is selected.</Label>
+			</Field>
+
+            <Field id="enableCustomLineSegmentsSeparator" type="separator"/>
+
+			<Field id="enableCustomLineSegmentsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
+				<Label>Custom Line Segments</Label>
+			</Field>
+
+			<Field id="enableCustomLineSegments" type="checkbox" defaultValue="false">
+				<Label/>
+                <Description>Enable Custom Line Segments</Description>
+		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
+			</Field>
+
+			<Field id="enableCustomLineSegmentsLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>Adds controls to plot user-defined line segments. If later disabled, previously defined segments will be ignored (the settings will be retained and hidden).</Label>
+			</Field>
+
+			<Field id="promoteCustomLineSegments" type="checkbox" defaultValue="false" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true">
+				<Label/>
+                <Description>Promote Custom Line Segments</Description>
+		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
+			</Field>
+
+			<Field id="promoteCustomLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>If enabled, chart ranges will be expanded to display custom line segments at all times. If disabled, custom line segments will only be displayed if they are within range of plotted data.</Label>
+			</Field>
+
+            <Field id="logEachChartCompletedSeparator" type="separator"/>
+
+			<Field id="logEachChartCompletedHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
+				<Label>Other</Label>
+			</Field>
+
+			<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">
+				<Label/>
+                <Description>Enable Snappy Menus</Description>
+		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
+			</Field>
+
+			<Field id="snappyConfigMenusLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>
+			</Field>
+
+            <Field id="matplotlibSeparator" type="separator"/>
+
+			<Field id="matplotlibAdvancedSettingsLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+				<Label>Matplotlib Style Sheets</Label>
+			</Field>
+
+			<Field id="matplotlibAdvancedSettings" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>You can also modify the Matplotlib style sheet (located within the plugin package). Note that the plugin necessarily modifies some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by newer versions of the plugin).</Label>
+			</Field>
+
+            <Field id="saveSettingsSeparator" type="separator"/>
+
+            <Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Your charts will be regenerated to reflect the new settings when you click save.
+Please be patient.</Label>
+            </Field>
+
+		</ConfigUI>
+	</MenuItem>
+
+    <MenuItem id="refreshChartsNow">
+        <Name>Redraw Charts Now</Name>
+        <CallbackMethod>refreshTheCharts</CallbackMethod>
+    </MenuItem>
+
+    <MenuItem id="checkVersionNow">
+        <Name>Check for Plugin Updates...</Name>
+        <CallbackMethod>checkVersionNow</CallbackMethod>
+    </MenuItem>
+
+    <MenuItem id="aboutMatplotlib">
+        <Name>About Matplotlib...</Name>
+		<ConfigUI>
+
+            <!--Matplotlib citation per TOS.-->
+			<Field id="aboutLabel" type="label" fontColor="black" fontSize="regular">
+				<Label>Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.</Label>
+			</Field>
+
+			<Field id="authorLabel" type="label" fontColor="black" fontSize="regular">
+				<Label>Authored by: J.D. Hunter</Label>
+			</Field>
+
+		</ConfigUI>
+	</MenuItem>
+
+</MenuItems>

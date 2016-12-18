@@ -1,0 +1,1967 @@
+<?xml version="1.0"?>
+<Devices>
+
+<!-- CSV Engine -->
+    <Device type="custom" id="csvEngine">
+        <Name>CSV Engine</Name>
+
+		<ConfigUI>
+
+            <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
+                <Label>The CSV Engine Device is used to construct data files for charting.  The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <Field id="numLinesToKeep" type="textfield" defaultValue = "300" hidden="false">
+				<Label>Observations:</Label>
+			</Field>
+
+            <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
+				<Label>Enter the number of observations that you would like to retain in your CSV files.</Label>
+			</Field>
+
+<!-- Add column -->
+			<Field id="addItemLabel" type="label" alignText="right">
+                <Label>Add Data Item</Label>
+            </Field>
+
+			<Field id="sep2" type="separator"/>
+
+			<Field id="label5" type="label" fontColor="black" fontSize="small">
+				<Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Validate'.</Label>
+			</Field>
+
+			<Field id="addKey" type="textfield" hidden="true">
+				<Label>Key:</Label>
+			</Field>
+
+			<Field id="addValue" type="textfield">
+				<Label>Title:</Label>
+			</Field>
+
+			<Field id="addSource" type="textfield">
+				<Label>ID:</Label>
+			</Field>
+
+			<Field id="refreshStates" type="button">
+				<Title>Validate</Title>
+                <CallbackMethod>csvSourceIdUpdated</CallbackMethod>
+			</Field>
+
+			<Field id="addState" type="menu">
+				<Label>Data:</Label>
+   				<List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
+			</Field>
+
+			<Field id="addColumn" type="button">
+				<Label/>
+				<Title>Add Item</Title>
+				<CallbackMethod>addColumn</CallbackMethod>
+			</Field>
+
+<!-- Edit column -->
+			<Field id="numObsLabel" type="label" alignText="right">
+                <Label>Edit Data Item</Label>
+            </Field>
+
+			<Field id="sep1" type="separator"/>
+
+            <Field id="label0.5" type="label" fontColor="black" fontSize="small">
+				<Label>Use this section to update or delete existing items.</Label>
+			</Field>
+
+			<Field id="columnList" type="menu" defaultValue="None">
+				<Label>Item List</Label>
+				<List class="self" filter="" method="columnList" dynamicReload="true"/>
+				<CallbackMethod>selectColumn</CallbackMethod>
+			</Field>
+
+			<Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
+				<Label>is an item selected</Label>
+			</Field>
+
+			<Field id="label1" type="label" fontColor="darkgray" fontSize="small" alignWithControl="true">
+				<Label>This is a list of all existing items the plugin is tracking.  It will only display those items that have been created by the CSV device.  Select an item from this list to update its values or delete it from the plugin.</Label>
+			</Field>
+
+			<Field id="columnDict" type="textfield" defaultValue = "{'k0': ('None', 'None', 'None')}" hidden="true">
+				<Label>Dict to Hold Column List:</Label>
+			</Field>
+
+			<Field id="editKey" type="textfield" readonly="true" hidden="true" enabledBindingId="isColumnSelected">
+				<Label>Key:</Label>
+			</Field>
+
+			<Field id="previousKey" type="textfield" hidden="true">
+				<Label>Previous Key:</Label>
+			</Field>
+
+			<Field id="editValue" type="textfield" enabledBindingId="isColumnSelected">
+				<Label>Title:</Label>
+			</Field>
+
+			<Field id="editSource" type="textfield" enabledBindingId="isColumnSelected">
+				<Label>ID:</Label>
+			</Field>
+
+			<Field id="editState" type="textfield" enabledBindingId="isColumnSelected">
+				<Label>Data:</Label>
+			</Field>
+
+			<Field id="updateColumn" type="button" enabledBindingId="isColumnSelected">
+				<Label/>
+				<Title>Update Item</Title>
+				<CallbackMethod>updateColumn</CallbackMethod>
+			</Field>
+
+			<Field id="label2.5" type="label" fontColor="darkgray" alignWithControl="true" fontSize="small">
+				<Label>or</Label>
+			</Field>
+
+			<Field id="deleteColumn" type="button" enabledBindingId="isColumnSelected">
+				<Label/>
+				<Title>Delete Item</Title>
+				<CallbackMethod>deleteColumn</CallbackMethod>
+			</Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+			<Field id="label6" type="label" fontColor="red" fontSize="small" alignText="left">
+				<Label>Note that changes made in this dialog will not be fully committed until you click the "Save" button.</Label>
+			</Field>
+
+		</ConfigUI>
+
+        <States>
+
+            <State id="csvLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>CSV Data Last Updated</TriggerLabel>
+                <ControlPageLabel>CSV Data Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Bar Charting Device -->
+    <Device type="custom" id="barChartingDevice">
+        <Name>Bar Chart</Name>
+
+        <ConfigUI>
+
+            <Field id="barChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_bar.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <!-- Chart Title -->
+            <Field id="chartTitle" type="textfield" defaultValue="Title"
+                   tooltip="Enter the title of your chart.">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Show Legend -->
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Extra Wide? -->
+            <Field id="rectWide" type="checkbox" defaultValue="false"
+                   tooltip="Check to use extra-wide dimensions.">
+                <Label>Extra Wide?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Chart Sizes? -->
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Chart Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Height -->
+            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <!-- Custom Width -->
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <!-- Custom Font Sizes? -->
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Main Font Size -->
+            <Field id="customTitleFontSize"
+                   type="menu"
+                   defaultValue="10"
+                   tooltip="Select your preference for the title font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Title Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Tick Font Size -->
+            <Field id="customTickFontSize"
+                   type="menu"
+                   defaultValue="8"
+                   tooltip="Select your preference for the tick font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Tick Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Axis Controls -->
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <!-- Set X Axis Label Format  -->
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The format specifier for the data for the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Set X Axis Datetime Frequency  -->
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Show X Axis Label -->
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <!-- Show X Axis Grid -->
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="yAxisSeparator" visibleBindingId="xAxisLabel" visibleBindingValue="true" type="separator"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <!-- Show Y Axis Min -->
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The minimum Y axis value.">
+                <Label>Axis Min:</Label>
+            </Field>
+
+            <!-- Show Y Axis Max -->
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The maximum Y axis value.">
+                <Label>Axis Max:</Label>
+            </Field>
+
+            <!-- Y Axis Precision-->
+            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Select preference for the precision of your chart's Y axis.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0*</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                </List>
+            </Field>
+
+            <!-- Show Y Axis Label -->
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <!-- Show Y Axis Grid -->
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Bar Controls-->
+            <Field id="barLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Bar Controls:</Label>
+            </Field>
+
+<!-- Bar 1 -->
+            <Field id="bar1Top" type="separator"/>
+
+            <Field id="barLabel1" type="checkbox" defaultValue="false">
+                <Label>Bar 1</Label>
+            </Field>
+
+            <!-- Data Columns -->
+            <Field id="bar1Source" type="menu" defaultValue="None" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Select data source for bar 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="bar1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first bar.">
+                <Label>Bar Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Bar 1 -->
+            <Field id="bar1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar1Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first bar. The value must be a Hex color (#FFFFFF).">
+                <Label>Hex:</Label>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotBar1Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotBar1Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 2 -->
+            <Field id="bar2Top" type="separator" visibleBindingId="barLabel1" visibleBindingValue="true"/>
+
+            <Field id="barLabel2" type="checkbox" defaultValue="false">
+                <Label>Bar 2</Label>
+            </Field>
+
+            <Field id="bar2Source" type="menu" defaultValue="None" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Select data source for bar 2.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="bar2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second bar.">
+                <Label>Bar Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Bar 2 -->
+            <Field id="bar2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar2Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second bar. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotBar2Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotBar2Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 3 -->
+            <Field id="bar3Top" type="separator" visibleBindingId="barLabel2" visibleBindingValue="true"/>
+
+            <Field id="barLabel3" type="checkbox" defaultValue="false">
+                <Label>Bar 3</Label>
+            </Field>
+
+            <Field id="bar3Source" type="menu" defaultValue="None" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Select data source for bar 3.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="bar3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third bar.">
+                <Label>Bar Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Bar 3 -->
+            <Field id="bar3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar3Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third bar. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotBar3Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotBar3Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 4 -->
+            <Field id="bar4Top" type="separator" visibleBindingId="barLabel3" visibleBindingValue="true"/>
+
+            <Field id="barLabel4" type="checkbox" defaultValue="false">
+                <Label>Bar 4</Label>
+            </Field>
+
+            <Field id="bar4Source" type="menu" defaultValue="None" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Select data source for bar 4.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="bar4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth bar.">
+                <Label>Bar Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Bar 4 -->
+            <Field id="bar4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar4Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's fourth bar. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Fill Below -->
+            <Field id="bar4Fill" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Check to fill below this bar.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotBar4Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotBar4Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="barSeparator" type="separator" visibleBindingId="barLabel4" visibleBindingValue="true"/>
+
+            <!-- Number of Obs -->
+            <Field id="numObs" type="textfield" defaultValue="20"
+                   tooltip="Enter the number of observations for the chart (integer).">
+                <Label>Number of Bars:</Label>
+            </Field>
+
+            <!-- Bar Width -->
+            <Field id="barWidth" type="textfield" defaultValue="0.1"
+                   tooltip="To control the width of the bars, enter a float greater than zero.">
+                <Label>Bar Width:</Label>
+            </Field>
+
+            <Field id="additionalBarSpace" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalBarSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+                <Label>Custom Bar Segments</Label>
+            </Field>
+
+            <Field id="additionalBarSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <!-- Custom Line Segments -->
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid
+number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF").'>
+                <Label>Constants:</Label>
+            </Field>
+
+            <!-- Style-->
+            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Calendar Device -->
+    <Device type="custom" id="calendarChartingDevice">
+        <Name>Calendar</Name>
+
+        <ConfigUI>
+
+            <Field id="CalendarDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Calendar devices are used to create graphic representations of the current month.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_calendar.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <!-- Custom Height -->
+            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to
+the default size, enter None.">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <!-- Custom Width -->
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to
+the default size, enter None.">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <!-- First Day of Week -->
+            <Field id="firstDayOfWeek" type="menu" defaultValue="6"
+                   tooltip="Select the first day of the week.">
+                <Label>Week Starts on:</Label>
+                <List>
+                    <Option value="6">Sunday*</Option>
+                    <Option value="0">Monday</Option>
+                </List>
+            </Field>
+
+            <!-- Font Size -->
+            <Field id="fontSize" type="menu" defaultValue="12"
+                   tooltip="Select the size of the font to use for the calendar plot.">
+                <Label>Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Line Charting Device -->
+    <Device type="custom" id="lineChartingDevice">
+        <Name>Line Chart</Name>
+
+        <ConfigUI>
+
+            <Field id="lineChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_line.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <!-- Chart Title -->
+            <Field id="chartTitle" type="textfield" defaultValue="Title"
+                   tooltip="Enter the title of your chart.">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Show Legend -->
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Extra Wide? -->
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use extra-wide dimensions.">
+                <Label>Extra Wide?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Chart Sizes? -->
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Chart Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Height -->
+            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <!-- Custom Width -->
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <!-- Custom Font Sizes? -->
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Main Font Size -->
+            <Field id="customTitleFontSize"
+                   type="menu"
+                   defaultValue="10"
+                   tooltip="Select your preference for the title font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Title Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Tick Font Size -->
+            <Field id="customTickFontSize"
+                   type="menu"
+                   defaultValue="8"
+                   tooltip="Select your preference for the tick font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Tick Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Axis Controls -->
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <!-- Set X Axis Label Format  -->
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Set X Axis Datetime Frequency  -->
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Show X Axis Label -->
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Axis Title:</Label>
+            </Field>
+
+            <!-- Show X Axis Grid -->
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <!-- Show Y Axis Min -->
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The minimum Y axis value.">
+                <Label>Axis Min:</Label>
+            </Field>
+
+            <!-- Show Y Axis Max -->
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The maximum Y axis value.">
+                <Label>Axis Max:</Label>
+            </Field>
+
+            <!-- Y Axis Precision-->
+            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Select preference for the precision of your chart's Y axis.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0*</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                </List>
+            </Field>
+
+            <!-- Show Y Axis Label -->
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Axis Title:</Label>
+            </Field>
+
+            <!-- Show Y Axis Grid -->
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Line Controls-->
+            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Line Controls</Label>
+            </Field>
+
+            <Field id="linesSeparator" type="separator"/>
+
+<!-- Line 1 -->
+
+            <Field id="lineLabel1" type="checkbox" defaultValue="false">
+                <Label>Line 1</Label>
+            </Field>
+
+            <!-- Data Columns -->
+            <Field id="line1Source" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select data source for line 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 1 -->
+            <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 1 Marker -->
+            <Field id="line1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first line markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Fill Below -->
+            <Field id="line1Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotLine1Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotLine1Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
+
+<!-- Line 2 -->
+            <Field id="lineLabel2" type="checkbox" defaultValue="false">
+                <Label>Line 2</Label>
+            </Field>
+
+            <!-- Data Columns -->
+            <Field id="line2Source" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select data source for line 2.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 2 -->
+            <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 2 Marker -->
+            <Field id="line2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second line markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Fill Below -->
+            <Field id="line2Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotLine2Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotLine2Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
+
+<!-- Line 3 -->
+            <Field id="lineLabel3" type="checkbox" defaultValue="false">
+                <Label>Line 3</Label>
+            </Field>
+
+            <!-- Data Columns -->
+            <Field id="line3Source" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select data source for line 3.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's third line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 3 -->
+            <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's third line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line3MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 3 Marker -->
+            <Field id="line3MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third line markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Fill Below -->
+            <Field id="line3Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotLine3Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotLine3Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line3Bottom" type="separator" visibleBindingId="lineLabel3" visibleBindingValue="true"/>
+
+<!-- Line 4 -->
+            <Field id="lineLabel4" type="checkbox" defaultValue="false">
+                <Label>Line 4</Label>
+            </Field>
+
+            <!-- Data Columns -->
+            <Field id="line4Source" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select data source for line 4.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 4 -->
+            <Field id="line4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line4Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's fourth line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's fourth line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line4MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 4 Marker -->
+            <Field id="line4MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line4MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's fourth line markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Fill Below -->
+            <Field id="line4Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Minimum Value -->
+            <Field id="plotLine4Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Plot Maximum Value -->
+            <Field id="plotLine4Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+                    <Label>Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <!-- Custom Line Segments -->
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid
+number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                <Label>Constants:</Label>l
+            </Field>
+
+            <!-- Style-->
+            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Multiline Text Device -->
+    <Device type="custom" id="multiLineText">
+        <Name>Multiline Text</Name>
+
+        <ConfigUI>
+
+            <Field id="multilineTextDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_multiline.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="sourceSpace1" type="label"/>
+
+            <Field id="sourceLabel" type="label" alignText="right">
+                <Label>Source Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <!-- Device/Variable Generator -->
+            <Field id="sourceDeviceText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
+                <Label>Select the device or variable that contains the text to chart and click on the 'Refresh' button.</Label>
+            </Field>
+
+            <Field id="thing" type="menu" defaultValue="None">
+                <Label>Source:</Label>
+                <List class="self" filter="" method="listGenerator" dynamicReload="true"/>
+            </Field>
+
+            <Field id="thingButton" type="button" defaultValue="None">
+                <Label/>
+                <Title>Refresh</Title>
+                <CallbackMethod>deviceStateGenerator</CallbackMethod>
+            </Field>
+
+            <Field id="sourceStateText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
+                <Label>Select the device state or variable value that contains the text to chart and click on the 'Refresh' button.</Label>
+            </Field>
+
+            <Field id="thingState" type="menu" defaultValue="None">
+                <Label>Data to chart:</Label>
+                <List class="self" filter="" method="deviceStateGenerator" dynamicReload="true"/>
+            </Field>
+
+            <Field id="sourceSpace2" type="label"/>
+
+            <Field id="sourceLabel2" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator2" type="separator"/>
+
+            <!-- Default Text -->
+            <Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
+                <Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>
+            </Field>
+
+            <!-- Chart Title -->
+            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes"
+                   tooltip="Enter the title of your chart.">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Placeholder Text -->
+            <Field id="defaultText" type="textfield" defaultValue="This is where the placeholder text goes."
+                   tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty.">
+                <Label>Placeholder:</Label>
+            </Field>
+
+            <!-- Figure Width -->
+            <Field id="figureWidth" type="textfield" defaultValue="700"
+                   tooltip="Enter the desired width of your figure (inches).">
+                <Label>Figure Width:</Label>
+            </Field>
+
+            <!-- Figure Height -->
+            <Field id="figureHeight" type="textfield" defaultValue="300"
+                   tooltip="Enter the desired height of your figure (inches).">
+                <Label>Figure Height:</Label>
+            </Field>
+
+            <!-- Number of Characters -->
+            <Field id="numberOfCharacters" type="textfield" defaultValue="100"
+                   tooltip="Enter the number of characters desired for each line of text.">
+                <Label>Characters:</Label>
+            </Field>
+
+            <!-- Font Size -->
+            <Field id="multilineFontSize" type="textfield" defaultValue="10"
+                   tooltip="Enter the font size to use for multiline text plots. This only affects this device instance.">
+                <Label>Font Size:</Label>
+            </Field>
+
+            <!-- Text Color-->
+            <Field id="textColor" type="menu" defaultValue="#FFFFFF"
+                   tooltip="Select preference for the text color of your plot.">
+                <Label>Font Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Multiline Text Color -->
+            <Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's multiline text. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label>Hex:</Label>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Polar Charting Device -->
+    <Device type="custom" id="polarChartingDevice">
+        <Name>Polar Chart</Name>
+
+        <ConfigUI>
+
+            <Field id="polarChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_polar.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="sourceSpace1" type="label"/>
+
+            <Field id="sourceLabel1" type="label" alignText="right">
+                <Label>Source Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <!-- Theta Value -->
+            <Field id="thetaValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+                <Label>Direction observations are in degrees (0-360). Fractional degrees (123.4) are okay.</Label>
+            </Field>
+
+            <Field id="thetaValue" type="menu" defaultValue="None"
+                   tooltip="Select data source for the direction value (theta).">
+                <Label>Direction Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <!-- Radii Value -->
+            <Field id="rasiiValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+                <Label>Magnitude observations are any real number greater than zero. Fractional numbers are okay.</Label>
+            </Field>
+
+            <Field id="radiiValue" type="menu" defaultValue="None"
+                   tooltip="Select data source for the magnitude value (radii).">
+                <Label>Magnitude Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+
+            <Field id="sourceSpace2" type="label"/>
+
+            <Field id="sourceLabel2" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator2" type="separator"/>
+
+            <!-- Number of Obs -->
+            <Field id="numObs" type="textfield" defaultValue="8"
+                   tooltip="Enter the number of observations for the chart (integer).">
+                <Label>Number of Obs:</Label>
+            </Field>
+
+            <!-- Chart Title -->
+            <Field id="chartTitle" type="textfield" defaultValue="Title"
+                   tooltip="Enter the title of your chart.">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Current Color-->
+            <Field id="currentWindColor" type="menu" defaultValue="#FF3333"
+                   tooltip="Select preference for the color of your chart's current wind observation.">
+                <Label>Current Obs Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Current Wind Color -->
+            <Field id="currentWindColorOther" type="textfield" defaultValue="#FF3333" visibleBindingId="currentWindColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's current obs indicator. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Max Color-->
+            <Field id="maxWindColor" type="menu" defaultValue="#3333FF"
+                   tooltip="Select preference for the color of your chart's maximum wind observation.">
+                <Label>Max Obs Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Maximum Wind Color -->
+            <Field id="maxWindColorOther" type="textfield" defaultValue="#3333FF" visibleBindingId="maxWindColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's maximum obs indicator. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Show Legend? -->
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend.">
+                <Label>Show Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Chart Sizes? -->
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Chart Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Size -->
+            <Field id="customSizePolar" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for both height and width. To set it back to
+the default size, enter None."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Size:</Label>
+            </Field>
+
+            <!-- Custom Font Sizes? -->
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Main Font Size -->
+            <Field id="customTitleFontSize"
+                   type="menu"
+                   defaultValue="10"
+                   tooltip="Select your preference for the title font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Title Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Tick Font Size -->
+            <Field id="customTickFontSize"
+                   type="menu"
+                   defaultValue="8"
+                   tooltip="Select your preference for the tick font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Tick Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- Forecast Charting Device -->
+    <Device type="custom" id="forecastChartingDevice">
+        <Name>Weather Forecast Chart</Name>
+
+        <ConfigUI>
+
+            <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Weather Forecast Charts only work with WUnderground Plugin Forecast Devices. Any available WUnderground devices are automatically added to the Source Device list.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- File Name -->
+            <Field id="fileName" type="textfield" defaultValue="chart_forecast.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <!-- Source Device -->
+            <Field id="forecastSourceDevice" type="menu" defaultValue="None"
+                   tooltip="Select source device for the weather forecast chart.">
+                <Label>Source Device:</Label>
+                <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
+            </Field>
+
+            <!-- Chart Title -->
+            <Field id="chartTitle" type="textfield" defaultValue="Title"
+                   tooltip="Enter the title of your chart.">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Show Legend -->
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Extra Wide? -->
+            <Field id="rectWide" type="checkbox" defaultValue="false"
+                   tooltip="Check to use extra-wide dimensions.">
+                <Label>Extra Wide?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Chart Sizes? -->
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Chart Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Custom Height -->
+            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <!-- Custom Width -->
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to
+the default size, enter None. Entering a value here will also override the Extra Wide setting."
+                   visibleBindingId="customSizeChart"
+                   visibleBindingValue="true">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <!-- Custom Font Sizes? -->
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Main Font Size -->
+            <Field id="customTitleFontSize"
+                   type="menu"
+                   defaultValue="10"
+                   tooltip="Select your preference for the title font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Title Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Tick Font Size -->
+            <Field id="customTickFontSize"
+                   type="menu"
+                   defaultValue="8"
+                   tooltip="Select your preference for the tick font size of your chart (this chart only)."
+                   visibleBindingId="customSizeFont"
+                   visibleBindingValue="true">
+                <Label>Tick Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+
+            <!-- Axis Controls -->
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <!-- Set X Axis Label Format  -->
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The format specifier for the data for the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Set X Axis Datetime Frequency  -->
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Show X Axis Label -->
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label</Label>
+            </Field>
+
+            <!-- Show X Axis Grid -->
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <!-- Show Y Axis Min -->
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The minimum Y axis value.">
+                <Label>Axis Min:</Label>
+            </Field>
+
+            <!-- Show Y Axis Max -->
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="The maximum Y axis value.">
+                <Label>Axis Max:</Label>
+            </Field>
+
+            <!-- Y Axis Precision-->
+            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Select preference for the precision of your chart's Y axis.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0*</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                </List>
+            </Field>
+
+            <!-- Show Y Axis Label -->
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Show Y Axis Grid -->
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="y2AxisSeparator" type="separator" visibleBindingId="yAxisLabel" visibleBindingValue="true"/>
+
+            <Field id="y2AxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y2 Axis</Label>
+            </Field>
+
+            <!-- Show Y2 Axis Min -->
+            <Field id="y2AxisMin" type="textfield" defaultValue="None" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="The minimum Y2 axis value.">
+                <Label>Y2 Axis Min:</Label>
+            </Field>
+
+            <!-- Show Y2 Axis Max -->
+            <Field id="y2AxisMax" type="textfield" defaultValue="None" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="The maximum Y2 axis value.">
+                <Label>Y2 Axis Max:</Label>
+            </Field>
+
+            <!-- Y2 Axis Precision-->
+            <Field id="y2AxisPrecision" type="menu" defaultValue="0" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="Select preference for the precision of your chart's Y2 axis.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0*</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                </List>
+            </Field>
+
+            <!-- Show Y2 Axis Label -->
+            <Field id="customAxisLabelY2" type="textfield" defaultValue="Y2 Axis" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y2 Axis label. Leave blank to display no label.">
+                <Label>Label</Label>
+            </Field>
+
+            <!-- Show Y2 Axis Grid -->
+            <Field id="showy2AxisGrid" type="checkbox" defaultValue="false" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="Check to display Y2 axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <!-- Line Controls-->
+            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Line Controls</Label>
+            </Field>
+
+            <Field id="linesSeparator" type="separator"/>
+
+<!-- High Temperature -->
+            <Field id="lineLabel1" type="checkbox" defaultValue="false">
+                <Label>High Temperature</Label>
+            </Field>
+
+            <Field id="highTemperatureText" type="label" fontColor="black" visibleBindingId="lineLabel1" visibleBindingValue="true" alignWithControl="true" fontSize="small">
+                <Label>High Temperature settings are used when generating both 10-day and 24-hour charts.</Label>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line1Color" type="menu" defaultValue="#FF3333" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 1 -->
+            <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 1 Marker -->
+            <Field id="line1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first line marker. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
+
+<!-- Low Temperature -->
+            <Field id="lineLabel2" type="checkbox" defaultValue="false">
+                <Label>Low Temperature</Label>
+            </Field>
+
+            <Field id="lowTemperatureText" type="label" fontColor="black" visibleBindingId="lineLabel2" visibleBindingValue="true" alignWithControl="true"
+                   fontSize="small">
+                <Label>Low Temperature settings are only used when generating 10-day charts (24-hour forecasts do not include a low temperature forecast).</Label>
+            </Field>
+
+            <!-- Style-->
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line2Color" type="menu" defaultValue="#0000FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second line.">
+                <Label>Line Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 2 -->
+            <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Marker-->
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Marker Color-->
+            <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 2 Marker -->
+            <Field id="line2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second line marker. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
+
+<!-- Precipitation -->
+            <Field id="lineLabel3" type="checkbox" defaultValue="false">
+                <Label>Precipitation</Label>
+            </Field>
+
+            <!-- Color-->
+            <Field id="line3Color" type="menu" defaultValue="#99CCFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second line.">
+                <Label>Bar Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+
+            <!-- Custom Color Line 3 -->
+            <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+
+            <!-- Annotate -->
+            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+                    <Label>Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <!-- Custom Line Segments -->
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid
+number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                <Label>Constants:</Label>l
+            </Field>
+
+            <!-- Style-->
+            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+</Devices>
