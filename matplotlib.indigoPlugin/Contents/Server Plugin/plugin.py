@@ -63,7 +63,7 @@ __build__     = ""
 __copyright__ = "Copyright 2016 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.2.05"
+__version__   = "0.3.01"
 
 
 class Plugin(indigo.PluginBase):
