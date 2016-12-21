@@ -1,3 +1,6 @@
+v0.3.01
+- Move project to GitHub and increments version number.
+
 v0.2.05
 - Fixes bug where certain combinations of temperatures would cause below zero
   temperatures to be plotted outside the boundaries of the plot.

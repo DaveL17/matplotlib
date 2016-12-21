@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <Actions>
   <SupportURL>http://www.google.com</SupportURL>
-  <!--<Action id="refreshTheChartsAction" deviceFilter="self">  Use this one to get the user to specify a device.-->
   <Action id="refreshTheChartsAction">
     <Name>Redraw Charts</Name>
     <CallbackMethod>refreshTheChartsAction</CallbackMethod>
