@@ -70,7 +70,8 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        self.updater = indigoPluginUpdateChecker.updateChecker(self, "https://dl.dropboxusercontent.com/u/2796881/matplotlib_version.html")
+        updater_url = "https://davel17.github.io/matplotlib/matplotlib_version.html"
+        self.updater = indigoPluginUpdateChecker.updateChecker(self, updater_url)
         # pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True, suspend=False)  # To enable remote PyCharm Debugging, uncomment this line.
 
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
