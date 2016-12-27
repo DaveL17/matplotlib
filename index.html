@@ -1,52 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
     <link rel="stylesheet" type="text/css" href="fogbert.css">
     <meta charset="UTF-8">
     <title>Matplotlib Plugin for Indigo Home Control Server</title>
-    </head>
-    <body>
-    <p>
-        <div style="text-align: center"><img src="img_MatplotlibLogo.png"></div>
-        <h1>About</h1>
-        <p>The Matplotlib plugin allows users to easily create attractive charts for display on Indigo Home Control Server control pages.  The plugin also includes a facility to create
-            necessary CSV data for display. <br><br><a href="https://github.com/DaveL17/matplotlib/releases"><img src="img_download.png"></a>
-                                                    <a href="http://forums.indigodomo.com/viewforum.php?f=219"><img src="img_forum.png"></a>
-                                                    <a href="https://github.com/DaveL17/matplotlib/wiki"><img src="img_wiki.png"></a></p>
+</head>
+<p>
 
-        <h3>Installation</h3>
-            <img class="TextWrap" src="img_pluginConfigDialog.png">
-            <p>Installation is easy. Download and extract the Indigo Plugin file onto your Indigo server machine. Double-click the plugin file and follow the prompts.
-        <h3>Devices</h3>
-            <p>Presently, the plugin contains functionality for several charting system devices including:
-                <ul>
-                <li>CSV Engine
-                <li>Bar Charts
-                <li>Calendar graphics
-                <li>Line Charts
-                <li>Multiline Text Graphics
-                <li>Polar Charts
-                <li>Weather Forecast Charts
-                </ul>
-        <h3>Actions</h3>
-            <p>Under construction.
-                <ul>
-                <li>Under construction.
-                </ul>
-        <h3>Menu Items</h3>
-            <p>Under construction.
-                <ul>
-                <li>Under construction.
-                </ul>
-        <h3>Sample Charts</h3>
-            <img class="TextWrap" src="img_chart_10_day_forecast.png" border="1">
-            <img class="TextWrap" src="img_chart_wind_rose.png" border="1">
-            <p>Here are a few examples of charts that were created with the plugin (the border around the outside of the image was added to show the boundary of the image for
-                this page).
-        <h3>Scripting and Technical Details</h3>
-            <p>Under construction.
-                <ul>
-                <li><em>com.fogbert.indigoplugin.matplotlib</em>
-                </ul>
-    </body>
+<div style="text-align: center"><img src="img_MatplotlibLogo.png"></div>
+
+<nav>
+    <a href="https://github.com/DaveL17/matplotlib/releases"><img src="img_download.png"></a>
+    <a href="http://forums.indigodomo.com/viewforum.php?f=219"><img src="img_forum.png"></a>
+    <a href="https://github.com/DaveL17/matplotlib/wiki"><img src="img_wiki.png"></a>
+</nav>
+
+<h1>About</h1>
+<p>The Matplotlib plugin allows users to easily create attractive charts for display on Indigo Home Control Server control pages. The plugin also includes a facility to create
+    necessary CSV data for display.</p>
+<p>Highlights:
+<ul>
+    <li>Easily create visually appealing charts for Indigo control pages.</li>
+    <li>Seamlessly manage attributes like color, fonts, sizes (and more!) for all charts at once.</li>
+    <li>Customize individual charts with markers, annotations, minimums and maximums, and user-defined constants.</li>
+    <li>Chart types Include: Line Charts, Bar Charts, Polar Charts, Multiline Text Charts, and WUnderground Plugin Charts.</li>
+    <li>Chart data that is created with the plugin, or incorporate your own (CSV).</li>
+    <li>Charts update automatically.</li>
+</ul>
+<p>The Matplotlib plugin is designed to make creating visually appealing charts for Indigo control pages. Many of the chart attributes, such as background color, font styles and
+    chart size can be managed centrally--for example, you can change the background color of all your charts simultaneously. You can add additional customizations to each
+    individual chart if you like, such as overriding the default chart size or displaying a chart legend only on selected charts. The overriding emphasis in designing the
+    plugin is simplicity. The instructions below seem like a lot, but almost all of the settings can be left as default when you begin. <strong>It's best to read through all
+        these instructions before getting started.</strong></p>
+
+<h3>Installation</h3>
+<img class="TextWrap" src="img_pluginConfigDialog.png">
+<p>Installation is easy. Download and extract the Indigo Plugin file onto your Indigo server machine. Double-click the plugin file and follow the prompts.</p>
+<p>The plugin configuration dialog is the first place that you will land after you install the plugin for the first time. Chances are that you will be able to leave most of
+    these settings alone when you begin. The configuration menu looks like this:
+<ul>
+    <li><span>&nbsp;Save Data Files To&nbsp;</span> - This is where the plugin will look for data to chart. The plugin can plot your CSV data or if you choose, the plugin can create CSV
+        data files for you (more on the data in a bit). The specified folder must be visible to the server at all times.
+    </li>
+    <br>
+    <li><span>&nbsp;Save Images To&nbsp;</span> - This is the folder where the plugin will saye the image files that it creates. If the default folder is used, the images will be
+        automatically available in the control page editor.
+    </li>
+    <br>
+    <li><span>&nbsp;Refresh Interval&nbsp;</span> - How often the plugin will generate a new version of your charts.</li>
+    <br>
+    <li><span>&nbsp;Resolution&nbsp;</span> - The resolution of the image files (in DPI). The default is 100 and will probably work just fine for most users.</li>
+    <br>
+    <li><span>&nbsp;Size for Rectangular Charts, Extra Wide Rectangular Charts, and Square Charts&nbsp;</span> - The default sizes for each chart. These values are in pixels. Square
+        charts only need one value which is used for length and width.
+    </li>
+    <br>
+    <li><span>&nbsp;Chart Properties&nbsp;</span> - These control the look and feel of all of your charts. A note about colors. You can use the standard palette of colors or--if you
+        enable the feature in advanced settings--you can select "Custom". if you select "Custom", a new field will appear for you to enter your custom color. These values are HTML color
+        values (see the image above for an example) or standard color names (like Blue or Green). There is also an additional color option for the chart background and the cart canvas
+        which allows these values to be transparent.
+    </li>
+    <br>
+    <li><span>&nbsp;Debugging&nbsp;</span> - The plugin takes advantage of Indigo 7's enhanced debug logging facility. The default for logging is "Warning" which will alert you only to
+        issues that you may want to address. Select "Informational Messages" to see select notifications of plugin activity. The logging levels are inclusive of "higher" levels. In other
+        words, if you set the level to Informational Messages, you'll also receive all Warnings, Errors and Critical messages.
+    </li>
+    </li></ul>
+</p>
+
+<h3>Devices</h3>
+<p>Presently, the plugin contains functionality for several charting system devices including:
+<ul>
+    <li>CSV Engine</li>
+    <li>Bar Charts</li>
+    <li>Calendar graphics</li>
+    <li>Line Charts</li>
+    <li>Multiline Text Graphics</li>
+    <li>Polar Charts</li>
+    <li>Weather Forecast Charts</li>
+</ul>
+
+<p>CSV Data - Once you save your settings, the next thing that you might want to do is generate some CSV data. This is done using the plugin's built-in CSV Data Engine. To
+    establish your CSV Engine, create a new Indigo Device, select Matplotlib as the device type and CSV Engine as the device model.
+    <br><img class="TextWrap" src="img_csvEngine.png"></p>
+<p>For each element, you must add three things: a title, a device number (or variable number) and a device state (or variable value). Once entered, then select "Add Item".
+    Note that things you add here are not fully committed until you hit the save button. Use the second configuration area to modify or delete existing data elements. Again,
+    changes will not be fully committed until you select save. Only data generated by the plugin can be managed with the CSV engine--if you add CSV data external to the
+    plugin, you're on your own. If you choose to use the feature, you only need to create one CSV engine device. If you add additional CSV data elements, add them using the
+    same CSV Engine device. After you add a new element, it will take some time for the CSV data to be generated. The first observation will be added the next time the
+    plugin cycles (which is set in the plugin configuration dialog above). Each time the plugin cycles, it will generate new CSV data and then will create new charts (to
+    ensure the most recent observations are included).</p>
+<p>Enter the Title and Indigo ID and then press the 'Validate' button. A list of all available states/values will be in the dropdown list. Note that these are not evaluated
+    to ensure that they're chartable. That's up to you. If you are successful, the plugin will generate CSV files like this:
+    <br><img src="img_csvData.png"></p>
+<p>Your First Plot - Once you have some data to chart, it's time to create your first plot. Plots are built using Matplotlib Plugin Devices. Create a new device and enter
+    the configuration dialog. Most of these settings should be self explanatory, but one or two deserve additional explanation.
+    <br><img class="TextWrap" src="img_chartLine.png"></p>
+<p>Output Filename: Here, we just enter the full name of the chart--something like: chart_illumination.png. You shouldn't include a path, that is set in the main plugin
+    configuration dialog.</p>
+<p>Some fields require a valid value or the word 'None'--if you set the value to None, the setting will be ignored. For example, a custom width value must either be a valid
+    value in pixels or None. A blank will cause an error. If there's a problem, the plugin will try to fix the error for you. Other things can be blank -- like a title --
+    because entering 'None' will generate a title 'None'!</p>
+<p>Custom Line Segments: this information (if enabled) requires a pair of values: a value to chart and a color presented as tuples: (123.4, 'blue'), (234.5, 'green').</p>
+
+<h3>Actions</h3>
+<p>There is one plugin action.
+<ul>
+    <li>Redraw Charts</li>
+</ul>
+
+<h3>Menu Items</h3>
+<p>There are several plugin menu items.
+<ul>
+    <li><span>&nbsp;Advanced Settings&nbsp;</span> - Select this option to set several items which affect the functionality of the plugin. These options are generally straightforward.
+    </li>
+    <br>
+    <ul>
+        <li><span>&nbsp;Enable Custom Colors&nbsp;</span> - the plugin is limited to standard color options until this setting is enabled.</li>
+        <br>
+        <li><span>&nbsp;Enable Custom Line Segments&nbsp;</span> - custom line segments are not available until this setting is enabled.</li>
+        <br>
+        <li><span>&nbsp;Promote Custom Line Segments&nbsp;</span> - if selected, the chart's Y axis will be expanded to ensure that the custom value is always visible.</li>
+        <br>
+        <li><span>&nbsp;Enable Snappy Menus&nbsp;</span> - if selected, this will cause all expandable menu sections to be minimized when first opened, even if they were left expanded
+            when the dialog was last closed.
+        </li>
+        <br>
+    </ul>
+    <li><span>&nbsp;Redraw Charts Now&nbsp;</span> - selecting this option will cause all charts to be redrawn; however, it will not cause a new set of data to be saved to any CSV Engine
+        data elements.
+    </li>
+    <br>
+    <li><span>&nbsp;Check for Plugin Updates&nbsp;</span> - will reach out to determine whether you are running the most recent version of the plugin.</li>
+    <br>
+    <li><span>&nbsp;About Matplotlib&nbsp;</span> - provides some information about the matplotlib program itself (not the plugin, but the underlying code that makes does the actual hard
+        work).
+    </li>
+</ul>
+
+<h3>Scripting and Technical Details</h3>
+<p>Under construction.
+<ul>
+    <li>com.fogbert.indigoplugin.matplotlib</li>
+</ul>
+
+<h3>Sample Charts</h3>
+<p>Here are a few examples of charts that were created with the plugin (the border around the outside of the image was added to show the boundary of the image for
+    this page).<br><br>
+    <img src="img_chart_10_day_forecast.png" border="1">
+    <img src="img_chart_wind_rose.png" border="1"></p>
+
+<h3>Requesting Features and Reporting Bugs</h3>
+<p>The best way to request features and to report undocumented features (bugs) is via the Indigo Forums. An alternative is to send me a Private Message via the Indigo
+    Forums—which is, in fact, the preferred way if your debug output contains sensitive information like your username, password and user email address. When reporting bugs,
+    it’s best to include the following information:
+<ol>
+    <li>What version of the plugin you’re using,</li>
+    <li>What version of Indigo you’re using,</li>
+    <li>Relevant error message text (be sure to provide the full text of the error you’re seeing, and</li>
+    <li>A version of the debug log showing what was happening when the error occurred.</li>
+</ol>
+<p>I will do my best to help you use the plugin, but I can only commit to providing support for the plugin itself; I can't commit to providing support for difficulties
+    accessing third-party resources, the accuracy of your data or other concerns external to the plugin. I would suggest that you post questions to the forum as other users
+    may be able to help and so all can benefit from answers provided.</p>
+<footer>
+    <hr>
+    <p>The Matplotlib Plugin is a third-party plugin for Indigo. Indigo Domotics—other than providing invaluable technical support and an absolutely fantastic product—have
+        nothing to do with the format, function, or results that this plugin provides. There are no warranties, either expressed or implied, that come with using this software. While I
+        have done my best to make a quality product, and will endeavor to fix any and all problems when they’re identified, I can’t guarantee that this plugin will be
+        trouble-free. Therefore, please do use the plugin, but use at your own risk.</p>
+</footer>
+
+</body>
 </html>
