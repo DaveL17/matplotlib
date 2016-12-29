@@ -93,15 +93,24 @@
 <p>Enter the Title and Indigo ID and then press the 'Validate' button. A list of all available states/values will be in the dropdown list. Note that these are not evaluated
     to ensure that they're chartable. That's up to you. If you are successful, the plugin will generate CSV files like this:
     <br><img src="img/img_csvData.png"></p>
-<p>Your First Plot - Once you have some data to chart, it's time to create your first plot. Plots are built using Matplotlib Plugin Devices. Create a new device and enter
-    the configuration dialog. Most of these settings should be self explanatory, but one or two deserve additional explanation.
+<p>Your First Plot - Once you have some data to chart, it's time to create your first plot. Plots are built using Matplotlib Plugin Charting Devices, and each plot is managed by its own
+    device instance. Create a new device and enter the configuration dialog. Most of these settings should be self explanatory, but one or two deserve additional explanation.
     <br><img class="TextWrap" src="img/img_chartLine.png"></p>
-<p>Output Filename: Here, we just enter the full name of the chart--something like: chart_illumination.png. You shouldn't include a path, that is set in the main plugin
-    configuration dialog.</p>
+<ul>
+    <li><span>&nbsp;Output Filename&nbsp;</span> - Here, we just enter the full name of the chart--something like: chart_illumination.png. You shouldn't include a path, that is set in
+        the main
+        plugin
+        configuration dialog.
+    </li>
+</ul>
 <p>Some fields require a valid value or the word 'None'--if you set the value to None, the setting will be ignored. For example, a custom width value must either be a valid
     value in pixels or None. A blank will cause an error. If there's a problem, the plugin will try to fix the error for you. Other things can be blank -- like a title --
     because entering 'None' will generate a title 'None'!</p>
-<p>Custom Line Segments: this information (if enabled) requires a pair of values: a value to chart and a color presented as tuples: (123.4, 'blue'), (234.5, 'green').</p>
+<ul>
+    <li><span>&nbsp;Custom Line Segments&nbsp;</span> - this information (if enabled) requires a pair of values: a value to chart and a color presented as tuples (separated by commas
+        when there are more than one): <code>(123.4, 'blue'), (234.5, 'green')</code>
+    </li>
+</ul>
 
 <h3>Actions</h3>
 <p>There is one plugin action.
@@ -141,7 +150,7 @@
 <h3>Scripting and Technical Details</h3>
 <p>Under construction.
 <ul>
-    <li>com.fogbert.indigoplugin.matplotlib</li>
+    <li><code>com.fogbert.indigoplugin.matplotlib</code></li>
 </ul>
 
 <h3>Sample Charts</h3>
