@@ -63,7 +63,7 @@ __build__     = ""
 __copyright__ = "Copyright 2016 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.3.01"
+__version__   = "0.3.02"
 
 
 class Plugin(indigo.PluginBase):
@@ -480,7 +480,7 @@ class Plugin(indigo.PluginBase):
             # valuesDict['columnDict'] = valuesDict.get('columnDict', '{"k0": ("None", "None", "None")}')  # Just in case the user has deleted all CSV Engine elements
             valuesDict['columnDict'] = valuesDict.get('columnDict', '{}')  # Returning an empty dict seems to work and may solve the 'None' issue
             column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
-            prop_list   = [(key, "{0}".format(value[0])) for key, value in column_dict.items()]
+            prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.warning(u"Error generating column list. {0}".format(sub_error))
@@ -610,16 +610,16 @@ class Plugin(indigo.PluginBase):
                 for k, v in sorted(csv_dict.items()):
 
                     # Create a path variable that is based on the target folder and the CSV column name.
-                    full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0])
+                    full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
 
                     # If the appropriate CSV file doesn't exist, create it and write the header line.
                     if not os.path.isfile(full_path):
                         csv_file = open(full_path, 'w')
-                        csv_file.write('{0},{1}\n'.format('Timestamp', v[0]))
+                        csv_file.write('{0},{1}\n'.format('Timestamp', v[0].encode("utf-8")))
                         csv_file.close()
 
                     # Determine the length of the CSV file and truncate if needed.
-                    backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0])
+                    backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
                     target_lines = int(dev.pluginProps['numLinesToKeep']) - 1
 
                     # Make a backup of the CSV file in case something goes wrong.
