@@ -16,7 +16,6 @@ proper WUnderground devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy)
 # TODO: Manual
 # TODO: Look into color palettes (grey scale, roygbiv, tableau 10, color blind 10, etc.)
-# TODO: Make changes to sleeptime take effect instantly.
 # TODO: See what other plugin devices the weather device will support.
 # TODO: Consider making autolayout an option. [ rcParams.update({'figure.autolayout': True}) ]
 # TODO: Automatically remove CSV items if their tuple is ('', '', '')
