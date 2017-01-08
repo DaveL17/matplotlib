@@ -1,4 +1,4 @@
-<?xml version = "1.0"?>
+<?xml version="1.0"?>
 <PluginConfig>
 
     <Field id="infoLabel0" type="label" fontColor="black" fontSize="regular">
@@ -78,9 +78,9 @@
     <Field id="rectChartWidth" type="textfield" defaultValue="600" tooltip="Enter your preference for the width of your chart in pixels (600).">
         <Label>Chart Width:</Label>
     </Field>
-    <!-- Rectangular Charts Extra Wide-->
+    <!-- Rectangular Charts Special-->
     <Field id="rectChartWideLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-        <Label>Rectangular Charts (Extra Wide)</Label>
+        <Label>Rectangular Charts (Special)</Label>
     </Field>
     <Field id="rectChartWideSeparator" type="separator"/>
     <!-- Wide Chart Height -->
@@ -108,7 +108,7 @@
     <!-- Main Font Style -->
     <Field id="fontMain" type="menu" defaultValue="Arial" tooltip="Select preference for the font of your chart.">
         <Label>Font:</Label>
-        <List class="self" filter="" method="getFontList" dynamicReload = "true"/>
+        <List class="self" filter="" method="getFontList" dynamicReload="true"/>
     </Field>
     <!-- Font Color -->
     <Field id="fontColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's text.">

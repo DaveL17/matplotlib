@@ -9,7 +9,7 @@
                 <Label>The CSV Engine Device is used to construct data files for charting.  The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
             </Field>
             <Field id="topSeparator" type="separator"/>
-            <Field id="numLinesToKeep" type="textfield" defaultValue = "300" hidden="false">
+            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false">
                 <Label>Observations:</Label>
             </Field>
             <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
@@ -62,7 +62,7 @@
             <Field id="label1" type="label" fontColor="darkgray" fontSize="small" alignWithControl="true">
                 <Label>This is a list of all existing items the plugin is tracking.  It will only display those items that have been created by the CSV device.  Select an item from this list to update its values or delete it from the plugin.</Label>
             </Field>
-            <Field id="columnDict" type="textfield" defaultValue = "{'k0': ('None', 'None', 'None')}" hidden="true">
+            <Field id="columnDict" type="textfield" defaultValue="{'k0': ('None', 'None', 'None')}" hidden="true">
                 <Label>Dict to Hold Column List:</Label>
             </Field>
             <Field id="editKey" type="textfield" readonly="true" hidden="true" enabledBindingId="isColumnSelected">
@@ -138,8 +138,8 @@
                 <Label>Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use extra-wide dimensions.">
-                <Label>Extra Wide?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
+                <Label>Special Size?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
@@ -147,11 +147,11 @@
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
@@ -468,8 +468,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use extra-wide dimensions.">
-                <Label>Extra Wide?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
+                <Label>Special Size?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
@@ -477,11 +477,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
@@ -1028,8 +1028,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use extra-wide dimensions.">
-                <Label>Extra Wide?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
+                <Label>Special Size?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
@@ -1037,11 +1037,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Extra Wide setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">

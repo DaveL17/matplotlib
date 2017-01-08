@@ -14,20 +14,18 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Provide hooks that can be used by other plugin authors.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy)
-# TODO: Manual
 # TODO: Look into color palettes (grey scale, roygbiv, tableau 10, color blind 10, etc.)
 # TODO: See what other plugin devices the weather device will support.
 # TODO: Consider making autolayout an option. [ rcParams.update({'figure.autolayout': True}) ]
 # TODO: Automatically remove CSV items if their tuple is ('', '', '')
 # TODO: Consider removing bar min markers -- will bar min always be zero?
+# TODO: Would it be possible to create a polar chart that can be used along with the WU Gauge Pack?
 
 # Feature requests:
 # TODO: Option to override legend names
 # TODO: Option to specify X and Y axis intervals
 # TODO: When the source title is changed in the CSV engine, refactor the CSV file, too.
 # TODO: When the source is deleted, offer to delete the CSV file too.
-# TODO: Add half-hourly X Axis intervals are done. Need to reign in the labels a bit.
-
 
 from ast import literal_eval
 from csv import reader
@@ -59,10 +57,10 @@ except ImportError as error:
 
 __author__    = "DaveL17"
 __build__     = ""
-__copyright__ = "Copyright 2016 DaveL17"
+__copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.3.02"
+__version__   = "0.3.03"
 
 
 class Plugin(indigo.PluginBase):
@@ -1083,7 +1081,7 @@ class Plugin(indigo.PluginBase):
                 if p_dict['bar{0}Source'.format(bar)] not in ["", "None"]:
 
                     # Get the data and grab the header.
-                    data_column = self.getTheData('{0}{1}'.format(self.pluginPrefs['dataPath'], p_dict['bar{0}Source'.format(bar)]))
+                    data_column = self.getTheData(u'{0}{1}'.format(self.pluginPrefs['dataPath'], p_dict['bar{0}Source'.format(bar)]))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -1967,6 +1965,9 @@ class Plugin(indigo.PluginBase):
             ("quarter-hourly", "Every 15 Minutes"),
             ("half-hourly", "Every 30 Minutes"),
             ("hourly", "Every Hour"),
+            ("hourly_4", "Every 4 Hours"),
+            ("hourly_8", "Every 8 Hours"),
+            ("hourly_12", "Every 12 Hours"),
             ("daily", "Every Day"),
             ("weekly", "Every Week"),
             ("monthly", "Every Month"),
@@ -2320,6 +2321,15 @@ class Plugin(indigo.PluginBase):
         elif x_axis_bins == 'hourly':
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 24)))
+        elif x_axis_bins == 'hourly_4':
+            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))
+        elif x_axis_bins == 'hourly_8':
+            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 4)))
+        elif x_axis_bins == 'hourly_12':
+            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 2)))
         elif x_axis_bins == 'daily':
             plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=1))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 6)))
