@@ -131,31 +131,24 @@
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator1" type="separator"/>
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
-                <Label>Chart Title:</Label>
-            </Field>
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
-                <Label>Special Size?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
-                <Label>Custom Chart Size?</Label>
+                <Label>Custom Size?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
-                <Label>Custom Font Size?</Label>
+                <Label>Custom Font Sizes?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
@@ -168,6 +161,19 @@
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of observations for the chart (integer).">
+                <Label>Number of Bars:</Label>
+            </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
+            </Field>
+            <Field id="barWidth" type="textfield" defaultValue="0.1" tooltip="To control the width of the bars, enter a float greater than zero.">
+                <Label>Width:</Label>
+            </Field>
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
@@ -175,32 +181,44 @@
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
             </Field>
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
-            </Field>
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
                 <Label>Label:</Label>
             </Field>
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
             <Field id="yAxisSeparator" visibleBindingId="xAxisLabel" visibleBindingValue="true" type="separator"/>
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
                 <Label>Y Axis</Label>
             </Field>
-            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
-                <Label>Axis Min:</Label>
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
             </Field>
             <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
-                <Label>Axis Max:</Label>
+                <Label>Max:</Label>
+            </Field>
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
+                <Label>Min:</Label>
+            </Field>
+            <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
+                <Label>Mirror</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
                    tooltip="Select preference for the precision of your chart's Y axis.">
@@ -212,13 +230,13 @@
                     <Option value="3">3</Option>
                 </List>
             </Field>
-            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
-                <Label>Label:</Label>
+            <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
+                <Label>Tick Labels:</Label>
             </Field>
-            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
+            <Field id="customTicksY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the numbers to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
+                <Label>Tick Locations:</Label>
             </Field>
             <Field id="barLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Bar Controls:</Label>
@@ -232,18 +250,22 @@
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
+            <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="bar1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first bar.">
-                <Label>Bar Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="bar1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar1Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's first bar. The value must be a Hex color (#FFFFFF).">
                 <Label>Hex:</Label>
             </Field>
-            <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
+            <Field id="bar1Legend" type="textfield" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
             </Field>
             <Field id="plotBar1Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -262,18 +284,22 @@
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
+            <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="bar2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second bar.">
-                <Label>Bar Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="bar2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar2Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's second bar. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
+            <Field id="bar2Legend" type="textfield" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
             </Field>
             <Field id="plotBar2Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -292,19 +318,23 @@
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
+            <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="bar3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third bar.">
-                <Label>Bar Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="bar3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar3Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's third bar. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
-                   tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
+            <Field id="bar3Legend" type="textfield" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
             </Field>
             <Field id="plotBar3Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -323,18 +353,22 @@
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
+            <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="bar4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth bar.">
-                <Label>Bar Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="bar4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar4Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's fourth bar. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
+            <Field id="bar4Legend" type="textfield" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
             </Field>
             <Field id="bar4Fill" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to fill below this bar.">
                 <Label>Fill</Label>
@@ -349,12 +383,6 @@
                 <Description>Yes/No</Description>
             </Field>
             <Field id="barSeparator" type="separator" visibleBindingId="barLabel4" visibleBindingValue="true"/>
-            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of observations for the chart (integer).">
-                <Label>Number of Bars:</Label>
-            </Field>
-            <Field id="barWidth" type="textfield" defaultValue="0.1" tooltip="To control the width of the bars, enter a float greater than zero.">
-                <Label>Bar Width:</Label>
-            </Field>
             <Field id="additionalBarSpace" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
@@ -371,7 +399,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
             <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Line Style:</Label>
+                <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="bottomSeparator" type="separator"/>
@@ -415,16 +443,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="customSizeWidth" type="textfield" defaultValue="None" tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None.">
                 <Label>Custom Width:</Label>
             </Field>
+            <Field id="fontSize" type="menu" defaultValue="12" tooltip="Select the size of the font to use for the calendar plot.">
+                <Label>Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
             <Field id="firstDayOfWeek" type="menu" defaultValue="6" tooltip="Select the first day of the week.">
                 <Label>Week Starts on:</Label>
                 <List>
                     <Option value="6">Sunday*</Option>
                     <Option value="0">Monday</Option>
                 </List>
-            </Field>
-            <Field id="fontSize" type="menu" defaultValue="12" tooltip="Select the size of the font to use for the calendar plot.">
-                <Label>Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
             </Field>
         </ConfigUI>
 
@@ -461,31 +489,24 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator1" type="separator"/>
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
-                <Label>Chart Title:</Label>
-            </Field>
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
-                <Label>Special Size?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
-                <Label>Custom Chart Size?</Label>
+                <Label>Custom Size?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
-                <Label>Custom Font Size?</Label>
+                <Label>Custom Font Sizes?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
@@ -498,12 +519,27 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
+            </Field>
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
             <Field id="xAxisSeparator" type="separator"/>
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
+            </Field>
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
             </Field>
             <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
@@ -514,23 +550,27 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Scale:</Label>
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
-            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
-                <Label>Axis Title:</Label>
-            </Field>
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
-            </Field>
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
                 <Label>Y Axis</Label>
             </Field>
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
             <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
-                <Label>Axis Min:</Label>
+                <Label>Min:</Label>
             </Field>
             <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
-                <Label>Axis Max:</Label>
+                <Label>Max:</Label>
+            </Field>
+            <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
+                <Label>Mirror</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
                    tooltip="Select preference for the precision of your chart's Y axis.">
@@ -542,13 +582,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                     <Option value="3">3</Option>
                 </List>
             </Field>
-            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
-                <Label>Axis Title:</Label>
+            <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the labels to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
+                <Label>Tick Labels:</Label>
             </Field>
-            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
+            <Field id="customTicksY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the numbers to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
+                <Label>Tick Locations:</Label>
             </Field>
             <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Line Controls</Label>
@@ -562,24 +602,31 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's first line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="line1Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's first line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            <Field id="line1Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
@@ -590,13 +637,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Enter your preference for the color of your chart's first line markers. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="line1Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
-                <Description>Yes/No</Description>
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
             <Field id="plotLine1Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -615,24 +659,31 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's second line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="line2Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's second line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            <Field id="line2Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
@@ -643,13 +694,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Enter your preference for the color of your chart's second line markers. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="line2Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
-                <Description>Yes/No</Description>
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
             <Field id="plotLine2Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -668,24 +716,31 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's third line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="line3Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's third line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            <Field id="line3Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's third line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="line3MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
@@ -696,13 +751,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Enter your preference for the color of your chart's third line markers. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="line3Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
-                <Description>Yes/No</Description>
+            <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's third line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
             <Field id="plotLine3Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -721,24 +773,31 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="line4Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line4Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's fourth line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's fourth line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            <Field id="line4Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="line4MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
@@ -748,13 +807,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Enter your preference for the color of your chart's fourth line markers. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="line4Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
-                <Description>Yes/No</Description>
+            <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's fourth line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
             <Field id="plotLine4Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min</Label>
@@ -777,7 +833,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
             <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Line Style:</Label>
+                <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="bottomSeparator" type="separator"/>
@@ -842,15 +898,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator2" type="separator"/>
-            <Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
-                <Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>
-            </Field>
-            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart.">
-                <Label>Chart Title:</Label>
-            </Field>
-            <Field id="defaultText" type="textfield" defaultValue="This is where the placeholder text goes."
-                   tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty.">
-                <Label>Placeholder:</Label>
+            <Field id="numberOfCharacters" type="textfield" defaultValue="100" tooltip="Enter the number of characters desired for each line of text.">
+                <Label>Characters:</Label>
             </Field>
             <Field id="figureWidth" type="textfield" defaultValue="700" tooltip="Enter the desired width of your figure (inches).">
                 <Label>Figure Width:</Label>
@@ -858,16 +907,23 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="figureHeight" type="textfield" defaultValue="300" tooltip="Enter the desired height of your figure (inches).">
                 <Label>Figure Height:</Label>
             </Field>
-            <Field id="numberOfCharacters" type="textfield" defaultValue="100" tooltip="Enter the number of characters desired for each line of text.">
-                <Label>Characters:</Label>
+            <Field id="textColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the text color of your plot.">
+                <Label>Font Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="multilineFontSize" type="textfield" defaultValue="10"
                    tooltip="Enter the font size to use for multiline text plots. This only affects this device instance.">
                 <Label>Font Size:</Label>
             </Field>
-            <Field id="textColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the text color of your plot.">
-                <Label>Font Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            <Field id="defaultText" type="textfield" defaultValue="This is where the placeholder text goes."
+                   tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty.">
+                <Label>Placeholder:</Label>
+            </Field>
+            <Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
+                <Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>
+            </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
             </Field>
             <Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's multiline text. The value must be in the form of an HTML color (#FFFFFF).">
@@ -931,14 +987,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator2" type="separator"/>
-            <Field id="numObs" type="textfield" defaultValue="8" tooltip="Enter the number of observations for the chart (integer).">
-                <Label>Number of Obs:</Label>
-            </Field>
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
-                <Label>Chart Title:</Label>
-            </Field>
             <Field id="currentWindColor" type="menu" defaultValue="#FF3333" tooltip="Select preference for the color of your chart's current wind observation.">
-                <Label>Current Obs Color:</Label>
+                <Label>Color (current):</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="currentWindColorOther" type="textfield" defaultValue="#FF3333" visibleBindingId="currentWindColor" visibleBindingValue="custom"
@@ -946,16 +996,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label/>
             </Field>
             <Field id="maxWindColor" type="menu" defaultValue="#3333FF" tooltip="Select preference for the color of your chart's maximum wind observation.">
-                <Label>Max Obs Color:</Label>
+                <Label>Color (max):</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="maxWindColorOther" type="textfield" defaultValue="#3333FF" visibleBindingId="maxWindColor" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's maximum obs indicator. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
-            </Field>
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Show Legend?</Label>
-                <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
                 <Label>Custom Chart Size?</Label>
@@ -966,7 +1012,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Size:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
-                <Label>Custom Font Size?</Label>
+                <Label>Custom Font Sizes?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
@@ -978,6 +1024,357 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+            <Field id="xHideLabels" defaultValue="false" type="checkbox" tooltip="Select to hide the surrounding labels on the outside of the chart.">
+                <Label>Hide X Labels:</Label>
+                <Description/>
+            </Field>
+            <Field id="yHideLabels" defaultValue="false" type="checkbox" tooltip="Select to hide the radial labels on the inside of the chart.">
+                <Label>Hide Y Labels:</Label>
+                <Description/>
+            </Field>
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="numObs" type="textfield" defaultValue="8" tooltip="Enter the number of observations for the chart (integer).">
+                <Label>Observations:</Label>
+            </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
+            </Field>
+            <Field id="bottomSeparator" type="separator"/>
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+    </Device>
+
+<!-- Scatter Charting Device -->
+    <Device type="custom" id="scatterChartingDevice">
+        <Name>Scatter Chart</Name>
+
+        <ConfigUI>
+            <Field id="scatterChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
+            </Field>
+            <Field id="topSeparator" type="separator"/>
+            <Field id="fileName" type="textfield" defaultValue="chart_scatter.png" tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+            <Field id="outputFileSpace" type="label"/>
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+            <Field id="sourceSeparator1" type="separator"/>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Height:</Label>
+            </Field>
+            <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Width:</Label>
+            </Field>
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+                   tooltip="Select your preference for the title font size of your chart (this chart only).">
+                <Label>Title Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+            <Field id="customTickFontSize" type="menu" defaultValue="8" visibleBindingId="customSizeFont" visibleBindingValue="true"
+                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
+                <Label>Tick Font Size:</Label>
+                <List class="self" filter="" method="getFontSizeList"/>
+            </Field>
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
+            </Field>
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+            <Field id="xAxisSeparator" type="separator"/>
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
+            </Field>
+            <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
+                <Label>Min:</Label>
+            </Field>
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
+                <Label>Max:</Label>
+            </Field>
+            <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
+                <Label>Mirror</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Select preference for the precision of your chart's Y axis.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0*</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                </List>
+            </Field>
+            <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
+                <Label>Tick Labels:</Label>
+            </Field>
+            <Field id="customTicksY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the numbers to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
+                <Label>Tick Locations:</Label>
+            </Field>
+            <Field id="groupLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Group Controls</Label>
+            </Field>
+            <Field id="groupSeparator" type="separator"/>
+<!-- Group 1 -->
+            <Field id="groupLabel1" type="checkbox" defaultValue="false">
+                <Label>Group 1</Label>
+            </Field>
+            <Field id="group1Source" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+            <Field id="group1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first group.">
+                <Label>Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group1Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first group. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group1Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel1" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="group1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group1MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's first group markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group1Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first group.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="plotGroup1Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="plotGroup1Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="group1Bottom" type="separator" visibleBindingId="groupLabel1" visibleBindingValue="true"/>
+<!-- Group 2 -->
+            <Field id="groupLabel2" type="checkbox" defaultValue="false">
+                <Label>Group 2</Label>
+            </Field>
+            <Field id="group2Source" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+            <Field id="group2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second group.">
+                <Label>Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group2Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second group. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group2Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="group2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group2MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's second group markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group2Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second group.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="plotGroup2Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="plotGroup2Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="group2Bottom" type="separator" visibleBindingId="groupLabel2" visibleBindingValue="true"/>
+<!-- Group 3 -->
+            <Field id="groupLabel3" type="checkbox" defaultValue="false">
+                <Label>Group 3</Label>
+            </Field>
+            <Field id="group3Source" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+            <Field id="group3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third group.">
+                <Label>Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group3Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third group. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group3Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel3" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="group3MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group3MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group3MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's third group markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group3Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's third group.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="plotGroup3Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="plotGroup3Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="group3Bottom" type="separator" visibleBindingId="groupLabel3" visibleBindingValue="true"/>
+<!-- Group 4 -->
+            <Field id="groupLabel4" type="checkbox" defaultValue="false">
+                <Label>Group 4</Label>
+            </Field>
+            <Field id="group4Source" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+            </Field>
+            <Field id="group4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth group.">
+                <Label>Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group4Color" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's fourth group. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group4Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+            <Field id="group4MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+            </Field>
+            <Field id="group4MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group4MarkerColor" visibleBindingValue="custom"
+                   tooltip="Enter your preference for the color of your chart's fourth group markers. The value must be in the form of an HTML color (#FFFFFF).">
+                <Label/>
+            </Field>
+            <Field id="group4Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's fourth group.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="plotGroup4Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="plotGroup4Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom group Segments</Label>
+            </Field>
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+                <Label>Custom Group Segments</Label>
+            </Field>
+            <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                <Label>Constants:</Label>l
+            </Field>
+            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth group.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="bottomSeparator" type="separator"/>
             <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
@@ -1021,15 +1418,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Source Device:</Label>
                 <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
             </Field>
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
-                <Label>Chart Title:</Label>
-            </Field>
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Special Size dimensions.">
-                <Label>Special Size?</Label>
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
@@ -1037,15 +1427,19 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Height:</Label>
             </Field>
             <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Special Size setting.">
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
                 <Label>Custom Width:</Label>
             </Field>
             <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
-                <Label>Custom Font Size?</Label>
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+                <Label>Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
             <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
@@ -1058,6 +1452,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+                <Label>Title:</Label>
+            </Field>
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Axis Controls</Label>
             </Field>
@@ -1069,28 +1466,36 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
                 <Label>Label</Label>
             </Field>
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
+            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The datetime units for the x axis.">
+                <Label>Scale:</Label>
+                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
                 <Label>Y Axis</Label>
             </Field>
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label</Label>
+            </Field>
             <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
-                <Label>Axis Min:</Label>
+                <Label>Min:</Label>
             </Field>
             <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
-                <Label>Axis Max:</Label>
+                <Label>Max:</Label>
             </Field>
             <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Select preference for the precision of your chart's Y axis.">
                 <Label>Precision:</Label>
@@ -1101,24 +1506,23 @@ number and the color value should be enclosed in double quotes. Multiple entries
                     <Option value="3">3</Option>
                 </List>
             </Field>
-            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
-                <Label>Label</Label>
-                <Description>Yes/No</Description>
-            </Field>
-            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
-            </Field>
             <Field id="y2AxisSeparator" type="separator" visibleBindingId="yAxisLabel" visibleBindingValue="true"/>
             <Field id="y2AxisLabel" type="checkbox" defaultValue="false">
                 <Label>Y2 Axis</Label>
             </Field>
+            <Field id="showy2AxisGrid" type="checkbox" defaultValue="false" visibleBindingId="y2AxisLabel" visibleBindingValue="true" tooltip="Check to display Y2 axis grid.">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+            <Field id="customAxisLabelY2" type="textfield" defaultValue="Y2 Axis" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y2 Axis label. Leave blank to display no label.">
+                <Label>Label</Label>
+            </Field>
             <Field id="y2AxisMin" type="textfield" defaultValue="None" visibleBindingId="y2AxisLabel" visibleBindingValue="true" tooltip="The minimum Y2 axis value.">
-                <Label>Y2 Axis Min:</Label>
+                <Label>Min:</Label>
             </Field>
             <Field id="y2AxisMax" type="textfield" defaultValue="None" visibleBindingId="y2AxisLabel" visibleBindingValue="true" tooltip="The maximum Y2 axis value.">
-                <Label>Y2 Axis Max:</Label>
+                <Label>Max:</Label>
             </Field>
             <Field id="y2AxisPrecision" type="menu" defaultValue="0" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
                    tooltip="Select preference for the precision of your chart's Y2 axis.">
@@ -1129,14 +1533,6 @@ number and the color value should be enclosed in double quotes. Multiple entries
                     <Option value="2">2</Option>
                     <Option value="3">3</Option>
                 </List>
-            </Field>
-            <Field id="customAxisLabelY2" type="textfield" defaultValue="Y2 Axis" visibleBindingId="y2AxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the Y2 Axis label. Leave blank to display no label.">
-                <Label>Label</Label>
-            </Field>
-            <Field id="showy2AxisGrid" type="checkbox" defaultValue="false" visibleBindingId="y2AxisLabel" visibleBindingValue="true" tooltip="Check to display Y2 axis grid.">
-                <Label>Grid</Label>
-                <Description>Yes/No</Description>
             </Field>
             <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Line Controls</Label>
@@ -1149,37 +1545,37 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="highTemperatureText" type="label" fontColor="black" visibleBindingId="lineLabel1" visibleBindingValue="true" alignWithControl="true" fontSize="small">
                 <Label>High Temperature settings are used when generating both 10-day and 24-hour charts.</Label>
             </Field>
-            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's first line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line1Color" type="menu" defaultValue="#FF3333" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's first line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
-            </Field>
             <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
             <Field id="line1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1MarkerColor" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's first line marker. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
-            </Field>
-            <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
             </Field>
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 <!-- Low Temperature -->
@@ -1190,54 +1586,54 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    fontSize="small">
                 <Label>Low Temperature settings are only used when generating 10-day charts (24-hour forecasts do not include a low temperature forecast).</Label>
             </Field>
-            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's second line.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
             </Field>
             <Field id="line2Color" type="menu" defaultValue="#0000FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second line.">
-                <Label>Line Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
             </Field>
-            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's second line.">
-                <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
-            </Field>
             <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second line.">
+                <Label>Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
             <Field id="line2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2MarkerColor" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's second line marker. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
-            </Field>
-            <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
             </Field>
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
 <!-- Precipitation -->
             <Field id="lineLabel3" type="checkbox" defaultValue="false">
                 <Label>Precipitation</Label>
             </Field>
+            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="line3Color" type="menu" defaultValue="#99CCFF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
-                <Label>Bar Color:</Label>
+                <Label>Color:</Label>
                 <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
                    tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
                 <Label/>
-            </Field>
-            <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
-                <Description>Yes/No</Description>
             </Field>
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
@@ -1252,7 +1648,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
             <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Line Style:</Label>
+                <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
             <Field id="bottomSeparator" type="separator"/>

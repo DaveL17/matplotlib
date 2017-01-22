@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <Actions>
-  <SupportURL>http://www.google.com</SupportURL>
+  <SupportURL>http://forums.indigodomo.com/viewforum.php?f=219</SupportURL>
   <Action id="refreshTheChartsAction">
     <Name>Redraw Charts</Name>
     <CallbackMethod>refreshTheChartsAction</CallbackMethod>
   </Action>
   <Action id="refreshTheChartsAPI" uiPath="hidden">
-    <Name>Redraw Charts</Name>
-    <CallbackMethod>refreshTheChartsActionTest</CallbackMethod>
+    <Name>API Action to Draw Simple Chart</Name>
+    <CallbackMethod>plotActionTest</CallbackMethod>
   </Action>
 </Actions>

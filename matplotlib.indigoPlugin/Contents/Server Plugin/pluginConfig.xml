@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
+
+<!-- Be sure to add any new plugin prefs to kDefaultPluginPrefs in plugin.py -->
+
 <PluginConfig>
 
     <Field id="infoLabel0" type="label" fontColor="black" fontSize="regular">
         <Label>Matplotlib Charting Plugin - Developed by DaveL17</Label>
     </Field>
     <Field id="space0" type="label"/>
+    <Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+        <Label>Existing charts will be regenerated when you click save. Please be patient.</Label>
+    </Field>
     <Field id="separator0" type="separator"/>
 
-<!-- Hidden controls -->
+    <!-- Hidden controls -->
     <!-- The DPI warning flag is used to alert the user that selecting a DPI value that's too low will produce subpar results. The checkbox is used to
          allow a warning to be displayed but then also allow the user to save the value if they still want to. -->
     <Field id="dpiWarningFlag" type="checkbox" hidden="True">
@@ -35,7 +41,12 @@
         <Description>Enable/Disable</Description>
     </Field>
     <!-- The snappyConfigMenus flag element is set in the advanced settings menu. -->
-    <Field id="snappyConfigMenus" type="checkbox" defaultValue="true" hidden="True">
+    <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">
+        <Label>Hidden</Label>
+        <Description>Enable/Disable</Description>
+    </Field>
+    <!-- The forceOriginLines flag element is set in the advanced settings menu. -->
+    <Field id="forceOriginLines" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
@@ -67,7 +78,7 @@
     </Field>
     <!-- Rectangular Charts -->
     <Field id="rectChartLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-        <Label>Rectangular Charts (Standard)</Label>
+        <Label>Rectangular Charts (Size 1)</Label>
     </Field>
     <Field id="rectChartSeparator" type="separator"/>
     <!-- Chart Height -->
@@ -80,7 +91,7 @@
     </Field>
     <!-- Rectangular Charts Special-->
     <Field id="rectChartWideLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-        <Label>Rectangular Charts (Special)</Label>
+        <Label>Rectangular Charts (Size 2)</Label>
     </Field>
     <Field id="rectChartWideSeparator" type="separator"/>
     <!-- Wide Chart Height -->
@@ -105,10 +116,25 @@
         <Label>Chart Properties</Label>
     </Field>
     <Field id="chartPropsSeparator" type="separator"/>
-    <!-- Main Font Style -->
-    <Field id="fontMain" type="menu" defaultValue="Arial" tooltip="Select preference for the font of your chart.">
-        <Label>Font:</Label>
-        <List class="self" filter="" method="getFontList" dynamicReload="true"/>
+    <!-- Font Color for Annotations -->
+    <Field id="fontColorAnnotation" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's annotation text.">
+        <Label>Annotation Color:</Label>
+        <List class="self" filter="" method="getColorList"/>
+    </Field>
+    <!-- Custom Annotations Color -->
+    <Field id="annotationColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="fontColorAnnotation" visibleBindingValue="custom"
+           tooltip="Enter your preference for the color of your chart's annotations. The value must be in the form of an hex color (#FFFFFF).">
+        <Label>Hex:</Label>
+    </Field>
+    <!-- Background Color -->
+    <Field id="backgroundColor" type="menu" defaultValue="#000000" tooltip="Select preference for the background color of your chart.">
+        <Label>Canvas Color:</Label>
+        <List class="self" filter="" method="getBackgroundColorList"/>
+    </Field>
+    <!-- Custom Background Color -->
+    <Field id="backgroundColorOther" type="textfield" defaultValue="#000000" visibleBindingId="backgroundColor" visibleBindingValue="custom"
+           tooltip="Enter your preference for the background color of your chart. The value must be in the form of an hex color (#FFFFFF).">
+        <Label>Hex:</Label>
     </Field>
     <!-- Font Color -->
     <Field id="fontColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's text.">
@@ -120,60 +146,34 @@
            tooltip="Enter your preference for the color of your chart's text. The value must be in the form of an hex color (#FFFFFF).">
         <Label>Hex:</Label>
     </Field>
-    <!-- Font Color for Annotations -->
-    <Field id="fontColorAnnotation" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's annotation text.">
-        <Label>Annotation Color:</Label>
+    <!-- Main Font Style -->
+    <Field id="fontMain" type="menu" defaultValue="Arial" tooltip="Select preference for the font of your chart.">
+        <Label>Font Style:</Label>
+        <List class="self" filter="" method="getFontList" dynamicReload="true"/>
+    </Field>
+    <!-- Grid Color -->
+    <Field id="gridColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's grids.">
+        <Label>Grid Color:</Label>
         <List class="self" filter="" method="getColorList"/>
     </Field>
-    <!-- Custom Annotations Color -->
-    <Field id="annotationColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="fontColorAnnotation" visibleBindingValue="custom"
-           tooltip="Enter your preference for the color of your chart's annotations. The value must be in the form of an hex color (#FFFFFF).">
+    <!-- Custom Grid Color -->
+    <Field id="gridColorOther" type="textfield" defaultValue="#888888" visibleBindingId="gridColor" visibleBindingValue="custom"
+           tooltip="Enter your preference for the grid color of your chart. The value must be in the form of an hex color (#FFFFFF).">
         <Label>Hex:</Label>
     </Field>
-    <!-- Main Font Size -->
-    <Field id="mainFontSize" type="menu" defaultValue="10" tooltip="Enter your preference for the title font size of your chart (integer).">
-        <Label>Title Font Size:</Label>
+    <!-- Grid Style -->
+    <Field id="gridStyle" type="menu" defaultValue=":" tooltip="Select preference for the style of your chart's grids.">
+        <Label>Grid Style:</Label>
+        <List class="self" filter="" method="getLineList"/>
+    </Field>
+    <!-- Legend Font Size -->
+    <Field id="legendFontSize" type="menu" defaultValue="6" tooltip="Enter your preference for the legend font size of your chart (integer).">
+        <Label>Legend Font Size:</Label>
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
-    <!-- Tick Font Size -->
-    <Field id="tickFontSize" type="menu" defaultValue="8" tooltip="Enter your preference for the tick font size of your chart (integer).">
-        <Label>Tick Font Size:</Label>
-        <List class="self" filter="" method="getFontSizeList"/>
-    </Field>
-    <!-- Tick Color -->
-    <Field id="tickColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's ticks.">
-        <Label>Tick Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Tick Color -->
-    <Field id="tickColorOther" type="textfield" defaultValue="#888888" visibleBindingId="tickColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the color of your chart's ticks. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
-    </Field>
-    <!-- Tick Size -->
-    <Field id="tickSize" type="menu" defaultValue="4" tooltip="Select preference for the size of the major tick marks. The minor ticks will be half as tall.">
-        <Label>Tick Size:</Label>
-        <List>
-            <Option value="0">0</Option>
-            <Option value="1">1</Option>
-            <Option value="2">2</Option>
-            <Option value="3">3</Option>
-            <Option value="4">4</Option>
-            <Option value="5">5</Option>
-            <Option value="6">6</Option>
-            <Option value="7">7</Option>
-            <Option value="8">8</Option>
-        </List>
-    </Field>
-    <!-- Background Color -->
-    <Field id="backgroundColor" type="menu" defaultValue="#000000" tooltip="Select preference for the background color of your chart.">
-        <Label>Canvas Color:</Label>
-        <List class="self" filter="" method="getBackgroundColorList"/>
-    </Field>
-    <!-- Custom Background Color -->
-    <Field id="backgroundColorOther" type="textfield" defaultValue="#000000" visibleBindingId="backgroundColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the background color of your chart. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
+    <!-- Line Weight -->
+    <Field id="lineWeight" type="textfield" defaultValue="1.0" tooltip="Enter the weight for all graph lines as a positive float(1.0).">
+        <Label>Line Weight:</Label>
     </Field>
     <!-- Plot Area Color -->
     <Field id="faceColor" type="menu" defaultValue="#000000"
@@ -196,24 +196,40 @@
            tooltip="Enter your preference for the spine color of your chart. The value must be in the form of an hex color (#FFFFFF).">
         <Label>Hex:</Label>
     </Field>
-    <!-- Grid Color -->
-    <Field id="gridColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's grids.">
-        <Label>Grid Color:</Label>
+    <!-- Tick Color -->
+    <Field id="tickColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's ticks.">
+        <Label>Tick Color:</Label>
         <List class="self" filter="" method="getColorList"/>
     </Field>
-    <!-- Custom Grid Color -->
-    <Field id="gridColorOther" type="textfield" defaultValue="#888888" visibleBindingId="gridColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the grid color of your chart. The value must be in the form of an hex color (#FFFFFF).">
+    <!-- Custom Tick Color -->
+    <Field id="tickColorOther" type="textfield" defaultValue="#888888" visibleBindingId="tickColor" visibleBindingValue="custom"
+           tooltip="Enter your preference for the color of your chart's ticks. The value must be in the form of an hex color (#FFFFFF).">
         <Label>Hex:</Label>
     </Field>
-    <!-- Grid Style -->
-    <Field id="gridStyle" type="menu" defaultValue=":" tooltip="Select preference for the style of your chart's grids.">
-        <Label>Grid Style:</Label>
-        <List class="self" filter="" method="getLineList"/>
+    <!-- Tick Font Size -->
+    <Field id="tickFontSize" type="menu" defaultValue="8" tooltip="Enter your preference for the tick font size of your chart (integer).">
+        <Label>Tick Font Size:</Label>
+        <List class="self" filter="" method="getFontSizeList"/>
     </Field>
-    <!-- Line Weight -->
-    <Field id="lineWeight" type="textfield" defaultValue="1.0" tooltip="Enter the weight for all graph lines as a positive float(1.0).">
-        <Label>Line Weight:</Label>
+    <!-- Tick Size -->
+    <Field id="tickSize" type="menu" defaultValue="4" tooltip="Select preference for the size of the major tick marks. The minor ticks will be half as tall.">
+        <Label>Tick Size:</Label>
+        <List>
+            <Option value="0">0</Option>
+            <Option value="1">1</Option>
+            <Option value="2">2</Option>
+            <Option value="3">3</Option>
+            <Option value="4">4</Option>
+            <Option value="5">5</Option>
+            <Option value="6">6</Option>
+            <Option value="7">7</Option>
+            <Option value="8">8</Option>
+        </List>
+    </Field>
+    <!-- Title Font Size -->
+    <Field id="mainFontSize" type="menu" defaultValue="10" tooltip="Enter your preference for the title font size of your chart (integer).">
+        <Label>Title Font Size:</Label>
+        <List class="self" filter="" method="getFontSizeList"/>
     </Field>
     <Field id="separator02" type="separator"/>
     <Field id="updaterEmailsEnabled" type="checkbox" defaultValue="false">
@@ -226,11 +242,11 @@
         <Label>Debug level:</Label>
         <Description/>
         <List>
-         <Option value="10">Debugging Messages</Option>
-         <Option value="20">Informational Messages</Option>
-         <Option value="30">Warning Messages</Option>
-         <Option value="40">Error Messages</Option>
-         <Option value="50">Critical Errors Only</Option>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
         </List>
     </Field>
     <Field id="space7" type="label" fontColor="black" alignWithControl="false" fontSize="small">
@@ -239,7 +255,7 @@
 Debugging Messages = Step by step plugin logging.
 Informational Messages = Useful information about plugin health.
 Warning Messages = Warnings about settings that may conflict.
-Error Messages =  Error messages alert you should address.
+Error Messages = Error messages alert you should address.
 Critical Errors Only = Critical errors that should probably be reported.
         </Label>
     </Field>

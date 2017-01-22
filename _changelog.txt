@@ -1,3 +1,25 @@
+v0.4.01
+- Adds new Scatter chart type.
+- Adds baseline API to allow scripters the ability to send data to create
+  charts.
+- Adds ability to modify legend labels with custom text (bar, line and scatter
+  charts only).
+- Adds ability to mirror Y axis value labels to Y2 (bar, line and scatter
+  charts only).
+- Adds ability to hide the X (surrounding) and Y (radial) labels for polar
+  charts.
+- Adds advanced settings menu item to force origin lines to be plotted when
+  charts contain both positive and negative values.
+- Fixes the min/max settings for precipitation values on weather charts.
+- Reorganizes most chart device settings (alphabetically within each grouping)
+  to make them easier to find.
+- Renames the standard rectangular sizes to increase clarity (they were still
+  too confusing). They are now Size 1 and Size 2. Size 1 is the default, Size 2
+  is the override and Custom Sizes override both Size 1 and Size 2.
+- Reduces the minimum size for chart dimensions to 75 pixels.
+- Additional fixes for international characters.
+- Various code refinements.
+
 v0.3.03
 - Adds 4, 8, and 12 hour bins to the X axis.
 - Substantial additions to the plugin manual.

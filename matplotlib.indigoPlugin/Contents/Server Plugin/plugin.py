@@ -1,3 +1,6 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+
 """
 matplotlib plugin
 author: DaveL17
@@ -12,20 +15,10 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery levels.)
 # TODO: NEW -- Create a new device to create dot plots (i.e., like Z-Wave Node Matrix)
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
-# TODO: NEW -- Provide hooks that can be used by other plugin authors.
+# TODO: NEW -- Create an error chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy)
-# TODO: Look into color palettes (grey scale, roygbiv, tableau 10, color blind 10, etc.)
-# TODO: See what other plugin devices the weather device will support.
-# TODO: Consider making autolayout an option. [ rcParams.update({'figure.autolayout': True}) ]
-# TODO: Automatically remove CSV items if their tuple is ('', '', '')
-# TODO: Consider removing bar min markers -- will bar min always be zero?
-# TODO: Would it be possible to create a polar chart that can be used along with the WU Gauge Pack?
+# TODO: scatter legend is a line instead of a dot.
 
-# Feature requests:
-# TODO: Option to override legend names
-# TODO: Option to specify X and Y axis intervals
-# TODO: When the source title is changed in the CSV engine, refactor the CSV file, too.
-# TODO: When the source is deleted, offer to delete the CSV file too.
 
 from ast import literal_eval
 from csv import reader
@@ -60,8 +53,47 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.3.03"
+__version__   = "0.4.01"
 
+kDefaultPluginPrefs = {
+    u'annotationColorOther': "#FFFFFF",
+    u'backgroundColor': "#000000",
+    u'backgroundColorOther': "#000000",
+    u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
+    u'chartResolution': 100,
+    u'dataPath': "/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/",
+    u'enableCustomColors': False,
+    u'enableCustomLineSegments': False,
+    u'faceColor': "#000000",
+    u'faceColorOther': "#000000",
+    u'fontColor': "#FFFFFF",
+    u'fontColorAnnotation': "#FFFFFF",
+    u'fontColorOther': "#FFFFFF",
+    u'fontMain': "Arial",
+    u'forceOriginLines': False,
+    u'gridColor': "#888888",
+    u'gridColorOther': "#888888",
+    u'gridStyle': ":",
+    u'legendFontSize': 6,
+    u'lineWeight': "1.0",
+    u'logEachChartCompleted': True,
+    u'mainFontSize': 10,
+    u'promoteCustomLineSegments': False,
+    u'rectChartHeight': 250,
+    u'rectChartWideHeight': 250,
+    u'rectChartWideWidth': 1000,
+    u'rectChartWidth': 600,
+    u'refreshInterval': 900,
+    u'showDebugLevel': 30,
+    u'snappyConfigMenus': False,
+    u'spineColor': "#888888",
+    u'spineColorOther': "#888888",
+    u'sqChartSize': 250,
+    u'tickColor': "#888888",
+    u'tickColorOther': "#888888",
+    u'tickFontSize': 8,
+    u'tickSize': 4
+}
 
 class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
@@ -94,6 +126,12 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
         self.logger.debug(u"{0:<31} {1}".format("Log Level = ", self.debugLevel))
         self.updater.checkVersionPoll()
+
+        self.logger.info(u"Updating device properties.")
+        for dev in indigo.devices.itervalues("self"):
+            props = dev.pluginProps
+            # Add props here
+            dev.replacePluginPropsOnServer(props)
 
     def deviceStartComm(self, dev):
         """ Start communication with plugin devices."""
@@ -132,6 +170,7 @@ class Plugin(indigo.PluginBase):
                          'fontMain': 'Arial',
                          'gridColor': '#888888',
                          'gridStyle': ':',
+                         'legendFontSize': '6',
                          'mainFontSize': '10',
                          'spineColor': '#888888',
                          'spineColorOther': '#888888',
@@ -197,9 +236,9 @@ class Plugin(indigo.PluginBase):
         # Chart dimension properties.
         for dimension_prop in ['rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize']:
             try:
-                if float(valuesDict[dimension_prop]) < 100:
-                    err_msg_dict[dimension_prop]  = u"The dimension value must be greater than 100 pixels."
-                    err_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is less than 100 pixels."
+                if float(valuesDict[dimension_prop]) < 75:
+                    err_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
+                    err_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is less than 75 pixels."
                     return False, valuesDict, err_msg_dict
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
@@ -323,9 +362,6 @@ class Plugin(indigo.PluginBase):
             # If enabled, reset all device config dialogs to a minimized state (all sub-groups minimized upon open.)
             if self.pluginPrefs['snappyConfigMenus']:
                 self.logger.debug(u"Enabling advanced feature: Snappy Config Menus.")
-                pluginProps['xAxisLabel']  = False
-                pluginProps['yAxisLabel']  = False
-                pluginProps['y2AxisLabel'] = False
                 pluginProps['barLabel1']   = False
                 pluginProps['barLabel2']   = False
                 pluginProps['barLabel3']   = False
@@ -334,6 +370,13 @@ class Plugin(indigo.PluginBase):
                 pluginProps['lineLabel2']  = False
                 pluginProps['lineLabel3']  = False
                 pluginProps['lineLabel4']  = False
+                pluginProps['groupLabel1']  = False
+                pluginProps['groupLabel2']  = False
+                pluginProps['groupLabel3']  = False
+                pluginProps['groupLabel4']  = False
+                pluginProps['xAxisLabel']  = False
+                pluginProps['y2AxisLabel'] = False
+                pluginProps['yAxisLabel']  = False
 
             return pluginProps
 
@@ -354,9 +397,9 @@ class Plugin(indigo.PluginBase):
         # Chart Custom Dimensions.
         for custom_dimension_prop in ['customSizeHeight', 'customSizeWidth', 'customSizePolar']:
             try:
-                if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 100:
-                    err_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 100 pixels."
-                    err_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 100 pixels."
+                if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 75:
+                    err_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
+                    err_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
                     return False, valuesDict, err_msg_dict
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
@@ -400,6 +443,7 @@ class Plugin(indigo.PluginBase):
         settings['enableCustomLineSegments'] = self.pluginPrefs['enableCustomLineSegments']
         settings['promoteCustomLineSegments'] = self.pluginPrefs['promoteCustomLineSegments']
         settings['snappyConfigMenus'] = self.pluginPrefs['snappyConfigMenus']
+        settings['forceOriginLines'] = self.pluginPrefs['forceOriginLines']
         self.logger.debug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
 
         return settings, err_msg_dict
@@ -415,6 +459,7 @@ class Plugin(indigo.PluginBase):
         self.pluginPrefs['enableCustomLineSegments']  = valuesDict['enableCustomLineSegments']
         self.pluginPrefs['promoteCustomLineSegments'] = valuesDict['promoteCustomLineSegments']
         self.pluginPrefs['snappyConfigMenus']         = valuesDict['snappyConfigMenus']
+        self.pluginPrefs['forceOriginLines']          = valuesDict['forceOriginLines']
 
         self.logger.debug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
         self.logger.info(u"{:=^80}".format(' Advanced settings saved. Regenerating Charts. '))
@@ -428,9 +473,10 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
         self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
-        self.logger.info(u"Use of custom colors: {0}".format(valuesDict['enableCustomColors']))
-        self.logger.info(u"Plot success messages: {0}".format(valuesDict['enableCustomLineSegments']))
-        self.logger.info(u"Plot success messages: {0}".format(valuesDict['snappyConfigMenus']))
+        self.logger.debug(u"Use of custom colors: {0}".format(valuesDict['enableCustomColors']))
+        self.logger.debug(u"Enable custom line segments: {0}".format(valuesDict['enableCustomLineSegments']))
+        self.logger.debug(u"Enable snappy config menus: {0}".format(valuesDict['snappyConfigMenus']))
+        self.logger.debug(u"Enable force origin lines: {0}".format(valuesDict['forceOriginLines']))
         self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
         return
 
@@ -708,9 +754,6 @@ class Plugin(indigo.PluginBase):
         p_dict['tick_right']  = 'off'
         p_dict['tick_top']    = 'off'
 
-        # A dict of plugin prefs (copy that we modify on the fly. We don't want to modify the original.) We add dev props to it later.
-        # p_dict  = dict(self.pluginPrefs)
-
         self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
         self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
@@ -779,6 +822,16 @@ class Plugin(indigo.PluginBase):
 
         for dev in indigo.devices.itervalues("self"):
 
+            # Custom font sizes for retina/non-retina adjustments.
+            try:
+                if dev.pluginProps['customSizeFont']:
+                    p_dict['mainFontSize'] = int(dev.pluginProps['customTitleFontSize'])
+                    plt.rcParams['xtick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
+                    plt.rcParams['ytick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
+            except KeyError:
+                # Not all devices may support this feature.
+                pass
+
             # kwargs
             k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
                                         'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center', 'textcoords': 'offset points',
@@ -821,46 +874,38 @@ class Plugin(indigo.PluginBase):
 
             p_dict.update(dev.pluginProps)
 
-            p_dict['bar_colors']     = []
-            p_dict['data_array']     = []
-            p_dict['dates_to_plot']  = []
-            p_dict['headers']        = []
-            p_dict['headers_1']      = ()  # Tuple
-            p_dict['headers_2']      = ()  # Tuple
-            p_dict['wind_direction'] = []
-            p_dict['wind_speed']     = []
-            p_dict['x_obs1']         = []
-            p_dict['x_obs2']         = []
-            p_dict['x_obs3']         = []
-            p_dict['x_obs4']         = []
-            p_dict['y_obs1']         = []
-            p_dict['y_obs1_max']     = []
-            p_dict['y_obs1_min']     = []
-            p_dict['y_obs2']         = []
-            p_dict['y_obs2_max']     = []
-            p_dict['y_obs2_min']     = []
-            p_dict['y_obs3']         = []
-            p_dict['y_obs3_max']     = []
-            p_dict['y_obs3_min']     = []
-            p_dict['y_obs4']         = []
-            p_dict['y_obs4_max']     = []
-            p_dict['y_obs4_min']     = []
+            p_dict['bar_colors']        = []
+            p_dict['customTicksLabelY'] = []
+            p_dict['customTicksY']      = []
+            p_dict['data_array']        = []
+            p_dict['dates_to_plot']     = []
+            p_dict['headers']           = []
+            p_dict['headers_1']         = ()  # Tuple
+            p_dict['headers_2']         = ()  # Tuple
+            p_dict['wind_direction']    = []
+            p_dict['wind_speed']        = []
+            p_dict['x_obs1']            = []
+            p_dict['x_obs2']            = []
+            p_dict['x_obs3']            = []
+            p_dict['x_obs4']            = []
+            p_dict['y_obs1']            = []
+            p_dict['y_obs1_max']        = []
+            p_dict['y_obs1_min']        = []
+            p_dict['y_obs2']            = []
+            p_dict['y_obs2_max']        = []
+            p_dict['y_obs2_min']        = []
+            p_dict['y_obs3']            = []
+            p_dict['y_obs3_max']        = []
+            p_dict['y_obs3_min']        = []
+            p_dict['y_obs4']            = []
+            p_dict['y_obs4_max']        = []
+            p_dict['y_obs4_min']        = []
 
             if dev.enabled and dev.model != "CSV Engine":
 
                 kv_list = []  # A list of state/value pairs used to feed updateStatesOnServer()
                 kv_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'})
                 p_dict.update(dev.pluginProps)
-
-                # Custom font sizes for retina/non-retina adjustments.
-                try:
-                    if dev.pluginProps['customSizeFont']:
-                        p_dict['mainFontSize'] = int(dev.pluginProps['customTitleFontSize'])
-                        plt.rcParams['xtick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
-                        plt.rcParams['ytick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
-                except KeyError:
-                    # Not all devices may support this feature.
-                    pass
 
                 # Limit number of observations
                 try:
@@ -874,13 +919,15 @@ class Plugin(indigo.PluginBase):
 
                 # Custom Square Size
                 try:
-                    if p_dict['customSizePolar'] != 'None':
+                    if p_dict['customSizePolar'] == 'None':
+                        pass
+                    else:
                         p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
                 except KeyError:
                     pass
                 except ValueError:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.warning(u"{0}: Custom size must be a positive number or None.")
+                    self.logger.warning(u"Custom size must be a positive number or None.")
 
                 # Extra Wide Chart
                 try:
@@ -972,6 +1019,10 @@ class Plugin(indigo.PluginBase):
                 if dev.deviceTypeId == 'multiLineText':
                     self.chartMultilineText(dev, p_dict, k_dict, kv_list)
 
+                # ======= Scatter Charts ======
+                if dev.deviceTypeId == "scatterChartingDevice":
+                    self.chartSimpleScatter(dev, p_dict, k_dict, kv_list)
+
                 # ======= Polar Charts ======
                 if dev.deviceTypeId == "polarChartingDevice":
                     self.chartPolar(dev, p_dict, k_dict, kv_list)
@@ -995,7 +1046,7 @@ class Plugin(indigo.PluginBase):
                     self.pluginErrorHandler(traceback.format_exc())
                     self.logger.critical(u"ValueError: {0}".format(sub_error))
 
-                plt.clf()  # In theory, this is redundate of close('all') below
+                plt.clf()  # In theory, this is redundant of close('all') below
                 plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
 
             else:
@@ -1015,30 +1066,43 @@ class Plugin(indigo.PluginBase):
     def refreshTheChartsAction(self, action):
         """ Called by an Indigo Action item. """
 
-        # indigo.server.log(str(indigo.devices[action.deviceId].address))  # to pull something from the specified device
-        # indigo.server.log(str(indigo.devices[action.deviceId].pluginProps['bar1Color']))  # to pull a prop from the specified device
-
         self.logger.debug(u"{0:*^40}".format(' Refresh Charts Action '))
         self.logger.threaddebug(u"  valuesDict: {0}".format(action))
         self.refreshTheCharts()
         self.logger.info(u"{:=^80}".format(' Cycle complete. '))
 
-    def refreshTheChartsActionTest(self, action):
-        """ Called by an Indigo Action item. """
+    def plotActionTest(self, pluginAction, dev, callerWaitingForResult):
+        """
+        A container for simple API calls to the matplotlib plugin.  Receives
+        payload = {'x_values': [1, 2, 3],
+                   'y_values': [2, 4, 6],
+                   'kwargs': {'linestyle': 'dashed',
+                              'color': 'b',
+                              'marker': 's',
+                              'markerfacecolor': 'b'},
+                   'path': '/full/path/name/',
+                   'filename': 'chart_filename.png'}
+        All payload elements are required, although kwargs can be an empty
+        dict if no kwargs desired.
 
-        # indigo.server.log(u"action.props['foo'] = {0}".format(action.props))
-        # indigo.server.log(u"action.props['foo'] = {0}".format(action.props['foo']))
-        self.plotActionTest(action.props)
+        If caller is waiting for a result (recommended), returns a dict.
+        :param pluginAction:
+        :param dev:
+        :param callerWaitingForResult:
+        :return:
+        """
+        try:
+            plt.plot(pluginAction.props['x_values'], pluginAction.props['y_values'], **pluginAction.props['kwargs'])
+            plt.savefig(u"{0}{1}".format(pluginAction.props['path'], pluginAction.props['filename']))
+            plt.close('all')
 
-        self.logger.debug(u"{0:*^40}".format(' Refresh Charts Action '))
-        self.logger.threaddebug(u"action dict: {0}".format(action))
+        except Exception as err:
+            if callerWaitingForResult:
+                indigo.server.log(u"Error: {0}".format(err), isError=True)
+                return {'success': False, 'message': u"{0}".format(err)}
 
-    def plotActionTest(self, payload):
-        """"""
-
-        plt.plot(payload['x_values'], payload['y_values'])
-        plt.savefig(u"{0}{1}".format(payload['path'], payload['filename']))
-        plt.close('all')
+        if callerWaitingForResult:
+            return {'success': True, 'message': u"Success"}
 
     def chartSimpleBar(self, dev, p_dict, k_dict, kv_list):
         """"""
@@ -1138,6 +1202,10 @@ class Plugin(indigo.PluginBase):
                         y_axis_max = max(p_dict['data_array']) * 1.02
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
+                # Mirror Y axis values on Y2.
+                if p_dict['yMirrorValues']:
+                    ax.tick_params(labelright=True)
+
             except ValueError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error))
@@ -1155,6 +1223,8 @@ class Plugin(indigo.PluginBase):
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(bar)][len(p_dict['y_obs{0}'.format(bar)]) - num_obs:]), color=p_dict['bar{0}Color'.format(bar)], **k_dict['k_min'])
                 if p_dict['plotBar{0}Max'.format(bar)]:
                     ax.axhline(y=max(p_dict['y_obs{0}'.format(bar)][len(p_dict['y_obs{0}'.format(bar)]) - num_obs:]), color=p_dict['bar{0}Color'.format(bar)], **k_dict['k_max'])
+                if self.pluginPrefs.get('forceOriginLines', True):
+                    ax.axhline(y=0, color=p_dict['spineColor'])
 
             # Chart title
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
@@ -1175,7 +1245,19 @@ class Plugin(indigo.PluginBase):
             # Legend Properties
             self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
             if p_dict['showLegend']:
-                legend = ax.legend(p_dict['headers'], loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': 6})
+
+                # Amend the headers if there are any custom legend entries defined.
+                counter = 1
+                final_headers = []
+                headers = [_.decode('utf-8') for _ in p_dict['headers']]
+                for header in headers:
+                    if p_dict['bar{0}Legend'.format(counter)] == "":
+                        final_headers.append(header)
+                    else:
+                        final_headers.append(p_dict['bar{0}Legend'.format(counter)])
+                    counter += 1
+
+                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -1186,6 +1268,18 @@ class Plugin(indigo.PluginBase):
                 plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
             if p_dict['showyAxisGrid']:
                 plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
+
+            # Custom Y ticks
+            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+            try:
+                marks  = [float(_) for _ in p_dict['customTicksY'].split(",")]
+                if p_dict['customTicksLabelY'] == "":
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
+                else:
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
+                plt.yticks(marks, labels)
+            except:
+                pass
 
             plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.15, right=0.92)
@@ -1284,8 +1378,6 @@ class Plugin(indigo.PluginBase):
                                  marker=p_dict['line{0}Marker'.format(line)], markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
-                    # num_obs = len(p_dict['y_obs{0}'.format(line)])  # TODO: what is the story with num_obs? Let's comment it out and see if anything breaks.
-
                     if p_dict['line{0}Fill'.format(line)]:
                         ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
@@ -1328,6 +1420,10 @@ class Plugin(indigo.PluginBase):
                         y_axis_max = max(p_dict['data_array']) * 1.02
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
+                # Mirror Y axis values on Y2.
+                if p_dict['yMirrorValues']:
+                    ax.tick_params(labelright=True)
+
             except ValueError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error))
@@ -1344,6 +1440,8 @@ class Plugin(indigo.PluginBase):
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_min'])
                 if p_dict['plotLine{0}Max'.format(line)]:
                     ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_max'])
+                if self.pluginPrefs.get('forceOriginLines', True):
+                    ax.axhline(y=0, color=p_dict['spineColor'])
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -1352,7 +1450,20 @@ class Plugin(indigo.PluginBase):
             # Legend
             self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
             if p_dict['showLegend']:
-                legend = ax.legend(p_dict['headers'], loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': 6})
+
+                # Amend the headers if there are any custom legend entries defined.
+                counter = 1
+                final_headers = []
+                headers = [_.decode('utf-8') for _ in p_dict['headers']]
+                for header in headers:
+                    if p_dict['line{0}Legend'.format(counter)] == "":
+                        final_headers.append(header)
+                    else:
+                        final_headers.append(p_dict['line{0}Legend'.format(counter)])
+                    counter += 1
+
+                # Set the legend
+                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -1371,7 +1482,17 @@ class Plugin(indigo.PluginBase):
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
                 self.logger.warning(u"{0}: X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
+            # Custom Y ticks
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+            try:
+                marks  = [float(_) for _ in p_dict['customTicksY'].split(",")]
+                if p_dict['customTicksLabelY'] == "":
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
+                else:
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
+                plt.yticks(marks, labels)
+            except:
+                pass
 
             plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.15, right=0.92)
@@ -1448,6 +1569,185 @@ class Plugin(indigo.PluginBase):
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.critical(u"{0}: Check path to CSV file ({1})".format(dev.name, sub_error))
 
+    def chartSimpleScatter(self, dev, p_dict, k_dict, kv_list):
+        """"""
+
+        try:
+
+            dates_to_plot = p_dict['dates_to_plot']
+
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+
+            fig = plt.figure(1, figsize=(p_dict['chart_width'] / plt.rcParams['savefig.dpi'], p_dict['chart_height'] / plt.rcParams['savefig.dpi']))
+            ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
+            ax.margins(0.04, 0.05)
+
+            [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+
+            ax.tick_params(axis='x', **k_dict['k_major_x'])
+            ax.tick_params(axis='x', **k_dict['k_minor_x'])
+            ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
+
+            ax.tick_params(axis='y', **k_dict['k_major_y'])
+            ax.tick_params(axis='y', **k_dict['k_minor_y'])
+            ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision']))))
+
+            for line in range(1, 5, 1):
+
+                # If line color is custom, set it equal to the custom color value.
+                if p_dict['group{0}Color'.format(line)] == 'custom':
+                    p_dict['group{0}Color'.format(line)] = p_dict['line{0}ColorOther'.format(line)]
+
+                # If line marker color is custom, set it equal to the custom color value.
+                if p_dict['group{0}MarkerColor'.format(line)] == 'custom':
+                    p_dict['group{0}MarkerColor'.format(line)] = p_dict['group{0}MarkerColorOther'.format(line)]
+
+                # If line color is the same as the background color, alert the user.
+                if p_dict['group{0}Color'.format(line)] == p_dict['backgroundColor']:
+                    self.logger.warning(u"{0}: Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
+
+                # Plot the points
+                if p_dict['group{0}Source'.format(line)] not in ["", "None"]:
+
+                    data_column = self.getTheData('{0}{1}'.format(self.pluginPrefs['dataPath'], p_dict['group{0}Source'.format(line)]))
+                    p_dict['headers'].append(data_column[0][1])
+                    del data_column[0]
+
+                    # Pull the observations into distinct lists for charting.
+                    for element in data_column:
+                        p_dict['x_obs{0}'.format(line)].append(element[0])
+                        p_dict['y_obs{0}'.format(line)].append(float(element[1]))
+
+                    # Convert the date strings for charting.
+                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M:%S.%f') for obs in p_dict['x_obs{0}'.format(line)]]
+                    dates_to_plot = mdate.date2num(list_of_dates)
+
+                    # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
+                    ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(line)], c=p_dict['group{0}Color'.format(line)], marker=p_dict['group{0}Marker'.format(line)],
+                               edgecolor=p_dict['group{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
+                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+
+            self.plotCustomLineSegments(ax, dates_to_plot, k_dict, p_dict)
+
+            self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                                  min(p_dict['data_array']),
+                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
+
+            try:
+                # Min and Max are not 'None'.
+                if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
+                    y_axis_min = float(p_dict['yAxisMin'])
+                    y_axis_max = float(p_dict['yAxisMax'])
+
+                # Max is 'None'.
+                elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
+                    y_axis_min = float(p_dict['yAxisMin'])
+                    y_axis_max = max(p_dict['data_array'])
+
+                # Min is 'None'.
+                elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
+                    y_axis_min = min(p_dict['data_array'])
+                    y_axis_max = float(p_dict['yAxisMax'])
+
+                # Both min and max are not 'None'.
+                else:
+                    if max(p_dict['data_array']) - min(p_dict['data_array']) == 0:
+                        y_axis_min = 0
+                        y_axis_max = 1
+                    elif max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
+                        y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
+                        y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
+                    else:
+                        y_axis_min = min(p_dict['data_array']) * 0.98
+                        y_axis_max = max(p_dict['data_array']) * 1.02
+                plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
+
+                # Mirror Y axis values on Y2.
+                if p_dict['yMirrorValues']:
+                    ax.tick_params(labelright=True)
+
+            except ValueError as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error))
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
+
+            # Set the scale for the X axis. We assume a date.
+            self.setAxisScaleX(p_dict['xAxisBins'])
+
+            # For lines 1-4, plot min and max as warranted.
+            for group in range(1, 5, 1):
+                if p_dict['plotGroup{0}Min'.format(group)]:
+                    ax.axhline(y=min(p_dict['y_obs{0}'.format(group)]), color=p_dict['group{0}Color'.format(line)], **k_dict['k_min'])
+                if p_dict['plotGroup{0}Max'.format(group)]:
+                    ax.axhline(y=max(p_dict['y_obs{0}'.format(group)]), color=p_dict['group{0}Color'.format(line)], **k_dict['k_max'])
+                if self.pluginPrefs.get('forceOriginLines', True):
+                    ax.axhline(y=0, color=p_dict['spineColor'])
+
+            # Legend
+            self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+            if p_dict['showLegend']:
+
+                # Amend the headers if there are any custom legend entries defined.
+                counter = 1
+                legend_styles = []
+                final_headers = []
+
+                headers = [_.decode('utf-8') for _ in p_dict['headers']]
+                for header in headers:
+                    if p_dict['group{0}Legend'.format(counter)] == "":
+                        final_headers.append(header)
+                    else:
+                        final_headers.append(p_dict['group{0}Legend'.format(counter)])
+
+                    legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
+                                                        markerfacecolor=p_dict['group{0}Color'.format(counter)])))
+                    counter += 1
+
+                legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, numpoints=1, prop={'size': float(p_dict['legendFontSize'])})
+                [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+                frame = legend.get_frame()
+                frame.set_alpha(0)
+
+            # Grids
+            self.logger.debug(u"Display grids [X/Y]: {0} / {1}".format(p_dict['showxAxisGrid'], p_dict['showyAxisGrid']))
+            if p_dict['showxAxisGrid']:
+                plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
+            if p_dict['showyAxisGrid']:
+                plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
+
+            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+
+            if not p_dict['showLegend']:
+                plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
+            if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
+                self.logger.warning(u"{0}: X axis label is suppressed to make room for the chart legend.".format(dev.name))
+
+            # Custom Y ticks
+            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+            try:
+                marks  = [float(_) for _ in p_dict['customTicksY'].split(",")]
+                if p_dict['customTicksLabelY'] == "":
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
+                else:
+                    labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
+                plt.yticks(marks, labels)
+            except:
+                pass
+            plt.tight_layout(pad=1)
+            plt.subplots_adjust(top=0.9, bottom=0.15, right=0.92)
+
+            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+
+        except IndexError as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"{0}: Check the structure of the CSV file ({1})".format(dev.name, sub_error))
+
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"{0}: Check path to CSV file ({1})".format(dev.name, sub_error))
+
     def chartSimpleNodeMatrix(self, dev, p_dict, k_dict, kv_list):
         """"""
         pass
@@ -1482,7 +1782,6 @@ class Plugin(indigo.PluginBase):
                     self.final_data.append(self.getTheData(radii_path))
 
                     # Pull out the header information out of the data.
-                    # p_dict['headers'] = (self.final_data[0][0][1], self.final_data[1][0][1])
                     del self.final_data[0][0]
                     del self.final_data[1][0]
 
@@ -1515,8 +1814,6 @@ class Plugin(indigo.PluginBase):
 
                 # Polar plots are in radians (not degrees.)
                 p_dict['wind_direction'] = np.radians(p_dict['wind_direction'])
-
-                # polar(theta, r, color)
                 wind = zip(p_dict['wind_direction'], p_dict['wind_speed'], p_dict['bar_colors'])
 
                 # Customizations.
@@ -1551,6 +1848,11 @@ class Plugin(indigo.PluginBase):
                     plt.text(0.5, 0.5, u"Holy crap!", color='#FFFFFF', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
                              bbox=dict(facecolor='red', alpha=0.5))
 
+                if p_dict['xHideLabels']:
+                    ax.axes.xaxis.set_ticklabels([])
+                if p_dict['yHideLabels']:
+                    ax.axes.yaxis.set_ticklabels([])
+
                 # Plot circles for current obs and max wind. Note that we reduce the value of the circle plot so that it appears when transparent charts are enabled (otherwise
                 # the circle is obscured. The transform can be done one of two ways: access the private attribute "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
                 fig = plt.gcf()
@@ -1580,7 +1882,7 @@ class Plugin(indigo.PluginBase):
                 # Legend Properties
                 self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
                 if p_dict['showLegend']:
-                    legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': 6})
+                    legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
                     legend.legendHandles[0].set_color(p_dict['currentWindColor'])
                     legend.legendHandles[1].set_color(p_dict['maxWindColor'])
                     [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
@@ -1701,13 +2003,51 @@ class Plugin(indigo.PluginBase):
                     for xy in zip(dates_to_plot, p_dict['y_obs3']):
                         ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            plt.ylim(0, 100)
+            try:
+                # Y2 Min/Max
+                if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
+                    y2_axis_min = float(p_dict['y2AxisMin'])
+                    y2_axis_max = float(p_dict['y2AxisMax'])
+
+                elif p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] == 'None':
+                    y2_axis_min = float(p_dict['y2AxisMin'])
+                    y2_axis_max = max(p_dict['y_obs3'])
+
+                elif p_dict['y2AxisMin'] == 'None' and p_dict['y2AxisMax'] != 'None':
+                    # y2_axis_min = min(p_dict['y_obs3'])
+                    y2_axis_min = 0
+                    y2_axis_max = float(p_dict['y2AxisMax'])
+
+                else:
+                    if max(p_dict['y_obs3']) - min(p_dict['y_obs3']) == 0:
+                        y2_axis_min = 0
+                        y2_axis_max = 1
+                    elif max(p_dict['y_obs3']) != 0 and min(p_dict['y_obs3']) != 0 and 0 < max(p_dict['y_obs3']) - min(p_dict['y_obs3']) <= 1:
+                        y2_axis_min = min(p_dict['y_obs3']) * (1 - (1 / min(p_dict['y_obs3']) ** 1.25))
+                        y2_axis_max = max(p_dict['y_obs3']) * (1 + (1 / max(p_dict['y_obs3']) ** 1.25))
+                    else:
+                        if min(p_dict['y_obs3']) < 0:
+                            y2_axis_min = min(p_dict['y_obs3']) * 1.5
+                        else:
+                            y2_axis_min = min(p_dict['y_obs3']) * 0.75
+                        if max(p_dict['y_obs3']) < 0:
+                            y2_axis_max = 0
+                        else:
+                            y2_axis_max = max(p_dict['y_obs3']) * 1.10
+                plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
+
+            except ValueError:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name))
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
 
             # X Axis Label
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], k_dict['k_x_axis_font'])
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-                self.logger.warning(u"{0}: X axis label [{1}] is suppressed to make room for the chart legend.".format(dev.name, p_dict['customAxisLabelX']))
+                self.logger.warning(u"{0}: X axis label suppressed to make room for the chart legend.".format(dev.name))
 
             # Y1 Axis Label
             plt.ylabel(p_dict['customAxisLabelY'], labelpad=20, **k_dict['k_y_axis_font'])
@@ -1715,7 +2055,8 @@ class Plugin(indigo.PluginBase):
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the precipitation subplot.)
             self.logger.debug(u"Display legend 1: {0}".format(p_dict['showLegend']))
             if p_dict['showLegend']:
-                legend = ax1.legend(p_dict['headers_2'], loc='upper right', bbox_to_anchor=(1.0, -0.1), ncol=1, prop={'size': 6})
+                headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
+                legend = ax1.legend(headers, loc='upper right', bbox_to_anchor=(1.0, -0.1), ncol=1, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -1748,9 +2089,6 @@ class Plugin(indigo.PluginBase):
 
             self.plotCustomLineSegments(ax2, dates_to_plot, k_dict, p_dict)
 
-            # y1, y2 = ax2.get_ylim()
-            # plt.ylim((y1 * .9), y2)
-
             # X2 Axis properties
             ax2.tick_params(axis='x', **k_dict['k_major_x'])
             ax2.tick_params(axis='x', **k_dict['k_minor_x'])
@@ -1772,6 +2110,7 @@ class Plugin(indigo.PluginBase):
                                                                                      min(p_dict['data_array']),
                                                                                      max(p_dict['data_array']) - min(p_dict['data_array'])))
 
+            # Y1 Axis Min/Max
             try:
                 if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
                     y_axis_min = float(p_dict['yAxisMin'])
@@ -1822,7 +2161,8 @@ class Plugin(indigo.PluginBase):
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the temperatures subplot.)
             self.logger.debug(u"Display legend 2: {0}".format(p_dict['showLegend']))
             if p_dict['showLegend']:
-                legend = ax2.legend(p_dict['headers_1'], loc='upper left', bbox_to_anchor=(0.0, -0.1), ncol=2, prop={'size': 6})
+                headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
+                legend = ax2.legend(headers, loc='upper left', bbox_to_anchor=(0.0, -0.1), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)  # Note: frame alpha should be an int and not '0'.
@@ -2124,7 +2464,8 @@ class Plugin(indigo.PluginBase):
             ("17", "17"),
             ("18", "18"),
             ("19", "19"),
-            ("20", "20")]
+            ("20", "20"),
+        ]
 
         return font_size_menu
 
@@ -2273,7 +2614,6 @@ class Plugin(indigo.PluginBase):
 
         if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ["", "None"]:
             try:
-                # num_obs = len(dates_to_plot)  # TODO: what is the story with num_obs? Let's comment it out and see if anything breaks.
                 constants_to_plot = literal_eval(p_dict['customLineSegments'])
                 for element in constants_to_plot:
                     if type(element) == tuple:
