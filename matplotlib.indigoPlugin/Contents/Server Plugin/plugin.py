@@ -132,14 +132,14 @@ class Plugin(indigo.PluginBase):
             # Add props here
             dev.replacePluginPropsOnServer(props)
 
+    def shutdown(self):
+        """ Plugin shutdown routines."""
+        self.logger.debug(u"{0:*^40}".format(' Shut Down '))
+
     def deviceStartComm(self, dev):
         """ Start communication with plugin devices."""
         self.logger.debug(u"Starting device: {0}".format(dev.name))
         dev.stateListOrDisplayStateIdChanged()
-
-    def shutdown(self):
-        """ Plugin shutdown routines."""
-        self.logger.debug(u"{0:*^40}".format(' Shut Down '))
 
     def deviceStopComm(self, dev):
         """ Stop communication with plugin devices."""
