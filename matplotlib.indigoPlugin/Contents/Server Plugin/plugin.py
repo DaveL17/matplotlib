@@ -17,7 +17,6 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Create an error chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy)
-# TODO: scatter legend is a line instead of a dot.
 
 
 from ast import literal_eval
