@@ -1,3 +1,20 @@
+v0.4.02
+- Adds new device type for tracking rcParams.
+- Adds optional border around multiline text plots.
+- Adds additional option to Mirror Y axis labels to have labels display *only*
+  on Y2.
+- Logs warning when CSV Engine data element source ID is None type.
+- Properly sets the state of the device indicator in the main Indigo UI (green
+  if enabled, gray if disabled), and provides a small set of status messages
+  as the plugin cycles.
+- Fixes bug where certain devices with unicode characters in a path name would
+  fail.
+- Fixes bug where 'pixel', 'triangle left' and 'triangle right' marker styles
+  would cause an error (scatter charts only).
+- Minor UI refinements.
+- Various code refinements.
+- Various error reporting improvements.
+
 v0.4.01
 - Adds new Scatter chart type.
 - Adds baseline API to allow scripters the ability to send data to create

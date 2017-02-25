@@ -72,6 +72,7 @@
     <li>Bar Charts</li>
     <li>Calendar graphics</li>
     <li>Line Charts</li>
+    <li>Matplotlib Parameters</li>
     <li>Multiline Text Graphics</li>
     <li>Polar Charts</li>
     <li>Scatter Charts</li>
@@ -165,7 +166,7 @@
                         applied to the tick marks (in order, starting from the bottom). In order to use custom tick labels, you must also use custom tick locations. If you don't specify
                         anything in the tick locations field, the custom tick labels field will be ignored.<br><br></li>
                     <li><span>&nbsp;Tick Locations&nbsp;</span> - the tick locations setting will control the placement of the tick marks on the Y axis. For example, if you were charting
-                        wind direction, matplotlib might automatically place tick marks every 50 degrees.  While accurate, it's not particularly helpful or visually appealing. Therefore,
+                        wind direction, matplotlib might automatically place tick marks every 50 degrees. While accurate, it's not particularly helpful or visually appealing. Therefore,
                         with this setting you could choose to only place tick marks at 0, 90, 180, 270, 360 degrees. The plugin will then only plot tick marks at these values. If you do
                         not specify custom tick locations, matplotlib will do its best to place them for you.<br><br></li>
                 </ul>
@@ -285,6 +286,9 @@
     <li><span>&nbsp;Matplotlib Style Sheets&nbsp;</span> - You can also modify the Matplotlib style sheet (located within the plugin package). Note that the plugin necessarily modifies
         some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by
         newer versions of the plugin).<br><br></li>
+    <li><span>&nbsp;Matplotlib Parameters Device&nbsp;</span> - the Matplotlib Parameters Device a special device type which is not used for generating charts. It is used as a
+        repository that holds the initial matplotlibrc configuration settings so that you can see at a glance the initial parameters that the plugin uses <strong><u>before</u></strong>
+        any customizations are applied. There are no settings or configurations for the Matplotlib Parameters device.<br><br></li>
 </ul>
 
 <h3>Sample Charts</h3>

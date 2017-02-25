@@ -231,13 +231,21 @@
         <Label>Title Font Size:</Label>
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
+    <Field id="emailLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+        <Label>Plugin Update Notifications</Label>
+    </Field>
     <Field id="separator02" type="separator"/>
     <Field id="updaterEmailsEnabled" type="checkbox" defaultValue="false">
-        <Label>Email Update Notifications:</Label>
+        <Label>Enable:</Label>
+        <Description>Yes/No</Description>
     </Field>
     <Field id="updaterEmail" type="textfield">
         <Label>Email:</Label>
     </Field>
+    <Field id="debugLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+        <Label>Debugging</Label>
+    </Field>
+    <Field id="separator03" type="separator"/>
     <Field id="showDebugLevel" type="menu" defaultValue="30" tooltip="Controls the amount of debug information written to the log.">
         <Label>Debug level:</Label>
         <Description/>
@@ -255,7 +263,7 @@
 Debugging Messages = Step by step plugin logging.
 Informational Messages = Useful information about plugin health.
 Warning Messages = Warnings about settings that may conflict.
-Error Messages = Error messages alert you should address.
+Error Messages = Error messages you might want to address.
 Critical Errors Only = Critical errors that should probably be reported.
         </Label>
     </Field>
