@@ -1,3 +1,6 @@
+v0.4.03
+- Adds steps mid and steps post to linestyles.
+
 v0.4.02
 - Adds new device type for tracking rcParams.
 - Adds optional border around multiline text plots.

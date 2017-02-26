@@ -4,6 +4,7 @@
 """
 matplotlib plugin
 author: DaveL17
+
 The matplotlib plugin is used to produce various types of charts and graphics
 for use on Indigo control pages. The key benefits of the plugin are its ability
 to make global changes to all generated charts (i.e., fonts, colors) and its
@@ -54,7 +55,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.02"
+__version__   = "0.4.03"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -2557,7 +2558,9 @@ class Plugin(indigo.PluginBase):
             (":", "Dotted"),
             ("-.", "Dot Dash"),
             ("-", "Solid"),
-            ("steps", "Steps")]
+            ("steps", "Steps"),
+            ("steps-mid", "Steps Mid")
+            ("steps-post", "Steps Post")]
 
         return line_list_menu
 
