@@ -31,11 +31,12 @@
             <Field id="addSource" type="menu">
                 <Label>ID:</Label>
                 <List class="self" filter="" method="csvSource" dynamicReload="true"/>
-            </Field>
-            <Field id="refreshStates" type="button">
-                <Title>Refresh Available Data Sources</Title>
                 <CallbackMethod>csvSourceIdUpdated</CallbackMethod>
             </Field>
+            <!--<Field id="refreshStates" type="button">-->
+                <!--<Title>Refresh Available Data Sources</Title>-->
+                <!--<CallbackMethod>csvSourceIdUpdated</CallbackMethod>-->
+            <!--</Field>-->
             <Field id="addState" type="menu">
                 <Label>Data:</Label>
                 <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>

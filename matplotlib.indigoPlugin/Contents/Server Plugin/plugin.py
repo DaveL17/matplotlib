@@ -18,10 +18,9 @@ proper WUnderground devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
 # TODO: Unicode gremlins
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
-# TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown.
-
-# Known Issues:
-# TODO: Look at fill with steps line style.
+# TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
+# TODO: Look at fill with steps line style via the plugin API.
+# TODO: Variable refresh rates
 
 from ast import literal_eval
 from csv import reader
