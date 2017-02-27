@@ -20,7 +20,7 @@ proper WUnderground devices.
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
 # TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Look at fill with steps line style via the plugin API.
-# TODO: Variable refresh rates
+# TODO: Variable refresh rates for each device so it can update on its own.
 
 from ast import literal_eval
 from csv import reader
