@@ -2568,7 +2568,7 @@ class Plugin(indigo.PluginBase):
             ("-.", "Dot Dash"),
             ("-", "Solid"),
             ("steps", "Steps"),
-            ("steps-mid", "Steps Mid",)
+            ("steps-mid", "Steps Mid"),
             ("steps-post", "Steps Post")]
 
         return line_list_menu
