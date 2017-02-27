@@ -16,11 +16,12 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
-
 # TODO: Unicode gremlins
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
 # TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown.
 
+# Known Issues:
+# TODO: Look at fill with steps line style.
 
 from ast import literal_eval
 from csv import reader
@@ -625,6 +626,15 @@ class Plugin(indigo.PluginBase):
         valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string for storage.
 
         return valuesDict, err_msg_dict
+
+    def csvSource(self, typeId, valuesDict, devId, targetId):
+        """"""
+        list_of = []
+
+        [list_of.append((dev.id, u"(D) {0}".format(dev.name))) for dev in indigo.devices.iter()]
+        [list_of.append((var.id, u"(V) {0}".format(var.name))) for var in indigo.variables.iter()]
+
+        return list_of
 
     def csvSourceIdUpdated(self, typeId, valuesDict, devId):
         """"""
@@ -2559,7 +2569,7 @@ class Plugin(indigo.PluginBase):
             ("-.", "Dot Dash"),
             ("-", "Solid"),
             ("steps", "Steps"),
-            ("steps-mid", "Steps Mid")
+            ("steps-mid", "Steps Mid",)
             ("steps-post", "Steps Post")]
 
         return line_list_menu
