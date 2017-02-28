@@ -641,16 +641,32 @@ class Plugin(indigo.PluginBase):
 
     def deviceStateValueList(self, typeId, valuesDict, devId, targetId):
         """"""
-        try:
-            if int(valuesDict['addSource']) in indigo.devices:
-                dev = indigo.devices[int(valuesDict['addSource'])]
-                return [x for x in dev.states.keys() if ".ui" not in x]
-            elif int(valuesDict['addSource']) in indigo.variables:
-                return [('value', 'value')]
-            else:
+
+        if valuesDict['addSource'] != u'':
+            try:
+                if int(valuesDict['addSource']) in indigo.devices:
+                    dev = indigo.devices[int(valuesDict['addSource'])]
+                    return [x for x in dev.states.keys() if ".ui" not in x]
+                elif int(valuesDict['addSource']) in indigo.variables:
+                    return [('value', 'value')]
+                else:
+                    return [('None', 'Enter a Valid ID Number')]
+            except ValueError:
                 return [('None', 'Enter a Valid ID Number')]
-        except ValueError:
-            return [('None', 'Enter a Valid ID Number')]
+
+        if valuesDict['editSource'] != u'':
+            try:
+                if int(valuesDict['editSource']) in indigo.devices:
+                    dev = indigo.devices[int(valuesDict['editSource'])]
+                    return [x for x in dev.states.keys() if ".ui" not in x]
+                elif int(valuesDict['editSource']) in indigo.variables:
+                    return [('value', 'value')]
+                else:
+                    return [('None', 'Enter a Valid ID Number')]
+            except ValueError:
+                return [('None', 'Enter a Valid ID Number')]
+        else:
+            return [('None', 'Please select a source ID first')]
 
     def getDeviceStateList(self, dev):
         """ getDeviceStateList is called automatically by
