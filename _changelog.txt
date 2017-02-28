@@ -1,7 +1,7 @@
 v0.4.03
 - Adds steps mid and steps post to linestyles.
-- Refactors CSV Engine configuration dialog to pre-populate all devices and
-  variables into dropdown menus so data no longer needs to be entered manually.
+- Refactors CSV Engine configuration dialog to pre-populate dropdown menus so
+  data no longer needs to be entered manually.
 
 v0.4.02
 - Adds new device type for tracking rcParams.
