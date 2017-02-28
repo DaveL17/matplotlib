@@ -1038,10 +1038,11 @@ class Plugin(indigo.PluginBase):
                     self.pluginErrorHandler(traceback.format_exc())
 
                 try:
-                    if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
-                        p_dict['customAxisLabelY2'] = 'null'
-                        k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                                       'weight': p_dict['font_weight'], 'visible': True}
+                    if 'customAxisLabelY2' in p_dict.keys():  # Not all devices that get to this point will support Y2.
+                        if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
+                            p_dict['customAxisLabelY2'] = 'null'
+                            k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
+                                                           'weight': p_dict['font_weight'], 'visible': True}
                 except KeyError:
                     self.pluginErrorHandler(traceback.format_exc())
                     pass
