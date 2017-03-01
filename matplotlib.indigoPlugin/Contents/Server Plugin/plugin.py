@@ -197,7 +197,7 @@ class Plugin(indigo.PluginBase):
         """ Validate select plugin config menu settings."""
         self.debugLevel = int(valuesDict['showDebugLevel'])
         self.indigo_log_handler.setLevel(self.debugLevel)
-        self.logger.threaddebug(u"Config UI validator valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"Config UI validator valuesDict: {0}".format(dict(valuesDict)))
 
         err_msg_dict = indigo.Dict()
 
@@ -271,7 +271,7 @@ class Plugin(indigo.PluginBase):
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         """ User closes config menu. The validatePrefsConfigUI() method will
         also be called."""
-        self.logger.threaddebug(u"Final valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"Final valuesDict: {0}".format(dict(valuesDict)))
 
         # If the user selects Save, let's redraw the charts so that they reflect the new settings.
         if not userCancelled:
@@ -283,8 +283,8 @@ class Plugin(indigo.PluginBase):
         """The getDeviceConfigUiValues() method is called when a device config
         is opened."""
         self.logger.debug(u"{0:*^40}".format(' Plugin Settings Menu '))
-        self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
+        # self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
 
         try:
 
@@ -395,8 +395,8 @@ class Plugin(indigo.PluginBase):
     def validateDeviceConfigUi(self, valuesDict, typeId, devId):
         """ Validate select device config menu settings."""
         self.logger.debug(u"{0:*^40}".format(' Validate Device Config UI '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         err_msg_dict = indigo.Dict()
 
@@ -433,8 +433,8 @@ class Plugin(indigo.PluginBase):
         config dialog either by save or cancel. Note that a device can't be
         updated from here because valuesDict has yet to be saved."""
         self.logger.debug(u"{0:*^40}".format(' Closed Device Configuration Dialog '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
 
     def getMenuActionConfigUiValues(self, menuId):
         """The getMenuActionConfigUiValues() method loads the settings
@@ -459,7 +459,7 @@ class Plugin(indigo.PluginBase):
         settings will be controlled. This method takes the returned values
         and sends them to the pluginPrefs for permanent storage."""
         # Note that valuesDict here is for the menu, not all plugin prefs.
-        self.logger.threaddebug(u"menuId = {0}".format(menuId))
+        # self.logger.threaddebug(u"menuId = {0}".format(menuId))
 
         self.pluginPrefs['enableCustomColors']        = valuesDict['enableCustomColors']
         self.pluginPrefs['enableCustomLineSegments']  = valuesDict['enableCustomLineSegments']
@@ -476,8 +476,8 @@ class Plugin(indigo.PluginBase):
     def advancedSettingsMenu(self, valuesDict, typeId="", devId=None):
         """The advancedSettingsMenu() method is called when actions are taken
         within the Advanced Settings Menu item from the plugin menu."""
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         self.logger.debug(u"Use of custom colors: {0}".format(valuesDict['enableCustomColors']))
         self.logger.debug(u"Enable custom line segments: {0}".format(valuesDict['enableCustomLineSegments']))
@@ -496,8 +496,8 @@ class Plugin(indigo.PluginBase):
         """The addColumn() method is called when the user clicks on the "Add
         Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Add Column List Item '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         err_msg_dict = indigo.Dict()
 
@@ -528,8 +528,8 @@ class Plugin(indigo.PluginBase):
         dialog. It's called at open and routinely as changes are made in the
         dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Column List Generated '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
 
         try:
             # valuesDict['columnDict'] = valuesDict.get('columnDict', '{"k0": ("None", "None", "None")}')  # Just in case the user has deleted all CSV Engine elements
@@ -546,8 +546,8 @@ class Plugin(indigo.PluginBase):
         """The deleteColumn() method is called when the user clicks on the
         "Delete Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Delete Column List Item '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
@@ -572,8 +572,8 @@ class Plugin(indigo.PluginBase):
         """The selectColumn() method is called when the user actually selects
         something within the Column List dropdown menu."""
         self.logger.debug(u"{0:*^40}".format(' Select Column '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         try:
             column_dict                    = literal_eval(valuesDict['columnDict'])
@@ -592,8 +592,8 @@ class Plugin(indigo.PluginBase):
         """The updateColumn() method is called when the user clicks on the
         "Update Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' Update Column '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         err_msg_dict = indigo.Dict()
         column_dict  = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
@@ -687,6 +687,29 @@ class Plugin(indigo.PluginBase):
 
         else:
             return state_list
+
+    def killAllComms(self):
+        """ killAllComms() sets the enabled status of all plugin devices to
+        false. """
+
+        for dev in indigo.devices.itervalues("self"):
+            try:
+                indigo.device.enable(dev, value=False)
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
+
+
+    def unkillAllComms(self):
+        """ unkillAllComms() sets the enabled status of all plugin devices to
+        true. """
+
+        for dev in indigo.devices.itervalues("self"):
+            try:
+                indigo.device.enable(dev, value=True)
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
 
     def rcParamsDeviceUpdate(self, dev):
         """ Push the rcParams settings to the rcParams Device. The state names
@@ -809,6 +832,7 @@ class Plugin(indigo.PluginBase):
                         ]
         dev.updateStatesOnServer(keyValueList)
         """
+        self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
 
         k_dict  = {}  # A dict of kwarg dicts
         p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
@@ -820,8 +844,9 @@ class Plugin(indigo.PluginBase):
         p_dict['tick_right']  = 'off'
         p_dict['tick_top']    = 'off'
 
-        self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
-        self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
         # rcParams overrides
         plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
@@ -883,8 +908,9 @@ class Plugin(indigo.PluginBase):
         else:
             p_dict['transparent_filled'] = True
 
-        self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
-        self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
         for dev in indigo.devices.itervalues("self"):
 
@@ -1153,7 +1179,7 @@ class Plugin(indigo.PluginBase):
         """ Called by an Indigo Action item. """
 
         self.logger.debug(u"{0:*^40}".format(' Refresh Charts Action '))
-        self.logger.threaddebug(u"  valuesDict: {0}".format(action))
+        # self.logger.threaddebug(u"  valuesDict: {0}".format(action))
         self.refreshTheCharts()
         self.logger.info(u"{:=^80}".format(' Cycle complete. '))
 
@@ -1237,8 +1263,9 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleBar(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
 
@@ -1290,9 +1317,9 @@ class Plugin(indigo.PluginBase):
 
             # Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly at times.
             # This block is meant to overcome that weirdness for something more desirable.
-            self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                                  min(p_dict['data_array']),
-                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
+            # self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+            #                                                                       min(p_dict['data_array']),
+            #                                                                       max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
@@ -1406,14 +1433,16 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleBattery(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
         pass
 
     def chartSimpleCalendar(self, dev, p_dict, k_dict):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
             import calendar
@@ -1459,8 +1488,9 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleLine(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
 
@@ -1512,9 +1542,10 @@ class Plugin(indigo.PluginBase):
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                                  min(p_dict['data_array']),
-                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
+            if self.verboseLogging:
+                self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                                      min(p_dict['data_array']),
+                                                                                      max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 # Min and Max are not 'None'.
@@ -1627,8 +1658,9 @@ class Plugin(indigo.PluginBase):
 
     def chartMultilineText(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
 
@@ -1695,8 +1727,9 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleNodeMatrix(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
         pass
 
     def chartPolar(self, dev, p_dict, k_dict, kv_list):
@@ -1704,8 +1737,9 @@ class Plugin(indigo.PluginBase):
         # Note that it would be possible to convert wind direction names (north-northeast) to an ordinal degree value, however, it would be very difficult to
         # contend with all of the possible international Unicode values that could be passed to the device.  Better to make it the responsibility of the user
         # to convert their data to degrees.
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
             self.final_data    = []
@@ -1855,12 +1889,11 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleScatter(self, dev, p_dict, k_dict, kv_list):
         """"""
-        self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
-
-            # dates_to_plot = p_dict['dates_to_plot']
 
             ax = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -1902,9 +1935,10 @@ class Plugin(indigo.PluginBase):
                                edgecolor=p_dict['group{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
-            self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                                  min(p_dict['data_array']),
-                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
+            if self.verboseLogging:
+                self.logger.threaddebug(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                                      min(p_dict['data_array']),
+                                                                                      max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 # Min and Max are not 'None'.
@@ -2032,7 +2066,8 @@ class Plugin(indigo.PluginBase):
                     if p_dict['line{0}MarkerColor'.format(line)] == 'custom':
                         p_dict['line{0}MarkerColor'.format(line)] = p_dict['line{0}MarkerColorOther'.format(line)]
 
-            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            if self.verboseLogging:
+                self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
             # Prepare the data for charting.
             if indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId == 'wundergroundHourly':
@@ -2057,7 +2092,8 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_2'] = ('Precipitation',)
 
                 self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
-                self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
+                if self.verboseLogging:
+                    self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
 
             elif indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId == 'wundergroundTenDay':
 
@@ -2082,7 +2118,8 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_2'] = ('Precipitation',)
 
                 self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
-                self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
+                if self.verboseLogging:
+                    self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
 
             else:
                 self.logger.warning(u"This device type only supports WUnderground plugin forecast devices.")
@@ -2193,9 +2230,10 @@ class Plugin(indigo.PluginBase):
             ax1.yaxis.tick_right()
             ax2.yaxis.tick_left()
 
-            self.logger.threaddebug(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
-                                                                                     min(p_dict['data_array']),
-                                                                                     max(p_dict['data_array']) - min(p_dict['data_array'])))
+            if self.verboseLogging:
+                self.logger.threaddebug(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
+                                                                                         min(p_dict['data_array']),
+                                                                                         max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             # Y1 Axis Min/Max
             try:
@@ -2291,7 +2329,8 @@ class Plugin(indigo.PluginBase):
         device.
         """
         self.logger.debug(u"{0:*^40}".format(' Device State Generator '))
-        self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
         state_list = []
 
         # If there are no devices created yet.
@@ -2357,8 +2396,9 @@ class Plugin(indigo.PluginBase):
     def getAxisList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of possible axis formats."""
         self.logger.debug(u"{0:*^40}".format(' Get Axis List '))
-        self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         axis_list_menu = [
             ("%I:%M", "01:00"),
@@ -2371,14 +2411,15 @@ class Plugin(indigo.PluginBase):
             ("%y", "16"),
             ("%Y", "2016")]
 
-        self.logger.threaddebug(u"axis_list_menu: {0}".format(axis_list_menu))
+        # self.logger.threaddebug(u"axis_list_menu: {0}".format(axis_list_menu))
         return axis_list_menu
 
     def getBinList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of bins for the X axis."""
         self.logger.debug(u"{0:*^40}".format(' Get Bin List '))
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         bin_list_menu = [
             ("quarter-hourly", "Every 15 Minutes"),
@@ -2392,15 +2433,16 @@ class Plugin(indigo.PluginBase):
             ("monthly", "Every Month"),
             ("yearly", "Every Year")]
 
-        self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
+        # self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
         return bin_list_menu
 
     def getBackgroundColorList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of available colors. There are two color lists. This
         list is for things that support transparency (e.g., background and plot
         area."""
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         background_color_list_menu = [
             ("#000000", "Black"),
@@ -2435,8 +2477,9 @@ class Plugin(indigo.PluginBase):
         """Returns a list of available colors. There are two color lists. This
         list is for things that don't support transparency (e.g., fonts, lines,
         etc.)"""
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         color_list_menu = [
             ("#000000", "Black"),
@@ -2470,8 +2513,9 @@ class Plugin(indigo.PluginBase):
         """Generates and returns a list of fonts.  Note that these are the
         fonts that Matplotlib can see, not necessarily all of the fonts
         installed on the system."""
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         font_menu = []
 
@@ -2524,9 +2568,10 @@ class Plugin(indigo.PluginBase):
 
     def getFontSizeList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of possible font sizes."""
-        self.logger.threaddebug(u"Constructing font size list.")
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"Constructing font size list.")
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         font_size_menu = [
             ("6", "6"),
@@ -2554,8 +2599,9 @@ class Plugin(indigo.PluginBase):
         WUnderground devices, but the intention is to expand the list of
         compatible devices going forward."""
         self.logger.debug(u"{0:*^40}".format(' Get Forecast Source '))
-        self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         forecast_source_menu = []
 
@@ -2574,9 +2620,10 @@ class Plugin(indigo.PluginBase):
 
     def getLineList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of line styles."""
-        self.logger.threaddebug(u"Constructing line list.")
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"Constructing line list.")
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         line_list_menu = [
             ("None", "None"),
@@ -2593,8 +2640,9 @@ class Plugin(indigo.PluginBase):
     def getListOfFiles(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Get list of CSV files."""
         self.logger.debug(u"{0:*^40}".format(' Get List of Files '))
-        self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         file_name_list_menu = []
         source_path = self.pluginPrefs.get('dataPath', '/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/')
@@ -2619,8 +2667,9 @@ class Plugin(indigo.PluginBase):
     def getMarkerList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of marker styles."""
         self.logger.debug(u"{0:*^40}".format(' Get Marker List '))
-        self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         marker_list_menu = [
             ("None", "None"),
@@ -2647,7 +2696,7 @@ class Plugin(indigo.PluginBase):
             ("|", "Vertical Line"),
             ("x", "X")]
 
-        self.logger.threaddebug(u"marker_list_menu: {0}".format(marker_list_menu))
+        # self.logger.threaddebug(u"marker_list_menu: {0}".format(marker_list_menu))
         return marker_list_menu
 
     def getTheData(self, data_source):
@@ -2665,7 +2714,8 @@ class Plugin(indigo.PluginBase):
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.warning(u"Error downloading CSV data. Skipping: {0}".format(sub_error))
 
-        self.logger.debug(u"{0:<19}{1}".format("Final data: ", final_data))
+        if self.verboseLogging:
+            self.logger.debug(u"{0:<19}{1}".format("Final data: ", final_data))
         return final_data
 
     def listGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2675,8 +2725,9 @@ class Plugin(indigo.PluginBase):
         make it easier to distinguish between the two.
         """
         self.logger.debug(u"{0:*^40}".format(' List Generator '))
-        self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
 
         dev_list = [(dev.id, u"(D) {0}".format(dev.name)) for dev in indigo.devices]
         var_list = [(var.id, u"(V) {0}".format(var.name)) for var in indigo.variables]

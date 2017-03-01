@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <MenuItems>
 
+    <MenuItem id="killAllComms">
+        <Name>Disable All Devices</Name>
+        <CallbackMethod>killAllComms</CallbackMethod>
+    </MenuItem>
+
+    <MenuItem id="unkillAllComms">
+        <Name>Enable All Devices</Name>
+        <CallbackMethod>unkillAllComms</CallbackMethod>
+    </MenuItem>
+
+    <MenuItem id="titleSeparator" type="separator"/>
+
     <MenuItem id="advancedSettings">
         <!--The advanced settings menu is used to manage more obscure plugin preferences. Adding an element here will require hooks in
             most, if not all of the following methods in the plugin.py file:

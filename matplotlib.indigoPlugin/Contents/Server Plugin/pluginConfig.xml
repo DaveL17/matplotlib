@@ -267,4 +267,11 @@ Error Messages = Error messages you might want to address.
 Critical Errors Only = Critical errors that should probably be reported.
         </Label>
     </Field>
+    <Field id="verboseLogging" type="checkbox" hidden="False">
+        <Label>Verbose Logging</Label>
+        <Description>Enable/Disable</Description>
+    </Field>
+    <Field id="verboseLoggingLabel" type="label" fontColor="black" fontSize="small">
+        <Label>Check this box to enable verbose logging. Checking this box will only affect the level and amount of information written to the plugin log file (it will not affect the amount of information written to the Indigo Event Log.</Label>
+    </Field>
 </PluginConfig>
