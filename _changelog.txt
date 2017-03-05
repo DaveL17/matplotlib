@@ -1,9 +1,12 @@
 v0.4.03
-- Adds steps mid and steps post to linestyles.
+- Adds steps-mid and steps-post to linestyles.
 - Adds plugin menu items to enable and disable communication for all charting
-  devices (include CSV Engine devices).
+  devices (includes CSV Engine devices).
 - Refactors CSV Engine configuration dialog to pre-populate dropdown menus so
   data no longer needs to be entered manually.
+- Adds additional validation checks to CSV Engine device to avoid creation of
+  null devices. Includes maintenance code to automatically eliminate null
+  devices that have been previously created.
 - Better handling of devices that produced a KeyError on 'customAxisLabelY2'.
 - Reduces the amount of default debug logging, and introduces a configuration
   setting to allow for verbose logging.

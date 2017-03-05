@@ -22,6 +22,8 @@ proper WUnderground devices.
 # TODO: Look at fill with steps line style via the plugin API.
 # TODO: Variable refresh rates for each device so it can update on its own.
 
+# TODO: CSV Engine - edit 'columnDict' to delete entries with (u'', u'', u'').
+
 from ast import literal_eval
 from csv import reader
 import datetime as dt
@@ -506,19 +508,44 @@ class Plugin(indigo.PluginBase):
             lister = [0]
             num_lister = []
 
+            # Add data item validation.  Will not allow add until all three conditions are met.
+            if valuesDict['addValue'] == "":
+                err_msg_dict['addValue'] = u"Please enter a title value for your CSV data element."
+                err_msg_dict['showAlertText'] = u"Title Error.\n\nA title is required for each CSV data element."
+                return valuesDict, err_msg_dict
+
+            if valuesDict['addSource'] == "":
+                err_msg_dict['addSource'] = u"Please select a device or variable as a source for your CSV data element."
+                err_msg_dict['showAlertText'] = u"ID Error.\n\nA source is required for each CSV data element."
+                return valuesDict, err_msg_dict
+
+            if valuesDict['addState'] == "":
+                err_msg_dict['addState'] = u"Please select a value source for your CSV data element."
+                err_msg_dict['showAlertText'] = u"Data Error.\n\nA data value is required for each CSV data element."
+                return valuesDict, err_msg_dict
+
             [lister.append(key.lstrip('k')) for key in sorted(column_dict.keys())]  # Create a list of existing keys with the 'k' lopped off
             [num_lister.append(int(item)) for item in lister]  # Change each value to an integer for evaluation
             next_key = u'k{0}'.format(int(max(num_lister)) + 1)  # Generate the next key
             column_dict[next_key] = (valuesDict['addValue'], valuesDict['addSource'], valuesDict['addState'])  # Save the tuple of properties
+
+            # Remove any empty entries as they're not going to do any good anyway.
+            new_dict = {}
+
+            for k, v in column_dict.iteritems():
+                for key, value in column_dict[k].iteritems():
+                    if column_dict[k][key] != ('', '', ''):
+                        new_dict[k] = {key: value}
+            column_dict = new_dict
+
             valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string and prepare it for storage.
 
         except Exception, sub_error:
             self.logger.warning(u"Error adding column. {0}".format(sub_error))
 
         # Wipe the field values clean for the next element to be added.
-        valuesDict['addValue'] = ""
-        valuesDict['addSource'] = ""
-        valuesDict['addState'] = ""
+        for key in ['addValue', 'addSource', 'addState']:
+            valuesDict[key] = u""
 
         return valuesDict, err_msg_dict
 
@@ -621,6 +648,14 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.warning(u"Something went wrong: {0}".format(sub_error))
+
+        # Remove any empty entries as they're not going to do any good anyway.
+        new_dict = {}
+
+        for k, v in column_dict.iteritems():
+            if v != ('', '', ''):
+                new_dict[k] = v
+        column_dict = new_dict
 
         valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string for storage.
 
