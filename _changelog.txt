@@ -1,3 +1,6 @@
+v0.4.04
+-
+
 v0.4.03
 - Adds steps-mid and steps-post to linestyles.
 - Adds plugin menu items to enable and disable communication for all charting
