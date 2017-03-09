@@ -1,30 +1,37 @@
-Version: 0.4.01
+Version: 0.4.03
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
 A Matplotlib Plugin update is now available
+v0.4.03
+- Adds steps-mid and steps-post to linestyles.
+- Adds plugin menu items to enable and disable communication for all charting
+  devices (includes CSV Engine devices).
+- Refactors CSV Engine configuration dialog to pre-populate dropdown menus so
+  data no longer needs to be entered manually.
+- Adds additional validation checks to CSV Engine device to avoid creation of
+  null devices. Includes maintenance code to automatically eliminate null
+  devices that have been previously created.
+- Better handling of devices that produced a KeyError on 'customAxisLabelY2'.
+- Reduces the amount of default debug logging, and introduces a configuration
+  setting to allow for verbose logging.
 
-v0.4.01
-- Adds new Scatter chart type.
-- Adds baseline API to allow scripters the ability to send data to create
-  charts.
-- Adds ability to modify legend labels with custom text (bar, line and scatter
-  charts only).
-- Adds ability to mirror Y axis value labels to Y2 (bar, line and scatter
-  charts only).
-- Adds ability to hide the X (surrounding) and Y (radial) labels for polar
-  charts.
-- Adds advanced settings menu item to force origin lines to be plotted when
-  charts contain both positive and negative values.
-- Fixes the min/max settings for precipitation values on weather charts.
-- Reorganizes most chart device settings (alphabetically within each grouping)
-  to make them easier to find.
-- Renames the standard rectangular sizes to increase clarity (they were still
-  too confusing). They are now Size 1 and Size 2. Size 1 is the default, Size 2
-  is the override and Custom Sizes override both Size 1 and Size 2.
-- Reduces the minimum size for chart dimensions to 75 pixels.
-- Additional fixes for international characters.
+v0.4.02
+- Adds new device type for tracking rcParams.
+- Adds optional border around multiline text plots.
+- Adds additional option to Mirror Y axis labels to have labels display *only*
+  on Y2.
+- Logs warning when CSV Engine data element source ID is None type.
+- Properly sets the state of the device indicator in the main Indigo UI (green
+  if enabled, gray if disabled), and provides a small set of status messages
+  as the plugin cycles.
+- Fixes bug where certain devices with unicode characters in a path name would
+  fail.
+- Fixes bug where 'pixel', 'triangle left' and 'triangle right' marker styles
+  would cause an error (scatter charts only).
+- Minor UI refinements.
 - Various code refinements.
+- Various error reporting improvements.
 
 As always, if something doesn't seem quite right, please let me know.
 
