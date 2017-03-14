@@ -201,20 +201,20 @@ class Plugin(indigo.PluginBase):
         self.indigo_log_handler.setLevel(self.debugLevel)
         # self.logger.threaddebug(u"Config UI validator valuesDict: {0}".format(dict(valuesDict)))
 
-        err_msg_dict = indigo.Dict()
+        error_msg_dict = indigo.Dict()
 
         # Data and chart paths.
         for path_prop in ['chartPath', 'dataPath']:
             try:
                 if not valuesDict[path_prop].endswith('/'):
-                    err_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
-                    err_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                    return False, valuesDict, err_msg_dict
+                    error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
+                    error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
+                    return False, valuesDict, error_msg_dict
             except AttributeError:
                 self.pluginErrorHandler(traceback.format_exc())
-                err_msg_dict[path_prop]       = u"The  path must end with a forward slash '/'."
-                err_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                return False, valuesDict, err_msg_dict
+                error_msg_dict[path_prop]       = u"The  path must end with a forward slash '/'."
+                error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
+                return False, valuesDict, error_msg_dict
 
         # Chart resolution.  Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
         try:
@@ -224,48 +224,48 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(u"No resolution value entered. Resetting resolution to 100 DPI.")
             # If warning flag and the value is potentially too small.
             elif valuesDict['dpiWarningFlag'] and 0 < int(valuesDict['chartResolution']) < 80:
-                err_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
-                err_msg_dict['showAlertText']   = u"Chart Resolution Warning.\n\nIt is recommended that you enter a value of 80 or more for best results."
+                error_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
+                error_msg_dict['showAlertText']   = u"Chart Resolution Warning.\n\nIt is recommended that you enter a value of 80 or more for best results."
                 valuesDict['dpiWarningFlag']    = False
-                return False, valuesDict, err_msg_dict
+                return False, valuesDict, error_msg_dict
 
             # If no warning flag and the value is good.
             elif not valuesDict['dpiWarningFlag'] or int(valuesDict['chartResolution']) >= 80:
                 pass
             else:
-                err_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
-                err_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is less than 0."
-                return False, valuesDict, err_msg_dict
+                error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
+                error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is less than 0."
+                return False, valuesDict, error_msg_dict
         except ValueError:
             self.pluginErrorHandler(traceback.format_exc())
-            err_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
-            err_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is not an integer."
-            return False, valuesDict, err_msg_dict
+            error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
+            error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is not an integer."
+            return False, valuesDict, error_msg_dict
 
         # Chart dimension properties.
         for dimension_prop in ['rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize']:
             try:
                 if float(valuesDict[dimension_prop]) < 75:
-                    err_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
-                    err_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is less than 75 pixels."
-                    return False, valuesDict, err_msg_dict
+                    error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
+                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is less than 75 pixels."
+                    return False, valuesDict, error_msg_dict
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
-                err_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
-                err_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is not a real number."
-                return False, valuesDict, err_msg_dict
+                error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
+                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is not a real number."
+                return False, valuesDict, error_msg_dict
 
         # Line weight.
         try:
             if float(valuesDict['lineWeight']) <= 0:
-                err_msg_dict['lineWeight']    = u"The line weight value must be greater than 0."
-                err_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is less than 0."
-                return False, valuesDict, err_msg_dict
+                error_msg_dict['lineWeight']    = u"The line weight value must be greater than 0."
+                error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is less than 0."
+                return False, valuesDict, error_msg_dict
         except ValueError:
             self.pluginErrorHandler(traceback.format_exc())
-            err_msg_dict['lineWeight']    = u"The line weight value must be a real number."
-            err_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is not a real number."
-            return False, valuesDict, err_msg_dict
+            error_msg_dict['lineWeight']    = u"The line weight value must be a real number."
+            error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is not a real number."
+            return False, valuesDict, error_msg_dict
 
         valuesDict['dpiWarningFlag'] = True
         return True, valuesDict
@@ -400,21 +400,21 @@ class Plugin(indigo.PluginBase):
         # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
         # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
-        err_msg_dict = indigo.Dict()
+        error_msg_dict = indigo.Dict()
 
         # Chart Custom Dimensions.
         for custom_dimension_prop in ['customSizeHeight', 'customSizeWidth', 'customSizePolar']:
             try:
                 if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 75:
-                    err_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
-                    err_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
-                    return False, valuesDict, err_msg_dict
+                    error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
+                    error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
+                    return False, valuesDict, error_msg_dict
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
-                err_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number."
-                err_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is not a real number."
+                error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number."
+                error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is not a real number."
                 valuesDict[custom_dimension_prop] = 'None'
-                return False, valuesDict, err_msg_dict
+                return False, valuesDict, error_msg_dict
 
         # Check to see that each axis limit matches one of the accepted formats.
         for limit_prop in ['yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin']:
@@ -423,10 +423,10 @@ class Plugin(indigo.PluginBase):
                     float(valuesDict[limit_prop])
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
-                err_msg_dict[limit_prop]      = u"An axis limit must be a real number or None."
-                err_msg_dict['showAlertText'] = u"Axis limit Error.\n\nA valid axis limit must be in the form of a real number or None."
+                error_msg_dict[limit_prop]      = u"An axis limit must be a real number or None."
+                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\nA valid axis limit must be in the form of a real number or None."
                 valuesDict[limit_prop] = 'None'
-                return False, valuesDict, err_msg_dict
+                return False, valuesDict, error_msg_dict
 
         return True, valuesDict
 
@@ -446,7 +446,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"menuId = {0}".format(menuId))
 
         settings     = indigo.Dict()
-        err_msg_dict = indigo.Dict()
+        error_msg_dict = indigo.Dict()
         settings['enableCustomColors'] = self.pluginPrefs['enableCustomColors']
         settings['enableCustomLineSegments'] = self.pluginPrefs['enableCustomLineSegments']
         settings['promoteCustomLineSegments'] = self.pluginPrefs['promoteCustomLineSegments']
@@ -454,7 +454,7 @@ class Plugin(indigo.PluginBase):
         settings['forceOriginLines'] = self.pluginPrefs['forceOriginLines']
         self.logger.debug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
 
-        return settings, err_msg_dict
+        return settings, error_msg_dict
 
     def advancedSettingsExecuted(self, valuesDict, menuId):
         """The advancedSettingsExecuted() method is a place where advanced
@@ -501,7 +501,7 @@ class Plugin(indigo.PluginBase):
         # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
         # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
-        err_msg_dict = indigo.Dict()
+        error_msg_dict = indigo.Dict()
 
         try:
             column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict
@@ -510,19 +510,19 @@ class Plugin(indigo.PluginBase):
 
             # Add data item validation.  Will not allow add until all three conditions are met.
             if valuesDict['addValue'] == "":
-                err_msg_dict['addValue'] = u"Please enter a title value for your CSV data element."
-                err_msg_dict['showAlertText'] = u"Title Error.\n\nA title is required for each CSV data element."
-                return valuesDict, err_msg_dict
+                error_msg_dict['addValue'] = u"Please enter a title value for your CSV data element."
+                error_msg_dict['showAlertText'] = u"Title Error.\n\nA title is required for each CSV data element."
+                return valuesDict, error_msg_dict
 
             if valuesDict['addSource'] == "":
-                err_msg_dict['addSource'] = u"Please select a device or variable as a source for your CSV data element."
-                err_msg_dict['showAlertText'] = u"ID Error.\n\nA source is required for each CSV data element."
-                return valuesDict, err_msg_dict
+                error_msg_dict['addSource'] = u"Please select a device or variable as a source for your CSV data element."
+                error_msg_dict['showAlertText'] = u"ID Error.\n\nA source is required for each CSV data element."
+                return valuesDict, error_msg_dict
 
             if valuesDict['addState'] == "":
-                err_msg_dict['addState'] = u"Please select a value source for your CSV data element."
-                err_msg_dict['showAlertText'] = u"Data Error.\n\nA data value is required for each CSV data element."
-                return valuesDict, err_msg_dict
+                error_msg_dict['addState'] = u"Please select a value source for your CSV data element."
+                error_msg_dict['showAlertText'] = u"Data Error.\n\nA data value is required for each CSV data element."
+                return valuesDict, error_msg_dict
 
             [lister.append(key.lstrip('k')) for key in sorted(column_dict.keys())]  # Create a list of existing keys with the 'k' lopped off
             [num_lister.append(int(item)) for item in lister]  # Change each value to an integer for evaluation
@@ -547,7 +547,7 @@ class Plugin(indigo.PluginBase):
         for key in ['addValue', 'addSource', 'addState']:
             valuesDict[key] = u""
 
-        return valuesDict, err_msg_dict
+        return valuesDict, error_msg_dict
 
     def columnList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """The columnList() method generates the list of Column Key : Column
@@ -622,7 +622,7 @@ class Plugin(indigo.PluginBase):
         # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
         # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
-        err_msg_dict = indigo.Dict()
+        error_msg_dict = indigo.Dict()
         column_dict  = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
         try:
@@ -630,7 +630,7 @@ class Plugin(indigo.PluginBase):
             previous_key = valuesDict['previousKey']
             if key != previous_key:
                 if key in column_dict:
-                    err_msg_dict['editKey'] = u"New key ({0}) already exists in the global properties, please use a different key value".format(key)
+                    error_msg_dict['editKey'] = u"New key ({0}) already exists in the global properties, please use a different key value".format(key)
                     valuesDict['editKey']   = previous_key
                 else:
                     del column_dict[previous_key]
@@ -642,7 +642,7 @@ class Plugin(indigo.PluginBase):
                 valuesDict['editState']  = ""
                 valuesDict['editValue']  = ""
 
-            if not len(err_msg_dict):
+            if not len(error_msg_dict):
                 valuesDict['previousKey'] = key
 
         except Exception as sub_error:
@@ -659,7 +659,7 @@ class Plugin(indigo.PluginBase):
 
         valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string for storage.
 
-        return valuesDict, err_msg_dict
+        return valuesDict, error_msg_dict
 
     def csvSource(self, typeId, valuesDict, devId, targetId):
         """"""
