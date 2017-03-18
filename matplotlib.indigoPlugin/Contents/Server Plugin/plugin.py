@@ -145,9 +145,9 @@ class Plugin(indigo.PluginBase):
     def deviceStartComm(self, dev):
         """ Start communication with plugin devices."""
         self.logger.debug(u"Starting device: {0}".format(dev.name))
+        dev.stateListOrDisplayStateIdChanged()
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-        dev.stateListOrDisplayStateIdChanged()
 
     def deviceStopComm(self, dev):
         """ Stop communication with plugin devices."""
@@ -533,14 +533,14 @@ class Plugin(indigo.PluginBase):
             new_dict = {}
 
             for k, v in column_dict.iteritems():
-                for key, value in column_dict[k].iteritems():
-                    if column_dict[k][key] != ('', '', ''):
-                        new_dict[k] = {key: value}
-            column_dict = new_dict
+                if v != (u"", u"", u"") and v != ('None', 'None', 'None'):
+                    new_dict[k] = v
+                else:
+                    self.logger.info(u"Pruning CSV Engine.")
 
-            valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string and prepare it for storage.
+            valuesDict['columnDict'] = str(new_dict)  # Convert column_dict back to a string and prepare it for storage.
 
-        except Exception, sub_error:
+        except AttributeError, sub_error:
             self.logger.warning(u"Error adding column. {0}".format(sub_error))
 
         # Wipe the field values clean for the next element to be added.
@@ -707,8 +707,8 @@ class Plugin(indigo.PluginBase):
         """ getDeviceStateList is called automatically by
         dev.stateListOrDisplayStateIdChanged().
         """
-        dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
         state_list = indigo.PluginBase.getDeviceStateList(self, dev)
+        # dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
 
         if dev.deviceTypeId == 'rcParamsDevice':
 

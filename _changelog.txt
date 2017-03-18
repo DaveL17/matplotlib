@@ -1,5 +1,5 @@
 v0.4.04
--
+- Fixes bug in CSV data element validation to eliminate null devices.
 
 v0.4.03
 - Adds steps-mid and steps-post to linestyles.
