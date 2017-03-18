@@ -1388,8 +1388,7 @@ class Plugin(indigo.PluginBase):
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
 
-            # Chart title
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])  # Chart title
 
             # X Axis Label - If the user chooses to display a legend, we don't want an axis label because they will fight with each other for space.
             if not p_dict['showLegend']:
