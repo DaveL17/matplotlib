@@ -941,6 +941,10 @@ There are presently no configurations available for this device.
             <Field id="numberOfCharacters" type="textfield" defaultValue="100" tooltip="Enter the number of characters desired for each line of text.">
                 <Label>Characters:</Label>
             </Field>
+            <Field id="cleanTheText" type="checkbox" defaultValue="true" tooltip="If enabled, the plugin will try to remove whitespace from the text.">
+                <Label>Clean Text:</Label>
+                <Description>Yes/No</Description>
+            </Field>
             <Field id="figureWidth" type="textfield" defaultValue="700" tooltip="Enter the desired width of your figure (inches).">
                 <Label>Figure Width:</Label>
             </Field>
@@ -956,13 +960,13 @@ There are presently no configurations available for this device.
                 <Label>Font Size:</Label>
             </Field>
             <Field id="defaultText" type="textfield" defaultValue="This is where the placeholder text goes."
-                   tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty.">
+                   tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty. Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.">
                 <Label>Placeholder:</Label>
             </Field>
-            <Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
-                <Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>
-            </Field>
-            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart.">
+            <!--<Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">-->
+                <!--<Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>-->
+            <!--</Field>-->
+            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart. If you do not want a title to appear, leave the box blank.">
                 <Label>Title:</Label>
             </Field>
             <Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"

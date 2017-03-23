@@ -24,7 +24,7 @@ proper WUnderground devices.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
 # TODO: Feature Request: Make cleanUpString optional (default on)
-
+# TODO: Get rid of the need to refresh in the multiline text device config.
 
 from ast import literal_eval
 from csv import reader
@@ -1731,8 +1731,9 @@ class Plugin(indigo.PluginBase):
                     text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
                     self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
-                # The cleanUpString method tries to remove some potential ugliness from the text to be plotted.
-                text_to_plot = self.cleanUpString(text_to_plot)
+                # The cleanUpString method tries to remove some potential ugliness from the text to be plotted. It's optional--defaulted to on.
+                if p_dict['cleanTheText']:
+                    text_to_plot = self.cleanUpString(text_to_plot)
 
             except ValueError:
                 self.pluginErrorHandler(traceback.format_exc())
