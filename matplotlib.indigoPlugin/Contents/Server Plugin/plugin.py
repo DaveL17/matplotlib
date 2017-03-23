@@ -21,8 +21,10 @@ proper WUnderground devices.
 # TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Look at fill with steps line style via the plugin API.
 # TODO: Variable refresh rates for each device so it can update on its own.
+# TODO: Independent Y2 axis.
+# TODO: Finer grained control over the legend.
+# TODO: Feature Request: Make cleanUpString optional (default on)
 
-# TODO: CSV Engine - edit 'columnDict' to delete entries with (u'', u'', u'').
 
 from ast import literal_eval
 from csv import reader
@@ -57,7 +59,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.04"
+__version__   = "0.4.05"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -856,7 +858,7 @@ class Plugin(indigo.PluginBase):
             else:
                 pass
 
-    def refreshTheCharts(self):
+    def refreshTheCharts(self, chart_id=None):
         """
         Refreshes all the charts.
         The keyValueList is a new Indigo API hook which allows the plugin to
@@ -867,7 +869,18 @@ class Plugin(indigo.PluginBase):
                         ]
         dev.updateStatesOnServer(keyValueList)
         """
+
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
+
+        # A specific chart id may be passed to the method. In that case,
+        # refresh only that chart. Otherwise, chart_id is None and we refresh
+        # all of the charts.
+        dev_list = []
+        if not chart_id:
+            for dev in indigo.devices.itervalues('self'):
+                dev_list.append(dev)
+        else:
+            dev_list.append(indigo.devices[int(chart_id)])
 
         k_dict  = {}  # A dict of kwarg dicts
         p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
@@ -947,7 +960,7 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
-        for dev in indigo.devices.itervalues("self"):
+        for dev in dev_list:
 
             if dev.deviceTypeId != 'csvEngine' and dev.enabled:
                 dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
@@ -1206,9 +1219,14 @@ class Plugin(indigo.PluginBase):
 
     def refreshTheChartsMenuAction(self):
         """ Called by an Indigo Menu selection. """
-        self.logger.debug(u"{0:*^40}".format(' User Call For Refresh '))
+        # self.logger.debug(u"{0:*^40}".format(' User Call For Refresh '))
         self.refreshTheCharts()
         self.logger.info(u"{:=^80}".format(' Cycle complete. '))
+
+    def refreshAChartAction(self, pluginAction):
+        """ Call for a chart refresh and pass the id of the device
+        called from the action. """
+        self.refreshTheCharts(pluginAction.props['chartToRefresh'])
 
     def refreshTheChartsAction(self, action):
         """ Called by an Indigo Action item. """
@@ -2469,6 +2487,22 @@ class Plugin(indigo.PluginBase):
 
         # self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
         return bin_list_menu
+
+    def getChartList(self, filter="", valuesDict=None, typeId="", targetId=0):
+        """Returns a list of all plugin charts."""
+        self.logger.debug(u"{0:*^40}".format(' Get Chart List '))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+
+        chart_list_menu = []
+
+        for dev in indigo.devices.itervalues('self'):
+            if dev.model not in ["CSV Engine", "Matplotlib Parameters Device"]:
+                chart_list_menu.append((dev.id, dev.name))
+
+        # self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
+        return chart_list_menu
 
     def getBackgroundColorList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Returns a list of available colors. There are two color lists. This
