@@ -910,23 +910,13 @@ There are presently no configurations available for this device.
                 <Label>Source Controls</Label>
             </Field>
             <Field id="sourceSeparator1" type="separator"/>
-            <Field id="sourceDeviceText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
-                <Label>Select the device or variable that contains the text to chart and click on the 'Refresh' button.</Label>
-            </Field>
             <Field id="thing" type="menu" defaultValue="None">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="listGenerator" dynamicReload="true"/>
-            </Field>
-            <Field id="thingButton" type="button" defaultValue="None">
-                <Label/>
-                <Title>Refresh</Title>
                 <CallbackMethod>deviceStateGenerator</CallbackMethod>
             </Field>
-            <Field id="sourceStateText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">
-                <Label>Select the device state or variable value that contains the text to chart and click on the 'Refresh' button.</Label>
-            </Field>
             <Field id="thingState" type="menu" defaultValue="None">
-                <Label>Data to chart:</Label>
+                <Label>Text to chart:</Label>
                 <List class="self" filter="" method="deviceStateGenerator" dynamicReload="true"/>
             </Field>
             <Field id="sourceSpace2" type="label"/>
@@ -963,9 +953,6 @@ There are presently no configurations available for this device.
                    tooltip="Enter the text to be displayed when the value of the multiline text element to be plotted is empty. Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.">
                 <Label>Placeholder:</Label>
             </Field>
-            <!--<Field id="defaultTextText" type="label" fontColor="black" fontSize="mini" alignWithControl="true">-->
-                <!--<Label>Placeholder text will be used when the device state or variable value is empty. You can also leave the box blank.</Label>-->
-            <!--</Field>-->
             <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart. If you do not want a title to appear, leave the box blank.">
                 <Label>Title:</Label>
             </Field>

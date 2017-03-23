@@ -1,7 +1,10 @@
 v0.4.05
 - Adds a new Action Item to refresh an individual chart. Useful when a single
   data point changes (i.e., device state or variable value).
-- Makes the cleanUpString() method optional for multiline text devices.
+- Makes the cleanUpString() method optional for multiline text charts.
+- Removes the need to manually refresh the list of values to chart when
+  selecting a data source for multiline text charts (removes the 'Refresh'
+  button).
 
 v0.4.04
 - Fixes bug in CSV data element validation to eliminate null devices.

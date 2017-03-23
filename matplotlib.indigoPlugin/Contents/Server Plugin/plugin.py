@@ -23,8 +23,7 @@ proper WUnderground devices.
 # TODO: Variable refresh rates for each device so it can update on its own.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
-# TODO: Feature Request: Make cleanUpString optional (default on)
-# TODO: Get rid of the need to refresh in the multiline text device config.
+# TODO: Add None to refresh interval in case people want to go all manual
 
 from ast import literal_eval
 from csv import reader
@@ -307,6 +306,9 @@ class Plugin(indigo.PluginBase):
                 pluginProps['isColumnSelected']       = False
                 pluginProps['previousKey']            = ""
                 self.logger.debug(u"Analyzing CSV Engine device settings.")
+                return pluginProps
+            if typeId == "multiLineText":
+                pluginProps['cleanTheText'] = True
                 return pluginProps
 
             else:
@@ -1741,7 +1743,8 @@ class Plugin(indigo.PluginBase):
 
             if len(text_to_plot) <= 1:
                 text_to_plot = unicode(p_dict['defaultText'])
-            text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']))
+            # text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']))
+            text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']), replace_whitespace=p_dict['cleanTheText'])
 
             ax = self.chartMakeFigure(p_dict['figureWidth'], p_dict['figureHeight'], p_dict)
 
