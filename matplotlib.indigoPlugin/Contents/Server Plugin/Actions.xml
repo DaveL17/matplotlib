@@ -1,12 +1,32 @@
 <?xml version="1.0"?>
 <Actions>
   <SupportURL>http://forums.indigodomo.com/viewforum.php?f=219</SupportURL>
+
   <Action id="refreshTheChartsAction">
-    <Name>Redraw Charts</Name>
+    <Name>Redraw All Charts</Name>
     <CallbackMethod>refreshTheChartsAction</CallbackMethod>
   </Action>
+
+  <Action id="refreshAChartAction">
+    <Name>Redraw Single Chart</Name>
+    <CallbackMethod>refreshAChartAction</CallbackMethod>
+        <ConfigUI>
+			<Field id="instructionsLabel" type="label" fontColor="black" fontSize="regular">
+				<Label>Use this Action Item to select an individual chart to be refreshed.</Label>
+			</Field>
+            <Field id="chartToRefresh" type="menu" fontColor="black" fontSize="regular">
+                <Label>Chart:</Label>
+                <List class="self" filter="" method="getChartList" dynamicReload="true"/>
+            </Field>
+			<Field id="exampleLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+				<Label>Only this chart will be refreshed when the Action Item is called. To refresh more charts, create additional Action Items.</Label>
+			</Field>
+        </ConfigUI>
+  </Action>
+
   <Action id="refreshTheChartsAPI" uiPath="hidden">
     <Name>API Action to Draw Simple Chart</Name>
     <CallbackMethod>plotActionTest</CallbackMethod>
   </Action>
+
 </Actions>
