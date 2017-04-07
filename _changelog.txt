@@ -1,10 +1,14 @@
 v0.4.05
-- Adds a new Action Item to refresh an individual chart. Useful when a single
+- Adds a new Action Item to refresh individual charts. Useful when a single
   data point changes (i.e., device state or variable value).
 - Makes the cleanUpString() method optional for multiline text charts.
 - Removes the need to manually refresh the list of values to chart when
   selecting a data source for multiline text charts (removes the 'Refresh'
   button).
+- Updates plugin to require Indigo API version 2.0 (as Indigo 7 is required
+  in order to run the plugin).
+- Testing new multiprocessing feature with multiline charts.
+- Stylistic changes to Indigo Plugin Update Checker module.
 
 v0.4.04
 - Fixes bug in CSV data element validation to eliminate null devices.

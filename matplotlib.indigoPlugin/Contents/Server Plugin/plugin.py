@@ -16,21 +16,29 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
+
 # TODO: Unicode gremlins
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
 # TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Look at fill with steps line style via the plugin API.
-# TODO: Variable refresh rates for each device so it can update on its own.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
-# TODO: Add None to refresh interval in case people want to go all manual
+# TODO: Variable refresh rates for each device so it can update on its own.
+# TODO: handle WU -99's as NaNs (known issue: if plot begins with NaN, and there's only one line, Y scale is hinky. Expressing Y range fixes it. Appears this was fixed in mpl 2.0
 
 from ast import literal_eval
 from csv import reader
 import datetime as dt
-import gc
+# import gc
 import indigoPluginUpdateChecker
 import logging
+import multiprocessing
+import numpy as np
+import traceback
+
+import matplotlib
+matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
+
 from matplotlib import rcParams
 try:
     import matplotlib.pyplot as plt
@@ -40,8 +48,7 @@ import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
-import numpy as np
-import traceback
+
 
 try:
     import indigo
@@ -113,6 +120,7 @@ class Plugin(indigo.PluginBase):
         self.debug      = True
         self.debugLevel = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debugLevel)
+        self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
 
         self.final_data = []
 
@@ -131,6 +139,7 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
         self.logger.debug(u"{0:<31} {1}".format("Log Level = ", self.debugLevel))
+
         self.updater.checkVersionPoll()
 
         self.logger.info(u"Updating device properties.")
@@ -227,7 +236,7 @@ class Plugin(indigo.PluginBase):
             elif valuesDict['dpiWarningFlag'] and 0 < int(valuesDict['chartResolution']) < 80:
                 error_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
                 error_msg_dict['showAlertText']   = u"Chart Resolution Warning.\n\nIt is recommended that you enter a value of 80 or more for best results."
-                valuesDict['dpiWarningFlag']    = False
+                valuesDict['dpiWarningFlag']      = False
                 return False, valuesDict, error_msg_dict
 
             # If no warning flag and the value is good.
@@ -274,13 +283,17 @@ class Plugin(indigo.PluginBase):
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         """ User closes config menu. The validatePrefsConfigUI() method will
         also be called."""
-        # self.logger.threaddebug(u"Final valuesDict: {0}".format(dict(valuesDict)))
+        # self.logger.info(valuesDict['refreshInterval'])
 
         # If the user selects Save, let's redraw the charts so that they reflect the new settings.
         if not userCancelled:
-            self.logger.info(u"{:=^80}".format(' Configuration saved. Regenerating Charts '))
-            self.refreshTheCharts()
-            self.logger.info(u"{:=^80}".format(' Regeneration complete. '))
+            self.logger.info(u"{:=^80}".format(' Configuration Saved '))
+            if valuesDict['refreshInterval'] == u'None':
+                self.logger.info(u"{:=^80}".format(' Manual Refresh Mode Selected '))
+            else:
+                self.logger.info(u"{:=^80}".format(' Regenerating Charts '))
+                self.refreshTheCharts()
+                self.logger.info(u"{:=^80}".format(' Regeneration complete '))
 
     def getDeviceConfigUiValues(self, pluginProps, typeId, devId):
         """The getDeviceConfigUiValues() method is called when a device config
@@ -768,7 +781,6 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"{0:*^40}".format(' Refresh the CSV '))
 
         for dev in indigo.devices.itervalues("self"):
-
             if dev.deviceTypeId == 'csvEngine' and dev.enabled:
                 dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
@@ -845,6 +857,7 @@ class Plugin(indigo.PluginBase):
                         csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
                         csv_file.close()
 
+
                     except ValueError as sub_error:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.warning(u"Invalid Indigo ID. {0}".format(sub_error))
@@ -854,7 +867,6 @@ class Plugin(indigo.PluginBase):
 
                 dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                           {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
-
                 self.logger.info(u"CSV data updated successfully.")
 
             else:
@@ -871,7 +883,6 @@ class Plugin(indigo.PluginBase):
                         ]
         dev.updateStatesOnServer(keyValueList)
         """
-
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
 
         # A specific chart id may be passed to the method. In that case,
@@ -1178,7 +1189,29 @@ class Plugin(indigo.PluginBase):
 
                 # ======= Multiline Text ======
                 if dev.deviceTypeId == 'multiLineText':
-                    self.chartMultilineText(dev, p_dict, k_dict, kv_list)
+
+                    return_queue = multiprocessing.Queue()  # Only need to setup queue once - outside the while loop
+
+                    # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method.
+                    if int(p_dict['thing']) in indigo.devices:
+                        text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
+                    elif int(p_dict['thing']) in indigo.variables:
+                        text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
+                    else:
+                        text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
+                        self.logger.info(u"Presently, the plugin only supports device state and variable values.")
+
+                    if __name__ == '__main__':
+                        p1 = multiprocessing.Process(name='p1', target=self.chartMultilineText, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                        p1.start()
+                        p1.join()  # Right now, we join because otherwise the main thread continues before the queue is returned.
+
+                        result = return_queue.get()
+
+                    if result['Error']:
+                        self.logger.critical(result['Message'], isError=True)
+                    else:
+                        self.logger.info(u"{0} {1}".format(dev.name, result['Message']))
 
                 # ======= Scatter Charts ======
                 if dev.deviceTypeId == "scatterChartingDevice":
@@ -1196,20 +1229,23 @@ class Plugin(indigo.PluginBase):
                 if dev.deviceTypeId == "simpleNodeMatrixChartingDevice":
                     self.chartSimpleNodeMatrix(dev, p_dict, k_dict, kv_list)
 
-                try:
-                    if p_dict['fileName'] != '':
-                        self.logger.threaddebug(u"Output chart: {0:<19}{1}".format(self.pluginPrefs['chartPath'], p_dict['fileName']))
-                        self.logger.threaddebug(u"Output kwargs: {0:<19}".format(dict(**k_dict['k_plot_fig'])))
-                        plt.savefig(u"{0}{1}".format(self.pluginPrefs['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+                if dev.deviceTypeId != 'multiLineText':
+                    try:
+                        if p_dict['fileName'] != '':
+                            self.logger.threaddebug(u"Output chart: {0:<19}{1}".format(p_dict['chartPath'], p_dict['fileName']))
+                            self.logger.threaddebug(u"Output kwargs: {0:<19}".format(dict(**k_dict['k_plot_fig'])))
+                            plt.savefig(u"{0}{1}".format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-                    self.logger.info(u"{0} updated successfully.".format(dev.name))
+                        self.logger.info(u"{0} updated successfully.".format(dev.name))
 
-                except ValueError as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.critical(u"ValueError: {0}".format(sub_error))
+                    except ValueError as sub_error:
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"ValueError: {0}".format(sub_error))
 
                 plt.clf()  # In theory, this is redundant of close('all') below
                 plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+
+                kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
 
             else:
                 kv_list = []  # A list of state/value pairs used to feed updateStatesOnServer()
@@ -1222,18 +1258,20 @@ class Plugin(indigo.PluginBase):
     def refreshTheChartsMenuAction(self):
         """ Called by an Indigo Menu selection. """
         # self.logger.debug(u"{0:*^40}".format(' User Call For Refresh '))
+        self.logger.info(u"{:=^80}".format(' Refresh the Charts Menu Action '))
         self.refreshTheCharts()
         self.logger.info(u"{:=^80}".format(' Cycle complete. '))
 
     def refreshAChartAction(self, pluginAction):
         """ Call for a chart refresh and pass the id of the device
         called from the action. """
+        self.logger.info(u"{:=^80}".format(' Refresh Single Chart Action '))
         self.refreshTheCharts(pluginAction.props['chartToRefresh'])
 
     def refreshTheChartsAction(self, action):
         """ Called by an Indigo Action item. """
 
-        self.logger.debug(u"{0:*^40}".format(' Refresh Charts Action '))
+        self.logger.info(u"{0:=^80}".format(' Refresh All Charts Action '))
         # self.logger.threaddebug(u"  valuesDict: {0}".format(action))
         self.refreshTheCharts()
         self.logger.info(u"{:=^80}".format(' Cycle complete. '))
@@ -1710,12 +1748,8 @@ class Plugin(indigo.PluginBase):
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.critical(u"{0}: Error plotting chart ({1})".format(dev.name, sub_error))
 
-    def chartMultilineText(self, dev, p_dict, k_dict, kv_list):
+    def chartMultilineText(self, dev, p_dict, k_dict, text_to_plot, return_queue):
         """"""
-        if self.verboseLogging:
-            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
-
         try:
 
             import textwrap
@@ -1723,27 +1757,17 @@ class Plugin(indigo.PluginBase):
             if p_dict['textColor'] == 'custom':
                 p_dict['textColor'] = p_dict['textColorOther']
 
-            text_to_plot = u""
-            try:
-                if int(p_dict['thing']) in indigo.devices:
-                    text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
-                elif int(p_dict['thing']) in indigo.variables:
-                    text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
-                else:
-                    text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
-                    self.logger.info(u"Presently, the plugin only supports device state and variable values.")
-
-                # The cleanUpString method tries to remove some potential ugliness from the text to be plotted. It's optional--defaulted to on.
+            # If the value to be plotted is empty, use the default text from the device configuration.
+            if len(text_to_plot) <= 1:
+                text_to_plot = unicode(p_dict['defaultText'])
+            else:
+                # The cleanUpString method tries to remove some potential ugliness from the text to be
+                # plotted. It's optional--defaulted to on. No need to call this if the default text is
+                # used.
                 if p_dict['cleanTheText']:
                     text_to_plot = self.cleanUpString(text_to_plot)
 
-            except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Multiline text device {0} not fully configured. Please check the settings.".format(dev.name))
-
-            if len(text_to_plot) <= 1:
-                text_to_plot = unicode(p_dict['defaultText'])
-            # text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']))
+            # Wrap the text and prepare it for plotting.
             text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']), replace_whitespace=p_dict['cleanTheText'])
 
             ax = self.chartMakeFigure(p_dict['figureWidth'], p_dict['figureHeight'], p_dict)
@@ -1767,19 +1791,22 @@ class Plugin(indigo.PluginBase):
             plt.tight_layout(pad=1)
             plt.subplots_adjust(left=0.02, right=0.98, top=0.9, bottom=0.05)
 
-            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+            if p_dict['fileName'] != '':
+                plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+
+            plt.clf()  # In theory, this is redundant of close('all') below
+            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+
+            return_queue.put({'Message': 'updated successfully.', 'Error': False, 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError) as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}: IndexError ({1})".format(dev.name, sub_error))
+            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
         except UnicodeEncodeError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error))
+            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}: Error plotting chart ({1})".format(dev.name, sub_error))
+            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
     def chartSimpleNodeMatrix(self, dev, p_dict, k_dict, kv_list):
         """"""
@@ -2364,8 +2391,8 @@ class Plugin(indigo.PluginBase):
         elements in order to try to make them more presentable. The need is
         easily seen by looking at the rough text that is provided by the U.S.
         National Weather Service, for example."""
-        self.logger.debug(u"{0:*^40}".format(" Clean Up String "))
-        self.logger.debug(u"Length of initial string: {0}".format(len(val)))
+        # self.logger.debug(u"{0:*^40}".format(" Clean Up String "))
+        # self.logger.debug(u"Length of initial string: {0}".format(len(val)))
 
         # List of (elements, replacements)
         clean_list = [(' am ', ' AM '), (' pm ', ' PM '), ('*', ' '), ('\u000A', ' '), ('...', ' '), ('/ ', '/'), (' /', '/'), ('/', ' / ')]
@@ -2376,7 +2403,7 @@ class Plugin(indigo.PluginBase):
 
         val = ' '.join(val.split())  # Eliminate spans of whitespace.
 
-        self.logger.debug(u"Length of final string: {0}".format(len(val)))
+        # self.logger.debug(u"Length of final string: {0}".format(len(val)))
         return val
 
     def deviceStateGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2894,15 +2921,22 @@ class Plugin(indigo.PluginBase):
 
         try:
             while True:
+                sleep_interval = self.pluginPrefs.get('refreshInterval', '900')
+
                 self.updater.checkVersionPoll()
                 self.refreshTheCSV()
-                self.refreshTheCharts()
-                self.logger.info(u"{:=^80}".format(' Cycle complete. '))
 
-                # Trying ensure that garbage is collected before sleeping.
-                gc.collect()
-                self.sleep(int(self.pluginPrefs.get('refreshInterval', '900')))
-                self.logger.info(u"{:=^80}".format(' Cycling Concurrent Thread '))
+                # If sleep interval is 'None', the user must update all charts manually
+                if sleep_interval != 'None':
+                    self.refreshTheCharts()
+                    self.logger.info(u"{:=^80}".format(' Cycle Complete '))
+                    self.sleep(int(sleep_interval))
+                    self.logger.info(u"{:=^80}".format(' Cycling Concurrent Thread '))
+                else:
+                    self.logger.info(u"{:=^80}".format(' Manual Refresh Mode '))
+                    # Plugin will check once per minute to break out if user
+                    # changes preference and plugin doesn't refresh on its own
+                    self.sleep(60)
 
         except self.StopThread():
             self.pluginErrorHandler(traceback.format_exc())
