@@ -34,6 +34,7 @@ import indigoPluginUpdateChecker
 import logging
 import multiprocessing
 import numpy as np
+import sys
 import traceback
 
 import matplotlib
@@ -65,7 +66,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.05"
+__version__   = "0.4.06"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -73,7 +74,7 @@ kDefaultPluginPrefs = {
     u'backgroundColorOther': "#000000",
     u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
     u'chartResolution': 100,
-    u'dataPath': "/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/",
+    u'dataPath': "{0}/com.fogbert.indigoplugin.matplotlib/".format(indigo.server.getLogsFolderPath()),
     u'enableCustomColors': False,
     u'enableCustomLineSegments': False,
     u'faceColor': "#000000",
@@ -138,6 +139,7 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
+        self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version))
         self.logger.debug(u"{0:<31} {1}".format("Log Level = ", self.debugLevel))
 
         self.updater.checkVersionPoll()
@@ -157,7 +159,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"Starting device: {0}".format(dev.name))
         dev.stateListOrDisplayStateIdChanged()
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
-        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
     def deviceStopComm(self, dev):
         """ Stop communication with plugin devices."""
@@ -288,12 +290,6 @@ class Plugin(indigo.PluginBase):
         # If the user selects Save, let's redraw the charts so that they reflect the new settings.
         if not userCancelled:
             self.logger.info(u"{:=^80}".format(' Configuration Saved '))
-            if valuesDict['refreshInterval'] == u'None':
-                self.logger.info(u"{:=^80}".format(' Manual Refresh Mode Selected '))
-            else:
-                self.logger.info(u"{:=^80}".format(' Regenerating Charts '))
-                self.refreshTheCharts()
-                self.logger.info(u"{:=^80}".format(' Regeneration complete '))
 
     def getDeviceConfigUiValues(self, pluginProps, typeId, devId):
         """The getDeviceConfigUiValues() method is called when a device config
@@ -487,9 +483,6 @@ class Plugin(indigo.PluginBase):
         self.pluginPrefs['forceOriginLines']          = valuesDict['forceOriginLines']
 
         self.logger.debug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
-        self.logger.info(u"{:=^80}".format(' Advanced settings saved. Regenerating Charts. '))
-        self.refreshTheCharts()
-        self.logger.info(u"{:=^80}".format(' CycleRegeneration complete. '))
         return True
 
     def advancedSettingsMenu(self, valuesDict, typeId="", devId=None):
@@ -751,7 +744,6 @@ class Plugin(indigo.PluginBase):
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
 
-
     def unkillAllComms(self):
         """ unkillAllComms() sets the enabled status of all plugin devices to
         true. """
@@ -857,7 +849,6 @@ class Plugin(indigo.PluginBase):
                         csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
                         csv_file.close()
 
-
                     except ValueError as sub_error:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.warning(u"Invalid Indigo ID. {0}".format(sub_error))
@@ -868,6 +859,7 @@ class Plugin(indigo.PluginBase):
                 dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                           {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
                 self.logger.info(u"CSV data updated successfully.")
+                dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
             else:
                 pass
@@ -989,6 +981,7 @@ class Plugin(indigo.PluginBase):
                 pass
 
             # kwargs
+            # Note: PyCharm wants attribute values to be strings. This is not always what Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
             k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
                                         'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center', 'textcoords': 'offset points',
                                         'verticalalignment': 'center'}
@@ -1210,8 +1203,10 @@ class Plugin(indigo.PluginBase):
 
                     if result['Error']:
                         self.logger.critical(result['Message'], isError=True)
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     else:
                         self.logger.info(u"{0} {1}".format(dev.name, result['Message']))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                 # ======= Scatter Charts ======
                 if dev.deviceTypeId == "scatterChartingDevice":
@@ -1233,10 +1228,12 @@ class Plugin(indigo.PluginBase):
                     try:
                         if p_dict['fileName'] != '':
                             self.logger.threaddebug(u"Output chart: {0:<19}{1}".format(p_dict['chartPath'], p_dict['fileName']))
-                            self.logger.threaddebug(u"Output kwargs: {0:<19}".format(dict(**k_dict['k_plot_fig'])))
+                            if self.verboseLogging:
+                                self.logger.threaddebug(u"Output kwargs: {0:<19}".format(dict(**k_dict['k_plot_fig'])))
                             plt.savefig(u"{0}{1}".format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
                         self.logger.info(u"{0} updated successfully.".format(dev.name))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                     except ValueError as sub_error:
                         self.pluginErrorHandler(traceback.format_exc())
@@ -1336,7 +1333,7 @@ class Plugin(indigo.PluginBase):
             if p_dict['yMirrorValues']:
                 ax.tick_params(labelright=True)
 
-                # A user may want tick lables only on Y2.
+                # A user may want tick labels only on Y2.
                 if not p_dict['yMirrorValuesAlsoY1']:
                     ax.tick_params(labelleft=False)
 
@@ -1348,7 +1345,8 @@ class Plugin(indigo.PluginBase):
     def chartFormatGrid(self, p_dict, k_dict):
         """"""
         # Show X and Axis Grids?
-        self.logger.debug(u"Display grids [X/Y]: {0} / {1}".format(p_dict['showxAxisGrid'], p_dict['showyAxisGrid']))
+        if self.verboseLogging:
+            self.logger.debug(u"Display grids [X/Y]: {0} / {1}".format(p_dict['showxAxisGrid'], p_dict['showyAxisGrid']))
         if p_dict['showxAxisGrid']:
             plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
         if p_dict['showyAxisGrid']:
@@ -1462,7 +1460,9 @@ class Plugin(indigo.PluginBase):
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
             # Legend Properties. Legend should be plotted before any other lines are plotted (like averages or custom line segments).
-            self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+            if self.verboseLogging:
+                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+
             if p_dict['showLegend']:
 
                 # Amend the headers if there are any custom legend entries defined.
@@ -1680,7 +1680,9 @@ class Plugin(indigo.PluginBase):
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
             # Legend
-            self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+            if self.verboseLogging:
+                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+
             if p_dict['showLegend']:
 
                 # Amend the headers if there are any custom legend entries defined.
@@ -1915,7 +1917,7 @@ class Plugin(indigo.PluginBase):
                     ax.set_rgrids([10, 20, 30, 40, 50], **k_dict['k_rgrids'])
                 elif 50 < max(p_dict['wind_speed']):
                     plt.text(0.5, 0.5, u"Holy crap!", color='#FFFFFF', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
-                             bbox=dict(facecolor='red', alpha=0.5))
+                             bbox=dict(facecolor='red', alpha='0.5'))
 
                 if p_dict['xHideLabels']:
                     ax.axes.xaxis.set_ticklabels([])
@@ -1949,7 +1951,9 @@ class Plugin(indigo.PluginBase):
                     fig.gca().add_artist(patch)
 
                 # Legend Properties
-                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+                if self.verboseLogging:
+                    self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+
                 if p_dict['showLegend']:
                     legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
                     legend.legendHandles[0].set_color(p_dict['currentWindColor'])
@@ -1958,7 +1962,8 @@ class Plugin(indigo.PluginBase):
                     frame = legend.get_frame()
                     frame.set_alpha(0)
 
-                self.logger.debug(u"Display grids[X / Y]: always on")
+                if self.verboseLogging:
+                    self.logger.debug(u"Display grids[X / Y]: always on")
 
                 # Chart title
                 plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
@@ -2060,7 +2065,9 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
 
             # Legend
-            self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+            if self.verboseLogging:
+                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+
             if p_dict['showLegend']:
 
                 # Amend the headers if there are any custom legend entries defined.
@@ -2274,7 +2281,9 @@ class Plugin(indigo.PluginBase):
             plt.ylabel(p_dict['customAxisLabelY'], labelpad=20, **k_dict['k_y_axis_font'])
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the precipitation subplot.)
-            self.logger.debug(u"Display legend 1: {0}".format(p_dict['showLegend']))
+            if self.verboseLogging:
+                self.logger.debug(u"Display legend 1: {0}".format(p_dict['showLegend']))
+
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
                 legend = ax1.legend(headers, loc='upper right', bbox_to_anchor=(1.0, -0.1), ncol=1, prop={'size': float(p_dict['legendFontSize'])})
@@ -2364,7 +2373,9 @@ class Plugin(indigo.PluginBase):
             plt.ylabel(p_dict['customAxisLabelY2'], labelpad=20, **k_dict['k_y2_axis_font'])
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the temperatures subplot.)
-            self.logger.debug(u"Display legend 2: {0}".format(p_dict['showLegend']))
+            if self.verboseLogging:
+                self.logger.debug(u"Display legend 2: {0}".format(p_dict['showLegend']))
+
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
                 legend = ax2.legend(headers, loc='upper left', bbox_to_anchor=(0.0, -0.1), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
@@ -2460,7 +2471,8 @@ class Plugin(indigo.PluginBase):
         conflicts with the construction of the XML code.  Matplotlib needs
         these values for select built-in marker styles, so we need to change
         them to what MPL is expecting."""
-        self.logger.threaddebug(u"Fixing the markers.")
+        if self.verboseLogging:
+            self.logger.threaddebug(u"Fixing the markers.")
 
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
 
@@ -2744,7 +2756,7 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         file_name_list_menu = []
-        source_path = self.pluginPrefs.get('dataPath', '/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/')
+        source_path = self.pluginPrefs.get('dataPath', '{0}/com.fogbert.indigoplugin.matplotlib/'.format(indigo.server.getLogsFolderPath()))
 
         try:
             import glob
@@ -2881,7 +2893,8 @@ class Plugin(indigo.PluginBase):
     def setAxisScaleX(self, x_axis_bins):
         """The setAxisScaleX() method sets the bins for the X axis. Presently,
         we assume a date-based axis."""
-        self.logger.threaddebug(u"Constructing the bins for the X axis.")
+        if self.verboseLogging:
+            self.logger.threaddebug(u"Constructing the bins for the X axis.")
 
         if x_axis_bins == 'quarter-hourly':
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
