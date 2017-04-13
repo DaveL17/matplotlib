@@ -66,7 +66,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.06"
+__version__   = "0.4.07"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -123,6 +123,21 @@ class Plugin(indigo.PluginBase):
         self.indigo_log_handler.setLevel(self.debugLevel)
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
 
+        self.logger.info(u"")
+        self.logger.info(u"{:=^80}".format(' Initializing New Plugin Session '))
+        self.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
+        self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
+        self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
+        self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
+        self.logger.info(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
+        self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
+        self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
+        self.logger.info(u"{0:<31} {1}".format("Plugin name:", pluginDisplayName))
+        self.logger.info(u"{0:<31} {1}".format("Plugin version:", pluginVersion))
+        self.logger.info(u"{0:<31} {1}".format("Plugin ID:", pluginId))
+        self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
+        self.logger.info(u"{:=^80}".format(""))
+
         self.final_data = []
 
     def __del__(self):
@@ -130,17 +145,6 @@ class Plugin(indigo.PluginBase):
 
     def startup(self):
         """ Plugin startup routines."""
-        self.logger.info(u"")
-        self.logger.info(u"{:=^80}".format(' Initializing New Plugin Session '))
-        self.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
-        self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
-        self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
-        self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version))
-        self.logger.debug(u"{0:<31} {1}".format("Log Level = ", self.debugLevel))
 
         self.updater.checkVersionPoll()
 
@@ -149,6 +153,8 @@ class Plugin(indigo.PluginBase):
             props = dev.pluginProps
             # Add props here
             dev.replacePluginPropsOnServer(props)
+
+        self.logger.debug(u"{0}{1}".format("Log Level = ", self.debugLevel))
 
     def shutdown(self):
         """ Plugin shutdown routines."""
@@ -170,7 +176,7 @@ class Plugin(indigo.PluginBase):
     def getPrefsConfigUiValues(self):
         """getPrefsConfigUiValues(self) is called when the plugin config dialog
         is called."""
-        self.logger.debug(u"{0:*^40}".format(' Get Prefs Config UI Values '))
+        self.logger.debug(u"{0:=^80}".format(' Get Prefs Config UI Values '))
 
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
@@ -858,7 +864,7 @@ class Plugin(indigo.PluginBase):
 
                 dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                           {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
-                self.logger.info(u"CSV data updated successfully.")
+                self.logger.info(u"[{0}] updated successfully.".format(dev.name))
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
             else:
@@ -1188,8 +1194,10 @@ class Plugin(indigo.PluginBase):
                     # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method.
                     if int(p_dict['thing']) in indigo.devices:
                         text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
+                        self.logger.debug(u"Data retrieved successfully: {0}".format(text_to_plot))
                     elif int(p_dict['thing']) in indigo.variables:
                         text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
+                        self.logger.debug(u"Data retrieved successfully: {0}".format(text_to_plot))
                     else:
                         text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
                         self.logger.info(u"Presently, the plugin only supports device state and variable values.")
@@ -1202,10 +1210,10 @@ class Plugin(indigo.PluginBase):
                         result = return_queue.get()
 
                     if result['Error']:
-                        self.logger.critical(result['Message'], isError=True)
+                        self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']), isError=True)
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     else:
-                        self.logger.info(u"{0} {1}".format(dev.name, result['Message']))
+                        self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                 # ======= Scatter Charts ======
@@ -1232,7 +1240,7 @@ class Plugin(indigo.PluginBase):
                                 self.logger.threaddebug(u"Output kwargs: {0:<19}".format(dict(**k_dict['k_plot_fig'])))
                             plt.savefig(u"{0}{1}".format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-                        self.logger.info(u"{0} updated successfully.".format(dev.name))
+                        self.logger.info(u"[{0}] updated successfully.".format(dev.name))
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                     except ValueError as sub_error:
@@ -1346,7 +1354,7 @@ class Plugin(indigo.PluginBase):
         """"""
         # Show X and Axis Grids?
         if self.verboseLogging:
-            self.logger.debug(u"Display grids [X/Y]: {0} / {1}".format(p_dict['showxAxisGrid'], p_dict['showyAxisGrid']))
+            self.logger.threaddebug(u"Display grids [X/Y]: {0} / {1}".format(p_dict['showxAxisGrid'], p_dict['showyAxisGrid']))
         if p_dict['showxAxisGrid']:
             plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
         if p_dict['showyAxisGrid']:
@@ -1461,7 +1469,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend Properties. Legend should be plotted before any other lines are plotted (like averages or custom line segments).
             if self.verboseLogging:
-                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+                self.logger.threaddebug(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -1681,7 +1689,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend
             if self.verboseLogging:
-                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+                self.logger.threaddebug(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -1952,7 +1960,7 @@ class Plugin(indigo.PluginBase):
 
                 # Legend Properties
                 if self.verboseLogging:
-                    self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+                    self.logger.threaddebug(u"Display legend: {0}".format(p_dict['showLegend']))
 
                 if p_dict['showLegend']:
                     legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
@@ -1963,7 +1971,7 @@ class Plugin(indigo.PluginBase):
                     frame.set_alpha(0)
 
                 if self.verboseLogging:
-                    self.logger.debug(u"Display grids[X / Y]: always on")
+                    self.logger.threaddebug(u"Display grids[X / Y]: always on")
 
                 # Chart title
                 plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
@@ -2066,7 +2074,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend
             if self.verboseLogging:
-                self.logger.debug(u"Display legend: {0}".format(p_dict['showLegend']))
+                self.logger.threaddebug(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -2183,7 +2191,7 @@ class Plugin(indigo.PluginBase):
 
                 self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
                 if self.verboseLogging:
-                    self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
+                    self.logger.threaddebug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs3'])))
 
             elif indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId == 'wundergroundTenDay':
 
@@ -2209,7 +2217,7 @@ class Plugin(indigo.PluginBase):
 
                 self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
                 if self.verboseLogging:
-                    self.logger.debug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
+                    self.logger.threaddebug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
 
             else:
                 self.logger.warning(u"This device type only supports WUnderground plugin forecast devices.")
@@ -2282,7 +2290,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the precipitation subplot.)
             if self.verboseLogging:
-                self.logger.debug(u"Display legend 1: {0}".format(p_dict['showLegend']))
+                self.logger.threaddebug(u"Display legend 1: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
@@ -2374,7 +2382,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the temperatures subplot.)
             if self.verboseLogging:
-                self.logger.debug(u"Display legend 2: {0}".format(p_dict['showLegend']))
+                self.logger.threaddebug(u"Display legend 2: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
@@ -2552,8 +2560,7 @@ class Plugin(indigo.PluginBase):
         list is for things that support transparency (e.g., background and plot
         area."""
         if self.verboseLogging:
-            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"Constructing background color list.")
 
         background_color_list_menu = [
             ("#000000", "Black"),
@@ -2589,8 +2596,7 @@ class Plugin(indigo.PluginBase):
         list is for things that don't support transparency (e.g., fonts, lines,
         etc.)"""
         if self.verboseLogging:
-            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"Constructing color list.")
 
         color_list_menu = [
             ("#000000", "Black"),
@@ -2681,8 +2687,6 @@ class Plugin(indigo.PluginBase):
         """Returns a list of possible font sizes."""
         if self.verboseLogging:
             self.logger.threaddebug(u"Constructing font size list.")
-            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         font_size_menu = [
             ("6", "6"),
@@ -2733,8 +2737,6 @@ class Plugin(indigo.PluginBase):
         """Returns a list of line styles."""
         if self.verboseLogging:
             self.logger.threaddebug(u"Constructing line list.")
-            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         line_list_menu = [
             ("None", "None"),
@@ -2826,7 +2828,7 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u"Error downloading CSV data. Skipping: {0}".format(sub_error))
 
         if self.verboseLogging:
-            self.logger.debug(u"{0:<19}{1}".format("Final data: ", final_data))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Final data: ", final_data))
         return final_data
 
     def listGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2929,7 +2931,7 @@ class Plugin(indigo.PluginBase):
 
     def runConcurrentThread(self):
         """"""
-        self.logger.info(u"{:=^80}".format(' Initializing Concurrent Thread '))
+        self.logger.info(u"{:=^80}".format(' Initializing Main Thread '))
         self.sleep(0.5)
 
         try:
@@ -2944,7 +2946,7 @@ class Plugin(indigo.PluginBase):
                     self.refreshTheCharts()
                     self.logger.info(u"{:=^80}".format(' Cycle Complete '))
                     self.sleep(int(sleep_interval))
-                    self.logger.info(u"{:=^80}".format(' Cycling Concurrent Thread '))
+                    self.logger.info(u"{:=^80}".format(' Cycling Main Thread '))
                 else:
                     self.logger.info(u"{:=^80}".format(' Manual Refresh Mode '))
                     # Plugin will check once per minute to break out if user
