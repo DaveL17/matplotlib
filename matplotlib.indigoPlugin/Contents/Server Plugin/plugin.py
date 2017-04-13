@@ -66,7 +66,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.07"
+__version__   = "0.4.08"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",

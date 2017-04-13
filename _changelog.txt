@@ -1,4 +1,4 @@
-v0.4.07
+v0.4.08
 - Adds a new Action Item to refresh individual charts. Useful when a single
   data point changes (i.e., device state or variable value).
 - Makes the cleanUpString() method optional for multiline text charts.
