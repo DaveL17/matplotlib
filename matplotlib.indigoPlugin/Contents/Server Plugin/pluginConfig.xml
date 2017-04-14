@@ -8,9 +8,6 @@
         <Label>Matplotlib Charting Plugin - Developed by DaveL17</Label>
     </Field>
     <Field id="space0" type="label"/>
-    <Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
-        <Label>Existing charts will be regenerated when you click save. Please be patient.</Label>
-    </Field>
     <Field id="separator0" type="separator"/>
 
     <!-- Hidden controls -->

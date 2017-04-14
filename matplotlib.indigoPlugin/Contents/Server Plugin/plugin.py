@@ -66,7 +66,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.08"
+__version__   = "0.4.09"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -122,6 +122,7 @@ class Plugin(indigo.PluginBase):
         self.debugLevel = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debugLevel)
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
+        self.sleep_interval = self.pluginPrefs.get('refreshInterval', 900)
 
         self.logger.info(u"")
         self.logger.info(u"{:=^80}".format(' Initializing New Plugin Session '))
@@ -291,7 +292,7 @@ class Plugin(indigo.PluginBase):
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         """ User closes config menu. The validatePrefsConfigUI() method will
         also be called."""
-        # self.logger.info(valuesDict['refreshInterval'])
+        self.sleep_interval = valuesDict['refreshInterval']
 
         # If the user selects Save, let's redraw the charts so that they reflect the new settings.
         if not userCancelled:
@@ -2936,21 +2937,19 @@ class Plugin(indigo.PluginBase):
 
         try:
             while True:
-                sleep_interval = self.pluginPrefs.get('refreshInterval', '900')
-
+                self.sleep_interval = self.pluginPrefs.get('refreshInterval', '900')
                 self.updater.checkVersionPoll()
-                self.refreshTheCSV()
 
                 # If sleep interval is 'None', the user must update all charts manually
-                if sleep_interval != 'None':
+                if self.sleep_interval != 'None':
+                    self.refreshTheCSV()
                     self.refreshTheCharts()
                     self.logger.info(u"{:=^80}".format(' Cycle Complete '))
-                    self.sleep(int(sleep_interval))
+                    self.sleep(int(self.sleep_interval))
                     self.logger.info(u"{:=^80}".format(' Cycling Main Thread '))
                 else:
-                    self.logger.info(u"{:=^80}".format(' Manual Refresh Mode '))
-                    # Plugin will check once per minute to break out if user
-                    # changes preference and plugin doesn't refresh on its own
+                    # Check once per minute to break out if user changes
+                    # preference and plugin doesn't refresh on its own
                     self.sleep(60)
 
         except self.StopThread():
