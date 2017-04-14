@@ -1,4 +1,4 @@
-Version: 0.4.04
+Version: 0.4.08
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
@@ -7,8 +7,18 @@ A Matplotlib Plugin update is now available
 This is a minor release. Users whose installs are functioning well
 do not need to install this patch.
 
-v0.4.04
-- Fixes bug where CSV Engine doesn't validate due to the existence of null device(s).
+v0.4.08
+
+- Adds a new Action Item to refresh individual charts. Useful when a single data point changes (i.e., device state or variable value).
+- Makes the cleanUpString() method optional for multiline text charts.
+- Removes the need to manually refresh the list of values to chart when selecting a data source for multiline text charts (removes the 'Refresh' button).
+- Updates plugin to require Indigo API version 2.0 (as Indigo 7 is required in order to run the plugin).
+- Testing new multiprocessing feature with multiline charts. Should not cause any observable differences in plugin operation.
+- Plugin now only calls the Matplotlib AGG backend.
+- Stylistic changes to Indigo Plugin Update Checker module.
+- Improves code used to read and write select information from the plugin logs folder.
+- Saving plugin configuration (or advanced settings configuration) will no longer regenerate all charts automatically. Feature wasn't working well on slower servers with a lot of charts.
+- Further reduces the amount of information written to the debug log.
 
 As always, if something doesn't seem quite right, please let me know.
 
