@@ -108,9 +108,12 @@
     <li>
         <span>Debugging</span>
         <p>
-            The plugin takes advantage of Indigo 7's enhanced debug logging facility. The default for logging is "Warning" which will alert you only to issues that you may want to
-            address. Select "Informational Messages" to see select notifications of plugin activity. The logging levels are inclusive of "higher" levels. In other words, if you set the
-            level to Informational Messages, you'll also receive all Warnings, Errors and Critical messages.
+            The Matplotlib plugin takes advantage of Indigo 7's enhanced debug logging facility. The default for logging is "Warning" which will alert you only to issues that you may
+            want to address. Select "Informational Messages" to see select notifications of plugin activity. The logging levels are inclusive of "higher" levels. In other words, if you
+            set the level to Informational Messages, you'll also receive all Warnings, Errors and Critical messages.
+        </p>
+        <p>
+            The plugin also has a setting called "Verbose Logging" which enables additional logging information to be written to the plugin log file (not the Indigo Event Log window).
         </p>
     </li>
 </ul>
@@ -535,10 +538,16 @@
 </p>
 <ul>
     <li>
-        <span>Redraw Charts</span>
+        <span>Redraw All Charts</span>
         <p>
-            Invoking this action item will cause all chart devices to refresh their images. It will not cause a new data observation to be saved to CSV Engine data elements (reloading
-            the plugin to redraw the charts <u>will</u> cause a new observation to be saved.
+            Invoking this action item will cause all chart devices to refresh their images. It will not cause a new data observations to be saved (reloading the plugin to redraw the
+            charts <u>will</u> cause a new observation to be saved.
+        </p>
+    </li>
+    <li>
+        <span>Redraw Single Chart</span>
+        <p>
+            Invoking this action item will cause a single specified chart to refresh its image. It will not cause a new data observation to be saved.
         </p>
     </li>
 </ul>
