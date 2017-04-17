@@ -60,7 +60,7 @@
     <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently you would like the plugin to redraw the charts.">
         <Label>Refresh Interval:</Label>
         <List>
-            <Option value="None">None - Manual Refresh Only</Option>
+            <Option value="0">None - Manual Refresh Only</Option>
             <Option value="60">Every Minute</Option>
             <Option value="300">Every 5 Minutes</Option>
             <Option value="600">Every 10 Minutes</Option>

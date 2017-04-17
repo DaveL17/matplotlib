@@ -50,7 +50,6 @@ import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
-
 try:
     import indigo
 except ImportError as error:
@@ -61,12 +60,13 @@ try:
 except ImportError as error:
     pass
 
+
 __author__    = "DaveL17"
 __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.09"
+__version__   = "0.4.10"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -125,19 +125,19 @@ class Plugin(indigo.PluginBase):
         self.sleep_interval = self.pluginPrefs.get('refreshInterval', 900)
 
         self.logger.info(u"")
-        self.logger.info(u"{:=^80}".format(' Initializing New Plugin Session '))
+        self.logger.info(u"{0:=^80}".format(' Initializing New Plugin Session '))
         self.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
         self.logger.info(u"{0:<31} {1}".format("Plugin name:", pluginDisplayName))
         self.logger.info(u"{0:<31} {1}".format("Plugin version:", pluginVersion))
         self.logger.info(u"{0:<31} {1}".format("Plugin ID:", pluginId))
         self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
-        self.logger.info(u"{:=^80}".format(""))
+        self.logger.debug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
+        self.logger.info(u"{0:=^80}".format(""))
 
         self.final_data = []
 
@@ -296,7 +296,7 @@ class Plugin(indigo.PluginBase):
 
         # If the user selects Save, let's redraw the charts so that they reflect the new settings.
         if not userCancelled:
-            self.logger.info(u"{:=^80}".format(' Configuration Saved '))
+            self.logger.info(u"{0:=^80}".format(' Configuration Saved '))
 
     def getDeviceConfigUiValues(self, pluginProps, typeId, devId):
         """The getDeviceConfigUiValues() method is called when a device config
@@ -1176,12 +1176,28 @@ class Plugin(indigo.PluginBase):
                     self.chartSimpleBar(dev, p_dict, k_dict, kv_list)
 
                 # ======= Battery Status Charts ======
-                if dev.deviceTypeId == "simpleBatteryChartingDevice":
-                    self.chartSimpleBattery(dev, p_dict, k_dict, kv_list)
+                # if dev.deviceTypeId == "simpleBatteryChartingDevice":
+                #     self.chartSimpleBattery(dev, p_dict, k_dict, kv_list)
 
                 # ======= Calendar Charts ======
                 if dev.deviceTypeId == "calendarChartingDevice":
-                    self.chartSimpleCalendar(dev, p_dict, k_dict)
+                    # self.chartSimpleCalendar(dev, p_dict, k_dict)
+
+                    return_queue = multiprocessing.Queue()  # Only need to setup queue once - outside the while loop
+
+                    if __name__ == '__main__':
+                        p1 = multiprocessing.Process(name='p_calendar', target=self.chartSimpleCalendar, args=(dev, p_dict, k_dict, return_queue,))
+                        p1.start()
+                        p1.join()  # Right now, we join because otherwise the main thread continues before the queue is returned.
+
+                        result = return_queue.get()
+
+                    if result['Error']:
+                        self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                    else:
+                        self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                 # ======= Line Charts ======
                 if dev.deviceTypeId == "lineChartingDevice":
@@ -1204,14 +1220,14 @@ class Plugin(indigo.PluginBase):
                         self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
                     if __name__ == '__main__':
-                        p1 = multiprocessing.Process(name='p1', target=self.chartMultilineText, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                        p1 = multiprocessing.Process(name='p_multiline', target=self.chartMultilineText, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
                         p1.start()
-                        p1.join()  # Right now, we join because otherwise the main thread continues before the queue is returned.
+                        p1.join()
 
                         result = return_queue.get()
 
                     if result['Error']:
-                        self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']), isError=True)
+                        self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     else:
                         self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
@@ -1230,10 +1246,10 @@ class Plugin(indigo.PluginBase):
                     self.chartWeatherForecast(dev, p_dict, k_dict, kv_list)
 
                 # ======= Z-Wave Node Matrix Charts ======
-                if dev.deviceTypeId == "simpleNodeMatrixChartingDevice":
-                    self.chartSimpleNodeMatrix(dev, p_dict, k_dict, kv_list)
+                # if dev.deviceTypeId == "simpleNodeMatrixChartingDevice":
+                #     self.chartSimpleNodeMatrix(dev, p_dict, k_dict, kv_list)
 
-                if dev.deviceTypeId != 'multiLineText':
+                if dev.deviceTypeId not in ['calendarChartingDevice', 'multiLineText']:
                     try:
                         if p_dict['fileName'] != '':
                             self.logger.threaddebug(u"Output chart: {0:<19}{1}".format(p_dict['chartPath'], p_dict['fileName']))
@@ -1264,14 +1280,14 @@ class Plugin(indigo.PluginBase):
     def refreshTheChartsMenuAction(self):
         """ Called by an Indigo Menu selection. """
         # self.logger.debug(u"{0:*^40}".format(' User Call For Refresh '))
-        self.logger.info(u"{:=^80}".format(' Refresh the Charts Menu Action '))
+        self.logger.info(u"{0:=^80}".format(' Refresh the Charts Menu Action '))
         self.refreshTheCharts()
-        self.logger.info(u"{:=^80}".format(' Cycle complete. '))
+        self.logger.info(u"{0:=^80}".format(' Cycle complete. '))
 
     def refreshAChartAction(self, pluginAction):
         """ Call for a chart refresh and pass the id of the device
         called from the action. """
-        self.logger.info(u"{:=^80}".format(' Refresh Single Chart Action '))
+        self.logger.info(u"{0:=^80}".format(' Refresh Single Chart Action '))
         self.refreshTheCharts(pluginAction.props['chartToRefresh'])
 
     def refreshTheChartsAction(self, action):
@@ -1280,7 +1296,7 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:=^80}".format(' Refresh All Charts Action '))
         # self.logger.threaddebug(u"  valuesDict: {0}".format(action))
         self.refreshTheCharts()
-        self.logger.info(u"{:=^80}".format(' Cycle complete. '))
+        self.logger.info(u"{0:=^80}".format(' Cycle complete. '))
 
     def plotActionTest(self, pluginAction, dev, callerWaitingForResult):
         """
@@ -1308,7 +1324,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as err:
             if callerWaitingForResult:
-                indigo.server.log(u"Error: {0}".format(err), isError=True)
+                self.logger.critical(u"Error: {0}".format(err))
                 return {'success': False, 'message': u"{0}".format(err)}
 
         if callerWaitingForResult:
@@ -1539,11 +1555,8 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
         pass
 
-    def chartSimpleCalendar(self, dev, p_dict, k_dict):
+    def chartSimpleCalendar(self, dev, p_dict, k_dict, return_queue):
         """"""
-        if self.verboseLogging:
-            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
         try:
             import calendar
@@ -1559,13 +1572,20 @@ class Plugin(indigo.PluginBase):
             ax.axes.get_yaxis().set_visible(False)
             ax.axis('off')  # uncomment this line to hide the box
 
+            if p_dict['fileName'] != '':
+                plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+
+            plt.clf()  # In theory, this is redundant of close('all') below
+            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+
+            # return_queue.put({'Message': 'updated successfully.', 'Error': False, 'Name': dev.name})
+            return_queue.put({'Message': 'updated successfully.', 'Error': False, 'Name': dev.name})
+
         except UnicodeEncodeError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error))
+            return_queue.put({'Message': sub_error, 'Error': True, 'Name': dev.name})
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}: Error plotting chart ({1})".format(dev.name, sub_error))
+            return_queue.put({'Message': sub_error, 'Error': True, 'Name': dev.name})
 
     def chartSimpleErrorBar(self, dev, p_dict, k_dict, kv_list):
         """ This is a very simple error chart. It is not currently used. """
@@ -1810,10 +1830,7 @@ class Plugin(indigo.PluginBase):
 
             return_queue.put({'Message': 'updated successfully.', 'Error': False, 'Name': dev.name})
 
-        except (KeyError, IndexError, ValueError) as sub_error:
-            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
-
-        except UnicodeEncodeError as sub_error:
+        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
         except Exception as sub_error:
@@ -2932,21 +2949,25 @@ class Plugin(indigo.PluginBase):
 
     def runConcurrentThread(self):
         """"""
-        self.logger.info(u"{:=^80}".format(' Initializing Main Thread '))
+        self.logger.info(u"{0:=^80}".format(' Initializing Main Thread '))
         self.sleep(0.5)
 
         try:
             while True:
-                self.sleep_interval = self.pluginPrefs.get('refreshInterval', '900')
                 self.updater.checkVersionPoll()
 
-                # If sleep interval is 'None', the user must update all charts manually
-                if self.sleep_interval != 'None':
+                try:
+                    self.sleep_interval = int(self.pluginPrefs.get('refreshInterval', '900'))
+                except ValueError:
+                    self.sleep_interval = 0
+
+                # If sleep interval is zero, the user must update all charts manually
+                if self.sleep_interval != 0:
                     self.refreshTheCSV()
                     self.refreshTheCharts()
-                    self.logger.info(u"{:=^80}".format(' Cycle Complete '))
-                    self.sleep(int(self.sleep_interval))
-                    self.logger.info(u"{:=^80}".format(' Cycling Main Thread '))
+                    self.logger.info(u"{0:=^80}".format(' Cycle Complete '))
+                    self.sleep(self.sleep_interval)
+                    self.logger.info(u"{0:=^80}".format(' Cycling Main Thread '))
                 else:
                     # Check once per minute to break out if user changes
                     # preference and plugin doesn't refresh on its own

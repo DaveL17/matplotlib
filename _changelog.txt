@@ -1,3 +1,8 @@
+v0.4.10
+- Adds calendar devices to multiprocessing.
+- Fixes error in debug logging where 'isError' attribute was used with API 2.0
+  logging.
+
 v0.4.09
 - Fixes bug where CSV data are updated once per minute when refresh interval
   set to manual only.
