@@ -883,6 +883,7 @@ class Plugin(indigo.PluginBase):
         dev.updateStatesOnServer(keyValueList)
         """
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
+        return_queue = multiprocessing.Queue()
 
         # A specific chart id may be passed to the method. In that case,
         # refresh only that chart. Otherwise, chart_id is None and we refresh
@@ -1181,14 +1182,11 @@ class Plugin(indigo.PluginBase):
 
                 # ======= Calendar Charts ======
                 if dev.deviceTypeId == "calendarChartingDevice":
-                    # self.chartSimpleCalendar(dev, p_dict, k_dict)
-
-                    return_queue = multiprocessing.Queue()  # Only need to setup queue once - outside the while loop
 
                     if __name__ == '__main__':
-                        p1 = multiprocessing.Process(name='p_calendar', target=self.chartSimpleCalendar, args=(dev, p_dict, k_dict, return_queue,))
-                        p1.start()
-                        p1.join()  # Right now, we join because otherwise the main thread continues before the queue is returned.
+                        p_calendar = multiprocessing.Process(name='p_calendar', target=self.chartSimpleCalendar, args=(dev, p_dict, k_dict, return_queue,))
+                        p_calendar.start()
+                        p_calendar.join()  # We're want individual processes; parallel processing may come later.
 
                         result = return_queue.get()
 
@@ -1206,9 +1204,7 @@ class Plugin(indigo.PluginBase):
                 # ======= Multiline Text ======
                 if dev.deviceTypeId == 'multiLineText':
 
-                    return_queue = multiprocessing.Queue()  # Only need to setup queue once - outside the while loop
-
-                    # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method.
+                    # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method (the process does not have access to the Indigo server).
                     if int(p_dict['thing']) in indigo.devices:
                         text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
                         self.logger.debug(u"Data retrieved successfully: {0}".format(text_to_plot))
@@ -1220,9 +1216,9 @@ class Plugin(indigo.PluginBase):
                         self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
                     if __name__ == '__main__':
-                        p1 = multiprocessing.Process(name='p_multiline', target=self.chartMultilineText, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
-                        p1.start()
-                        p1.join()
+                        p_multiline = multiprocessing.Process(name='p_multiline', target=self.chartMultilineText, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                        p_multiline.start()
+                        p_multiline.join()
 
                         result = return_queue.get()
 
@@ -1243,13 +1239,29 @@ class Plugin(indigo.PluginBase):
 
                 # ======= Weather Forecast Charts ======
                 if dev.deviceTypeId == "forecastChartingDevice":
-                    self.chartWeatherForecast(dev, p_dict, k_dict, kv_list)
+                    # self.chartWeatherForecast(dev, p_dict, k_dict, kv_list)
+
+                    dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
+                    state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
+                    if __name__ == '__main__':
+                        p_weather = multiprocessing.Process(name='p_weather', target=self.chartWeatherForecast, args=(dev, dev_type, p_dict, k_dict, kv_list, state_list, return_queue,))
+                        p_weather.start()
+                        p_weather.join()  # We're want individual processes; parallel processing may come later.
+
+                        result = return_queue.get()
+
+                    if result['Error']:
+                        self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                    else:
+                        self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
                 # ======= Z-Wave Node Matrix Charts ======
                 # if dev.deviceTypeId == "simpleNodeMatrixChartingDevice":
                 #     self.chartSimpleNodeMatrix(dev, p_dict, k_dict, kv_list)
 
-                if dev.deviceTypeId not in ['calendarChartingDevice', 'multiLineText']:
+                if dev.deviceTypeId not in ['calendarChartingDevice', 'forecastChartingDevice', 'multiLineText']:
                     try:
                         if p_dict['fileName'] != '':
                             self.logger.threaddebug(u"Output chart: {0:<19}{1}".format(p_dict['chartPath'], p_dict['fileName']))
@@ -2164,7 +2176,7 @@ class Plugin(indigo.PluginBase):
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.critical(u"{0}: Error plotting chart ({1})".format(dev.name, sub_error))
 
-    def chartWeatherForecast(self, dev, p_dict, k_dict, kv_list):
+    def chartWeatherForecast(self, dev, dev_type, p_dict, k_dict, kv_list, state_list, return_queue):
         """"""
 
         try:
@@ -2175,23 +2187,22 @@ class Plugin(indigo.PluginBase):
                 if p_dict['line{0}Color'.format(line)] == 'custom':
                     p_dict['line{0}Color'.format(line)] = p_dict['line{0}ColorOther'.format(line)]
 
-                if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
-                    self.logger.warning(u"{0}: High temperature color is the same as the background color (so you may not be able to see it).".format(dev.name))
+                # if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
+                #     self.logger.warning(u"{0}: High temperature color is the same as the background color (so you may not be able to see it).".format(dev.name))
 
                 if line < 3:
                     if p_dict['line{0}MarkerColor'.format(line)] == 'custom':
                         p_dict['line{0}MarkerColor'.format(line)] = p_dict['line{0}MarkerColorOther'.format(line)]
 
-            if self.verboseLogging:
-                self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            # if self.verboseLogging:
+            #     self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
             # Prepare the data for charting.
-            if indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId == 'wundergroundHourly':
-
+            if dev_type == 'wundergroundHourly':
+                pass
                 for counter in range(1, 25, 1):
                     if counter < 10:
                         counter = '0{0}'.format(counter)
-                    state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
                     p_dict['x_obs1'].append(state_list['h{0}_timeLong'.format(counter)])
                     p_dict['y_obs1'].append(state_list['h{0}_temp'.format(counter)])
                     p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
@@ -2207,16 +2218,11 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_1'] = ('Temperature',)  # Note that the trailing comma is required to ensure that Matplotlib interprets the legend as a tuple.
                     p_dict['headers_2'] = ('Precipitation',)
 
-                self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
-                if self.verboseLogging:
-                    self.logger.threaddebug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs3'])))
-
-            elif indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId == 'wundergroundTenDay':
-
+            elif dev_type == 'wundergroundTenDay':
+                pass
                 for counter in range(1, 11, 1):
                     if counter < 10:
                         counter = '0{0}'.format(counter)
-                    state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
                     p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
                     p_dict['y_obs1'].append(state_list['d{0}_high'.format(counter)])
                     p_dict['y_obs2'].append(state_list['d{0}_low'.format(counter)])
@@ -2233,12 +2239,9 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_1'] = ('High Temperature', 'Low Temperature',)
                     p_dict['headers_2'] = ('Precipitation',)
 
-                self.logger.debug(u"Data retrieved successfully: {0} [{1}]".format(dev.name, dev.id))
-                if self.verboseLogging:
-                    self.logger.threaddebug(u"{0:<19}{1}".format("Final data:", zip(p_dict['x_obs1'], p_dict['y_obs1'], p_dict['y_obs2'], p_dict['y_obs3'])))
-
             else:
-                self.logger.warning(u"This device type only supports WUnderground plugin forecast devices.")
+                return_queue.put({'Message': u"This device type only supports WUnderground plugin forecast devices.", 'Error': True, 'Name': dev.name})
+                # self.logger.warning(u"This device type only supports WUnderground plugin forecast devices.")
 
             ax1 = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -2290,25 +2293,23 @@ class Plugin(indigo.PluginBase):
                             y2_axis_max = max(p_dict['y_obs3']) * 1.10
                 plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
-            except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name))
+            except ValueError as sub_error:
+                return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
             except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
+                return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
             # X Axis Label
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], k_dict['k_x_axis_font'])
-            if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-                self.logger.warning(u"{0}: X axis label suppressed to make room for the chart legend.".format(dev.name))
+            # if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
+            #     self.logger.warning(u"{0}: X axis label suppressed to make room for the chart legend.".format(dev.name))
 
             # Y1 Axis Label
             plt.ylabel(p_dict['customAxisLabelY'], labelpad=20, **k_dict['k_y_axis_font'])
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the precipitation subplot.)
-            if self.verboseLogging:
-                self.logger.threaddebug(u"Display legend 1: {0}".format(p_dict['showLegend']))
+            # if self.verboseLogging:
+            #     self.logger.threaddebug(u"Display legend 1: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
@@ -2348,10 +2349,10 @@ class Plugin(indigo.PluginBase):
             ax1.yaxis.tick_right()
             ax2.yaxis.tick_left()
 
-            if self.verboseLogging:
-                self.logger.threaddebug(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
-                                                                                         min(p_dict['data_array']),
-                                                                                         max(p_dict['data_array']) - min(p_dict['data_array'])))
+            # if self.verboseLogging:
+            #     self.logger.threaddebug(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
+            #                                                                              min(p_dict['data_array']),
+            #                                                                              max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             # Y1 Axis Min/Max
             try:
@@ -2386,11 +2387,13 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name))
+                return_queue.put({'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name), 'Error': True, 'Name': dev.name})
+                # self.pluginErrorHandler(traceback.format_exc())
+                # self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name))
             except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
+                return_queue.put({'Message': u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error), 'Error': True, 'Name': dev.name})
+                # self.pluginErrorHandler(traceback.format_exc())
+                # self.logger.warning(u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error))
 
             # Chart title
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
@@ -2399,8 +2402,8 @@ class Plugin(indigo.PluginBase):
             plt.ylabel(p_dict['customAxisLabelY2'], labelpad=20, **k_dict['k_y2_axis_font'])
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the temperatures subplot.)
-            if self.verboseLogging:
-                self.logger.threaddebug(u"Display legend 2: {0}".format(p_dict['showLegend']))
+            # if self.verboseLogging:
+            #     self.logger.threaddebug(u"Display legend 2: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
@@ -2414,14 +2417,15 @@ class Plugin(indigo.PluginBase):
             plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.15)
 
-            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+            if p_dict['fileName'] != '':
+                plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+
+            return_queue.put({'Message': 'updated successfully.', 'Error': False, 'Name': dev.name})
 
         except ValueError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.warning(u"Something went wrong: {0}".format(sub_error))
+            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.warning(u"Something went wrong: {0}".format(sub_error))
+            return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
 
     def cleanUpString(self, val):
         """The cleanUpString(self, val) method is used to scrub multiline text
