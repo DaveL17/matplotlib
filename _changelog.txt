@@ -1,3 +1,11 @@
+v0.4.11
+- The following devices have been moved to a multiprocessing environment:
+    . Bar Chart Devices
+    . Line Chart Devices
+    . Polar Chart Devices
+    . Scatter Chart Devices
+- Adds trap for Matplotlib runtime error when charts are refreshed.
+
 v0.4.10
 - The following devices have been moved to a multiprocessing environment:
     . Calendar Devices
