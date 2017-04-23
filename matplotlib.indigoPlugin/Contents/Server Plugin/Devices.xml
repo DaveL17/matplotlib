@@ -173,7 +173,7 @@
                 <Label>Title:</Label>
             </Field>
             <Field id="barWidth" type="textfield" defaultValue="0.1" tooltip="To control the width of the bars, enter a float greater than zero.">
-                <Label>Width:</Label>
+                <Label>Width of Bars:</Label>
             </Field>
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Axis Controls:</Label>
@@ -259,14 +259,9 @@
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="bar1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel1" visibleBindingValue="true"
+            <Field id="bar1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first bar.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="bar1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar1Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first bar. The value must be a Hex color (#FFFFFF).">
-                <Label>Hex:</Label>
             </Field>
             <Field id="bar1Legend" type="textfield" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -293,14 +288,9 @@
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="bar2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel2" visibleBindingValue="true"
+            <Field id="bar2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second bar.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="bar2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar2Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second bar. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="bar2Legend" type="textfield" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -328,14 +318,9 @@
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="bar3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel3" visibleBindingValue="true"
+            <Field id="bar3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third bar.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="bar3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar3Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third bar. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="bar3Legend" type="textfield" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -362,14 +347,9 @@
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="bar4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="barLabel4" visibleBindingValue="true"
+            <Field id="bar4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth bar.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="bar4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="bar4Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's fourth bar. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="bar4Legend" type="textfield" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -619,32 +599,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Fill</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's first line.">
-                <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
             <Field id="line1Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line1Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first line.">
+                <Label>Line Color:</Label>
             </Field>
             <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
-            <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first line markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
@@ -676,32 +646,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Fill</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's second line.">
-                <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
             <Field id="line2Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line2Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second line.">
+                <Label>Line Color:</Label>
             </Field>
             <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
-            <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second line markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
@@ -733,32 +693,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Fill</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's third line.">
-                <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
             <Field id="line3Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line3Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third line.">
+                <Label>Line Color:</Label>
             </Field>
             <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's third line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
-            <Field id="line3MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line3MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third line markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third line.">
@@ -790,31 +740,21 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Fill</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's fourth line.">
-                <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line4Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's fourth line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
             <Field id="line4Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
+            </Field>
+            <Field id="line4Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth line.">
+                <Label>Line Color:</Label>
             </Field>
             <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
-            <Field id="line4MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="line4MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line4MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line4MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's fourth line markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth line.">
@@ -941,10 +881,14 @@ There are presently no configurations available for this device.
             <Field id="figureHeight" type="textfield" defaultValue="300" tooltip="Enter the desired height of your figure (inches).">
                 <Label>Figure Height:</Label>
             </Field>
-            <Field id="textColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the text color of your plot.">
+            <Field id="textColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the text color of your plot.">
                 <Label>Font Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
+                <!--<List class="self" filter="" method="getColorList" dynamicReload="true"/>-->
             </Field>
+            <!--<Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"-->
+                   <!--tooltip="Enter your preference for the color of your chart's multiline text. The value must be in the form of an HTML color (#FFFFFF).">-->
+                <!--<Label>Hex:</Label>-->
+            <!--</Field>-->
             <Field id="multilineFontSize" type="textfield" defaultValue="10"
                    tooltip="Enter the font size to use for multiline text plots. This only affects this device instance.">
                 <Label>Font Size:</Label>
@@ -955,10 +899,6 @@ There are presently no configurations available for this device.
             </Field>
             <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart. If you do not want a title to appear, leave the box blank.">
                 <Label>Title:</Label>
-            </Field>
-            <Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's multiline text. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label>Hex:</Label>
             </Field>
             <Field id="bottomSeparator" type="separator"/>
             <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
@@ -1018,21 +958,11 @@ There are presently no configurations available for this device.
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator2" type="separator"/>
-            <Field id="currentWindColor" type="menu" defaultValue="#FF3333" tooltip="Select preference for the color of your chart's current wind observation.">
+            <Field id="currentWindColor" type="colorpicker" defaultValue="#FF3333" tooltip="Select preference for the color of your chart's current wind observation.">
                 <Label>Color (current):</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
-            <Field id="currentWindColorOther" type="textfield" defaultValue="#FF3333" visibleBindingId="currentWindColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's current obs indicator. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
-            <Field id="maxWindColor" type="menu" defaultValue="#3333FF" tooltip="Select preference for the color of your chart's maximum wind observation.">
+            <Field id="maxWindColor" type="colorpicker" defaultValue="#3333FF" tooltip="Select preference for the color of your chart's maximum wind observation.">
                 <Label>Color (max):</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="maxWindColorOther" type="textfield" defaultValue="#3333FF" visibleBindingId="maxWindColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's maximum obs indicator. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
                 <Label>Custom Chart Size?</Label>
@@ -1229,27 +1159,17 @@ There are presently no configurations available for this device.
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="group1Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first group.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group1Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first group. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group1Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
-            <Field id="group1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group1MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first group markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group1Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first group.">
@@ -1273,27 +1193,17 @@ There are presently no configurations available for this device.
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="group2Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second group.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group2Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second group. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group2Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
-            <Field id="group2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group2MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second group markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group2Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second group.">
@@ -1317,27 +1227,17 @@ There are presently no configurations available for this device.
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="group3Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third group.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group3Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third group. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group3Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
-            <Field id="group3MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group3MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group3MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third group markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group3Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third group.">
@@ -1361,26 +1261,16 @@ There are presently no configurations available for this device.
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
-            <Field id="group4Color" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true"
+            <Field id="group4Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth group.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group4ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group4Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's fourth group. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group4Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
-            <Field id="group4MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="group4MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="group4MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="group4MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's fourth group markers. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="group4Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth group.">
@@ -1584,19 +1474,13 @@ There are presently no configurations available for this device.
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line1Color" type="menu" defaultValue="#FF3333" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Color" type="colorpicker" defaultValue="#FF3333" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first line.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
-            <Field id="line1ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
-            <Field id="line1MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
@@ -1607,10 +1491,6 @@ There are presently no configurations available for this device.
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
-            <Field id="line1MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line1MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's first line marker. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 <!-- Low Temperature -->
@@ -1625,19 +1505,13 @@ There are presently no configurations available for this device.
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line2Color" type="menu" defaultValue="#0000FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Color" type="colorpicker" defaultValue="#0000FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second line.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
-            <Field id="line2ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
-            <Field id="line2MarkerColor" type="menu" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
             </Field>
             <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
@@ -1649,10 +1523,6 @@ There are presently no configurations available for this device.
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
-            <Field id="line2MarkerColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line2MarkerColor" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's second line marker. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
-            </Field>
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
 <!-- Precipitation -->
             <Field id="lineLabel3" type="checkbox" defaultValue="false">
@@ -1662,13 +1532,8 @@ There are presently no configurations available for this device.
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="line3Color" type="menu" defaultValue="#99CCFF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
+            <Field id="line3Color" type="colorpicker" defaultValue="#99CCFF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
                 <Label>Color:</Label>
-                <List class="self" filter="" method="getColorList" dynamicReload="true"/>
-            </Field>
-            <Field id="line3ColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="line3Color" visibleBindingValue="custom"
-                   tooltip="Enter your preference for the color of your chart's third line. The value must be in the form of an HTML color (#FFFFFF).">
-                <Label/>
             </Field>
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>

@@ -1,3 +1,11 @@
+v0.4.12
+- Converts all color settings to new Indigo Color Picker. This may cause users
+  to need to re-enter color preferences in the plugin configuration (affecting
+  all charts at once) and each device configuration (affecting devices
+  individually.) This should only need to be done once, and will not be needed
+  for new devices.
+- Improves multiprocessing logging.
+
 v0.4.11
 - The following devices have been moved to a multiprocessing environment:
     . Bar Chart Devices

@@ -25,14 +25,15 @@ proper WUnderground devices.
 # TODO: Finer grained control over the legend.
 # TODO: Variable refresh rates for each device so it can update on its own.
 # TODO: handle WU -99's as NaNs (known issue: if plot begins with NaN, and there's only one line, Y scale is hinky. Expressing Y range fixes it. Appears this was fixed in mpl 2.0
-
 # TODO: remove all custom color stuff and use the color picker api.
-# TODO: add multilevel logging to multiprocess queue
+
+# TODO: look at use of kv_list to ensure that all devices are updated properly
+# TODO: new multiline text device can be saved with incomplete config
+# TODO: trap and warn on wind device with not enough observations
 
 from ast import literal_eval
 from csv import reader
 import datetime as dt
-# import gc
 import indigoPluginUpdateChecker
 import logging
 import multiprocessing
@@ -69,7 +70,7 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.11"
+__version__   = "0.4.12"
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -187,8 +188,7 @@ class Plugin(indigo.PluginBase):
         plugin_prefs = self.pluginPrefs
         self.logger.threaddebug(u"Initial plugin_prefs: {0}".format(dict(plugin_prefs)))
 
-        # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need
-        # to be set here (the others can be set directly by the XML.)
+        # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
         defaults_dict = {'annotationColorOther': '#FFFFFF',
                          'backgroundColor': '#000000',
                          'backgroundColorOther': '#000000',
@@ -305,8 +305,9 @@ class Plugin(indigo.PluginBase):
         """The getDeviceConfigUiValues() method is called when a device config
         is opened."""
         self.logger.debug(u"{0:*^40}".format(' Plugin Settings Menu '))
-        # self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
 
         try:
 
@@ -331,8 +332,8 @@ class Plugin(indigo.PluginBase):
                 return pluginProps
 
             else:
-                # Establish a set of defaults for select device settings. Only those settings that are populated dynamically need
-                # to be set here (the others can be set directly by the XML.)
+                # Establish a set of defaults for select device settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the
+                # XML.)
                 defaults_dict = {'bar1Color': '#FFFFFF',
                                  'bar1ColorOther': '#FFFFFF',
                                  'bar1Source': 'None',
@@ -420,8 +421,9 @@ class Plugin(indigo.PluginBase):
     def validateDeviceConfigUi(self, valuesDict, typeId, devId):
         """ Validate select device config menu settings."""
         self.logger.debug(u"{0:*^40}".format(' Validate Device Config UI '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         error_msg_dict = indigo.Dict()
 
@@ -458,8 +460,9 @@ class Plugin(indigo.PluginBase):
         config dialog either by save or cancel. Note that a device can't be
         updated from here because valuesDict has yet to be saved."""
         self.logger.debug(u"{0:*^40}".format(' Closed Device Configuration Dialog '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
 
     def getMenuActionConfigUiValues(self, menuId):
         """The getMenuActionConfigUiValues() method loads the settings
@@ -498,8 +501,9 @@ class Plugin(indigo.PluginBase):
     def advancedSettingsMenu(self, valuesDict, typeId="", devId=None):
         """The advancedSettingsMenu() method is called when actions are taken
         within the Advanced Settings Menu item from the plugin menu."""
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         self.logger.debug(u"Use of custom colors: {0}".format(valuesDict['enableCustomColors']))
         self.logger.debug(u"Enable custom line segments: {0}".format(valuesDict['enableCustomLineSegments']))
@@ -518,8 +522,9 @@ class Plugin(indigo.PluginBase):
         """The addColumn() method is called when the user clicks on the "Add
         Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Add Column List Item '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         error_msg_dict = indigo.Dict()
 
@@ -575,8 +580,9 @@ class Plugin(indigo.PluginBase):
         dialog. It's called at open and routinely as changes are made in the
         dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Column List Generated '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
 
         try:
             # valuesDict['columnDict'] = valuesDict.get('columnDict', '{"k0": ("None", "None", "None")}')  # Just in case the user has deleted all CSV Engine elements
@@ -593,8 +599,9 @@ class Plugin(indigo.PluginBase):
         """The deleteColumn() method is called when the user clicks on the
         "Delete Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' CSV Device Delete Column List Item '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
@@ -619,8 +626,9 @@ class Plugin(indigo.PluginBase):
         """The selectColumn() method is called when the user actually selects
         something within the Column List dropdown menu."""
         self.logger.debug(u"{0:*^40}".format(' Select Column '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         try:
             column_dict                    = literal_eval(valuesDict['columnDict'])
@@ -639,8 +647,9 @@ class Plugin(indigo.PluginBase):
         """The updateColumn() method is called when the user clicks on the
         "Update Column" button in the CSV Engine config dialog."""
         self.logger.debug(u"{0:*^40}".format(' Update Column '))
-        # self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-        # self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
         error_msg_dict = indigo.Dict()
         column_dict  = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
@@ -683,6 +692,10 @@ class Plugin(indigo.PluginBase):
 
     def csvSource(self, typeId, valuesDict, devId, targetId):
         """"""
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}  targetId = {2}".format(typeId, devId, targetId))
+
         list_of = []
 
         [list_of.append((dev.id, u"(D) {0}".format(dev.name))) for dev in indigo.devices.iter()]
@@ -696,6 +709,9 @@ class Plugin(indigo.PluginBase):
 
     def deviceStateValueList(self, typeId, valuesDict, devId, targetId):
         """"""
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {1}  targetId = {2}".format(typeId, devId, targetId))
 
         if valuesDict['addSource'] != u'':
             try:
@@ -728,7 +744,6 @@ class Plugin(indigo.PluginBase):
         dev.stateListOrDisplayStateIdChanged().
         """
         state_list = indigo.PluginBase.getDeviceStateList(self, dev)
-        # dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
 
         if dev.deviceTypeId == 'rcParamsDevice':
 
@@ -888,9 +903,7 @@ class Plugin(indigo.PluginBase):
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
         return_queue = multiprocessing.Queue()
 
-        # A specific chart id may be passed to the method. In that case,
-        # refresh only that chart. Otherwise, chart_id is None and we refresh
-        # all of the charts.
+        # A specific chart id may be passed to the method. In that case, refresh only that chart. Otherwise, chart_id is None and we refresh all of the charts.
         dev_list = []
         if not chart_id:
             for dev in indigo.devices.itervalues('self'):
@@ -923,54 +936,36 @@ class Plugin(indigo.PluginBase):
         plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
         plt.rcParams['ytick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
 
-        if self.pluginPrefs.get('gridColor', '#888888') == 'custom':
-            plt.rcParams['grid.color'] = self.pluginPrefs.get('gridColorOther', '#888888')
-        else:
-            plt.rcParams['grid.color'] = self.pluginPrefs.get('gridColor', '#888888')
+        plt.rcParams['grid.color'] = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+        plt.rcParams['xtick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
+        plt.rcParams['ytick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
 
-        if self.pluginPrefs.get('tickColor', '#888888') == 'custom':
-            plt.rcParams['xtick.color'] = self.pluginPrefs.get('tickColorOther', '#888888')
-            plt.rcParams['ytick.color'] = self.pluginPrefs.get('tickColorOther', '#888888')
-        else:
-            plt.rcParams['xtick.color'] = self.pluginPrefs.get('tickColor', '#888888')
-            plt.rcParams['ytick.color'] = self.pluginPrefs.get('tickColor', '#888888')
-
-        if self.pluginPrefs.get('fontColor', '#888888') == 'custom':
-            p_dict['fontColor'] = self.pluginPrefs.get('fontColorOther', '#888888')
-        else:
-            p_dict['fontColor'] = self.pluginPrefs.get('fontColor', '#888888')
-
-        if self.pluginPrefs.get('fontColorAnnotation', '#FFFFFF') == 'custom':
-            p_dict['fontColorAnnotation'] = self.pluginPrefs.get('annotationColorOther', '#FFFFFF')
-        else:
-            p_dict['fontColorAnnotation'] = self.pluginPrefs.get('fontColorAnnotation', '#FFFFFF')
-
-        if self.pluginPrefs.get('spineColor', '#888888') == 'custom':
-            p_dict['spineColor'] = self.pluginPrefs.get('spineColorOther', '#888888')
-        else:
-            p_dict['spineColor'] = self.pluginPrefs.get('spineColor', '#888888')
+        p_dict['fontColor'] = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+        p_dict['fontColorAnnotation'] = r"#{0}".format(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF').replace(' ', '').replace('#', ''))
+        p_dict['gridColor'] = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+        p_dict['spineColor'] = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
 
         # Background color?
-        if self.pluginPrefs.get('backgroundColor', '#000000') == 'custom':
-            p_dict['backgroundColor'] = self.pluginPrefs.get('backgroundColorOther', '#000000')
+        if not self.pluginPrefs.get('backgroundColorOther', 'false'):
             p_dict['transparent_charts'] = False
-        elif self.pluginPrefs.get('backgroundColor', '#000000') == 'transparent':
-            p_dict['backgroundColor'] = '#000000'
-            p_dict['transparent_charts'] = True
+            p_dict['backgroundColor'] = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+        elif self.pluginPrefs.get('backgroundColorOther', 'false') == 'false':
+            p_dict['transparent_charts'] = False
+            p_dict['backgroundColor'] = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
         else:
-            p_dict['transparent_charts'] = False
+            p_dict['transparent_charts'] = True
+            p_dict['backgroundColor'] = '#000000'
 
         # Plot Area color?
-        if self.pluginPrefs.get('faceColor', '#000000') == 'custom':
-            p_dict['faceColor'] = self.pluginPrefs.get('faceColorOther', '#000000')
+        if not self.pluginPrefs.get('faceColorOther', 'false'):
             p_dict['transparent_filled'] = True
-        elif self.pluginPrefs.get('faceColor', '#000000') == "transparent":
-            if not p_dict['transparent_charts']:
-                self.logger.warning(u"Global: No plot areas will appear as transparent because a background color has been specified.")
-            p_dict['faceColor'] = '#000000'
-            p_dict['transparent_filled'] = False
+            p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+        elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
+            p_dict['transparent_filled'] = True
+            p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
         else:
-            p_dict['transparent_filled'] = True
+            p_dict['transparent_filled'] = False
+            p_dict['faceColor'] = '#000000'
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
@@ -1077,7 +1072,7 @@ class Plugin(indigo.PluginBase):
                         pass
                     except ValueError:
                         self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.warning(u"{0}: Custom size must be a positive number or None.")
+                        self.logger.warning(u"The number of observations must be a positive number.")
 
                     # Custom Square Size
                     try:
@@ -1111,8 +1106,8 @@ class Plugin(indigo.PluginBase):
                     except KeyError:
                         self.pluginErrorHandler(traceback.format_exc())
 
-                    # Since users may or may not include axis labels and because we want to ensure that all plot areas present in the same way, we need to create 'phantom'
-                    # labels that are plotted but not visible.  Setting the font color to 'None' will effectively hide them.
+                    # Since users may or may not include axis labels and because we want to ensure that all plot areas present in the same way, we need to create 'phantom' labels that
+                    # are plotted but not visible.  Setting the font color to 'None' will effectively hide them.
                     try:
                         if p_dict['customAxisLabelX'].isspace() or p_dict['customAxisLabelX'] == '':
                             p_dict['customAxisLabelX'] = 'null'
@@ -1133,8 +1128,8 @@ class Plugin(indigo.PluginBase):
                         if 'customAxisLabelY2' in p_dict.keys():  # Not all devices that get to this point will support Y2.
                             if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
                                 p_dict['customAxisLabelY2'] = 'null'
-                                k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                                               'weight': p_dict['font_weight'], 'visible': True}
+                                k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                               'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
                     except KeyError:
                         self.pluginErrorHandler(traceback.format_exc())
                         pass
@@ -1149,8 +1144,8 @@ class Plugin(indigo.PluginBase):
                         except KeyError:
                             self.pluginErrorHandler(traceback.format_exc())
 
-                    # Some line markers need to be adjusted due to their inherent value.  For example, matplotlib uses '<', '>' and '.' as markers but storing these values will blow up the
-                    # XML.  So we need to convert them. (See self.fixTheMarkers() method.)
+                    # Some line markers need to be adjusted due to their inherent value.  For example, matplotlib uses '<', '>' and '.' as markers but storing these values will blow up
+                    # the XML.  So we need to convert them. (See self.fixTheMarkers() method.)
                     try:
                         if p_dict['line1Marker'] != 'None' or p_dict['line2Marker'] != 'None' or p_dict['line3Marker'] != 'None:' or p_dict['line4Marker'] != 'None:':
                             p_dict['line1Marker'], p_dict['line2Marker'], p_dict['line3Marker'], p_dict['line4Marker'] = self.fixTheMarkers(p_dict['line1Marker'],
@@ -1205,7 +1200,8 @@ class Plugin(indigo.PluginBase):
                     # ======= Multiline Text ======
                     if dev.deviceTypeId == 'multiLineText':
 
-                        # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method (the process does not have access to the Indigo server).
+                        # Get the text to plot. We do this here so we don't need to send all the devices and variables to the method (the process does not have access to the Indigo
+                        # server).
                         if int(p_dict['thing']) in indigo.devices:
                             text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
                             self.logger.debug(u"Data retrieved successfully: {0}".format(text_to_plot))
@@ -1239,20 +1235,31 @@ class Plugin(indigo.PluginBase):
 
                     # ======= Weather Forecast Charts ======
                     if dev.deviceTypeId == "forecastChartingDevice":
-                        # self.chartWeatherForecast(dev, p_dict, k_dict, kv_list)
 
                         dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
                         state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
                         if __name__ == '__main__':
-                            p_weather = multiprocessing.Process(name='p_weather', target=self.chartWeatherForecast, args=(dev, dev_type, p_dict, k_dict, kv_list, state_list, return_queue,))
+                            p_weather = multiprocessing.Process(name='p_weather', target=self.chartWeatherForecast,
+                                                                args=(dev, dev_type, p_dict, k_dict, kv_list, state_list, return_queue,))
                             p_weather.start()
                             p_weather.join()
 
                     # ======= Process the output queue ======
-                    result = return_queue.get()
+                    if dev.deviceTypeId != 'rcParamsDevice':
+                        result = return_queue.get()
 
-                    for event in result['Log']:
-                        self.logger.debug(event)
+                        for event in result['Log']:
+                            for thing in result['Log'][event]:
+                                if event == 'Threaddebug':
+                                    self.logger.threaddebug(thing)
+                                elif event == 'Debug':
+                                    self.logger.debug(thing)
+                                elif event == 'Info':
+                                    self.logger.info(thing)
+                                elif event == 'Warning':
+                                    self.logger.warning(thing)
+                                else:
+                                    self.logger.critical(thing)
 
                     if result['Error']:
                         self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
@@ -1263,22 +1270,18 @@ class Plugin(indigo.PluginBase):
 
                     dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
                     kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+                    dev.updateStatesOnServer(kv_list)
 
                 except RuntimeError as sub_error:
                     self.logger.critical(u"[{0}] Critical Error: {1}".format(dev.name, sub_error))
                     self.logger.critical(u"Skipping device.")
 
             else:
-                kv_list = []  # A list of state/value pairs used to feed updateStatesOnServer()
                 if dev.model != "CSV Engine":
                     self.logger.info(u"Disabled: {0}: {1} [{2}] - Skipping plot sequence.".format(dev.model, dev.name, dev.id))
-                    # kv_list.append({'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'})
-
-            dev.updateStatesOnServer(kv_list)
 
     def refreshTheChartsMenuAction(self):
         """ Called by an Indigo Menu selection. """
-        # self.logger.debug(u"{0:*^40}".format(' User Call For Refresh '))
         self.logger.info(u"{0:=^80}".format(' Refresh the Charts Menu Action '))
         self.refreshTheCharts()
         self.logger.info(u"{0:=^80}".format(' Cycle complete. '))
@@ -1291,9 +1294,10 @@ class Plugin(indigo.PluginBase):
 
     def refreshTheChartsAction(self, action):
         """ Called by an Indigo Action item. """
-
         self.logger.info(u"{0:=^80}".format(' Refresh All Charts Action '))
-        # self.logger.threaddebug(u"  valuesDict: {0}".format(action))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"  valuesDict: {0}".format(action))
+
         self.refreshTheCharts()
         self.logger.info(u"{0:=^80}".format(' Cycle complete. '))
 
@@ -1361,7 +1365,7 @@ class Plugin(indigo.PluginBase):
                 if not p_dict['yMirrorValuesAlsoY1']:
                     ax.tick_params(labelleft=False)
 
-        except:
+        except Exception as sub_error:
             pass
 
         return ax
@@ -1378,16 +1382,18 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleBar(self, dev, p_dict, k_dict, kv_list, return_queue):
         """"""
-
-        log = []
-        if self.verboseLogging:
-            log.append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-            log.append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
+            if self.verboseLogging:
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
-            # dates_to_plot = p_dict['dates_to_plot']
             num_obs = p_dict['numObs']
+            p_dict['bar1Color'] = r"#{0}".format(p_dict['bar1Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar2Color'] = r"#{0}".format(p_dict['bar2Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar3Color'] = r"#{0}".format(p_dict['bar3Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar4Color'] = r"#{0}".format(p_dict['bar4Color'].replace(' ', '').replace('#', ''))
 
             ax = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -1396,14 +1402,9 @@ class Plugin(indigo.PluginBase):
 
             for bar in range(1, 5, 1):
 
-                # If the bar color is set to custom, set it to the custom value.
-                if p_dict['bar{0}Color'.format(bar)] == 'custom':
-                    p_dict['bar{0}Color'.format(bar)] = p_dict['bar{0}ColorOther']
-
                 # If the bar color is the same as the background color, alert the user.
-                # if p_dict['bar{0}Color'.format(bar)] == p_dict['backgroundColor']:
-                #     self.logger.warning(u"{0}: Bar {0} color is the same as the background color (so you may not be able to see it).".format(dev.name, bar))
-
+                if p_dict['bar{0}Color'.format(bar)] == p_dict['backgroundColor']:
+                    log['Info'].append(u"[{0}] Bar {0} color is the same as the background color (so you may not be able to see it).".format(dev.name, bar))
                 # Plot the bars
                 if p_dict['bar{0}Source'.format(bar)] not in ["", "None"]:
 
@@ -1432,11 +1433,11 @@ class Plugin(indigo.PluginBase):
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(bar)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            # Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly at times.
-            # This block is meant to overcome that weirdness for something more desirable.
-            log.append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                                  min(p_dict['data_array']),
-                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
+            # Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly at times. This block is meant to overcome that weirdness
+            # for something more desirable.
+            log['Debug'].append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                              min(p_dict['data_array']),
+                                                                              max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
@@ -1464,7 +1465,8 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             except ValueError as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log,
+                                  'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
             except Exception as sub_error:
                 return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error), 'Name': dev.name})
 
@@ -1474,7 +1476,7 @@ class Plugin(indigo.PluginBase):
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
             # if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-            #     self.logger.warning(u"{0}: X axis label is suppressed to make room for the chart legend.".format(dev.name))
+                log['Warning'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
             # Y Axis Label
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
@@ -1485,7 +1487,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend Properties. Legend should be plotted before any other lines are plotted (like averages or custom line segments).
             if self.verboseLogging:
-                log.append(u"Display legend: {0}".format(p_dict['showLegend']))
+                log['Debug'].append(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -1505,15 +1507,15 @@ class Plugin(indigo.PluginBase):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            # Plot the min/max lines if needed.  Note that these need to be plotted after the legend is established, otherwise some of the characteristics of the min/max
-            # lines will take over the legend props.
+            # Plot the min/max lines if needed.  Note that these need to be plotted after the legend is established, otherwise some of the characteristics of the min/max lines will
+            # take over the legend props.
             for bar in range(1, 5, 1):
                 if p_dict['plotBar{0}Min'.format(bar)]:
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(bar)][len(p_dict['y_obs{0}'.format(bar)]) - num_obs:]), color=p_dict['bar{0}Color'.format(bar)], **k_dict['k_min'])
                 if p_dict['plotBar{0}Max'.format(bar)]:
                     ax.axhline(y=max(p_dict['y_obs{0}'.format(bar)][len(p_dict['y_obs{0}'.format(bar)]) - num_obs:]), color=p_dict['bar{0}Color'.format(bar)], **k_dict['k_max'])
-                # if self.pluginPrefs.get('forceOriginLines', True):
-                #     ax.axhline(y=0, color=p_dict['spineColor'])
+                if self.pluginPrefs.get('forceOriginLines', True):
+                    ax.axhline(y=0, color=p_dict['spineColor'])
 
             self.plotCustomLineSegments(ax, k_dict, p_dict)
             self.chartFormatGrid(p_dict, k_dict)
@@ -1536,20 +1538,27 @@ class Plugin(indigo.PluginBase):
             if p_dict['fileName'] != '':
                 plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
+            plt.clf()
+            plt.close('all')
+
             return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
         except IndexError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: IndexError ({1})".format(dev.name, sub_error)})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] IndexError ({1})".format(dev.name, sub_error)})
         except UnicodeEncodeError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error)})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] UnicodeEncodeError ({1})".format(dev.name, sub_error)})
         except Exception as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: Error plotting chart ({1})".format(dev.name, sub_error)})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error plotting chart ({1})".format(dev.name, sub_error)})
 
     def chartSimpleCalendar(self, dev, p_dict, k_dict, return_queue):
         """"""
 
-        log = []
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
         try:
+            if self.verboseLogging:
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+
             import calendar
             today = dt.datetime.today()
             calendar.setfirstweekday(int(dev.pluginProps['firstDayOfWeek']))
@@ -1566,8 +1575,8 @@ class Plugin(indigo.PluginBase):
             if p_dict['fileName'] != '':
                 plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-            plt.clf()  # In theory, this is redundant of close('all') below
-            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+            plt.clf()
+            plt.close('all')
 
             return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
@@ -1578,15 +1587,21 @@ class Plugin(indigo.PluginBase):
 
     def chartSimpleLine(self, dev, p_dict, k_dict, kv_list, return_queue):
         """"""
-
-        log = []
-        if self.verboseLogging:
-            log.append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-            log.append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
+            if self.verboseLogging:
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
-            # dates_to_plot = p_dict['dates_to_plot']
+            p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            p_dict['line4Color'] = r"#{0}".format(p_dict['line4Color'].replace(' ', '').replace('#', ''))
+            p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['line3MarkerColor'] = r"#{0}".format(p_dict['line3MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['line4MarkerColor'] = r"#{0}".format(p_dict['line4MarkerColor'].replace(' ', '').replace('#', ''))
 
             ax = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -1595,17 +1610,9 @@ class Plugin(indigo.PluginBase):
 
             for line in range(1, 5, 1):
 
-                # If line color is custom, set it equal to the custom color value.
-                if p_dict['line{0}Color'.format(line)] == 'custom':
-                    p_dict['line{0}Color'.format(line)] = p_dict['line{0}ColorOther'.format(line)]
-
-                # If line marker color is custom, set it equal to the custom color value.
-                if p_dict['line{0}MarkerColor'.format(line)] == 'custom':
-                    p_dict['line{0}MarkerColor'.format(line)] = p_dict['line{0}MarkerColorOther'.format(line)]
-
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
-                    self.logger.warning(u"{0}: Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
+                    log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
                 # Plot the lines
                 if p_dict['line{0}Source'.format(line)] not in ["", "None"]:
@@ -1635,9 +1642,9 @@ class Plugin(indigo.PluginBase):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             if self.verboseLogging:
-                log.append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                          min(p_dict['data_array']),
-                                                                          max(p_dict['data_array']) - min(p_dict['data_array'])))
+                log['Debug'].append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                                  min(p_dict['data_array']),
+                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 # Min and Max are not 'None'.
@@ -1669,9 +1676,10 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             except ValueError as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log,
+                                  'Message': u"[{0}] Y Min or Y Max error. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
             except Exception as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. {1}".format(dev.name, sub_error), 'Name': dev.name})
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -1679,7 +1687,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend
             if self.verboseLogging:
-                return_queue.put({'Error': False, 'Log': log, 'Message': u"Display legend: {0}".format(p_dict['showLegend']), 'Name': dev.name})
+                log['Debug'].append(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -1717,7 +1725,7 @@ class Plugin(indigo.PluginBase):
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-                return_queue.put({'Error': False, 'Log': log, 'Message': u"{0}: IndexError ({1})".format(dev.name, u"{0}: X axis label is suppressed to make room for the chart legend.".format(dev.name)), 'Name': dev.name})
+                log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
             # Custom Y ticks
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
@@ -1728,7 +1736,7 @@ class Plugin(indigo.PluginBase):
                 else:
                     labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
                 plt.yticks(marks, labels)
-            except:
+            except Exception as sub_error:
                 pass
 
             plt.tight_layout(pad=1)
@@ -1737,38 +1745,40 @@ class Plugin(indigo.PluginBase):
             if p_dict['fileName'] != '':
                 plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-            plt.clf()  # In theory, this is redundant of close('all') below
-            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+            plt.clf()
+            plt.close('all')
 
             return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
-            # kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
 
         except IndexError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
         except UnicodeEncodeError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
         except Exception as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
 
     def chartMultilineText(self, dev, p_dict, k_dict, text_to_plot, return_queue):
         """"""
 
-        log = []
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
         try:
 
             import textwrap
 
-            if p_dict['textColor'] == 'custom':
-                p_dict['textColor'] = p_dict['textColorOther']
+            if self.verboseLogging:
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+
+            p_dict['textColor'] = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
 
             # If the value to be plotted is empty, use the default text from the device configuration.
             if len(text_to_plot) <= 1:
                 text_to_plot = unicode(p_dict['defaultText'])
             else:
-                # The cleanUpString method tries to remove some potential ugliness from the text to be
-                # plotted. It's optional--defaulted to on. No need to call this if the default text is
-                # used.
+                # The cleanUpString method tries to remove some potential ugliness from the text to be plotted. It's optional--defaulted to on. No need to call this if the default text
+                # is used.
                 if p_dict['cleanTheText']:
                     text_to_plot = self.cleanUpString(text_to_plot)
 
@@ -1799,8 +1809,8 @@ class Plugin(indigo.PluginBase):
             if p_dict['fileName'] != '':
                 plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-            plt.clf()  # In theory, this is redundant of close('all') below
-            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+            plt.clf()
+            plt.close('all')
 
             return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
@@ -1810,25 +1820,20 @@ class Plugin(indigo.PluginBase):
             return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
 
     def chartPolar(self, dev, p_dict, k_dict, kv_list, return_queue):
-        # Note that the polar chart device can be used for other things, but it is coded like a wind rose which makes it easier to understand what's happening.
-        # Note that it would be possible to convert wind direction names (north-northeast) to an ordinal degree value, however, it would be very difficult to
-        # contend with all of the possible international Unicode values that could be passed to the device.  Better to make it the responsibility of the user
-        # to convert their data to degrees.
-        # if self.verboseLogging:
-        #     self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        #     self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        # Note that the polar chart device can be used for other things, but it is coded like a wind rose which makes it easier to understand what's happening. Note that it would be
+        # possible to convert wind direction names (north-northeast) to an ordinal degree value, however, it would be very difficult to contend with all of the possible international
+        # Unicode values that could be passed to the device.  Better to make it the responsibility of the user to convert their data to degrees.
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
-        log = []
         try:
+            if self.verboseLogging:
+                log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
             self.final_data    = []
             num_obs = p_dict['numObs']
-
-            if p_dict['currentWindColor'] == 'custom':
-                p_dict['currentWindColor'] = p_dict['currentWindColorOther']
-
-            if p_dict['maxWindColor'] == 'custom':
-                p_dict['maxWindColor'] = p_dict['maxWindColorOther']
+            p_dict['currentWindColor'] = r"#{0}".format(p_dict['currentWindColor'].replace(' ', '').replace('#', ''))
+            p_dict['maxWindColor'] = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
 
             # Grab the column headings for the labels, then delete the row from self.final_data.
             theta_path = '{0}{1}'.format(self.pluginPrefs['dataPath'], p_dict['thetaValue'])  # The name of the theta file.
@@ -1853,14 +1858,14 @@ class Plugin(indigo.PluginBase):
                     p_dict['wind_speed'] = p_dict['wind_speed'][len(p_dict['wind_speed']) - num_obs: len(p_dict['wind_speed'])]
 
                 except IndexError as sub_error:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+                    return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
                 except UnicodeEncodeError as sub_error:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+                    return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
                 except Exception as sub_error:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
+                    return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
 
-                # Create the array of grey scale for the intermediate lines and set the last one red. (MPL will accept string values '0' - '1' as grey scale, so we create
-                # a number of greys based on 1.0 / number of observations.)
+                # Create the array of grey scale for the intermediate lines and set the last one red. (MPL will accept string values '0' - '1' as grey scale, so we create a number of
+                # greys based on 1.0 / number of observations.)
                 color_increment = 1.0 / num_obs
                 color = color_increment
                 for item in range(0, num_obs, 1):
@@ -1913,8 +1918,8 @@ class Plugin(indigo.PluginBase):
                 if p_dict['yHideLabels']:
                     ax.axes.yaxis.set_ticklabels([])
 
-                # Plot circles for current obs and max wind. Note that we reduce the value of the circle plot so that it appears when transparent charts are enabled (otherwise
-                # the circle is obscured. The transform can be done one of two ways: access the private attribute "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
+                # Plot circles for current obs and max wind. Note that we reduce the value of the circle plot so that it appears when transparent charts are enabled (otherwise the
+                # circle is obscured. The transform can be done one of two ways: access the private attribute "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
                 fig = plt.gcf()
                 max_wind_circle = plt.Circle((0, 0), (max(p_dict['wind_speed']) * 0.99),
                                              transform=ax.transProjectionAffine + ax.transAxes,
@@ -1941,7 +1946,7 @@ class Plugin(indigo.PluginBase):
 
                 # Legend Properties
                 if self.verboseLogging:
-                    log.append(u"Display legend: {0}".format(p_dict['showLegend']))
+                    log['Debug'].append(u"Display legend: {0}".format(p_dict['showLegend']))
 
                 if p_dict['showLegend']:
                     legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
@@ -1952,7 +1957,7 @@ class Plugin(indigo.PluginBase):
                     frame.set_alpha(0)
 
                 if self.verboseLogging:
-                    log.append(u"Display grids[X / Y]: always on")
+                    log['Debug'].append(u"Display grids[X / Y]: always on")
 
                 # Chart title
                 plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
@@ -1960,29 +1965,35 @@ class Plugin(indigo.PluginBase):
                 if p_dict['fileName'] != '':
                     plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-                plt.clf()  # In theory, this is redundant of close('all') below
-                plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+                plt.clf()
+                plt.close('all')
 
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
-                # kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+                kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
 
         except ValueError as sub_error:
             return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
         except KeyError as sub_error:
             return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
 
-
     def chartSimpleScatter(self, dev, p_dict, k_dict, kv_list, return_queue):
         """"""
-
-        log = []
-        # if self.verboseLogging:
-        #     self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-        #     self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
+            if self.verboseLogging:
+                log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+
+            p_dict['group1Color'] = r"#{0}".format(p_dict['group1Color'].replace(' ', '').replace('#', ''))
+            p_dict['group2Color'] = r"#{0}".format(p_dict['group2Color'].replace(' ', '').replace('#', ''))
+            p_dict['group3Color'] = r"#{0}".format(p_dict['group3Color'].replace(' ', '').replace('#', ''))
+            p_dict['group4Color'] = r"#{0}".format(p_dict['group4Color'].replace(' ', '').replace('#', ''))
+            p_dict['group1MarkerColor'] = r"#{0}".format(p_dict['group1MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['group2MarkerColor'] = r"#{0}".format(p_dict['group2MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['group3MarkerColor'] = r"#{0}".format(p_dict['group3MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['group4MarkerColor'] = r"#{0}".format(p_dict['group4MarkerColor'].replace(' ', '').replace('#', ''))
 
             ax = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -1991,17 +2002,9 @@ class Plugin(indigo.PluginBase):
 
             for line in range(1, 5, 1):
 
-                # If line color is custom, set it equal to the custom color value.
-                if p_dict['group{0}Color'.format(line)] == 'custom':
-                    p_dict['group{0}Color'.format(line)] = p_dict['line{0}ColorOther'.format(line)]
-
-                # If line marker color is custom, set it equal to the custom color value.
-                if p_dict['group{0}MarkerColor'.format(line)] == 'custom':
-                    p_dict['group{0}MarkerColor'.format(line)] = p_dict['group{0}MarkerColorOther'.format(line)]
-
                 # If dot color is the same as the background color, alert the user.
                 if p_dict['group{0}Color'.format(line)] == p_dict['backgroundColor']:
-                    log.append(u"{0}: Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
+                    log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
                 # Plot the points
                 if p_dict['group{0}Source'.format(line)] not in ["", "None"]:
@@ -2025,9 +2028,9 @@ class Plugin(indigo.PluginBase):
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
             if self.verboseLogging:
-                log.append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
-                                                                         min(p_dict['data_array']),
-                                                                         max(p_dict['data_array']) - min(p_dict['data_array'])))
+                log['Debug'].append(u"Y Max: {0}  Y Min: {1}  Y Diff: {2}".format(max(p_dict['data_array']),
+                                                                                  min(p_dict['data_array']),
+                                                                                  max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             try:
                 # Min and Max are not 'None'.
@@ -2059,13 +2062,14 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             except ValueError as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log,
+                                  'Message': u"[{0}] Y Min or Y Max error. Set values to a real number or None. {1}".format(dev.name, sub_error), 'Name': dev.name})
             except Exception as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. {1}".format(dev.name, sub_error), 'Name': dev.name})
 
             # Legend
             if self.verboseLogging:
-                log.append(u"Display legend: {0}".format(p_dict['showLegend']))
+                log['Debug'].append(u"Display legend: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
 
@@ -2107,7 +2111,7 @@ class Plugin(indigo.PluginBase):
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-                self.logger.warning(u"{0}: X axis label is suppressed to make room for the chart legend.".format(dev.name))
+                log['Warning'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
             # Custom Y ticks
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
@@ -2126,39 +2130,44 @@ class Plugin(indigo.PluginBase):
             if p_dict['fileName'] != '':
                 plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-            plt.clf()  # In theory, this is redundant of close('all') below
-            plt.close('all')  # Changed plt.close() to plt.close('all') to see if it fixes the race/leak
+            plt.clf()
+            plt.close('all')
 
-            # kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+            return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
+
+            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
 
         except IndexError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
         except UnicodeEncodeError as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
         except Exception as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}: Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
 
     def chartWeatherForecast(self, dev, dev_type, p_dict, k_dict, kv_list, state_list, return_queue):
         """"""
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
-        log = []
         try:
+            if self.verboseLogging:
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+
+            p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
+
             dates_to_plot = p_dict['dates_to_plot']
 
             for line in range(1, 4, 1):
 
-                if p_dict['line{0}Color'.format(line)] == 'custom':
-                    p_dict['line{0}Color'.format(line)] = p_dict['line{0}ColorOther'.format(line)]
-
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
-                    log.append(u"{0}: A line color is the same as the background color (so you will not be able to see it).".format(dev.name))
-
-                if line < 3:
-                    if p_dict['line{0}MarkerColor'.format(line)] == 'custom':
-                        p_dict['line{0}MarkerColor'.format(line)] = p_dict['line{0}MarkerColorOther'.format(line)]
+                    log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not be able to see it).".format(dev.name))
 
             if self.verboseLogging:
-                log.append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
             # Prepare the data for charting.
             if dev_type == 'wundergroundHourly':
@@ -2203,15 +2212,15 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_2'] = ('Precipitation',)
 
             else:
-                return_queue.put({'Message': u"This device type only supports WUnderground plugin forecast devices.", 'Error': True, 'Name': dev.name})
+                log['Warning'].append(u"This device type only supports WUnderground plugin forecast devices.")
 
             ax1 = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             self.chartFormatAxisX(ax1, k_dict, p_dict)
             self.chartFormatAxisY(ax1, k_dict, p_dict)
 
-            # Plot the chance of precipitation bars.  The width of the bars is a percentage of a day, so we need to account for instances where the unit of time could be
-            # hours to months or years.
+            # Plot the chance of precipitation bars.  The width of the bars is a percentage of a day, so we need to account for instances where the unit of time could be hours to months
+            # or years.
             if p_dict['y_obs3']:
                 if len(dates_to_plot) <= 15:
                     ax1.bar(dates_to_plot, p_dict['y_obs3'], align='center', color=p_dict['line3Color'], width=((1.0 / len(dates_to_plot)) * 5), alpha=0.25, zorder=3)
@@ -2256,22 +2265,22 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
             except ValueError as sub_error:
-                return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
+                return_queue.put({'Error': True, 'Message': str(sub_error), 'Name': dev.name})
             except Exception as sub_error:
-                return_queue.put({'Message': str(sub_error), 'Error': True, 'Name': dev.name})
+                return_queue.put({'Error': True, 'Message': str(sub_error), 'Name': dev.name})
 
             # X Axis Label
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], k_dict['k_x_axis_font'])
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
-                log.append(u"{0}: X axis label suppressed to make room for the chart legend.".format(dev.name))
+                log['Debug'].append(u"[{0}] X axis label suppressed to make room for the chart legend.".format(dev.name))
 
             # Y1 Axis Label
             plt.ylabel(p_dict['customAxisLabelY'], labelpad=20, **k_dict['k_y_axis_font'])
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the precipitation subplot.)
             if self.verboseLogging:
-                log.append(u"Display legend 1: {0}".format(p_dict['showLegend']))
+                log['Debug'].append(u"Display legend 1: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
@@ -2312,9 +2321,9 @@ class Plugin(indigo.PluginBase):
             ax2.yaxis.tick_left()
 
             if self.verboseLogging:
-                log.append(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
-                                                                            min(p_dict['data_array']),
-                                                                            max(p_dict['data_array']) - min(p_dict['data_array'])))
+                log['Debug'].append(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
+                                                                                     min(p_dict['data_array']),
+                                                                                     max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             # Y1 Axis Min/Max
             try:
@@ -2349,9 +2358,9 @@ class Plugin(indigo.PluginBase):
                 plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             except ValueError:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. Set values to a real number or None.".format(dev.name), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. Set values to a real number or None.".format(dev.name), 'Name': dev.name})
             except Exception as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"Warning: trouble with {0} Y Min or Y Max. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. {1}".format(dev.name, sub_error), 'Name': dev.name})
 
             # Chart title
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
@@ -2361,7 +2370,7 @@ class Plugin(indigo.PluginBase):
 
             # Legend Properties (note that we need a separate instance of this code for each subplot. This one controls the temperatures subplot.)
             if self.verboseLogging:
-                log.append(u"Display legend 2: {0}".format(p_dict['showLegend']))
+                log['Debug'].append(u"Display legend 2: {0}".format(p_dict['showLegend']))
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
@@ -2390,8 +2399,9 @@ class Plugin(indigo.PluginBase):
         elements in order to try to make them more presentable. The need is
         easily seen by looking at the rough text that is provided by the U.S.
         National Weather Service, for example."""
-        # self.logger.debug(u"{0:*^40}".format(" Clean Up String "))
-        # self.logger.debug(u"Length of initial string: {0}".format(len(val)))
+        if self.verboseLogging:
+            self.logger.debug(u"{0:*^40}".format(" Clean Up String "))
+            self.logger.debug(u"Length of initial string: {0}".format(len(val)))
 
         # List of (elements, replacements)
         clean_list = [(' am ', ' AM '), (' pm ', ' PM '), ('*', ' '), ('\u000A', ' '), ('...', ' '), ('/ ', '/'), (' /', '/'), ('/', ' / ')]
@@ -2400,10 +2410,7 @@ class Plugin(indigo.PluginBase):
         for (old, new) in clean_list:
             val = val.replace(old, new)
 
-        val = ' '.join(val.split())  # Eliminate spans of whitespace.
-
-        # self.logger.debug(u"Length of final string: {0}".format(len(val)))
-        return val
+        return ' '.join(val.split())  # Eliminate spans of whitespace.
 
     def deviceStateGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
         """The deviceStateGenerator() method produces a list of device states
@@ -2450,9 +2457,9 @@ class Plugin(indigo.PluginBase):
                 state_list.append("None")
                 return state_list
 
-            # If an item has not been selected, return and empty list.
-            else:
-                return state_list
+        # If an item has not been selected, return and empty list.
+        else:
+            return state_list
 
     def fixTheMarkers(self, line1_marker, line2_marker, line3_marker, line4_marker):
         """ The devices.xml file cannot contain '<' or '>' as a value, as this
@@ -2516,7 +2523,6 @@ class Plugin(indigo.PluginBase):
             ("monthly", "Every Month"),
             ("yearly", "Every Year")]
 
-        # self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
         return bin_list_menu
 
     def getChartList(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2532,7 +2538,6 @@ class Plugin(indigo.PluginBase):
             if dev.model not in ["CSV Engine", "Matplotlib Parameters Device"]:
                 chart_list_menu.append((dev.id, dev.name))
 
-        # self.logger.threaddebug(u"bin_list_menu: {0}".format(bin_list_menu))
         return chart_list_menu
 
     def getBackgroundColorList(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2709,8 +2714,8 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u"Error getting list of forecast devices. {0}".format(sub_error))
 
         self.logger.threaddebug(u"Forecast device list generated successfully: {0}".format(forecast_source_menu))
-
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
+
         return forecast_source_menu
 
     def getLineList(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2789,7 +2794,6 @@ class Plugin(indigo.PluginBase):
             ("|", "Vertical Line"),
             ("x", "X")]
 
-        # self.logger.threaddebug(u"marker_list_menu: {0}".format(marker_list_menu))
         return marker_list_menu
 
     def getTheData(self, data_source):
@@ -2809,6 +2813,7 @@ class Plugin(indigo.PluginBase):
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Final data: ", final_data))
+
         return final_data
 
     def listGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2829,6 +2834,7 @@ class Plugin(indigo.PluginBase):
         device_variable_list_menu.append((u"None", u"None"))
 
         self.logger.debug(u"List generator data generated successfully.\nDevice List:\n{0}\nVariable List:\n{1}".format(dev_list, var_list))
+
         return device_variable_list_menu
 
     def plotCustomLineSegments(self, ax, k_dict, p_dict):

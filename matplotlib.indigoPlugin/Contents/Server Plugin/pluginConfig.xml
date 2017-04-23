@@ -115,34 +115,21 @@
     </Field>
     <Field id="chartPropsSeparator" type="separator"/>
     <!-- Font Color for Annotations -->
-    <Field id="fontColorAnnotation" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's annotation text.">
+    <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's annotation text.">
         <Label>Annotation Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Annotations Color -->
-    <Field id="annotationColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="fontColorAnnotation" visibleBindingValue="custom"
-           tooltip="Enter your preference for the color of your chart's annotations. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
     </Field>
     <!-- Background Color -->
-    <Field id="backgroundColor" type="menu" defaultValue="#000000" tooltip="Select preference for the background color of your chart.">
+    <Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00" tooltip="Select preference for the background color of your chart.">
         <Label>Canvas Color:</Label>
-        <List class="self" filter="" method="getBackgroundColorList"/>
     </Field>
-    <!-- Custom Background Color -->
-    <Field id="backgroundColorOther" type="textfield" defaultValue="#000000" visibleBindingId="backgroundColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the background color of your chart. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
+    <!-- Transparent Background Color -->
+    <Field id="backgroundColorOther" type="checkbox" defaultValue="false"
+           tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+        <Label>Transparent Canvas?</Label>
     </Field>
     <!-- Font Color -->
-    <Field id="fontColor" type="menu" defaultValue="#FFFFFF" tooltip="Select preference for the color of your chart's text.">
+    <Field id="fontColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's text.">
         <Label>Font Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Font Color -->
-    <Field id="fontColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="fontColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the color of your chart's text. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
     </Field>
     <!-- Main Font Style -->
     <Field id="fontMain" type="menu" defaultValue="Arial" tooltip="Select preference for the font of your chart.">
@@ -150,14 +137,8 @@
         <List class="self" filter="" method="getFontList" dynamicReload="true"/>
     </Field>
     <!-- Grid Color -->
-    <Field id="gridColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's grids.">
+    <Field id="gridColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's grids.">
         <Label>Grid Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Grid Color -->
-    <Field id="gridColorOther" type="textfield" defaultValue="#888888" visibleBindingId="gridColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the grid color of your chart. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
     </Field>
     <!-- Grid Style -->
     <Field id="gridStyle" type="menu" defaultValue=":" tooltip="Select preference for the style of your chart's grids.">
@@ -174,35 +155,22 @@
         <Label>Line Weight:</Label>
     </Field>
     <!-- Plot Area Color -->
-    <Field id="faceColor" type="menu" defaultValue="#000000"
+    <Field id="faceColor" type="colorpicker" defaultValue="00 00 00"
            tooltip="Select preference for the plot area color of your chart. Note that this only affects the plot area and any selected canvas color will display.">
         <Label>Plot Area Color:</Label>
-        <List class="self" filter="" method="getBackgroundColorList"/>
     </Field>
-    <!-- Custom Plot Area Color -->
-    <Field id="faceColorOther" type="textfield" defaultValue="#000000" visibleBindingId="faceColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the plot area color of your chart. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
+    <!-- Transparent Plot Area Color -->
+    <Field id="faceColorOther" type="checkbox" defaultValue="false"
+           tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+        <Label>Transparent Plot?</Label>
     </Field>
     <!-- Spine Color -->
-    <Field id="spineColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's spines.">
+    <Field id="spineColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's spines.">
         <Label>Spine Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Spine Color -->
-    <Field id="spineColorOther" type="textfield" defaultValue="#888888" visibleBindingId="spineColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the spine color of your chart. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
     </Field>
     <!-- Tick Color -->
-    <Field id="tickColor" type="menu" defaultValue="#888888" tooltip="Select preference for the color of your chart's ticks.">
+    <Field id="tickColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's ticks.">
         <Label>Tick Color:</Label>
-        <List class="self" filter="" method="getColorList"/>
-    </Field>
-    <!-- Custom Tick Color -->
-    <Field id="tickColorOther" type="textfield" defaultValue="#888888" visibleBindingId="tickColor" visibleBindingValue="custom"
-           tooltip="Enter your preference for the color of your chart's ticks. The value must be in the form of an hex color (#FFFFFF).">
-        <Label>Hex:</Label>
     </Field>
     <!-- Tick Font Size -->
     <Field id="tickFontSize" type="menu" defaultValue="8" tooltip="Enter your preference for the tick font size of your chart (integer).">
