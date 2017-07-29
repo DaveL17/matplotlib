@@ -27,18 +27,18 @@
 			<Field id="instructionsLabel" type="label" fontColor="black" fontSize="regular">
 				<Label>Advanced Plugin Settings</Label>
 			</Field>
-            <Field id="enableCustomColorsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
-                <Label>Custom Colors</Label>
-            </Field>
-            <Field id="enableCustomColorsSeparator" type="separator"/>
-			<Field id="enableCustomColors" type="checkbox" defaultValue="false">
-				<Label/>
-                <Description>Enable Custom Colors</Description>
-		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
-			</Field>
-			<Field id="enableCustomColorsLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>Adds controls to plot with user-defined colors. If later disabled, previously defined colors will still be used until a new color is selected.</Label>
-			</Field>
+            <!--<Field id="enableCustomColorsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">-->
+                <!--<Label>Custom Colors</Label>-->
+            <!--</Field>-->
+            <!--<Field id="enableCustomColorsSeparator" type="separator"/>-->
+			<!--<Field id="enableCustomColors" type="checkbox" defaultValue="false">-->
+				<!--<Label/>-->
+                <!--<Description>Enable Custom Colors</Description>-->
+		        <!--<CallbackMethod>advancedSettingsMenu</CallbackMethod>-->
+			<!--</Field>-->
+			<!--<Field id="enableCustomColorsLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">-->
+				<!--<Label>Adds controls to plot with user-defined colors. If later disabled, previously defined colors will still be used until a new color is selected.</Label>-->
+			<!--</Field>-->
 			<Field id="enableCustomLineSegmentsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
 				<Label>Custom Line Segments</Label>
 			</Field>

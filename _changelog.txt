@@ -1,3 +1,6 @@
+v0.4.13
+- Changes font list method to a list comprehension.
+
 v0.4.12
 - Converts all color settings to new Indigo Color Picker. This may cause users
   to need to re-enter color preferences in the plugin configuration (affecting

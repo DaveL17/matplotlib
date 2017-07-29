@@ -17,12 +17,6 @@
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
-    <!-- The enableCustomColors flag element is set in the advanced settings menu. -->
-    <Field id="enableCustomColors" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Hidden</Label>
-        <Description>Enable/Disable</Description>
-    </Field>
-    <!-- The enableCustomLineSegments flag element is set in the advanced settings menu. -->
     <Field id="enableCustomLineSegments" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>

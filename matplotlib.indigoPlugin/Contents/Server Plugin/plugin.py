@@ -17,7 +17,6 @@ proper WUnderground devices.
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
 
-# TODO: Unicode gremlins
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
 # TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Look at fill with steps line style via the plugin API.
@@ -25,11 +24,10 @@ proper WUnderground devices.
 # TODO: Finer grained control over the legend.
 # TODO: Variable refresh rates for each device so it can update on its own.
 # TODO: handle WU -99's as NaNs (known issue: if plot begins with NaN, and there's only one line, Y scale is hinky. Expressing Y range fixes it. Appears this was fixed in mpl 2.0
-# TODO: remove all custom color stuff and use the color picker api.
 
 # TODO: look at use of kv_list to ensure that all devices are updated properly
-# TODO: new multiline text device can be saved with incomplete config
-# TODO: trap and warn on wind device with not enough observations
+# TODO: multiline text device can be saved with incomplete config
+# TODO: trap condition where there are too many observations to plot ( i.e., too many x axis values)
 
 from ast import literal_eval
 from csv import reader
@@ -70,8 +68,9 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.12"
+__version__   = "0.4.13"
 
+# TODO: all the 'Other' prefs can come out now, yes?
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
     u'backgroundColor': "#000000",
@@ -79,7 +78,6 @@ kDefaultPluginPrefs = {
     u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
     u'chartResolution': 100,
     u'dataPath': "{0}/com.fogbert.indigoplugin.matplotlib/".format(indigo.server.getLogsFolderPath()),
-    u'enableCustomColors': False,
     u'enableCustomLineSegments': False,
     u'faceColor': "#000000",
     u'faceColorOther': "#000000",
@@ -129,7 +127,7 @@ class Plugin(indigo.PluginBase):
         self.sleep_interval = self.pluginPrefs.get('refreshInterval', 900)
 
         self.logger.info(u"")
-        self.logger.info(u"{0:=^80}".format(' Initializing New Plugin Session '))
+        self.logger.info(u"{0:=^130}".format(' Initializing New Plugin Session '))
         self.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
@@ -141,9 +139,22 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<31} {1}".format("Plugin ID:", pluginId))
         self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
         self.logger.debug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
-        self.logger.info(u"{0:=^80}".format(""))
+        self.logger.info(u"{0:=^130}".format(""))
 
         self.final_data = []
+
+        # Initially, the plugin was constructed with a standard set of colors that could be overwritten by electing to set a custom color value.
+        # With the inclusion of the color picker control, this is no longer needed.  So we try to set the color field to the custom value.
+        # This block is for plugin color preferences.
+        if '#custom' in self.pluginPrefs.values():
+            for pref in self.pluginPrefs:
+                if 'color' in pref.lower():
+                    if self.pluginPrefs[pref] in['#custom', 'custom']:
+                        indigo.server.log(u"Resetting plugin preferences for custom colors to new color picker.")
+                        if self.pluginPrefs[u'{0}Other'.format(pref)]:
+                            self.pluginPrefs[pref] = self.pluginPrefs[u'{0}Other'.format(pref)]
+                        else:
+                            self.pluginPrefs[pref] = 'FF FF FF'
 
     def __del__(self):
         indigo.PluginBase.__del__(self)
@@ -151,14 +162,25 @@ class Plugin(indigo.PluginBase):
     def startup(self):
         """ Plugin startup routines."""
 
-        self.updater.checkVersionPoll()
-
-        self.logger.info(u"Updating device properties.")
+        # Initially, the plugin was constructed with a standard set of colors that could be overwritten by electing to set a custom color value.
+        # With the inclusion of the color picker control, this is no longer needed.  So we try to set the color field to the custom value.
+        # This block is for device color preferences. They should be updated whether or not the device is enabled in the Indigo UI.
         for dev in indigo.devices.itervalues("self"):
             props = dev.pluginProps
-            # Add props here
+
+            if '#custom' in props.values() or 'custom' in props.values():
+                for prop in props:
+                    if 'color' in prop.lower():
+                        if props[prop] in ['#custom', 'custom']:
+                            indigo.server.log(u"Resetting device preferences for custom colors to new color picker.")
+                            if props[u'{0}Other'.format(prop)]:
+                                props[prop] = props[u'{0}Other'.format(prop)]
+                            else:
+                                props[prop] = 'FF FF FF'
             dev.replacePluginPropsOnServer(props)
 
+
+        self.updater.checkVersionPoll()
         self.logger.debug(u"{0}{1}".format("Log Level = ", self.debugLevel))
 
     def shutdown(self):
@@ -192,7 +214,6 @@ class Plugin(indigo.PluginBase):
         defaults_dict = {'annotationColorOther': '#FFFFFF',
                          'backgroundColor': '#000000',
                          'backgroundColorOther': '#000000',
-                         'enableCustomColors': False,
                          'faceColor': '#000000',
                          'faceColorOther': '#000000',
                          'fontColor': '#FFFFFF',
@@ -221,7 +242,7 @@ class Plugin(indigo.PluginBase):
         """ Validate select plugin config menu settings."""
         self.debugLevel = int(valuesDict['showDebugLevel'])
         self.indigo_log_handler.setLevel(self.debugLevel)
-        # self.logger.threaddebug(u"Config UI validator valuesDict: {0}".format(dict(valuesDict)))
+        self.logger.info(u"Debug level set to: {0}".format(self.debugLevel))
 
         error_msg_dict = indigo.Dict()
 
@@ -304,6 +325,16 @@ class Plugin(indigo.PluginBase):
     def getDeviceConfigUiValues(self, pluginProps, typeId, devId):
         """The getDeviceConfigUiValues() method is called when a device config
         is opened."""
+        import binascii
+
+        for key, value in pluginProps.iteritems():
+            try:
+                if value.startswith('#') and len(value) == 7:
+                    binascii.unhexlify(value[1:])
+                    pluginProps[key] = u"{0} {1} {2}".format(value[1:3], value[3:5], value[5:7])
+            except (AttributeError, TypeError):
+                pass
+
         self.logger.debug(u"{0:*^40}".format(' Plugin Settings Menu '))
         if self.verboseLogging:
             self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
@@ -392,7 +423,7 @@ class Plugin(indigo.PluginBase):
                 pluginProps['enableCustomLineSegmentsSetting'] = False
 
             # If enabled, reset all device config dialogs to a minimized state (all sub-groups minimized upon open.)
-            if self.pluginPrefs['snappyConfigMenus']:
+            if self.pluginPrefs.get('snappyConfigMenus', False):
                 self.logger.debug(u"Enabling advanced feature: Snappy Config Menus.")
                 pluginProps['barLabel1']   = False
                 pluginProps['barLabel2']   = False
@@ -402,10 +433,10 @@ class Plugin(indigo.PluginBase):
                 pluginProps['lineLabel2']  = False
                 pluginProps['lineLabel3']  = False
                 pluginProps['lineLabel4']  = False
-                pluginProps['groupLabel1']  = False
-                pluginProps['groupLabel2']  = False
-                pluginProps['groupLabel3']  = False
-                pluginProps['groupLabel4']  = False
+                pluginProps['groupLabel1'] = False
+                pluginProps['groupLabel2'] = False
+                pluginProps['groupLabel3'] = False
+                pluginProps['groupLabel4'] = False
                 pluginProps['xAxisLabel']  = False
                 pluginProps['y2AxisLabel'] = False
                 pluginProps['yAxisLabel']  = False
@@ -473,11 +504,10 @@ class Plugin(indigo.PluginBase):
 
         settings     = indigo.Dict()
         error_msg_dict = indigo.Dict()
-        settings['enableCustomColors'] = self.pluginPrefs['enableCustomColors']
-        settings['enableCustomLineSegments'] = self.pluginPrefs['enableCustomLineSegments']
-        settings['promoteCustomLineSegments'] = self.pluginPrefs['promoteCustomLineSegments']
-        settings['snappyConfigMenus'] = self.pluginPrefs['snappyConfigMenus']
-        settings['forceOriginLines'] = self.pluginPrefs['forceOriginLines']
+        settings['enableCustomLineSegments'] = self.pluginPrefs.get('enableCustomLineSegments', False)
+        settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
+        settings['snappyConfigMenus'] = self.pluginPrefs.get('snappyConfigMenus', False)
+        settings['forceOriginLines'] = self.pluginPrefs.get('forceOriginLines', False)
         self.logger.debug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
 
         return settings, error_msg_dict
@@ -489,7 +519,6 @@ class Plugin(indigo.PluginBase):
         # Note that valuesDict here is for the menu, not all plugin prefs.
         # self.logger.threaddebug(u"menuId = {0}".format(menuId))
 
-        self.pluginPrefs['enableCustomColors']        = valuesDict['enableCustomColors']
         self.pluginPrefs['enableCustomLineSegments']  = valuesDict['enableCustomLineSegments']
         self.pluginPrefs['promoteCustomLineSegments'] = valuesDict['promoteCustomLineSegments']
         self.pluginPrefs['snappyConfigMenus']         = valuesDict['snappyConfigMenus']
@@ -505,7 +534,6 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
             self.logger.threaddebug(u"typeId = {0}  devId = {1}".format(typeId, devId))
 
-        self.logger.debug(u"Use of custom colors: {0}".format(valuesDict['enableCustomColors']))
         self.logger.debug(u"Enable custom line segments: {0}".format(valuesDict['enableCustomLineSegments']))
         self.logger.debug(u"Enable snappy config menus: {0}".format(valuesDict['snappyConfigMenus']))
         self.logger.debug(u"Enable force origin lines: {0}".format(valuesDict['forceOriginLines']))
@@ -1365,7 +1393,7 @@ class Plugin(indigo.PluginBase):
                 if not p_dict['yMirrorValuesAlsoY1']:
                     ax.tick_params(labelleft=False)
 
-        except Exception as sub_error:
+        except Exception:
             pass
 
         return ax
@@ -1736,7 +1764,7 @@ class Plugin(indigo.PluginBase):
                 else:
                     labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
                 plt.yticks(marks, labels)
-            except Exception as sub_error:
+            except Exception:
                 pass
 
             plt.tight_layout(pad=1)
@@ -1857,11 +1885,7 @@ class Plugin(indigo.PluginBase):
                     p_dict['wind_direction'] = p_dict['wind_direction'][len(p_dict['wind_direction']) - num_obs: len(p_dict['wind_direction'])]
                     p_dict['wind_speed'] = p_dict['wind_speed'][len(p_dict['wind_speed']) - num_obs: len(p_dict['wind_speed'])]
 
-                except IndexError as sub_error:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] IndexError ({1})".format(dev.name, sub_error), 'Name': dev.name})
-                except UnicodeEncodeError as sub_error:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] UnicodeEncodeError ({1})".format(dev.name, sub_error), 'Name': dev.name})
-                except Exception as sub_error:
+                except (IndexError, UnicodeEncodeError) as sub_error:
                     return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error plotting chart ({1})".format(dev.name, sub_error), 'Name': dev.name})
 
                 # Create the array of grey scale for the intermediate lines and set the last one red. (MPL will accept string values '0' - '1' as grey scale, so we create a number of
@@ -1880,6 +1904,11 @@ class Plugin(indigo.PluginBase):
                 # Polar plots are in radians (not degrees.)
                 p_dict['wind_direction'] = np.radians(p_dict['wind_direction'])
                 wind = zip(p_dict['wind_direction'], p_dict['wind_speed'], p_dict['bar_colors'])
+
+                if len(wind) < num_obs:
+                    return_queue.put({'Error': True,
+                                      'Log': log,
+                                      'Message': u"[{0}] Error plotting chart (CSV file contains insufficient number of observations.)".format(dev.name), 'Name': dev.name})
 
                 # Customizations.
                 size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
@@ -2540,77 +2569,6 @@ class Plugin(indigo.PluginBase):
 
         return chart_list_menu
 
-    def getBackgroundColorList(self, filter="", valuesDict=None, typeId="", targetId=0):
-        """Returns a list of available colors. There are two color lists. This
-        list is for things that support transparency (e.g., background and plot
-        area."""
-        if self.verboseLogging:
-            self.logger.threaddebug(u"Constructing background color list.")
-
-        background_color_list_menu = [
-            ("#000000", "Black"),
-            ("#111111", "Grey(9)"),
-            ("#222222", "Grey(8)"),
-            ("#333333", "Grey(7)"),
-            ("#444444", "Grey(6)"),
-            ("#555555", "Grey(5)"),
-            ("#666666", "Grey(4)"),
-            ("#777777", "Grey(3)"),
-            ("#888888", "Grey(2)"),
-            ("#999999", "Grey(1)"),
-            ("#FFFFFF", "White"),
-            ("#FF0000", "Red"),
-            ("#FFA500", "Orange"),
-            ("#FFFF00", "Yellow"),
-            ("#008000", "Green"),
-            ("#0000FF", "Blue"),
-            ("#4B0082", "Indigo"),
-            ("#EE82EE", "Violet"),
-            ("transparent", "Transparent")]
-
-        try:
-            if self.pluginPrefs['enableCustomColors']:
-                background_color_list_menu.append(("custom", "Custom"))
-        except KeyError:
-            self.pluginErrorHandler(traceback.format_exc())
-
-        return background_color_list_menu
-
-    def getColorList(self, filter="", valuesDict=None, typeId="", targetId=0):
-        """Returns a list of available colors. There are two color lists. This
-        list is for things that don't support transparency (e.g., fonts, lines,
-        etc.)"""
-        if self.verboseLogging:
-            self.logger.threaddebug(u"Constructing color list.")
-
-        color_list_menu = [
-            ("#000000", "Black"),
-            ("#111111", "Grey(9)"),
-            ("#222222", "Grey(8)"),
-            ("#333333", "Grey(7)"),
-            ("#444444", "Grey(6)"),
-            ("#555555", "Grey(5)"),
-            ("#666666", "Grey(4)"),
-            ("#777777", "Grey(3)"),
-            ("#888888", "Grey(2)"),
-            ("#999999", "Grey(1)"),
-            ("#FFFFFF", "White"),
-            ("#FF0000", "Red"),
-            ("#FFA500", "Orange"),
-            ("#FFFF00", "Yellow"),
-            ("#008000", "Green"),
-            ("#0000FF", "Blue"),
-            ("#4B0082", "Indigo"),
-            ("#EE82EE", "Violet")]
-
-        try:
-            if self.pluginPrefs['enableCustomColors']:
-                color_list_menu.append(("custom", "Custom"))
-        except KeyError:
-            self.pluginErrorHandler(traceback.format_exc())
-
-        return color_list_menu
-
     def getFontList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Generates and returns a list of fonts.  Note that these are the
         fonts that Matplotlib can see, not necessarily all of the fonts
@@ -2669,29 +2627,11 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     def getFontSizeList(self, filter="", valuesDict=None, typeId="", targetId=0):
-        """Returns a list of possible font sizes."""
+        """Returns a list of allowable font sizes."""
         if self.verboseLogging:
             self.logger.threaddebug(u"Constructing font size list.")
 
-        font_size_menu = [
-            ("6", "6"),
-            ("7", "7"),
-            ("8", "8"),
-            ("9", "9"),
-            ("10", "10"),
-            ("11", "11"),
-            ("12", "12"),
-            ("13", "13"),
-            ("14", "14"),
-            ("15", "15"),
-            ("16", "16"),
-            ("17", "17"),
-            ("18", "18"),
-            ("19", "19"),
-            ("20", "20"),
-        ]
-
-        return font_size_menu
+        return [(str(_), str(_)) for _ in np.arange(6, 21)]
 
     def getForecastSource(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Generates and returns a list of potential forecast devices for the
@@ -2723,7 +2663,7 @@ class Plugin(indigo.PluginBase):
         if self.verboseLogging:
             self.logger.threaddebug(u"Constructing line list.")
 
-        line_list_menu = [
+        return [
             ("None", "None"),
             ("--", "Dashed"),
             (":", "Dotted"),
@@ -2731,9 +2671,8 @@ class Plugin(indigo.PluginBase):
             ("-", "Solid"),
             ("steps", "Steps"),
             ("steps-mid", "Steps Mid"),
-            ("steps-post", "Steps Post")]
-
-        return line_list_menu
+            ("steps-post", "Steps Post")
+        ]
 
     def getListOfFiles(self, filter="", valuesDict=None, typeId="", targetId=0):
         """Get list of CSV files."""
@@ -2769,7 +2708,7 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"filter = {0}  typeId = {1}  targetId = {2}".format(filter, typeId, targetId))
             self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
-        marker_list_menu = [
+        return [
             ("None", "None"),
             ("o", "Circle"),
             ("D", "Diamond"),
@@ -2792,9 +2731,8 @@ class Plugin(indigo.PluginBase):
             ("3", "Tri Left"),
             ("4", "Tri Right"),
             ("|", "Vertical Line"),
-            ("x", "X")]
-
-        return marker_list_menu
+            ("x", "X")
+        ]
 
     def getTheData(self, data_source):
         """ Get the data. """
@@ -2851,12 +2789,12 @@ class Plugin(indigo.PluginBase):
                         cls = ax.axhline(y=element[0], color=element[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
 
                         # If we want to promote custom line segments, we need to add them to the list that's used to calculate the Y axis limits.
-                        if self.pluginPrefs['promoteCustomLineSegments']:
+                        if self.pluginPrefs.get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(element[0])
                     else:
                         cls = ax.axhline(y=constants_to_plot[0], color=constants_to_plot[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
 
-                        if self.pluginPrefs['promoteCustomLineSegments']:
+                        if self.pluginPrefs.get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(constants_to_plot[0])
 
                 return cls

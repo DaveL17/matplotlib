@@ -55,7 +55,7 @@
                 <CallbackMethod>selectColumn</CallbackMethod>
             </Field>
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
-                <Label>is an item selected</Label>
+                <Label>is an item selected?</Label>
             </Field>
             <Field id="label1" type="label" fontColor="darkgray" fontSize="small" alignWithControl="true">
                 <Label>This is a list of all existing items the plugin is tracking.  It will only display those items that have been created by the CSV device.  Select an item from this list to update its values or delete it from the plugin.</Label>
