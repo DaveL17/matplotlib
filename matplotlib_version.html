@@ -1,24 +1,40 @@
-Version: 0.4.08
+Version: 0.4.13
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
 A Matplotlib Plugin update is now available
 
-This is a minor release. Users whose installs are functioning well
-do not need to install this patch.
+v0.4.13
+- Improve font list generation.
 
-v0.4.08
+v0.4.12
+- Converts all color settings to new Indigo Color Picker. This may cause users
+  to need to re-enter color preferences in the plugin configuration (affecting
+  all charts at once) and each device configuration (affecting devices
+  individually.) This should only need to be done once, and will not be needed
+  for new devices.
+- Improves multiprocessing logging.
 
-- Adds a new Action Item to refresh individual charts. Useful when a single data point changes (i.e., device state or variable value).
-- Makes the cleanUpString() method optional for multiline text charts.
-- Removes the need to manually refresh the list of values to chart when selecting a data source for multiline text charts (removes the 'Refresh' button).
-- Updates plugin to require Indigo API version 2.0 (as Indigo 7 is required in order to run the plugin).
-- Testing new multiprocessing feature with multiline charts. Should not cause any observable differences in plugin operation.
-- Plugin now only calls the Matplotlib AGG backend.
-- Stylistic changes to Indigo Plugin Update Checker module.
-- Improves code used to read and write select information from the plugin logs folder.
-- Saving plugin configuration (or advanced settings configuration) will no longer regenerate all charts automatically. Feature wasn't working well on slower servers with a lot of charts.
-- Further reduces the amount of information written to the debug log.
+v0.4.11
+- The following devices have been moved to a multiprocessing environment:
+    . Bar Chart Devices
+    . Line Chart Devices
+    . Polar Chart Devices
+    . Scatter Chart Devices
+- Adds trap for Matplotlib runtime error when charts are refreshed.
+
+v0.4.10
+- The following devices have been moved to a multiprocessing environment:
+    . Calendar Devices
+    . Multiline Text Devices
+    . Weather Forecast Devices
+- Fixes error in debug logging where 'isError' attribute was used with API 2.0
+  logging.
+
+v0.4.09
+- Fixes bug where CSV data are updated once per minute when refresh interval
+  set to manual only.
+- Ensures that refresh interval is updated as soon as the setting is changed.
 
 As always, if something doesn't seem quite right, please let me know.
 
