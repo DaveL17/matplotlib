@@ -1,40 +1,15 @@
-Version: 0.4.13
+Version: 0.4.14
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
 A Matplotlib Plugin update is now available
 
-v0.4.13
-- Improve font list generation.
+v0.4.14
+- Standardizes plugin menu item styles. Menu items with an ellipsis (...)
+  denote that a dialog box will open. Menu items without an ellipsis denote
+  that the plugin will take immediate action.
 
-v0.4.12
-- Converts all color settings to new Indigo Color Picker. This may cause users
-  to need to re-enter color preferences in the plugin configuration (affecting
-  all charts at once) and each device configuration (affecting devices
-  individually.) This should only need to be done once, and will not be needed
-  for new devices.
-- Improves multiprocessing logging.
-
-v0.4.11
-- The following devices have been moved to a multiprocessing environment:
-    . Bar Chart Devices
-    . Line Chart Devices
-    . Polar Chart Devices
-    . Scatter Chart Devices
-- Adds trap for Matplotlib runtime error when charts are refreshed.
-
-v0.4.10
-- The following devices have been moved to a multiprocessing environment:
-    . Calendar Devices
-    . Multiline Text Devices
-    . Weather Forecast Devices
-- Fixes error in debug logging where 'isError' attribute was used with API 2.0
-  logging.
-
-v0.4.09
-- Fixes bug where CSV data are updated once per minute when refresh interval
-  set to manual only.
-- Ensures that refresh interval is updated as soon as the setting is changed.
+This is a cosmetic release and users can forego updating until the next release.
 
 As always, if something doesn't seem quite right, please let me know.
 
