@@ -1,4 +1,9 @@
 v0.4.13
+- Standardizes plugin menu item styles. Menu items with an ellipsis (...)
+  denote that a dialog box will open. Menu items without an ellipsis denote
+  that the plugin will take immediate action.
+
+v0.4.13
 - Changes font list method to a list comprehension.
 
 v0.4.12

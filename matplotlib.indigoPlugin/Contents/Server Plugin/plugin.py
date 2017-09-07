@@ -29,6 +29,8 @@ proper WUnderground devices.
 # TODO: multiline text device can be saved with incomplete config
 # TODO: trap condition where there are too many observations to plot ( i.e., too many x axis values)
 
+# TODO: all the 'Other' prefs can come out now, yes?
+
 from ast import literal_eval
 from csv import reader
 import datetime as dt
@@ -68,9 +70,8 @@ __build__     = ""
 __copyright__ = "Copyright 2017 DaveL17"
 __license__   = ""
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.13"
+__version__   = "0.4.14"
 
-# TODO: all the 'Other' prefs can come out now, yes?
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
     u'backgroundColor': "#000000",
