@@ -864,7 +864,7 @@ There are presently no configurations available for this device.
                 <Label>Chart Controls</Label>
             </Field>
             <Field id="sourceSeparator2" type="separator"/>
-            <Field id="textAreaBorder" type="checkbox" defaultValue="100" tooltip="Enter the number of characters desired for each line of text.">
+            <Field id="textAreaBorder" type="checkbox" defaultValue="100" tooltip="Chedck this box if you would like a border around your image.">
                 <Label>Border?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -875,10 +875,10 @@ There are presently no configurations available for this device.
                 <Label>Clean Text:</Label>
                 <Description>Yes/No</Description>
             </Field>
-            <Field id="figureWidth" type="textfield" defaultValue="700" tooltip="Enter the desired width of your figure (inches).">
+            <Field id="figureWidth" type="textfield" defaultValue="700" tooltip="Enter the desired width of your figure (pixels).">
                 <Label>Figure Width:</Label>
             </Field>
-            <Field id="figureHeight" type="textfield" defaultValue="300" tooltip="Enter the desired height of your figure (inches).">
+            <Field id="figureHeight" type="textfield" defaultValue="300" tooltip="Enter the desired height of your figure (pixels).">
                 <Label>Figure Height:</Label>
             </Field>
             <Field id="textColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the text color of your plot.">

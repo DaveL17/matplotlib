@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
-
-<!-- Be sure to add any new plugin prefs to kDefaultPluginPrefs in plugin.py -->
-
 <PluginConfig>
 
     <Field id="infoLabel0" type="label" fontColor="black" fontSize="regular">
         <Label>Matplotlib Charting Plugin - Developed by DaveL17</Label>
     </Field>
-    <Field id="space0" type="label"/>
-    <Field id="separator0" type="separator"/>
+
+    <Field id="space00" type="label"/>
+
+    <Field id="space01" type="label" alignText="right">
+        <Label>Plugin Settings</Label>
+    </Field>
+
+    <Field id="separator00" type="separator"/>
 
     <!-- Hidden controls -->
     <!-- The DPI warning flag is used to alert the user that selecting a DPI value that's too low will produce subpar results. The checkbox is used to
@@ -17,35 +20,42 @@
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <Field id="enableCustomLineSegments" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <!-- The promoteCustomLineSegments flag element is set in the advanced settings menu. -->
     <Field id="promoteCustomLineSegments" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <!-- The logEachChartCompleted flag element is set in the advanced settings menu. -->
     <Field id="logEachChartCompleted" type="checkbox" defaultValue="true" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <!-- The snappyConfigMenus flag element is set in the advanced settings menu. -->
     <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <!-- The forceOriginLines flag element is set in the advanced settings menu. -->
     <Field id="forceOriginLines" type="checkbox" defaultValue="false" hidden="True">
         <Label>Hidden</Label>
         <Description>Enable/Disable</Description>
     </Field>
+
     <!-- Chart Output Location -->
     <Field id="dataPath" type="textfield" defaultValue="/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/"
            tooltip="Enter the path to the folder where you want to store your charting data.">
         <Label>Save Data Files To:</Label>
     </Field>
+
     <Field id="chartPath" type="textfield" defaultValue="/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/"
            tooltip="Enter the path to the folder where your charts should be saved.">
         <Label>Save Images To:</Label>
@@ -64,113 +74,141 @@
             <Option value="86400">Every Day</Option>
         </List>
     </Field>
+
     <!-- Chart Resolution -->
     <Field id="chartResolution" type="textfield" defaultValue="100" tooltip="Enter your preference for the resolution of your chart in DPI (100).">
         <Label>Resolution:</Label>
     </Field>
+
     <!-- Rectangular Charts -->
     <Field id="rectChartLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
         <Label>Rectangular Charts (Size 1)</Label>
     </Field>
+
     <Field id="rectChartSeparator" type="separator"/>
     <!-- Chart Height -->
     <Field id="rectChartHeight" type="textfield" defaultValue="250" tooltip="Enter your preference for the height of your chart in pixels (250).">
         <Label>Chart Height:</Label>
     </Field>
+
     <!-- Chart Width -->
     <Field id="rectChartWidth" type="textfield" defaultValue="600" tooltip="Enter your preference for the width of your chart in pixels (600).">
         <Label>Chart Width:</Label>
     </Field>
+
     <!-- Rectangular Charts Special-->
     <Field id="rectChartWideLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
         <Label>Rectangular Charts (Size 2)</Label>
     </Field>
+
     <Field id="rectChartWideSeparator" type="separator"/>
+
     <!-- Wide Chart Height -->
     <Field id="rectChartWideHeight" type="textfield" defaultValue="250" tooltip="Enter your preference for the height of your chart in pixels (250).">
         <Label>Chart Height:</Label>
     </Field>
+
     <!-- Wide Chart Width -->
     <Field id="rectChartWideWidth" type="textfield" defaultValue="1000" tooltip="Enter your preference for the width of your chart in pixels (1000).">
         <Label>Chart Width:</Label>
     </Field>
+
     <!-- Square Charts -->
     <Field id="sqChartLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
         <Label>Square Charts</Label>
     </Field>
+
     <Field id="sqChartSeparator" type="separator"/>
+
     <!-- Chart Height -->
     <Field id="sqChartSize" type="textfield" defaultValue="250"
            tooltip="Enter your preference for the size of your chart in pixels (250). The value will be used for both height and width.">
         <Label>Chart Size:</Label>
     </Field>
+
     <Field id="chartPropsLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
         <Label>Chart Properties</Label>
     </Field>
+
     <Field id="chartPropsSeparator" type="separator"/>
+
     <!-- Font Color for Annotations -->
     <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's annotation text.">
         <Label>Annotation Color:</Label>
     </Field>
     <!-- Background Color -->
+
     <Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00" tooltip="Select preference for the background color of your chart.">
         <Label>Canvas Color:</Label>
     </Field>
+
     <!-- Transparent Background Color -->
     <Field id="backgroundColorOther" type="checkbox" defaultValue="false"
            tooltip="Check this box if you would like to override the background color selection with a transparent background.">
         <Label>Transparent Canvas?</Label>
     </Field>
+
     <!-- Font Color -->
     <Field id="fontColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's text.">
         <Label>Font Color:</Label>
     </Field>
+
     <!-- Main Font Style -->
     <Field id="fontMain" type="menu" defaultValue="Arial" tooltip="Select preference for the font of your chart.">
         <Label>Font Style:</Label>
         <List class="self" filter="" method="getFontList" dynamicReload="true"/>
     </Field>
+
     <!-- Grid Color -->
     <Field id="gridColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's grids.">
         <Label>Grid Color:</Label>
     </Field>
+
     <!-- Grid Style -->
     <Field id="gridStyle" type="menu" defaultValue=":" tooltip="Select preference for the style of your chart's grids.">
         <Label>Grid Style:</Label>
         <List class="self" filter="" method="getLineList"/>
     </Field>
+
     <!-- Legend Font Size -->
     <Field id="legendFontSize" type="menu" defaultValue="6" tooltip="Enter your preference for the legend font size of your chart (integer).">
         <Label>Legend Font Size:</Label>
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
+
     <!-- Line Weight -->
     <Field id="lineWeight" type="textfield" defaultValue="1.0" tooltip="Enter the weight for all graph lines as a positive float(1.0).">
         <Label>Line Weight:</Label>
     </Field>
+
     <!-- Plot Area Color -->
     <Field id="faceColor" type="colorpicker" defaultValue="00 00 00"
            tooltip="Select preference for the plot area color of your chart. Note that this only affects the plot area and any selected canvas color will display.">
         <Label>Plot Area Color:</Label>
     </Field>
+
     <!-- Transparent Plot Area Color -->
     <Field id="faceColorOther" type="checkbox" defaultValue="false"
            tooltip="Check this box if you would like to override the background color selection with a transparent background.">
         <Label>Transparent Plot?</Label>
     </Field>
+
     <!-- Spine Color -->
     <Field id="spineColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's spines.">
         <Label>Spine Color:</Label>
     </Field>
+
     <!-- Tick Color -->
     <Field id="tickColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's ticks.">
         <Label>Tick Color:</Label>
     </Field>
+
     <!-- Tick Font Size -->
     <Field id="tickFontSize" type="menu" defaultValue="8" tooltip="Enter your preference for the tick font size of your chart (integer).">
         <Label>Tick Font Size:</Label>
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
+
     <!-- Tick Size -->
     <Field id="tickSize" type="menu" defaultValue="4" tooltip="Select preference for the size of the major tick marks. The minor ticks will be half as tall.">
         <Label>Tick Size:</Label>
@@ -186,52 +224,24 @@
             <Option value="8">8</Option>
         </List>
     </Field>
+
     <!-- Title Font Size -->
     <Field id="mainFontSize" type="menu" defaultValue="10" tooltip="Enter your preference for the title font size of your chart (integer).">
         <Label>Title Font Size:</Label>
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
-    <Field id="emailLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-        <Label>Plugin Update Notifications</Label>
-    </Field>
-    <Field id="separator02" type="separator"/>
-    <Field id="updaterEmailsEnabled" type="checkbox" defaultValue="false">
-        <Label>Enable:</Label>
-        <Description>Yes/No</Description>
-    </Field>
-    <Field id="updaterEmail" type="textfield">
-        <Label>Email:</Label>
-    </Field>
-    <Field id="debugLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-        <Label>Debugging</Label>
-    </Field>
-    <Field id="separator03" type="separator"/>
-    <Field id="showDebugLevel" type="menu" defaultValue="30" tooltip="Controls the amount of debug information written to the log.">
-        <Label>Debug level:</Label>
-        <Description/>
-        <List>
-            <Option value="10">Debugging Messages</Option>
-            <Option value="20">Informational Messages</Option>
-            <Option value="30">Warning Messages</Option>
-            <Option value="40">Error Messages</Option>
-            <Option value="50">Critical Errors Only</Option>
-        </List>
-    </Field>
-    <Field id="space7" type="label" fontColor="black" alignWithControl="false" fontSize="small">
-        <Label>Always be careful when posting debug output to the forums or other public places. You should review it to ensure that it doesn't contain sensitive information.
 
-Debugging Messages = Step by step plugin logging.
-Informational Messages = Useful information about plugin health.
-Warning Messages = Warnings about settings that may conflict.
-Error Messages = Error messages you might want to address.
-Critical Errors Only = Critical errors that should probably be reported.
-        </Label>
-    </Field>
+    <!-- Notifications Template -->
+    <Template file="DLFramework/template_notifications.xml" />
+
+    <!-- Debugging Template -->
+    <Template file="DLFramework/template_debugging.xml" />
+
     <Field id="verboseLogging" type="checkbox" hidden="False">
         <Label>Verbose Logging</Label>
         <Description>Enable/Disable</Description>
     </Field>
-    <Field id="verboseLoggingLabel" type="label" fontColor="black" fontSize="small">
-        <Label>Check this box to enable verbose logging. Checking this box will only affect the level and amount of information written to the plugin log file (it will not affect the amount of information written to the Indigo Event Log.</Label>
+    <Field id="verboseLoggingLabel" type="label" fontColor="black" fontSize="small" alignWithControl="True">
+        <Label>Check this box to enable verbose logging. Checking this box will only affect the level and amount of information written to the plugin log file (it will not affect the amount of information written to the Indigo Event Log).</Label>
     </Field>
 </PluginConfig>

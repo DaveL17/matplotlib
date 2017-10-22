@@ -12,6 +12,9 @@ relative simplicity.  It contains direct support for some automated charts (for
 example, it can create WUnderground plugin forecast charts if linked to the
 proper WUnderground devices.
 """
+
+# =================================== TO DO ===================================
+
 # TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery levels.)
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Create an "error" chart with min/max/avg
@@ -22,7 +25,7 @@ proper WUnderground devices.
 # TODO: Look at fill with steps line style via the plugin API.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
-# TODO: Variable refresh rates for each device so it can update on its own.
+# TODO: Variable refresh rates for each device so it can update on its own (including CSV engine).
 # TODO: handle WU -99's as NaNs (known issue: if plot begins with NaN, and there's only one line, Y scale is hinky. Expressing Y range fixes it. Appears this was fixed in mpl 2.0
 
 # TODO: look at use of kv_list to ensure that all devices are updated properly
@@ -31,46 +34,60 @@ proper WUnderground devices.
 
 # TODO: all the 'Other' prefs can come out now, yes?
 
+# TODO: From: http://forums.indigodomo.com/viewtopic.php?f=219&t=19016&p=144812#p144794
+# TODO: Convert boolean data to 0/1 so it can be plotted. Would be nice if it also handled several of the common text-boolean-equivalents (up/down, on/off, locked/unlocked, true/false,
+#       etc).
+# TODO: Linear transformations with multiplier and offset (e.g. <datum> * X + Y). Offset would be especially helpful for plotting multiple boolean values. Multiplier is nice for unit
+#       conversion or just getting two plotlines in the same neighborhood if actual value is less important than trend or correlation.
+
+# TODO: Note that matplotlib and ghostXML seem to fight each other for some reason.  Multiprocessing problem?  See if the process naming conventions collide.
+
+# ================================== IMPORTS ==================================
+
+# Built-in modules
 from ast import literal_eval
 from csv import reader
 import datetime as dt
-import indigoPluginUpdateChecker
 import logging
 import multiprocessing
 import numpy as np
-import sys
 import traceback
-
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-
 from matplotlib import rcParams
 try:
     import matplotlib.pyplot as plt
-except ValueError:
+except ImportError:
     indigo.server.log(u"There was an error importing necessary Matplotlib components. Please reboot your server and try to re-enable the plugin.", isError=True)
 import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
+# Third-party modules
+from DLFramework import indigoPluginUpdateChecker
 try:
     import indigo
 except ImportError as error:
     pass
-
 try:
     import pydevd  # To support remote debugging
 except ImportError as error:
     pass
 
+# My modules
+import DLFramework as dlf
 
-__author__    = "DaveL17"
-__build__     = ""
-__copyright__ = "Copyright 2017 DaveL17"
-__license__   = ""
+# =================================== HEADER ==================================
+
+__author__    = dlf.DLFramework.__author__
+__copyright__ = dlf.DLFramework.__copyright__
+__license__   = dlf.DLFramework.__license__
+__build__     = dlf.DLFramework.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.14"
+__version__   = "0.4.16"
+
+# =============================================================================
 
 kDefaultPluginPrefs = {
     u'annotationColorOther': "#FFFFFF",
@@ -118,7 +135,6 @@ class Plugin(indigo.PluginBase):
 
         updater_url = "https://davel17.github.io/matplotlib/matplotlib_version.html"
         self.updater = indigoPluginUpdateChecker.updateChecker(self, updater_url)
-        # pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True, suspend=False)  # To enable remote PyCharm Debugging, uncomment this line.
 
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
         self.debug      = True
@@ -127,18 +143,26 @@ class Plugin(indigo.PluginBase):
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
         self.sleep_interval = self.pluginPrefs.get('refreshInterval', 900)
 
+        # ====================== Initialize DLFramework =======================
+
+        self.dlf = dlf.DLFramework.Fogbert(self)
+
+        # Log pluginEnvironment information when plugin is first started
+        self.dlf.pluginEnvironment()
+
+        # Convert old debugLevel scale (low, medium, high) to new scale (1, 2, 3).
+        if not int(self.pluginPrefs.get('showDebugLevel')):
+            self.pluginPrefs['showDebugLevel'] = self.dlf.convertDebugLevel(self.debugLevel)
+
+        # =====================================================================
+
         self.logger.info(u"")
-        self.logger.info(u"{0:=^130}".format(' Initializing New Plugin Session '))
-        self.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
+        self.logger.info(u"{0:=^130}".format(" Matplotlib Environment "))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
-        self.logger.info(u"{0:<31} {1}".format("Plugin name:", pluginDisplayName))
-        self.logger.info(u"{0:<31} {1}".format("Plugin version:", pluginVersion))
-        self.logger.info(u"{0:<31} {1}".format("Plugin ID:", pluginId))
-        self.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
         self.logger.debug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.info(u"{0:=^130}".format(""))
 
@@ -156,6 +180,11 @@ class Plugin(indigo.PluginBase):
                             self.pluginPrefs[pref] = self.pluginPrefs[u'{0}Other'.format(pref)]
                         else:
                             self.pluginPrefs[pref] = 'FF FF FF'
+
+        # try:
+        #     pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True, suspend=False)
+        # except:
+        #     pass
 
     def __del__(self):
         indigo.PluginBase.__del__(self)
@@ -866,7 +895,7 @@ class Plugin(indigo.PluginBase):
                         lines = orig_file.readlines()
                         orig_num_lines = sum(1 for _ in lines)
 
-                    # Write the file (retaining the header line and the last target_lines.
+                    # Write the file (retaining the header line and the last target_lines).
                     if orig_num_lines > target_lines:
                         with open(full_path, 'w') as new_file:
                             new_file.writelines(lines[0:1])
@@ -1319,7 +1348,7 @@ class Plugin(indigo.PluginBase):
         """ Call for a chart refresh and pass the id of the device
         called from the action. """
         self.logger.info(u"{0:=^80}".format(' Refresh Single Chart Action '))
-        self.refreshTheCharts(pluginAction.props['chartToRefresh'])
+        self.refreshTheCharts(pluginAction.deviceId)
 
     def refreshTheChartsAction(self, action):
         """ Called by an Indigo Action item. """
