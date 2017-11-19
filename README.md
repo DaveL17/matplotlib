@@ -1,3 +1,15 @@
-# Matplotlib Plugin for Indigo
+# ![Logo](img/img_MatplotlibLogo.png)
 
-An Indigo plugin for creating charts to be used with Indigo control pages.
+The Matplotlib plugin allows you to easily create attractive charts for display on Indigo Home Control Server control pages. The plugin also includes a facility to create necessary CSV data for display.
+
+*Highlights:*  
+- Easily create visually appealing charts for Indigo control pages.
+- Seamlessly manage attributes like color, fonts, sizes (and more!) for all charts at once.
+- Customize individual charts with markers, annotations, minimums and maximums, and user-defined constants.
+- Chart types Include: Line Charts, Bar Charts, Polar Charts, Multiline Text Charts, and WUnderground Plugin Charts.
+- Chart data that is created with the plugin, or incorporate your own (CSV).
+- Charts update automatically.
+
+The Matplotlib plugin is designed to make creating visually appealing charts for Indigo control pages easy. Many of the chart attributes, such as background color, font styles and chart size can be managed centrally--for example, you can change the background color of all your charts simultaneously. You can add additional customizations to each individual chart if you like, such as overriding the default chart size or displaying a chart legend only on selected charts. The overriding emphasis in designing the plugin is simplicity. The instructions below seem like a lot, but almost all of the settings can be left at their default when you begin. It's probably best to read through all these instructions before getting started.
+
+- ***Note:*** The Matplotlib plugin does not require access to the Internet in order to function; however, some features--like the software version update check--do require Internet access to determine the most current version of the plugin.
