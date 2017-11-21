@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
 <PluginConfig>
 
-    <Field id="infoLabel0" type="label" fontColor="black" fontSize="regular">
-        <Label>Matplotlib Charting Plugin - Developed by DaveL17</Label>
+    <Field id="infoLabel0" type="label">
+        <Label>Matplotlib Charting Plugin</Label>
+    </Field>
+
+    <Field id="infoLabel1" type="label" fontSize="small">
+        <Label>Developed by DaveL17</Label>
     </Field>
 
     <Field id="space00" type="label"/>

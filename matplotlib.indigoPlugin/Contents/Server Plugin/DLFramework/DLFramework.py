@@ -24,6 +24,7 @@ class Fogbert(object):
         def __init__(self, plugin):
             self.plugin = plugin
             self.plugin.debugLog(u"Initializing DLFramework...")
+            self.pluginPrefs = plugin.pluginPrefs
 
         def pluginEnvironment(self):
             """
@@ -51,7 +52,7 @@ class Fogbert(object):
             string-based setting to account for older plugin versions. Over time, this
             method will become obsolete and should be deprecated.
             """
-            self.plugin.debugLog(u"DLFramework somethingElse method called.")
+            self.plugin.debugLog(u"DLFramework convertDebugLevel method called.")
 
             # If the debug value is High/Medium/Low, it is the old style. Covert it to 3/2/1
             if debug_val in ["High", "Medium", "Low"]:
@@ -63,3 +64,42 @@ class Fogbert(object):
                     return 1
             
             return debug_val
+            
+        def lauchWebPage(self, url):
+            """
+            The launchWebPage method is used to direct a call to the registered
+            default browser and open the page referenced by the parameter 'URL'.
+            """
+            import webbrowser
+            
+            webbrowser.open(url)
+
+class Formatter(object):
+        """ 
+        The Formatter class contains methods to provide unique custom data	
+        formats as needed.
+        """
+            
+        def __init__(self, plugin):
+            self.plugin = plugin
+            self.pluginPrefs = plugin.pluginPrefs
+
+        def dateFormat(self):
+            """ 
+            The dateFormat method takes the user configuration preference for 
+            date and time display and converts them to a valid datetime() 
+            format specifier.
+            """
+            
+            date_formatter = {'DD-MM-YYYY': '%d-%m-%Y', 'MM-DD-YYYY': '%m-%d-%Y', 'YYYY-MM-DD': '%Y-%m-%d'}
+            return date_formatter[self.pluginPrefs['uiDateFormat']]
+            
+        def timeFormat(self):
+            """ 
+            The timeFormat method takes the user configuration preference for 
+            date and time display and converts them to a valid datetime() 
+            format specifier.
+            """
+            
+            time_formatter = {'military': '%H:%M', 'standard': '%I:%M'}
+            return time_formatter[self.pluginPrefs['uiTimeFormat']]

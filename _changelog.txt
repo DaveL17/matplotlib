@@ -1,3 +1,6 @@
+v0.5.01
+- Increments version number for release.
+
 v0.4.16
 - Code consolidation using DLFramework.
 - Standardizes file framework.

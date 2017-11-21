@@ -42,6 +42,10 @@ proper WUnderground devices.
 
 # TODO: Note that matplotlib and ghostXML seem to fight each other for some reason.  Multiprocessing problem?  See if the process naming conventions collide.
 
+# TODO: Be more agnostic about date formatting.  Look at dateutil.parser
+# TODO: Better trap for CSV data that doesn't have a properly formatted date column.
+# TODO: What happens when the style sheet is set to read only and a new version of the plugin is installed?
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -76,16 +80,16 @@ except ImportError as error:
     pass
 
 # My modules
-import DLFramework as dlf
+import DLFramework.DLFramework as Dave
 
 # =================================== HEADER ==================================
 
-__author__    = dlf.DLFramework.__author__
-__copyright__ = dlf.DLFramework.__copyright__
-__license__   = dlf.DLFramework.__license__
-__build__     = dlf.DLFramework.__build__
+__author__    = Dave.__author__
+__copyright__ = Dave.__copyright__
+__license__   = Dave.__license__
+__build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.4.16"
+__version__   = "0.5.01"
 
 # =============================================================================
 
@@ -145,14 +149,14 @@ class Plugin(indigo.PluginBase):
 
         # ====================== Initialize DLFramework =======================
 
-        self.dlf = dlf.DLFramework.Fogbert(self)
+        self.Fogbert = Dave.Fogbert(self)
 
         # Log pluginEnvironment information when plugin is first started
-        self.dlf.pluginEnvironment()
+        self.Fogbert.pluginEnvironment()
 
         # Convert old debugLevel scale (low, medium, high) to new scale (1, 2, 3).
         if not int(self.pluginPrefs.get('showDebugLevel')):
-            self.pluginPrefs['showDebugLevel'] = self.dlf.convertDebugLevel(self.debugLevel)
+            self.pluginPrefs['showDebugLevel'] = self.Fogbert.convertDebugLevel(self.debugLevel)
 
         # =====================================================================
 
@@ -921,10 +925,12 @@ class Plugin(indigo.PluginBase):
                             self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
 
                         # Give matplotlib something it can chew on if the value to be saved is 'None'
-                        if state_to_write == 'None':
+                        if state_to_write in ['None', None]:
                             state_to_write = 'NaN'
-                        if not state_to_write:
-                            state_to_write = 'NaN'
+                        # if state_to_write == 'None':
+                        #     state_to_write = 'NaN'
+                        # if not state_to_write:
+                        #     state_to_write = 'NaN'
 
                         # Write the latest value to the file.
                         timestamp = u"{0}".format(indigo.server.getTime().strftime('%Y-%m-%d %H:%M:%S.%f'))
