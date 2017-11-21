@@ -1,4 +1,4 @@
-# ![Logo](img/img_MatplotlibLogo.png)
+# ![Logo](https://github.com/DaveL17/matplotlib/wiki/img/img_MatplotlibLogo.png)
 
 The Matplotlib plugin allows you to easily create attractive charts for display on Indigo Home Control Server control pages. The plugin also includes a facility to create necessary CSV data for display.
 
