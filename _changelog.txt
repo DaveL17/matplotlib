@@ -1,3 +1,6 @@
+v0.5.02
+- Corrects Indigo API reference in info.plist from 2.0.0 to 2.0
+
 v0.5.01
 - Increments version number for release.
 
