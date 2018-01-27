@@ -26,25 +26,19 @@ proper WUnderground devices.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
 # TODO: Variable refresh rates for each device so it can update on its own (including CSV engine).
-# TODO: handle WU -99's as NaNs (known issue: if plot begins with NaN, and there's only one line, Y scale is hinky. Expressing Y range fixes it. Appears this was fixed in mpl 2.0
 
 # TODO: look at use of kv_list to ensure that all devices are updated properly
-# TODO: multiline text device can be saved with incomplete config
 # TODO: trap condition where there are too many observations to plot ( i.e., too many x axis values)
 
-# TODO: all the 'Other' prefs can come out now, yes?
-
-# TODO: From: http://forums.indigodomo.com/viewtopic.php?f=219&t=19016&p=144812#p144794
-# TODO: Convert boolean data to 0/1 so it can be plotted. Would be nice if it also handled several of the common text-boolean-equivalents (up/down, on/off, locked/unlocked, true/false,
-#       etc).
 # TODO: Linear transformations with multiplier and offset (e.g. <datum> * X + Y). Offset would be especially helpful for plotting multiple boolean values. Multiplier is nice for unit
 #       conversion or just getting two plotlines in the same neighborhood if actual value is less important than trend or correlation.
-
-# TODO: Note that matplotlib and ghostXML seem to fight each other for some reason.  Multiprocessing problem?  See if the process naming conventions collide.
 
 # TODO: Be more agnostic about date formatting.  Look at dateutil.parser
 # TODO: Better trap for CSV data that doesn't have a properly formatted date column.
 # TODO: What happens when the style sheet is set to read only and a new version of the plugin is installed?
+
+# TODO: Scatter charts: don't need GroupXColor? Seems to use only GroupXMarkerColor. Consider deleting GroupXColor?
+# TODO: Scatter charts: Y axis tick locations instructions are not right.
 
 # ================================== IMPORTS ==================================
 
@@ -89,7 +83,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.5.02"
+__version__   = "0.5.03"
 
 # =============================================================================
 
@@ -193,6 +187,290 @@ class Plugin(indigo.PluginBase):
     def __del__(self):
         indigo.PluginBase.__del__(self)
 
+# Indigo Methods ==============================================================
+
+    def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
+        """This routine will be called whenever the user has closed the device
+        config dialog either by save or cancel. Note that a device can't be
+        updated from here because valuesDict has yet to be saved."""
+        self.logger.debug(u"{0:*^40}".format(' Closed Device Configuration Dialog '))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
+
+    def closedPrefsConfigUi(self, valuesDict, userCancelled):
+        """ User closes config menu. The validatePrefsConfigUI() method will
+        also be called."""
+        self.sleep_interval = valuesDict['refreshInterval']
+
+        # If the user selects Save, let's redraw the charts so that they reflect the new settings.
+        if not userCancelled:
+            self.logger.info(u"{0:=^80}".format(' Configuration Saved '))
+
+    def deviceStartComm(self, dev):
+        """ Start communication with plugin devices."""
+        self.logger.debug(u"Starting device: {0}".format(dev.name))
+        dev.stateListOrDisplayStateIdChanged()
+        dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
+        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+
+    def deviceStopComm(self, dev):
+        """ Stop communication with plugin devices."""
+        self.logger.debug(u"Stopping device: {0}".format(dev.name))
+        dev.updateStatesOnServer([{'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'}])
+        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+
+    def getDeviceConfigUiValues(self, valuesDict, typeId, devId):
+        """The getDeviceConfigUiValues() method is called when a device config
+        is opened."""
+
+        self.logger.debug(u"{0:*^40}".format(' Plugin Settings Menu '))
+        if self.verboseLogging:
+            self.logger.threaddebug(u"pluginProps = {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
+
+        dev = indigo.devices[int(devId)]
+        indigo.server.log(str(dev.configured))
+
+        try:
+
+            # Make sure that the data entry fields of the CVS Engine device are in the proper state when the dialog is opened.
+            if typeId == "csvEngine":
+                valuesDict['addItemFieldsCompleted'] = False
+                valuesDict['addKey']                 = ""
+                valuesDict['addSource']              = ""
+                valuesDict['addState']               = ""
+                valuesDict['addValue']               = ""
+                valuesDict['columnList']             = ""
+                valuesDict['editKey']                = ""
+                valuesDict['editSource']             = ""
+                valuesDict['editState']              = ""
+                valuesDict['editValue']              = ""
+                valuesDict['isColumnSelected']       = False
+                valuesDict['previousKey']            = ""
+                self.logger.debug(u"Analyzing CSV Engine device settings.")
+                return valuesDict
+
+            # For new devices, force certain defaults that don't carry from devices.xml. This seems to be especially important for
+            # menu items built with callbacks and colorpicker controls that don't appear to accept defaultValue.
+            if not dev.configured:
+                if typeId == "barChartingDevice":
+                    valuesDict['bar1Color']           = 'FF FF FF'
+                    valuesDict['bar1Source']          = 'None'
+                    valuesDict['bar2Color']           = 'FF FF FF'
+                    valuesDict['bar2Source']          = 'None'
+                    valuesDict['bar3Color']           = 'FF FF FF'
+                    valuesDict['bar3Source']          = 'None'
+                    valuesDict['bar4Color']           = 'FF FF FF'
+                    valuesDict['bar4Source']          = 'None'
+                    valuesDict['customLineStyle']     = '-'
+                    valuesDict['customTickFontSize']  = 8
+                    valuesDict['customTitleFontSize'] = 10
+                    valuesDict['xAxisBins']           = 'daily'
+                    valuesDict['xAxisLabelFormat']    = '%A'
+
+                if typeId == "calendarChartingDevice":
+                    valuesDict['fontSize'] = 16
+
+                if typeId == "lineChartingDevice":
+                    valuesDict['customLineStyle']     = '-'
+                    valuesDict['customTickFontSize']  = 8
+                    valuesDict['customTitleFontSize'] = 10
+                    valuesDict['line1Color']          = 'FF FF FF'
+                    valuesDict['line1Marker']         = 'None'
+                    valuesDict['line1MarkerColor']    = 'FF FF FF'
+                    valuesDict['line1Source']         = 'None'
+                    valuesDict['line1Style']          = '-'
+                    valuesDict['line2Color']          = 'FF FF FF'
+                    valuesDict['line2Marker']         = 'None'
+                    valuesDict['line2MarkerColor']    = 'FF FF FF'
+                    valuesDict['line2Source']         = 'None'
+                    valuesDict['line2Style']          = '-'
+                    valuesDict['line3Color']          = 'FF FF FF'
+                    valuesDict['line3Marker']         = 'None'
+                    valuesDict['line3MarkerColor']    = 'FF FF FF'
+                    valuesDict['line3Source']         = 'None'
+                    valuesDict['line3Style']          = '-'
+                    valuesDict['line4Color']          = 'FF FF FF'
+                    valuesDict['line4Marker']         = 'None'
+                    valuesDict['line4MarkerColor']    = 'FF FF FF'
+                    valuesDict['line4Source']         = 'None'
+                    valuesDict['line4Style']          = '-'
+                    valuesDict['xAxisBins']           = 'daily'
+                    valuesDict['xAxisLabelFormat']    = '%A'
+
+                if typeId == "multiLineText":
+                    valuesDict['textColor']  = "FF 00 FF"
+                    valuesDict['thing']      = 'None'
+                    valuesDict['thingState'] = 'None'
+
+                if typeId == "polarChartingDevice":
+                    valuesDict['customTickFontSize']  = 8
+                    valuesDict['customTitleFontSize'] = 10
+                    valuesDict['currentWindColor']    = 'FF 33 33'
+                    valuesDict['maxWindColor']        = '33 33 FF'
+                    valuesDict['radiiValue']          = 'None'
+                    valuesDict['thetaValue']          = 'None'
+
+                if typeId == "scatterChartingDevice":
+                    valuesDict['customLineStyle']     = '-'
+                    valuesDict['customTickFontSize']  = 8
+                    valuesDict['customTitleFontSize'] = 10
+                    valuesDict['group1Color']         = 'FF FF FF'
+                    valuesDict['group1Marker']        = '.'
+                    valuesDict['group1MarkerColor']   = 'FF FF FF'
+                    valuesDict['group1Source']        = 'None'
+                    valuesDict['group2Color']         = 'FF FF FF'
+                    valuesDict['group2Marker']        = '.'
+                    valuesDict['group2MarkerColor']   = 'FF FF FF'
+                    valuesDict['group2Source']        = 'None'
+                    valuesDict['group3Color']         = 'FF FF FF'
+                    valuesDict['group3Marker']        = '.'
+                    valuesDict['group3MarkerColor']   = 'FF FF FF'
+                    valuesDict['group3Source']        = 'None'
+                    valuesDict['group4Color']         = 'FF FF FF'
+                    valuesDict['group4Marker']        = '.'
+                    valuesDict['group4MarkerColor']   = 'FF FF FF'
+                    valuesDict['group4Source']        = 'None'
+                    valuesDict['xAxisBins']           = 'daily'
+                    valuesDict['xAxisLabelFormat']    = '%A'
+
+                if typeId == "forecastChartingDevice":
+                    valuesDict['customLineStyle']      = '-'
+                    valuesDict['customTickFontSize']   = 8
+                    valuesDict['customTitleFontSize']  = 10
+                    valuesDict['forecastSourceDevice'] = 'None'
+                    valuesDict['line1Color']           = 'FF 33 33'
+                    valuesDict['line1Marker']          = 'None'
+                    valuesDict['line1MarkerColor']     = 'FF FF FF'
+                    valuesDict['line1Style']           = '-'
+                    valuesDict['line2Color']           = '00 00 FF'
+                    valuesDict['line2Marker']          = 'None'
+                    valuesDict['line2MarkerColor']     = 'FF FF FF'
+                    valuesDict['line2Style']           = '-'
+                    valuesDict['line3Color']           = '99 CC FF'
+                    valuesDict['line3MarkerColor']     = 'FF FF FF'
+                    valuesDict['xAxisBins']            = 'daily'
+                    valuesDict['xAxisLabelFormat']     = '%A'
+
+            if self.pluginPrefs.get('enableCustomLineSegments', False):
+                valuesDict['enableCustomLineSegmentsSetting'] = True
+                self.logger.debug(u"Enabling advanced feature: Custom Line Segments.")
+            else:
+                valuesDict['enableCustomLineSegmentsSetting'] = False
+
+            # If enabled, reset all device config dialogs to a minimized state (all sub-groups minimized upon open.)
+            if self.pluginPrefs.get('snappyConfigMenus', False):
+                self.logger.debug(u"Enabling advanced feature: Snappy Config Menus.")
+                valuesDict['barLabel1']   = False
+                valuesDict['barLabel2']   = False
+                valuesDict['barLabel3']   = False
+                valuesDict['barLabel4']   = False
+                valuesDict['lineLabel1']  = False
+                valuesDict['lineLabel2']  = False
+                valuesDict['lineLabel3']  = False
+                valuesDict['lineLabel4']  = False
+                valuesDict['groupLabel1'] = False
+                valuesDict['groupLabel2'] = False
+                valuesDict['groupLabel3'] = False
+                valuesDict['groupLabel4'] = False
+                valuesDict['xAxisLabel']  = False
+                valuesDict['y2AxisLabel'] = False
+                valuesDict['yAxisLabel']  = False
+
+            return valuesDict
+
+        except KeyError as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.debug(u"!!!!! KeyError preparing device config values: {0} !!!!!".format(sub_error))
+
+        return True
+
+    def getMenuActionConfigUiValues(self, menuId):
+        """The getMenuActionConfigUiValues() method loads the settings
+        for the advanced settings menu dialog. Populates them, and
+        sends them to the dialog as it's loaded."""
+        self.logger.debug(u"{0:*^80}".format(' Advanced Settings Menu '))
+        self.logger.debug(u"menuId = {0}".format(menuId))
+
+        settings     = indigo.Dict()
+        error_msg_dict = indigo.Dict()
+        settings['enableCustomLineSegments'] = self.pluginPrefs.get('enableCustomLineSegments', False)
+        settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
+        settings['snappyConfigMenus'] = self.pluginPrefs.get('snappyConfigMenus', False)
+        settings['forceOriginLines'] = self.pluginPrefs.get('forceOriginLines', False)
+        self.logger.debug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
+
+        return settings, error_msg_dict
+
+    def getPrefsConfigUiValues(self):
+        """getPrefsConfigUiValues(self) is called when the plugin config dialog
+        is called."""
+        self.logger.debug(u"{0:=^80}".format(' Get Prefs Config UI Values '))
+
+        # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
+        # Subsequent calls will pass the established dict.
+        plugin_prefs = self.pluginPrefs
+        self.logger.threaddebug(u"Initial plugin_prefs: {0}".format(dict(plugin_prefs)))
+
+        # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
+        defaults_dict = {'annotationColorOther': 'FF FF FF',
+                         'backgroundColor': '00 00 00',
+                         'backgroundColorOther': '00 00 00',
+                         'faceColor': '00 00 00',
+                         'faceColorOther': '00 00 00',
+                         'fontColor': 'FF FF FF',
+                         'fontColorAnnotation': 'FF FF FF',
+                         'fontColorOther': 'FF FF FF',
+                         'fontMain': 'Arial',
+                         'gridColor': '88 88 88',
+                         'gridStyle': ':',
+                         'legendFontSize': '6',
+                         'mainFontSize': '10',
+                         'spineColor': '88 88 88',
+                         'spineColorOther': '88 88 88',
+                         'tickColor': '88 88 88',
+                         'tickColorOther': '88 88 88',
+                         'tickFontSize': '8'}
+
+        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the defaults_dict above.
+        # This should only be necessary the first time the plugin is configured.
+        for key, value in defaults_dict.items():
+            plugin_prefs[key] = plugin_prefs.get(key, value)
+
+        self.logger.threaddebug(u"Updated initial plugin_prefs: {0}".format(dict(plugin_prefs)))
+        return plugin_prefs
+
+    def runConcurrentThread(self):
+        """"""
+        self.logger.info(u"{0:=^80}".format(' Initializing Main Thread '))
+        self.sleep(0.5)
+
+        try:
+            while True:
+                self.updater.checkVersionPoll()
+
+                try:
+                    self.sleep_interval = int(self.pluginPrefs.get('refreshInterval', '900'))
+                except ValueError:
+                    self.sleep_interval = 0
+
+                # If sleep interval is zero, the user must update all charts manually
+                if self.sleep_interval != 0:
+                    self.refreshTheCSV()
+                    self.refreshTheCharts()
+                    self.logger.info(u"{0:=^80}".format(' Cycle Complete '))
+                    self.sleep(self.sleep_interval)
+                    self.logger.info(u"{0:=^80}".format(' Cycling Main Thread '))
+                else:
+                    # Check once per minute to break out if user changes
+                    # preference and plugin doesn't refresh on its own
+                    self.sleep(60)
+
+        except self.StopThread():
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.debug(u"self.stopThread() called.")
+
     def startup(self):
         """ Plugin startup routines."""
 
@@ -220,57 +498,6 @@ class Plugin(indigo.PluginBase):
     def shutdown(self):
         """ Plugin shutdown routines."""
         self.logger.debug(u"{0:*^40}".format(' Shut Down '))
-
-    def deviceStartComm(self, dev):
-        """ Start communication with plugin devices."""
-        self.logger.debug(u"Starting device: {0}".format(dev.name))
-        dev.stateListOrDisplayStateIdChanged()
-        dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
-        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-
-    def deviceStopComm(self, dev):
-        """ Stop communication with plugin devices."""
-        self.logger.debug(u"Stopping device: {0}".format(dev.name))
-        dev.updateStatesOnServer([{'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'}])
-        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-
-    def getPrefsConfigUiValues(self):
-        """getPrefsConfigUiValues(self) is called when the plugin config dialog
-        is called."""
-        self.logger.debug(u"{0:=^80}".format(' Get Prefs Config UI Values '))
-
-        # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
-        # Subsequent calls will pass the established dict.
-        plugin_prefs = self.pluginPrefs
-        self.logger.threaddebug(u"Initial plugin_prefs: {0}".format(dict(plugin_prefs)))
-
-        # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
-        defaults_dict = {'annotationColorOther': '#FFFFFF',
-                         'backgroundColor': '#000000',
-                         'backgroundColorOther': '#000000',
-                         'faceColor': '#000000',
-                         'faceColorOther': '#000000',
-                         'fontColor': '#FFFFFF',
-                         'fontColorAnnotation': '#FFFFFF',
-                         'fontColorOther': '#FFFFFF',
-                         'fontMain': 'Arial',
-                         'gridColor': '#888888',
-                         'gridStyle': ':',
-                         'legendFontSize': '6',
-                         'mainFontSize': '10',
-                         'spineColor': '#888888',
-                         'spineColorOther': '#888888',
-                         'tickColor': '#888888',
-                         'tickColorOther': '#888888',
-                         'tickFontSize': '8'}
-
-        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the defaults_dict above.
-        # This should only be necessary the first time the plugin is configured.
-        for key, value in defaults_dict.items():
-            plugin_prefs[key] = plugin_prefs.get(key, value)
-
-        self.logger.threaddebug(u"Updated initial plugin_prefs: {0}".format(dict(plugin_prefs)))
-        return plugin_prefs
 
     def validatePrefsConfigUi(self, valuesDict):
         """ Validate select plugin config menu settings."""
@@ -347,142 +574,6 @@ class Plugin(indigo.PluginBase):
         valuesDict['dpiWarningFlag'] = True
         return True, valuesDict
 
-    def closedPrefsConfigUi(self, valuesDict, userCancelled):
-        """ User closes config menu. The validatePrefsConfigUI() method will
-        also be called."""
-        self.sleep_interval = valuesDict['refreshInterval']
-
-        # If the user selects Save, let's redraw the charts so that they reflect the new settings.
-        if not userCancelled:
-            self.logger.info(u"{0:=^80}".format(' Configuration Saved '))
-
-    def getDeviceConfigUiValues(self, pluginProps, typeId, devId):
-        """The getDeviceConfigUiValues() method is called when a device config
-        is opened."""
-        import binascii
-
-        for key, value in pluginProps.iteritems():
-            try:
-                if value.startswith('#') and len(value) == 7:
-                    binascii.unhexlify(value[1:])
-                    pluginProps[key] = u"{0} {1} {2}".format(value[1:3], value[3:5], value[5:7])
-            except (AttributeError, TypeError):
-                pass
-
-        self.logger.debug(u"{0:*^40}".format(' Plugin Settings Menu '))
-        if self.verboseLogging:
-            self.logger.threaddebug(u"pluginProps = {0}".format(dict(pluginProps)))
-            self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
-
-        try:
-
-            # Make sure that the data entry fields of the CVS Engine device are in the proper state when the dialog is opened.
-            if typeId == "csvEngine":
-                pluginProps['addItemFieldsCompleted'] = False
-                pluginProps['addKey']                 = ""
-                pluginProps['addSource']              = ""
-                pluginProps['addState']               = ""
-                pluginProps['addValue']               = ""
-                pluginProps['columnList']             = ""
-                pluginProps['editKey']                = ""
-                pluginProps['editSource']             = ""
-                pluginProps['editState']              = ""
-                pluginProps['editValue']              = ""
-                pluginProps['isColumnSelected']       = False
-                pluginProps['previousKey']            = ""
-                self.logger.debug(u"Analyzing CSV Engine device settings.")
-                return pluginProps
-            if typeId == "multiLineText":
-                pluginProps['cleanTheText'] = True
-                return pluginProps
-
-            else:
-                # Establish a set of defaults for select device settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the
-                # XML.)
-                defaults_dict = {'bar1Color': '#FFFFFF',
-                                 'bar1ColorOther': '#FFFFFF',
-                                 'bar1Source': 'None',
-                                 'bar2Color': '#FFFFFF',
-                                 'bar2ColorOther': '#FFFFFF',
-                                 'bar2Source': 'None',
-                                 'bar3Color': '#FFFFFF',
-                                 'bar3ColorOther': '#FFFFFF',
-                                 'bar3Source': 'None',
-                                 'bar4Color': '#FFFFFF',
-                                 'bar4ColorOther': '#FFFFFF',
-                                 'bar4Source': 'None',
-                                 'customLineStyle': '-',
-                                 'line1Color': '#FFFFFF',
-                                 'line1ColorOther': '#FFFFFF',
-                                 'line1Marker': 'None',
-                                 'line1MarkerColor': '#FFFFFF',
-                                 'line1MarkerColorOther': '#FFFFFF',
-                                 'line1Source': 'None',
-                                 'line1Style': 'None',
-                                 'line2Color': '#FFFFFF',
-                                 'line2ColorOther': '#FFFFFF',
-                                 'line2Marker': 'None',
-                                 'line2MarkerColor': '#FFFFFF',
-                                 'line2MarkerColorOther': '#FFFFFF',
-                                 'line2Source': 'None',
-                                 'line2Style': 'None',
-                                 'line3Color': '#FFFFFF',
-                                 'line3ColorOther': '#FFFFFF',
-                                 'line3Marker': 'None',
-                                 'line3MarkerColor': '#FFFFFF',
-                                 'line3MarkerColorOther': '#FFFFFF',
-                                 'line3Source': 'None',
-                                 'line3Style': 'None',
-                                 'line4Color': '#FFFFFF',
-                                 'line4ColorOther': '#FFFFFF',
-                                 'line4Marker': 'None',
-                                 'line4MarkerColor': '#FFFFFF',
-                                 'line4MarkerColorOther': '#FFFFFF',
-                                 'line4Source': 'None',
-                                 'line4Style': 'None',
-                                 'xAxisBins': 'daily',
-                                 'xAxisLabelFormat': '%A',
-                                 }
-
-                # Try to assign the value from pluginProps. If it doesn't work, add the key, value pair based on the defaults_dict above.
-                # This should only be necessary the first time the device is configured.
-                self.logger.debug(u"Applying updated defaults as needed.")
-                for key, value in defaults_dict.items():
-                    pluginProps[key] = pluginProps.get(key, value)
-
-            if self.pluginPrefs.get('enableCustomLineSegments', False):
-                pluginProps['enableCustomLineSegmentsSetting'] = True
-                self.logger.debug(u"Enabling advanced feature: Custom Line Segments.")
-            else:
-                pluginProps['enableCustomLineSegmentsSetting'] = False
-
-            # If enabled, reset all device config dialogs to a minimized state (all sub-groups minimized upon open.)
-            if self.pluginPrefs.get('snappyConfigMenus', False):
-                self.logger.debug(u"Enabling advanced feature: Snappy Config Menus.")
-                pluginProps['barLabel1']   = False
-                pluginProps['barLabel2']   = False
-                pluginProps['barLabel3']   = False
-                pluginProps['barLabel4']   = False
-                pluginProps['lineLabel1']  = False
-                pluginProps['lineLabel2']  = False
-                pluginProps['lineLabel3']  = False
-                pluginProps['lineLabel4']  = False
-                pluginProps['groupLabel1'] = False
-                pluginProps['groupLabel2'] = False
-                pluginProps['groupLabel3'] = False
-                pluginProps['groupLabel4'] = False
-                pluginProps['xAxisLabel']  = False
-                pluginProps['y2AxisLabel'] = False
-                pluginProps['yAxisLabel']  = False
-
-            return pluginProps
-
-        except KeyError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.debug(u"!!!!! KeyError preparing device config values: {0} !!!!!".format(sub_error))
-
-        return True
-
     def validateDeviceConfigUi(self, valuesDict, typeId, devId):
         """ Validate select device config menu settings."""
         self.logger.debug(u"{0:*^40}".format(' Validate Device Config UI '))
@@ -492,7 +583,59 @@ class Plugin(indigo.PluginBase):
 
         error_msg_dict = indigo.Dict()
 
-        # Chart Custom Dimensions.
+        # Bar Chart Device
+        if typeId == 'barChartingDevice':
+            if valuesDict['bar1Source'] == 'None':
+                error_msg_dict['bar1Source'] = u"You must select at least one data source."
+                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Line Chart Device
+        if typeId == 'lineChartingDevice':
+            if valuesDict['line1Source'] == 'None':
+                error_msg_dict['line1Source'] = u"You must select at least one data source."
+                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Polar Chart Device
+        if typeId == 'polarChartingDevice':
+            if not valuesDict['thetaValue']:
+                error_msg_dict['thetaValue'] = u"You must select a data source."
+                error_msg_dict['showAlertText'] = u"Direction Source Error.\n\nYou must select a direction source for charting."
+                return False, valuesDict, error_msg_dict
+
+            if not valuesDict['radiiValue']:
+                error_msg_dict['radiiValue'] = u"You must select a data source."
+                error_msg_dict['showAlertText'] = u"Magnitude Source Error.\n\nYou must select a magnitude source for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Scatter Chart Device
+        if typeId == 'scatterChartingDevice':
+            if not valuesDict['group1Source']:
+                error_msg_dict['group1Source'] = u"You must select at least one data source."
+                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Multiline Text
+        if typeId == 'multiLineText':
+            if not valuesDict['thing']:
+                error_msg_dict['thing'] = u"You must select a data source."
+                error_msg_dict['showAlertText'] = u"Source Error.\n\nYou must select a text source for charting."
+                return False, valuesDict, error_msg_dict
+
+            if not valuesDict['thingState']:
+                error_msg_dict['thingState'] = u"You must select a data source."
+                error_msg_dict['showAlertText'] = u"Text to Chart Error.\n\nYou must select a text source for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Weather Chart Device
+        if typeId == 'forecastChartingDevice':
+            if not valuesDict['forecastSourceDevice']:
+                error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
+                error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
+                return False, valuesDict, error_msg_dict
+
+        # Chart Custom Dimensions
         for custom_dimension_prop in ['customSizeHeight', 'customSizeWidth', 'customSizePolar']:
             try:
                 if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 75:
@@ -506,7 +649,7 @@ class Plugin(indigo.PluginBase):
                 valuesDict[custom_dimension_prop] = 'None'
                 return False, valuesDict, error_msg_dict
 
-        # Check to see that each axis limit matches one of the accepted formats.
+        # Check to see that each axis limit matches one of the accepted formats
         for limit_prop in ['yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin']:
             try:
                 if limit_prop in valuesDict.keys() and valuesDict[limit_prop] not in ['None', '0']:
@@ -520,31 +663,7 @@ class Plugin(indigo.PluginBase):
 
         return True, valuesDict
 
-    def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
-        """This routine will be called whenever the user has closed the device
-        config dialog either by save or cancel. Note that a device can't be
-        updated from here because valuesDict has yet to be saved."""
-        self.logger.debug(u"{0:*^40}".format(' Closed Device Configuration Dialog '))
-        if self.verboseLogging:
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-            self.logger.threaddebug(u"userCancelled = {0}  typeId = {1}  devId = {2}".format(userCancelled, typeId, devId))
-
-    def getMenuActionConfigUiValues(self, menuId):
-        """The getMenuActionConfigUiValues() method loads the settings
-        for the advanced settings menu dialog. Populates them, and
-        sends them to the dialog as it's loaded."""
-        self.logger.debug(u"{0:*^80}".format(' Advanced Settings Menu '))
-        self.logger.debug(u"menuId = {0}".format(menuId))
-
-        settings     = indigo.Dict()
-        error_msg_dict = indigo.Dict()
-        settings['enableCustomLineSegments'] = self.pluginPrefs.get('enableCustomLineSegments', False)
-        settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
-        settings['snappyConfigMenus'] = self.pluginPrefs.get('snappyConfigMenus', False)
-        settings['forceOriginLines'] = self.pluginPrefs.get('forceOriginLines', False)
-        self.logger.debug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
-
-        return settings, error_msg_dict
+# Plugin methods ==============================================================
 
     def advancedSettingsExecuted(self, valuesDict, menuId):
         """The advancedSettingsExecuted() method is a place where advanced
@@ -1029,7 +1148,7 @@ class Plugin(indigo.PluginBase):
             p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
         else:
             p_dict['transparent_filled'] = False
-            p_dict['faceColor'] = '#000000'
+            p_dict['faceColor'] = '00 00 00'
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
@@ -1539,7 +1658,7 @@ class Plugin(indigo.PluginBase):
             # X Axis Label - If the user chooses to display a legend, we don't want an axis label because they will fight with each other for space.
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-            # if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
+            if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
                 log['Warning'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
             # Y Axis Label
@@ -1975,7 +2094,7 @@ class Plugin(indigo.PluginBase):
                     ax.yaxis.set_ticks(np.arange(10, 50, 10))
                     ax.set_rgrids([10, 20, 30, 40, 50], **k_dict['k_rgrids'])
                 elif 50 < max(p_dict['wind_speed']):
-                    plt.text(0.5, 0.5, u"Holy crap!", color='#FFFFFF', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
+                    plt.text(0.5, 0.5, u"Holy crap!", color='FF FF FF', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
                              bbox=dict(facecolor='red', alpha='0.5'))
 
                 if p_dict['xHideLabels']:
@@ -2477,54 +2596,48 @@ class Plugin(indigo.PluginBase):
 
         return ' '.join(val.split())  # Eliminate spans of whitespace.
 
+    def convertTheData(self, final_data):
+        """Matplotlib can't plot values like 'Open' and 'Closed', so we convert
+        them for plotting. We do this on the fly and we do not change the
+        underlying data in any way."""
+
+        converter = {'true': 1,
+                     'false': 0,
+                     'open': 1,
+                     'closed': 0,
+                     'on': 1,
+                     'off': 0,
+                     'locked': 1,
+                     'unlocked': 0,
+                     'up': 1,
+                     'down': 0,
+                     '1': 1,
+                     '0': 0,
+                     '-99': 'NaN'}
+
+        for value in final_data:
+            if value[1].lower() in converter.keys():
+                value[1] = converter[value[1].lower()]
+
+        return final_data
+
+    def _dummyCallback(self, valuesDict=None, typeId="", targetId=0):
+        """The purpose of the _dummyCallback method is to provide something
+        for configuration dialogs to call in order to force a refresh of any
+        dynamic controls (dynamicReload=True)."""
+        pass
+
     def deviceStateGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
-        """The deviceStateGenerator() method produces a list of device states
+        """The deviceStateGenerator() method returns a list of device states
         and variables. Each device list includes only states for the selected
         device.
         """
-        self.logger.debug(u"{0:*^40}".format(' Device State Generator '))
-        if self.verboseLogging:
-            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
-        state_list = []
 
-        # If there are no devices created yet.
-        if not valuesDict:
-            return state_list
-
-        if valuesDict and "thing" in valuesDict:
-            # If an item has been selected.
-            if valuesDict['thing'] not in ["", "None"]:
-                device_string = int(valuesDict['thing'])
-                try:
-                    # If it's a device, grab the selected state.
-                    for devID in indigo.devices.iterkeys():
-                        if device_string == devID:
-                            # If there's no device specified, the state is NoneType.
-                            for state in indigo.devices[device_string].states:
-                                # if ".ui" in state or "All" in state or "zone" in state:
-                                if any(item in state for item in (".ui", "All", "zone")):
-                                    pass
-                                else:
-                                    state_list.append(state)
-
-                    # If it's not a device, it's a variable. Grab it's value.
-                    for varID in indigo.variables.iterkeys():
-                        if device_string == varID:
-                            var = indigo.variables[device_string].name
-                            state_list.append(var + u" value")
-
-                # If it's somehow not a device or a variable, skip it.
-                except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.info(u"Element not of device type or variable type. Skipping. {0}".format(sub_error))
-
-                # Append the list with a "None" choice.
-                state_list.append("None")
-                return state_list
-
-        # If an item has not been selected, return and empty list.
-        else:
-            return state_list
+        try:
+            id = valuesDict['thing']
+            return self.Fogbert.generatorStateOrValue(id)
+        except KeyError:
+            return [("Select a Source Above", "Select a Source Above")]
 
     def fixTheMarkers(self, line1_marker, line2_marker, line3_marker, line4_marker):
         """ The devices.xml file cannot contain '<' or '>' as a value, as this
@@ -2779,6 +2892,7 @@ class Plugin(indigo.PluginBase):
             csv_data   = reader(data_file, delimiter=',')
             [final_data.append(item) for item in csv_data]
             data_file.close()
+            final_data = self.convertTheData(final_data)
             self.logger.debug(u"Data retrieved successfully: {0}".format(data_source.decode("utf-8")))
 
         except Exception as sub_error:
@@ -2791,25 +2905,11 @@ class Plugin(indigo.PluginBase):
         return final_data
 
     def listGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
-        """This method collects IDs and names for all Indigo devices and
-        variables. It creates a dictionary of the form
+        """This method returns a dictionary of the form
         ((dev.id, dev.name), (var.id, var.name)). It prepends (D) or (V) to
         make it easier to distinguish between the two.
         """
-        self.logger.debug(u"{0:*^40}".format(' List Generator '))
-        if self.verboseLogging:
-            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
-            self.logger.threaddebug(u"filter = {0} typeId = {1}  devId = {2}".format(filter, typeId, targetId))
-
-        dev_list = [(dev.id, u"(D) {0}".format(dev.name)) for dev in indigo.devices]
-        var_list = [(var.id, u"(V) {0}".format(var.name)) for var in indigo.variables]
-
-        device_variable_list_menu = dev_list + var_list
-        device_variable_list_menu.append((u"None", u"None"))
-
-        self.logger.debug(u"List generator data generated successfully.\nDevice List:\n{0}\nVariable List:\n{1}".format(dev_list, var_list))
-
-        return device_variable_list_menu
+        return self.Fogbert.deviceAndVariableList()
 
     def plotCustomLineSegments(self, ax, k_dict, p_dict):
         """"""
@@ -2888,33 +2988,3 @@ class Plugin(indigo.PluginBase):
         elif x_axis_bins == 'yearly':
             plt.gca().xaxis.set_major_locator(mdate.YearLocator())
             plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
-
-    def runConcurrentThread(self):
-        """"""
-        self.logger.info(u"{0:=^80}".format(' Initializing Main Thread '))
-        self.sleep(0.5)
-
-        try:
-            while True:
-                self.updater.checkVersionPoll()
-
-                try:
-                    self.sleep_interval = int(self.pluginPrefs.get('refreshInterval', '900'))
-                except ValueError:
-                    self.sleep_interval = 0
-
-                # If sleep interval is zero, the user must update all charts manually
-                if self.sleep_interval != 0:
-                    self.refreshTheCSV()
-                    self.refreshTheCharts()
-                    self.logger.info(u"{0:=^80}".format(' Cycle Complete '))
-                    self.sleep(self.sleep_interval)
-                    self.logger.info(u"{0:=^80}".format(' Cycling Main Thread '))
-                else:
-                    # Check once per minute to break out if user changes
-                    # preference and plugin doesn't refresh on its own
-                    self.sleep(60)
-
-        except self.StopThread():
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.debug(u"self.stopThread() called.")

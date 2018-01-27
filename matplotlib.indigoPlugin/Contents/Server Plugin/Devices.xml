@@ -63,7 +63,7 @@
                 <Label>Use this section to update or delete existing items.</Label>
             </Field>
 
-            <Field id="columnList" type="menu" defaultValue="None">
+            <Field id="columnList" type="menu">
                 <Label>Item List</Label>
                 <List class="self" filter="" method="columnList" dynamicReload="true"/>
                 <CallbackMethod>selectColumn</CallbackMethod>
@@ -191,13 +191,13 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the title font size of your chart (this chart only).">
                 <Label>Title Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="customTickFontSize" type="menu" defaultValue="8" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
@@ -235,7 +235,7 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
@@ -246,7 +246,7 @@
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
                 <Label>Scale:</Label>
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
@@ -266,6 +266,7 @@
                    tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
                 <Label>Label:</Label>
             </Field>
+
             <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
                 <Label>Max:</Label>
             </Field>
@@ -315,7 +316,7 @@
                 <Label>Bar 1</Label>
             </Field>
 
-            <Field id="bar1Source" type="menu" defaultValue="None" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
+            <Field id="bar1Source" type="menu" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -352,7 +353,7 @@
                 <Label>Bar 2</Label>
             </Field>
 
-            <Field id="bar2Source" type="menu" defaultValue="None" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
+            <Field id="bar2Source" type="menu" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -389,7 +390,7 @@
                 <Label>Bar 3</Label>
             </Field>
 
-            <Field id="bar3Source" type="menu" defaultValue="None" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
+            <Field id="bar3Source" type="menu" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -427,7 +428,7 @@
                 <Label>Bar 4</Label>
             </Field>
 
-            <Field id="bar4Source" type="menu" defaultValue="None" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
+            <Field id="bar4Source" type="menu" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -483,7 +484,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>
             </Field>
 
-            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
@@ -537,7 +538,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Width:</Label>
             </Field>
 
-            <Field id="fontSize" type="menu" defaultValue="12" tooltip="Select the size of the font to use for the calendar plot.">
+            <Field id="fontSize" type="menu" tooltip="Select the size of the font to use for the calendar plot.">
                 <Label>Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
@@ -616,13 +617,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the title font size of your chart (this chart only).">
                 <Label>Title Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="customTickFontSize" type="menu" defaultValue="8" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
@@ -652,18 +653,18 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
-                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
-                <Label>Label:</Label>
-            </Field>
-
-            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
                 <Label>Scale:</Label>
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
@@ -733,7 +734,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 1</Label>
             </Field>
 
-            <Field id="line1Source" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Select data source for line 1.">
+            <Field id="line1Source" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Select data source for line 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -753,23 +754,23 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="line1Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first line.">
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Marker" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -791,7 +792,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 2</Label>
             </Field>
 
-            <Field id="line2Source" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Select data source for line 2.">
+            <Field id="line2Source" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Select data source for line 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -811,23 +812,23 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="line2Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second line.">
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Marker" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -849,7 +850,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 3</Label>
             </Field>
 
-            <Field id="line3Source" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select data source for line 3.">
+            <Field id="line3Source" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select data source for line 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -869,23 +870,23 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="line3Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third line.">
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Style" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's third line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line3MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Marker" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -907,7 +908,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 4</Label>
             </Field>
 
-            <Field id="line4Source" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select data source for line 4.">
+            <Field id="line4Source" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select data source for line 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -927,22 +928,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="line4Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth line.">
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Style" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line4MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="line4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Marker" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -973,7 +974,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
@@ -1053,13 +1054,13 @@ There are presently no configurations available for this device.
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="thing" type="menu" defaultValue="None">
+            <Field id="thing" type="menu">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="listGenerator" dynamicReload="true"/>
-                <CallbackMethod>deviceStateGenerator</CallbackMethod>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="thingState" type="menu" defaultValue="None">
+            <Field id="thingState" type="menu">
                 <Label>Text to chart:</Label>
                 <List class="self" filter="" method="deviceStateGenerator" dynamicReload="true"/>
             </Field>
@@ -1094,15 +1095,9 @@ There are presently no configurations available for this device.
                 <Label>Figure Height:</Label>
             </Field>
 
-            <Field id="textColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the text color of your plot.">
+            <Field id="textColor" type="colorpicker" defaultValue="FF 33 00" tooltip="Select preference for the text color of your plot.">
                 <Label>Font Color:</Label>
-                <!--<List class="self" filter="" method="getColorList" dynamicReload="true"/>-->
             </Field>
-
-            <!--<Field id="textColorOther" type="textfield" defaultValue="#FFFFFF" visibleBindingId="textColor" visibleBindingValue="custom"-->
-                   <!--tooltip="Enter your preference for the color of your chart's multiline text. The value must be in the form of an HTML color (#FFFFFF).">-->
-                <!--<Label>Hex:</Label>-->
-            <!--</Field>-->
 
             <Field id="multilineFontSize" type="textfield" defaultValue="10"
                    tooltip="Enter the font size to use for multiline text plots. This only affects this device instance.">
@@ -1169,16 +1164,16 @@ There are presently no configurations available for this device.
                 <Label>Direction observations are in degrees (0-360). Fractional degrees (123.4) are okay.</Label>
             </Field>
 
-            <Field id="thetaValue" type="menu" defaultValue="None" tooltip="Select data source for the direction value (theta).">
+            <Field id="thetaValue" type="menu" tooltip="Select data source for the direction value (theta).">
                 <Label>Direction Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
-            <Field id="rasiiValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+            <Field id="radiiValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
                 <Label>Magnitude observations are any real number greater than zero. Fractional numbers are okay.</Label>
             </Field>
 
-            <Field id="radiiValue" type="menu" defaultValue="None" tooltip="Select data source for the magnitude value (radii).">
+            <Field id="radiiValue" type="menu" tooltip="Select data source for the magnitude value (radii).">
                 <Label>Magnitude Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
@@ -1191,11 +1186,11 @@ There are presently no configurations available for this device.
 
             <Field id="sourceSeparator2" type="separator"/>
 
-            <Field id="currentWindColor" type="colorpicker" defaultValue="#FF3333" tooltip="Select preference for the color of your chart's current wind observation.">
+            <Field id="currentWindColor" type="colorpicker" defaultValue="FF 33 33" tooltip="Select preference for the color of your chart's current wind observation.">
                 <Label>Color (current):</Label>
             </Field>
 
-            <Field id="maxWindColor" type="colorpicker" defaultValue="#3333FF" tooltip="Select preference for the color of your chart's maximum wind observation.">
+            <Field id="maxWindColor" type="colorpicker" defaultValue="33 33 FF" tooltip="Select preference for the color of your chart's maximum wind observation.">
                 <Label>Color (max):</Label>
             </Field>
 
@@ -1214,13 +1209,13 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the title font size of your chart (this chart only).">
                 <Label>Title Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="customTickFontSize" defaultValue="8" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
@@ -1295,6 +1290,7 @@ There are presently no configurations available for this device.
 
             <Field id="sourceSeparator1" type="separator"/>
 
+<!--Chart Controls-->
             <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
                 <Label>Use Size 2?</Label>
                 <Description>Yes/No</Description>
@@ -1320,13 +1316,13 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the title font size of your chart (this chart only).">
                 <Label>Title Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="customTickFontSize" type="menu" defaultValue="8" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
@@ -1340,7 +1336,7 @@ There are presently no configurations available for this device.
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
                 <Label>Title:</Label>
             </Field>
-
+<!--X Axis-->
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
@@ -1361,17 +1357,18 @@ There are presently no configurations available for this device.
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
                 <Label>Scale:</Label>
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
 
+<!--Y Axis-->
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
 
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
@@ -1437,12 +1434,12 @@ There are presently no configurations available for this device.
                 <Label>Group 1</Label>
             </Field>
 
-            <Field id="group1Source" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
+            <Field id="group1Source" type="menu" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
-            <Field id="group1Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first group.">
                 <Label>Color:</Label>
             </Field>
@@ -1452,12 +1449,12 @@ There are presently no configurations available for this device.
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="group1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group1Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1Marker" type="menu" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first group.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -1479,12 +1476,12 @@ There are presently no configurations available for this device.
                 <Label>Group 2</Label>
             </Field>
 
-            <Field id="group2Source" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
+            <Field id="group2Source" type="menu" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
-            <Field id="group2Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second group.">
                 <Label>Color:</Label>
             </Field>
@@ -1494,12 +1491,12 @@ There are presently no configurations available for this device.
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="group2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group2Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2Marker" type="menu" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second group.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -1521,12 +1518,12 @@ There are presently no configurations available for this device.
                 <Label>Group 3</Label>
             </Field>
 
-            <Field id="group3Source" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
+            <Field id="group3Source" type="menu" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
-            <Field id="group3Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third group.">
                 <Label>Color:</Label>
             </Field>
@@ -1536,12 +1533,12 @@ There are presently no configurations available for this device.
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="group3MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group3Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3Marker" type="menu" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third group.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -1563,12 +1560,12 @@ There are presently no configurations available for this device.
                 <Label>Group 4</Label>
             </Field>
 
-            <Field id="group4Source" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
+            <Field id="group4Source" type="menu" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
-            <Field id="group4Color" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true"
+            <Field id="group4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's fourth group.">
                 <Label>Color:</Label>
             </Field>
@@ -1578,11 +1575,11 @@ There are presently no configurations available for this device.
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="group4MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="group4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group4Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true"
+            <Field id="group4Marker" type="menu" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth group.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
@@ -1613,7 +1610,7 @@ There are presently no configurations available for this device.
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth group.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
@@ -1665,7 +1662,7 @@ There are presently no configurations available for this device.
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="forecastSourceDevice" type="menu" defaultValue="None" tooltip="Select source device for the weather forecast chart.">
+            <Field id="forecastSourceDevice" type="menu" tooltip="Select source device for the weather forecast chart.">
                 <Label>Source Device:</Label>
                 <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
             </Field>
@@ -1700,13 +1697,13 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" defaultValue="10" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the title font size of your chart (this chart only).">
                 <Label>Title Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="customTickFontSize" type="menu" defaultValue="8" visibleBindingId="customSizeFont" visibleBindingValue="true"
+            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
                    tooltip="Select your preference for the tick font size of your chart (this chart only).">
                 <Label>Tick Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
@@ -1726,7 +1723,7 @@ There are presently no configurations available for this device.
                 <Label>X Axis</Label>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -1741,7 +1738,7 @@ There are presently no configurations available for this device.
                 <Label>Label</Label>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The datetime units for the x axis.">
                 <Label>Scale:</Label>
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
@@ -1836,23 +1833,23 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line1Color" type="colorpicker" defaultValue="#FF3333" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Color" type="colorpicker" defaultValue="FF 33 33" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first line.">
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="line1MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Marker" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
@@ -1874,23 +1871,23 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line2Color" type="colorpicker" defaultValue="#0000FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Color" type="colorpicker" defaultValue="00 00 FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's second line.">
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="line2MarkerColor" type="colorpicker" defaultValue="#FFFFFF" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Marker" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
@@ -1907,7 +1904,7 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line3Color" type="colorpicker" defaultValue="#99CCFF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
+            <Field id="line3Color" type="colorpicker" defaultValue="99 CC FF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
                 <Label>Color:</Label>
             </Field>
 
@@ -1926,7 +1923,7 @@ There are presently no configurations available for this device.
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>

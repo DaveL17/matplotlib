@@ -1,3 +1,14 @@
+v0.5.03
+- Adds internal converter to allow more binary values to be plotted. The
+  following values plot as True (1): 'locked', 'on', 'open', 'up', 'true', '1'.
+  The plugin will now also skip values of '-99' which are meaningless values
+  set by the WUnderground plugin when rational data aren't provided by the
+  service.
+- Improves device config default settings for all charts.
+- Improves device config validation for: Bar, Line, Multiline Text, Polar,
+  Scatter, and Weather charts.
+- Expands use of DLFramework for device and variable selection.
+
 v0.5.02
 - Corrects Indigo API reference in info.plist from 2.0.0 to 2.0
 
