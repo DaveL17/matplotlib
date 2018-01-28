@@ -12,7 +12,7 @@ payload = {'x_values': [1, 2, 3],
            'filename': 'chart_filename.png'
            }
 try:
-    result - matplotlibPlugin.executeAction('refreshTheChartsAPI', deviceId=0, waitUntilDone=True, props=payload)
+    result = matplotlibPlugin.executeAction('refreshTheChartsAPI', deviceId=0, waitUntilDone=True, props=payload)
     if result is not None:
         indigo.server.log(result['message'])
 except Exception as err:
