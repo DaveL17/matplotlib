@@ -85,22 +85,22 @@ __version__   = "0.5.03"
 # =============================================================================
 
 kDefaultPluginPrefs = {
-    u'annotationColorOther': "#FFFFFF",
-    u'backgroundColor': "#000000",
-    u'backgroundColorOther': "#000000",
+    u'annotationColorOther': "FF FF FF",
+    u'backgroundColor': "00 00 00",
+    u'backgroundColorOther': "00 00 00",
     u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
     u'chartResolution': 100,
     u'dataPath': "{0}/com.fogbert.indigoplugin.matplotlib/".format(indigo.server.getLogsFolderPath()),
     u'enableCustomLineSegments': False,
-    u'faceColor': "#000000",
-    u'faceColorOther': "#000000",
-    u'fontColor': "#FFFFFF",
-    u'fontColorAnnotation': "#FFFFFF",
-    u'fontColorOther': "#FFFFFF",
+    u'faceColor': "00 00 00",
+    u'faceColorOther': "00 00 00",
+    u'fontColor': "FF FF FF",
+    u'fontColorAnnotation': "FF FF FF",
+    u'fontColorOther': "FF FF FF",
     u'fontMain': "Arial",
     u'forceOriginLines': False,
-    u'gridColor': "#888888",
-    u'gridColorOther': "#888888",
+    u'gridColor': "88 88 88",
+    u'gridColorOther': "88 88 88",
     u'gridStyle': ":",
     u'legendFontSize': 6,
     u'lineWeight': "1.0",
@@ -114,11 +114,11 @@ kDefaultPluginPrefs = {
     u'refreshInterval': 900,
     u'showDebugLevel': 30,
     u'snappyConfigMenus': False,
-    u'spineColor': "#888888",
-    u'spineColorOther': "#888888",
+    u'spineColor': "88 88 88",
+    u'spineColorOther': "88 88 88",
     u'sqChartSize': 250,
-    u'tickColor': "#888888",
-    u'tickColorOther': "#888888",
+    u'tickColor': "88 88 88",
+    u'tickColorOther': "88 88 88",
     u'tickFontSize': 8,
     u'tickSize': 4
 }
@@ -1127,10 +1127,10 @@ class Plugin(indigo.PluginBase):
         # Background color?
         if not self.pluginPrefs.get('backgroundColorOther', 'false'):
             p_dict['transparent_charts'] = False
-            p_dict['backgroundColor'] = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
         elif self.pluginPrefs.get('backgroundColorOther', 'false') == 'false':
             p_dict['transparent_charts'] = False
-            p_dict['backgroundColor'] = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
         else:
             p_dict['transparent_charts'] = True
             p_dict['backgroundColor'] = '#000000'
@@ -1138,10 +1138,10 @@ class Plugin(indigo.PluginBase):
         # Plot Area color?
         if not self.pluginPrefs.get('faceColorOther', 'false'):
             p_dict['transparent_filled'] = True
-            p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+            p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
         elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
             p_dict['transparent_filled'] = True
-            p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+            p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
         else:
             p_dict['transparent_filled'] = False
             p_dict['faceColor'] = '#000000'
@@ -1570,11 +1570,11 @@ class Plugin(indigo.PluginBase):
 
             num_obs = p_dict['numObs']
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['bar1Color'] = r"#{0}".format(p_dict['bar1Color'].replace(' ', '').replace('#', ''))
-            p_dict['bar2Color'] = r"#{0}".format(p_dict['bar2Color'].replace(' ', '').replace('#', ''))
-            p_dict['bar3Color'] = r"#{0}".format(p_dict['bar3Color'].replace(' ', '').replace('#', ''))
-            p_dict['bar4Color'] = r"#{0}".format(p_dict['bar4Color'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['bar1Color']       = r"#{0}".format(p_dict['bar1Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar2Color']       = r"#{0}".format(p_dict['bar2Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar3Color']       = r"#{0}".format(p_dict['bar3Color'].replace(' ', '').replace('#', ''))
+            p_dict['bar4Color']       = r"#{0}".format(p_dict['bar4Color'].replace(' ', '').replace('#', ''))
 
             ax = self.chartMakeFigure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -1775,12 +1775,12 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
-            p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
-            p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
-            p_dict['line4Color'] = r"#{0}".format(p_dict['line4Color'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            p_dict['line4Color']       = r"#{0}".format(p_dict['line4Color'].replace(' ', '').replace('#', ''))
             p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
             p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
             p_dict['line3MarkerColor'] = r"#{0}".format(p_dict['line3MarkerColor'].replace(' ', '').replace('#', ''))
@@ -1955,8 +1955,8 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['textColor'] = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['textColor']       = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
 
             # If the value to be plotted is empty, use the default text from the device configuration.
             if len(text_to_plot) <= 1:
@@ -2017,10 +2017,10 @@ class Plugin(indigo.PluginBase):
 
             self.final_data    = []
             num_obs = p_dict['numObs']
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['currentWindColor'] = r"#{0}".format(p_dict['currentWindColor'].replace(' ', '').replace('#', ''))
-            p_dict['maxWindColor'] = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
+            p_dict['maxWindColor']     = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
 
             # Grab the column headings for the labels, then delete the row from self.final_data.
             theta_path = '{0}{1}'.format(self.pluginPrefs['dataPath'], p_dict['thetaValue'])  # The name of the theta file.
@@ -2174,12 +2174,12 @@ class Plugin(indigo.PluginBase):
                 log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['group1Color'] = r"#{0}".format(p_dict['group1Color'].replace(' ', '').replace('#', ''))
-            p_dict['group2Color'] = r"#{0}".format(p_dict['group2Color'].replace(' ', '').replace('#', ''))
-            p_dict['group3Color'] = r"#{0}".format(p_dict['group3Color'].replace(' ', '').replace('#', ''))
-            p_dict['group4Color'] = r"#{0}".format(p_dict['group4Color'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']   = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']         = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['group1Color']       = r"#{0}".format(p_dict['group1Color'].replace(' ', '').replace('#', ''))
+            p_dict['group2Color']       = r"#{0}".format(p_dict['group2Color'].replace(' ', '').replace('#', ''))
+            p_dict['group3Color']       = r"#{0}".format(p_dict['group3Color'].replace(' ', '').replace('#', ''))
+            p_dict['group4Color']       = r"#{0}".format(p_dict['group4Color'].replace(' ', '').replace('#', ''))
             p_dict['group1MarkerColor'] = r"#{0}".format(p_dict['group1MarkerColor'].replace(' ', '').replace('#', ''))
             p_dict['group2MarkerColor'] = r"#{0}".format(p_dict['group2MarkerColor'].replace(' ', '').replace('#', ''))
             p_dict['group3MarkerColor'] = r"#{0}".format(p_dict['group3MarkerColor'].replace(' ', '').replace('#', ''))
@@ -2343,11 +2343,11 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
-            p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
-            p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
             p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
             p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
 
