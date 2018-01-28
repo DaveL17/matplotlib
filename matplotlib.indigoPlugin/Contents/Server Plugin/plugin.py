@@ -487,7 +487,6 @@ class Plugin(indigo.PluginBase):
                                 props[prop] = 'FF FF FF'
             dev.replacePluginPropsOnServer(props)
 
-
         self.updater.checkVersionPoll()
         self.logger.debug(u"{0}{1}".format("Log Level = ", self.debugLevel))
 
