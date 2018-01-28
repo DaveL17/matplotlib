@@ -37,9 +37,6 @@ proper WUnderground devices.
 # TODO: Better trap for CSV data that doesn't have a properly formatted date column.
 # TODO: What happens when the style sheet is set to read only and a new version of the plugin is installed?
 
-# TODO: Scatter charts: don't need GroupXColor? Seems to use only GroupXMarkerColor. Consider deleting GroupXColor?
-# TODO: Scatter charts: Y axis tick locations instructions are not right.
-
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -230,7 +227,6 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"typeId = {0}  devId = {0}".format(typeId, devId))
 
         dev = indigo.devices[int(devId)]
-        indigo.server.log(str(dev.configured))
 
         try:
 
@@ -1119,14 +1115,15 @@ class Plugin(indigo.PluginBase):
         plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
         plt.rcParams['ytick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
 
-        plt.rcParams['grid.color'] = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+        plt.rcParams['grid.color']  = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
         plt.rcParams['xtick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
         plt.rcParams['ytick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
 
-        p_dict['fontColor'] = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+        p_dict['faceColor']           = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+        p_dict['fontColor']           = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
         p_dict['fontColorAnnotation'] = r"#{0}".format(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF').replace(' ', '').replace('#', ''))
-        p_dict['gridColor'] = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
-        p_dict['spineColor'] = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
+        p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+        p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
 
         # Background color?
         if not self.pluginPrefs.get('backgroundColorOther', 'false'):
@@ -1148,7 +1145,7 @@ class Plugin(indigo.PluginBase):
             p_dict['faceColor'] = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
         else:
             p_dict['transparent_filled'] = False
-            p_dict['faceColor'] = '00 00 00'
+            p_dict['faceColor'] = '#000000'
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
@@ -1573,6 +1570,8 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
             num_obs = p_dict['numObs']
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['bar1Color'] = r"#{0}".format(p_dict['bar1Color'].replace(' ', '').replace('#', ''))
             p_dict['bar2Color'] = r"#{0}".format(p_dict['bar2Color'].replace(' ', '').replace('#', ''))
             p_dict['bar3Color'] = r"#{0}".format(p_dict['bar3Color'].replace(' ', '').replace('#', ''))
@@ -1777,6 +1776,8 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
             p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
             p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
@@ -1954,6 +1955,8 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['textColor'] = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
 
             # If the value to be plotted is empty, use the default text from the device configuration.
@@ -2015,6 +2018,8 @@ class Plugin(indigo.PluginBase):
 
             self.final_data    = []
             num_obs = p_dict['numObs']
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['currentWindColor'] = r"#{0}".format(p_dict['currentWindColor'].replace(' ', '').replace('#', ''))
             p_dict['maxWindColor'] = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
 
@@ -2170,6 +2175,8 @@ class Plugin(indigo.PluginBase):
                 log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['group1Color'] = r"#{0}".format(p_dict['group1Color'].replace(' ', '').replace('#', ''))
             p_dict['group2Color'] = r"#{0}".format(p_dict['group2Color'].replace(' ', '').replace('#', ''))
             p_dict['group3Color'] = r"#{0}".format(p_dict['group3Color'].replace(' ', '').replace('#', ''))
@@ -2337,6 +2344,8 @@ class Plugin(indigo.PluginBase):
                 log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
                 log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
 
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['line1Color'] = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
             p_dict['line2Color'] = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
             p_dict['line3Color'] = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
@@ -2415,43 +2424,38 @@ class Plugin(indigo.PluginBase):
                     for xy in zip(dates_to_plot, p_dict['y_obs3']):
                         ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            try:
+            # try:
                 # Y2 Min/Max
-                if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
-                    y2_axis_min = float(p_dict['y2AxisMin'])
-                    y2_axis_max = float(p_dict['y2AxisMax'])
+            if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
+                y2_axis_min = float(p_dict['y2AxisMin'])
+                y2_axis_max = float(p_dict['y2AxisMax'])
 
-                elif p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] == 'None':
-                    y2_axis_min = float(p_dict['y2AxisMin'])
-                    y2_axis_max = max(p_dict['y_obs3'])
+            elif p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] == 'None':
+                y2_axis_min = float(p_dict['y2AxisMin'])
+                y2_axis_max = max(p_dict['y_obs3'])
 
-                elif p_dict['y2AxisMin'] == 'None' and p_dict['y2AxisMax'] != 'None':
-                    # y2_axis_min = min(p_dict['y_obs3'])
+            elif p_dict['y2AxisMin'] == 'None' and p_dict['y2AxisMax'] != 'None':
+                # y2_axis_min = min(p_dict['y_obs3'])
+                y2_axis_min = 0
+                y2_axis_max = float(p_dict['y2AxisMax'])
+
+            else:
+                if max(p_dict['y_obs3']) - min(p_dict['y_obs3']) == 0:
                     y2_axis_min = 0
-                    y2_axis_max = float(p_dict['y2AxisMax'])
-
+                    y2_axis_max = 1
+                elif max(p_dict['y_obs3']) != 0 and min(p_dict['y_obs3']) != 0 and 0 < max(p_dict['y_obs3']) - min(p_dict['y_obs3']) <= 1:
+                    y2_axis_min = min(p_dict['y_obs3']) * (1 - (1 / min(p_dict['y_obs3']) ** 1.25))
+                    y2_axis_max = max(p_dict['y_obs3']) * (1 + (1 / max(p_dict['y_obs3']) ** 1.25))
                 else:
-                    if max(p_dict['y_obs3']) - min(p_dict['y_obs3']) == 0:
-                        y2_axis_min = 0
-                        y2_axis_max = 1
-                    elif max(p_dict['y_obs3']) != 0 and min(p_dict['y_obs3']) != 0 and 0 < max(p_dict['y_obs3']) - min(p_dict['y_obs3']) <= 1:
-                        y2_axis_min = min(p_dict['y_obs3']) * (1 - (1 / min(p_dict['y_obs3']) ** 1.25))
-                        y2_axis_max = max(p_dict['y_obs3']) * (1 + (1 / max(p_dict['y_obs3']) ** 1.25))
+                    if min(p_dict['y_obs3']) < 0:
+                        y2_axis_min = min(p_dict['y_obs3']) * 1.5
                     else:
-                        if min(p_dict['y_obs3']) < 0:
-                            y2_axis_min = min(p_dict['y_obs3']) * 1.5
-                        else:
-                            y2_axis_min = min(p_dict['y_obs3']) * 0.75
-                        if max(p_dict['y_obs3']) < 0:
-                            y2_axis_max = 0
-                        else:
-                            y2_axis_max = max(p_dict['y_obs3']) * 1.10
-                plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
-
-            except ValueError as sub_error:
-                return_queue.put({'Error': True, 'Message': str(sub_error), 'Name': dev.name})
-            except Exception as sub_error:
-                return_queue.put({'Error': True, 'Message': str(sub_error), 'Name': dev.name})
+                        y2_axis_min = min(p_dict['y_obs3']) * 0.75
+                    if max(p_dict['y_obs3']) < 0:
+                        y2_axis_max = 0
+                    else:
+                        y2_axis_max = max(p_dict['y_obs3']) * 1.10
+            plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
             # X Axis Label
             if not p_dict['showLegend']:
@@ -2510,41 +2514,35 @@ class Plugin(indigo.PluginBase):
                                                                                      max(p_dict['data_array']) - min(p_dict['data_array'])))
 
             # Y1 Axis Min/Max
-            try:
-                if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
-                    y_axis_min = float(p_dict['yAxisMin'])
-                    y_axis_max = float(p_dict['yAxisMax'])
+            if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
+                y_axis_min = float(p_dict['yAxisMin'])
+                y_axis_max = float(p_dict['yAxisMax'])
 
-                elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
-                    y_axis_min = float(p_dict['yAxisMin'])
-                    y_axis_max = max(p_dict['data_array'])
+            elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
+                y_axis_min = float(p_dict['yAxisMin'])
+                y_axis_max = max(p_dict['data_array'])
 
-                elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
-                    y_axis_min = min(p_dict['data_array'])
-                    y_axis_max = float(p_dict['yAxisMax'])
+            elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
+                y_axis_min = min(p_dict['data_array'])
+                y_axis_max = float(p_dict['yAxisMax'])
 
+            else:
+                if max(p_dict['data_array']) - min(p_dict['data_array']) == 0:
+                    y_axis_min = 0
+                    y_axis_max = 1
+                elif max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
+                    y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
+                    y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
                 else:
-                    if max(p_dict['data_array']) - min(p_dict['data_array']) == 0:
-                        y_axis_min = 0
-                        y_axis_max = 1
-                    elif max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
-                        y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
-                        y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
+                    if min(p_dict['data_array']) < 0:
+                        y_axis_min = min(p_dict['data_array']) * 1.5
                     else:
-                        if min(p_dict['data_array']) < 0:
-                            y_axis_min = min(p_dict['data_array']) * 1.5
-                        else:
-                            y_axis_min = min(p_dict['data_array']) * 0.75
-                        if max(p_dict['data_array']) < 0:
-                            y_axis_max = 0
-                        else:
-                            y_axis_max = max(p_dict['data_array']) * 1.10
-                plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
-
-            except ValueError:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. Set values to a real number or None.".format(dev.name), 'Name': dev.name})
-            except Exception as sub_error:
-                return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Y Min or Y Max error. {1}".format(dev.name, sub_error), 'Name': dev.name})
+                        y_axis_min = min(p_dict['data_array']) * 0.75
+                    if max(p_dict['data_array']) < 0:
+                        y_axis_max = 0
+                    else:
+                        y_axis_max = max(p_dict['data_array']) * 1.10
+            plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
             # Chart title
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
