@@ -35,7 +35,6 @@ proper WUnderground devices.
 
 # TODO: Be more agnostic about date formatting.  Look at dateutil.parser
 # TODO: Better trap for CSV data that doesn't have a properly formatted date column.
-# TODO: What happens when the style sheet is set to read only and a new version of the plugin is installed?
 
 # ================================== IMPORTS ==================================
 
@@ -80,27 +79,24 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.5.03"
+__version__   = "0.5.04"
 
 # =============================================================================
 
 kDefaultPluginPrefs = {
-    u'annotationColorOther': "FF FF FF",
     u'backgroundColor': "00 00 00",
-    u'backgroundColorOther': "00 00 00",
+    u'backgroundColorOther': False,
     u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
     u'chartResolution': 100,
     u'dataPath': "{0}/com.fogbert.indigoplugin.matplotlib/".format(indigo.server.getLogsFolderPath()),
     u'enableCustomLineSegments': False,
     u'faceColor': "00 00 00",
-    u'faceColorOther': "00 00 00",
+    u'faceColorOther': False,
     u'fontColor': "FF FF FF",
     u'fontColorAnnotation': "FF FF FF",
-    u'fontColorOther': "FF FF FF",
     u'fontMain': "Arial",
     u'forceOriginLines': False,
     u'gridColor': "88 88 88",
-    u'gridColorOther': "88 88 88",
     u'gridStyle': ":",
     u'legendFontSize': 6,
     u'lineWeight': "1.0",
@@ -115,10 +111,8 @@ kDefaultPluginPrefs = {
     u'showDebugLevel': 30,
     u'snappyConfigMenus': False,
     u'spineColor': "88 88 88",
-    u'spineColorOther': "88 88 88",
     u'sqChartSize': 250,
     u'tickColor': "88 88 88",
-    u'tickColorOther': "88 88 88",
     u'tickFontSize': 8,
     u'tickSize': 4
 }
@@ -410,23 +404,19 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"Initial plugin_prefs: {0}".format(dict(plugin_prefs)))
 
         # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
-        defaults_dict = {'annotationColorOther': 'FF FF FF',
-                         'backgroundColor': '00 00 00',
+        defaults_dict = {'backgroundColor': '00 00 00',
                          'backgroundColorOther': '00 00 00',
                          'faceColor': '00 00 00',
                          'faceColorOther': '00 00 00',
                          'fontColor': 'FF FF FF',
                          'fontColorAnnotation': 'FF FF FF',
-                         'fontColorOther': 'FF FF FF',
                          'fontMain': 'Arial',
                          'gridColor': '88 88 88',
                          'gridStyle': ':',
                          'legendFontSize': '6',
                          'mainFontSize': '10',
                          'spineColor': '88 88 88',
-                         'spineColorOther': '88 88 88',
                          'tickColor': '88 88 88',
-                         'tickColorOther': '88 88 88',
                          'tickFontSize': '8'}
 
         # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the defaults_dict above.
@@ -1101,7 +1091,7 @@ class Plugin(indigo.PluginBase):
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
-            self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", p_dict))
 
         # rcParams overrides
         plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
@@ -1148,7 +1138,7 @@ class Plugin(indigo.PluginBase):
 
         if self.verboseLogging:
             self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
-            self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", p_dict))
 
         for dev in dev_list:
 
@@ -1457,7 +1447,7 @@ class Plugin(indigo.PluginBase):
 
             else:
                 if dev.model != "CSV Engine":
-                    self.logger.info(u"Disabled: {0}: {1} [{2}] - Skipping plot sequence.".format(dev.model, dev.name, dev.id))
+                    self.logger.info(u"Disabled: {0}: {1} [{2}]".format(dev.model, dev.name, dev.id))
 
     def refreshTheChartsMenuAction(self):
         """ Called by an Indigo Menu selection. """
@@ -1564,9 +1554,7 @@ class Plugin(indigo.PluginBase):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             num_obs = p_dict['numObs']
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
@@ -1736,9 +1724,7 @@ class Plugin(indigo.PluginBase):
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
         try:
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             import calendar
             today = dt.datetime.today()
@@ -1771,9 +1757,7 @@ class Plugin(indigo.PluginBase):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
@@ -1950,9 +1934,7 @@ class Plugin(indigo.PluginBase):
 
             import textwrap
 
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
@@ -2011,9 +1993,7 @@ class Plugin(indigo.PluginBase):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            if self.verboseLogging:
-                log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             self.final_data    = []
             num_obs = p_dict['numObs']
@@ -2170,9 +2150,7 @@ class Plugin(indigo.PluginBase):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            if self.verboseLogging:
-                log['Threaddebug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Threaddebug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             p_dict['backgroundColor']   = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']         = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
@@ -2339,9 +2317,7 @@ class Plugin(indigo.PluginBase):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
-                log['Debug'].append(u"{0:<19}{1}".format("k_dict: ", [(k, v) for (k, v) in sorted(k_dict.items())]))
+            self._logDicts(p_dict, k_dict)
 
             p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
@@ -2357,9 +2333,6 @@ class Plugin(indigo.PluginBase):
 
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
                     log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not be able to see it).".format(dev.name))
-
-            if self.verboseLogging:
-                log['Debug'].append(u"{0:<19}{1}".format("p_dict: ", [(k, v) for (k, v) in sorted(p_dict.items())]))
 
             # Prepare the data for charting.
             if dev_type == 'wundergroundHourly':
@@ -2623,6 +2596,12 @@ class Plugin(indigo.PluginBase):
         for configuration dialogs to call in order to force a refresh of any
         dynamic controls (dynamicReload=True)."""
         pass
+
+    def _logDicts(self, p_dict=None, k_dict=None):
+        """"""
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", p_dict))
+            self.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", k_dict))
 
     def deviceStateGenerator(self, filter="", valuesDict=None, typeId="", targetId=0):
         """The deviceStateGenerator() method returns a list of device states
