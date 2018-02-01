@@ -1,18 +1,27 @@
-Version: 0.4.16
+Version: 0.5.4
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
 A Matplotlib Plugin update is now available
 
-v0.4.16
-- Under-the-hood code refinements.
-- Adds note to documentation that the plugin requires Internet access to function.
+v0.5.04
+- Adds data adjustment factor to line devices.
+- Removes obsolete references to pre-colorpicker color settings.
+- Adds logic to convert legacy colors set as hex to raw. (FF FF FF instead of #FFFFFF)
+- Adds format setting for X axis label format to be None. (No X axis label will appear.)
+- Plugin is now more agnostic about the date format for CSV files. (Should now work with any date/time value that is acceptable to the dateutil parser.)
 
-v0.4.15
-- Moves Redraw Single Chart action to the device actions submenu and renames it to 'Redraw Chart'.
-- Moves Redraw All Charts action to the device actions submenu.
+v0.5.03
+- Adds internal converter to allow more binary values to be plotted. The following values plot as True (1): 'locked', 'on', 'open', 'up',
+  'true', '1'. The plugin will now also skip values of '-99' which are meaningless values set by the WUnderground plugin when rational data
+  aren't provided by the service.
+- Improves device config default settings for all charts.
+- Improves device config validation for: Bar, Line, Multiline Text, Polar, Scatter, and Weather charts.
+- Expands use of DLFramework.
 
-This is a cosmetic release and users can forego updating until the next release.
+v0.5.02
+- Corrects Indigo API reference in info.plist from 2.0.0 to 2.0
+
 
 As always, if something doesn't seem quite right, please let me know.
 
