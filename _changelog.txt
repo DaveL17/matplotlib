@@ -1,5 +1,12 @@
 v0.5.04
-- Removed obsolete references to pre-colorpicker color settings.
+- Adds data adjustment factor to line devices.
+- Removes obsolete references to pre-colorpicker color settings.
+- Adds logic to convert legacy colors set as hex to raw.
+  (FF FF FF instead of #FFFFFF)
+- Adds format setting for X axis label format to be None. (No X axis label
+  will appear.)
+- Plugin is now more agnostic about the date format for CSV files. (Should now
+  work with any date/time value that is acceptable to the dateutil parser.)
 
 v0.5.03
 - Adds internal converter to allow more binary values to be plotted. The

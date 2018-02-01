@@ -21,19 +21,12 @@ proper WUnderground devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
 
 # TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
-# TODO: consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
+# TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Look at fill with steps line style via the plugin API.
 # TODO: Independent Y2 axis.
 # TODO: Finer grained control over the legend.
 # TODO: Variable refresh rates for each device so it can update on its own (including CSV engine).
-
-# TODO: look at use of kv_list to ensure that all devices are updated properly
-# TODO: trap condition where there are too many observations to plot ( i.e., too many x axis values)
-
-# TODO: Linear transformations with multiplier and offset (e.g. <datum> * X + Y). Offset would be especially helpful for plotting multiple boolean values. Multiplier is nice for unit
-#       conversion or just getting two plotlines in the same neighborhood if actual value is less important than trend or correlation.
-
-# TODO: Be more agnostic about date formatting.  Look at dateutil.parser
+# TODO: Trap condition where there are too many observations to plot ( i.e., too many x axis values)
 # TODO: Better trap for CSV data that doesn't have a properly formatted date column.
 
 # ================================== IMPORTS ==================================
@@ -42,6 +35,7 @@ proper WUnderground devices.
 from ast import literal_eval
 from csv import reader
 import datetime as dt
+from dateutil.parser import parse as date_parse
 import logging
 import multiprocessing
 import numpy as np
@@ -57,6 +51,7 @@ import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
+import re
 
 # Third-party modules
 from DLFramework import indigoPluginUpdateChecker
@@ -134,7 +129,8 @@ class Plugin(indigo.PluginBase):
 
         # ====================== Initialize DLFramework =======================
 
-        self.Fogbert = Dave.Fogbert(self)
+        self.Fogbert = Dave.Fogbert(self)  # Plugin functional framework
+        self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
 
         # Log pluginEnvironment information when plugin is first started
         self.Fogbert.pluginEnvironment()
@@ -240,6 +236,17 @@ class Plugin(indigo.PluginBase):
                 valuesDict['previousKey']            = ""
                 self.logger.debug(u"Analyzing CSV Engine device settings.")
                 return valuesDict
+
+# #############################################################################
+            # For existing devices
+            if dev.configured:
+
+                # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+                for prop in valuesDict:
+                    if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(valuesDict[prop])):
+                        s = valuesDict[prop]
+                        valuesDict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
+# #############################################################################
 
             # For new devices, force certain defaults that don't carry from devices.xml. This seems to be especially important for
             # menu items built with callbacks and colorpicker controls that don't appear to accept defaultValue.
@@ -577,6 +584,18 @@ class Plugin(indigo.PluginBase):
 
         # Line Chart Device
         if typeId == 'lineChartingDevice':
+            if valuesDict['line1Source'] == 'None':
+                error_msg_dict['line1Source'] = u"You must select at least one data source."
+                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, valuesDict, error_msg_dict
+
+            for line in range(1, 5, 1):
+                for char in valuesDict['line{0}adjuster'.format(line)]:
+                    if char not in ' +-/*.0123456789':  # allowable numeric specifiers
+                        error_msg_dict['line{0}adjuster'.format(line)] = u"Valid operators are +, -, *, /"
+                        error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
+                        return False, valuesDict, error_msg_dict
+
             if valuesDict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
@@ -1082,16 +1101,16 @@ class Plugin(indigo.PluginBase):
         k_dict  = {}  # A dict of kwarg dicts
         p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
 
+        if self.verboseLogging:
+            self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
+            self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", p_dict))
+
         p_dict['font_style']  = 'normal'
         p_dict['font_weight'] = 'normal'
         p_dict['tick_bottom'] = 'on'
         p_dict['tick_left']   = 'on'
         p_dict['tick_right']  = 'off'
         p_dict['tick_top']    = 'off'
-
-        if self.verboseLogging:
-            self.logger.threaddebug(u"{0:<19}{1}".format("Starting rcParams: ", dict(plt.rcParams)))
-            self.logger.threaddebug(u"{0:<19}{1}".format("Starting p_dict: ", p_dict))
 
         # rcParams overrides
         plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
@@ -1512,10 +1531,15 @@ class Plugin(indigo.PluginBase):
 
     def chartFormatAxisX(self, ax, k_dict, p_dict):
         """"""
+
         ax.tick_params(axis='x', **k_dict['k_major_x'])
         ax.tick_params(axis='x', **k_dict['k_minor_x'])
         ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
         self.setAxisScaleX(p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
+
+        # If the x axis format has been set to None, let's hide the labels.
+        if p_dict['xAxisLabelFormat'] == "None":
+            ax.axes.xaxis.set_ticklabels([])
 
         return ax
 
@@ -1538,6 +1562,15 @@ class Plugin(indigo.PluginBase):
             pass
 
         return ax
+
+    def chartFormatDates(self, list_of_dates):
+        """Convert string representations of date values to values to mdate
+        values for charting"""
+        self.logger.threaddebug(unicode(list_of_dates))
+
+        dates_to_plot = [date_parse(obs) for obs in list_of_dates]
+        dates_to_plot = mdate.date2num(dates_to_plot)
+        return dates_to_plot
 
     def chartFormatGrid(self, p_dict, k_dict):
         """"""
@@ -1588,8 +1621,7 @@ class Plugin(indigo.PluginBase):
                         p_dict['y_obs{0}'.format(bar)].append(float(element[1]))
 
                     # Convert the date strings for charting.
-                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M:%S.%f') for obs in p_dict['x_obs{0}'.format(bar)]]
-                    dates_to_plot = mdate.date2num(list_of_dates)
+                    dates_to_plot = self.chartFormatDates(p_dict['x_obs{0}'.format(bar)])
 
                     # Plot the bar.
                     # Note: hatching is not supported in the PNG backend.
@@ -1793,9 +1825,21 @@ class Plugin(indigo.PluginBase):
                         p_dict['x_obs{0}'.format(line)].append(element[0])
                         p_dict['y_obs{0}'.format(line)].append(float(element[1]))
 
+# #############################################################################
+                    # Apply the adjustment factor if warranted.
+                    try:
+                        if dev.pluginProps['line{0}adjuster'.format(line)] != "":
+                            temp_list = []
+                            for obs in p_dict['y_obs{0}'.format(line)]:
+                                expr = u'{0}{1}'.format(obs, dev.pluginProps['line{0}adjuster'.format(line)])
+                                temp_list.append(self.evalExpr.eval_expr(expr))
+                            p_dict['y_obs{0}'.format(line)] = temp_list
+                    except KeyError:
+                        pass
+# #############################################################################
+
                     # Convert the date strings for charting.
-                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M:%S.%f') for obs in p_dict['x_obs{0}'.format(line)]]
-                    dates_to_plot = mdate.date2num(list_of_dates)
+                    dates_to_plot = self.chartFormatDates(p_dict['x_obs{0}'.format(line)])
 
                     ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)], markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
@@ -2187,8 +2231,7 @@ class Plugin(indigo.PluginBase):
                         p_dict['y_obs{0}'.format(line)].append(float(element[1]))
 
                     # Convert the date strings for charting.
-                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M:%S.%f') for obs in p_dict['x_obs{0}'.format(line)]]
-                    dates_to_plot = mdate.date2num(list_of_dates)
+                    dates_to_plot = self.chartFormatDates(p_dict['x_obs{0}'.format(line)])
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
                     ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(line)], c=p_dict['group{0}Color'.format(line)], marker=p_dict['group{0}Marker'.format(line)],
@@ -2345,8 +2388,8 @@ class Plugin(indigo.PluginBase):
                     p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
 
                     # Convert the date strings for charting.
-                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M') for obs in p_dict['x_obs1']]
-                    dates_to_plot = mdate.date2num(list_of_dates)
+                    # list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d %H:%M') for obs in p_dict['x_obs1']]
+                    dates_to_plot = self.chartFormatDates(p_dict['x_obs1'])
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -2366,8 +2409,7 @@ class Plugin(indigo.PluginBase):
                     p_dict['y_obs3'].append(state_list['d{0}_pop'.format(counter)])
 
                     # Convert the date strings for charting.
-                    list_of_dates = [dt.datetime.strptime(obs, '%Y-%m-%d') for obs in p_dict['x_obs1']]
-                    dates_to_plot = mdate.date2num(list_of_dates)
+                    dates_to_plot = self.chartFormatDates(p_dict['x_obs1'])
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -2554,7 +2596,6 @@ class Plugin(indigo.PluginBase):
         easily seen by looking at the rough text that is provided by the U.S.
         National Weather Service, for example."""
         if self.verboseLogging:
-            self.logger.debug(u"{0:*^40}".format(" Clean Up String "))
             self.logger.debug(u"Length of initial string: {0}".format(len(val)))
 
         # List of (elements, replacements)
@@ -2564,7 +2605,12 @@ class Plugin(indigo.PluginBase):
         for (old, new) in clean_list:
             val = val.replace(old, new)
 
-        return ' '.join(val.split())  # Eliminate spans of whitespace.
+        val = ' '.join(val.split())  # Eliminate spans of whitespace.
+
+        if self.verboseLogging:
+            self.logger.debug(u"Length of final string: {0}".format(len(val)))
+
+        return val
 
     def convertTheData(self, final_data):
         """Matplotlib can't plot values like 'Open' and 'Closed', so we convert
@@ -2645,6 +2691,7 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
 
         axis_list_menu = [
+            ("None", "None"),
             ("%I:%M", "01:00"),
             ("%l:%M %p", "1:00 pm"),
             ("%H:%M", "13:00"),
@@ -2869,6 +2916,7 @@ class Plugin(indigo.PluginBase):
             [final_data.append(item) for item in csv_data]
             data_file.close()
             final_data = self.convertTheData(final_data)
+            indigo.server.log(str(final_data))
             self.logger.debug(u"Data retrieved successfully: {0}".format(data_source.decode("utf-8")))
 
         except Exception as sub_error:

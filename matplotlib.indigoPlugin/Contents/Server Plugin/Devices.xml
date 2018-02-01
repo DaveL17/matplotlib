@@ -473,7 +473,7 @@
 
             <Field id="additionalBarSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
                    alignText="right">
-                <Label>Custom Bar Segments</Label>
+                <Label>Custom Line Segments</Label>
             </Field>
 
             <Field id="additionalBarSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
@@ -485,7 +485,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's fourth line.">
+                   tooltip="Select preference for the style of your chart's custom line segments.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
@@ -739,6 +739,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
+            <Field id="line1adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
             <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
@@ -761,7 +765,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
-                <Label>Style:</Label>
+                <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
@@ -797,6 +801,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
+            <Field id="line2adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
             <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
@@ -819,7 +827,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
-                <Label>Style:</Label>
+                <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
@@ -855,6 +863,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
+            <Field id="line3adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
             <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
@@ -877,7 +889,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line3Style" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's third line.">
-                <Label>Style:</Label>
+                <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
@@ -913,6 +925,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
             </Field>
 
+            <Field id="line4adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
             <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate</Label>
                 <Description>Yes/No</Description>
@@ -935,7 +951,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line4Style" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Style:</Label>
+                <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
@@ -975,7 +991,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's fourth line.">
+                   tooltip="Select preference for the style of your chart's custom line segments.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
@@ -1611,7 +1627,7 @@ There are presently no configurations available for this device.
             </Field>
 
             <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's fourth group.">
+                   tooltip="Select preference for the style of your chart's custom line segments.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
@@ -1838,6 +1854,12 @@ There are presently no configurations available for this device.
                 <Label>Color:</Label>
             </Field>
 
+            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
             <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
@@ -1847,12 +1869,6 @@ There are presently no configurations available for this device.
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
-            </Field>
-
-            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's first line.">
-                <Label>Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
@@ -1876,6 +1892,12 @@ There are presently no configurations available for this device.
                 <Label>Color:</Label>
             </Field>
 
+            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
             <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
@@ -1885,12 +1907,6 @@ There are presently no configurations available for this device.
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
-            </Field>
-
-            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's second line.">
-                <Label>Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
@@ -1924,8 +1940,8 @@ There are presently no configurations available for this device.
             </Field>
 
             <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's fourth line.">
-                <Label>Style:</Label>
+                   tooltip="Select preference for the style of your chart's custom line segments.">
+                <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
 
