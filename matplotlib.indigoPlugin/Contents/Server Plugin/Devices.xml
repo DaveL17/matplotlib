@@ -729,6 +729,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="linesSeparator" type="separator"/>
+
 <!-- Line 1 -->
             <Field id="lineLabel1" type="checkbox" defaultValue="false">
                 <Label>Line 1</Label>

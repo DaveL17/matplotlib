@@ -1,3 +1,8 @@
+v0.5.05
+- Adds line chart device validation to disallow fill with steps line style.
+- Updates plugin update checker to use curl to overcome outdated security of
+  Apple's Python install.
+
 v0.5.04
 - Adds data adjustment factor to line devices.
 - Removes obsolete references to pre-colorpicker color settings.

@@ -20,11 +20,8 @@ proper WUnderground devices.
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices (like energy or battery health.)
 
-# TODO: Consider hiding Y1 tick labels if Y2 is a mirror of Y1.
 # TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
-# TODO: Look at fill with steps line style via the plugin API.
 # TODO: Independent Y2 axis.
-# TODO: Finer grained control over the legend.
 # TODO: Variable refresh rates for each device so it can update on its own (including CSV engine).
 # TODO: Trap condition where there are too many observations to plot ( i.e., too many x axis values)
 # TODO: Better trap for CSV data that doesn't have a properly formatted date column.
@@ -74,7 +71,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.5.04"
+__version__   = "0.5.05"
 
 # =============================================================================
 
@@ -117,7 +114,7 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        updater_url = "https://davel17.github.io/matplotlib/matplotlib_version.html"
+        updater_url = "https://raw.githubusercontent.com/DaveL17/matplotlib/master/matplotlib_version.html"
         self.updater = indigoPluginUpdateChecker.updateChecker(self, updater_url)
 
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
@@ -596,10 +593,11 @@ class Plugin(indigo.PluginBase):
                         error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
                         return False, valuesDict, error_msg_dict
 
-            if valuesDict['line1Source'] == 'None':
-                error_msg_dict['line1Source'] = u"You must select at least one data source."
-                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, valuesDict, error_msg_dict
+                if valuesDict['line{0}Style'.format(line)] == 'steps' and valuesDict['line{0}Fill'.format(line)]:
+                    error_msg_dict['line{0}Fill'.format(line)] = u"Fill is not supported for the Steps line type."
+                    error_msg_dict['line{0}Style'.format(line)] = u"Fill is not supported for the Steps line type."
+                    error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
+                    return False, valuesDict, error_msg_dict
 
         # Polar Chart Device
         if typeId == 'polarChartingDevice':
