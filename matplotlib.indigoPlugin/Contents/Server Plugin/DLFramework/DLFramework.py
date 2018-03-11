@@ -129,7 +129,8 @@ class Fogbert(object):
 
             if id_number in indigo.devices.keys():
                 state_list = [(state, state) for state in indigo.devices[id_number].states if not state.endswith('.ui')]
-                state_list.remove(('onOffState', 'onOffState'))
+                if ('onOffState', 'onOffState') in state_list:
+                    state_list.remove(('onOffState', 'onOffState'))
                 return state_list
 
             elif id_number in indigo.variables.keys():

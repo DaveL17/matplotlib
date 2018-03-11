@@ -5,6 +5,9 @@
     <Device type="custom" id="csvEngine">
         <Name>CSV Engine</Name>
         <ConfigUI>
+
+            <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
+
             <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
                 <Label>The CSV Engine Device is used to construct data files for charting.  The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
             </Field>
@@ -39,7 +42,7 @@
             <Field id="addSource" type="menu">
                 <Label>ID:</Label>
                 <List class="self" filter="" method="csvSource" dynamicReload="true"/>
-                <CallbackMethod>csvSourceIdUpdated</CallbackMethod>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="addState" type="menu">
@@ -47,10 +50,10 @@
                 <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
             </Field>
 
-            <Field id="addColumn" type="button">
+            <Field id="csvItemAdd" type="button">
                 <Label/>
                 <Title>Add Item</Title>
-                <CallbackMethod>addColumn</CallbackMethod>
+                <CallbackMethod>csvItemAdd</CallbackMethod>
             </Field>
 
             <Field id="numObsLabel" type="label" alignText="right">
@@ -63,10 +66,10 @@
                 <Label>Use this section to update or delete existing items.</Label>
             </Field>
 
-            <Field id="columnList" type="menu">
+            <Field id="csvItemList" type="menu">
                 <Label>Item List</Label>
-                <List class="self" filter="" method="columnList" dynamicReload="true"/>
-                <CallbackMethod>selectColumn</CallbackMethod>
+                <List class="self" filter="" method="csvItemList" dynamicReload="true"/>
+                <CallbackMethod>csvItemSelect</CallbackMethod>
             </Field>
 
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
@@ -96,7 +99,7 @@
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
                 <Label>ID:</Label>
                 <List class="self" filter="" method="csvSource" dynamicReload="true"/>
-                <CallbackMethod>csvSourceIdUpdated</CallbackMethod>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
@@ -104,20 +107,20 @@
                 <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
             </Field>
 
-            <Field id="updateColumn" type="button" enabledBindingId="isColumnSelected">
+            <Field id="csvItemUpdate" type="button" enabledBindingId="isColumnSelected">
                 <Label/>
                 <Title>Update Item</Title>
-                <CallbackMethod>updateColumn</CallbackMethod>
+                <CallbackMethod>csvItemUpdate</CallbackMethod>
             </Field>
 
             <Field id="label2.5" type="label" fontColor="darkgray" alignWithControl="true" fontSize="small">
                 <Label>or</Label>
             </Field>
 
-            <Field id="deleteColumn" type="button" enabledBindingId="isColumnSelected">
+            <Field id="csvItemDelete" type="button" enabledBindingId="isColumnSelected">
                 <Label/>
                 <Title>Delete Item</Title>
-                <CallbackMethod>deleteColumn</CallbackMethod>
+                <CallbackMethod>csvItemDelete</CallbackMethod>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>
@@ -148,6 +151,9 @@
     <Device type="custom" id="barChartingDevice">
         <Name>Bar Chart</Name>
         <ConfigUI>
+
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="barChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
             </Field>
@@ -318,7 +324,7 @@
 
             <Field id="bar1Source" type="menu" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -355,7 +361,7 @@
 
             <Field id="bar2Source" type="menu" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -392,7 +398,7 @@
 
             <Field id="bar3Source" type="menu" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
@@ -430,7 +436,7 @@
 
             <Field id="bar4Source" type="menu" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -519,6 +525,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Calendar</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="CalendarDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Calendar devices are used to create graphic representations of the current month.</Label>
             </Field>
@@ -569,11 +577,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
     </Device>
 
-<!-- Line Charting Device -->
+    <!-- Line Charting Device -->
     <Device type="custom" id="lineChartingDevice">
         <Name>Line Chart</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="lineChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
@@ -737,7 +747,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line1Source" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Select data source for line 1.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="line1adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
@@ -799,7 +809,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line2Source" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Select data source for line 2.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="line2adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
@@ -861,7 +871,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line3Source" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select data source for line 3.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="line3adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
@@ -923,7 +933,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line4Source" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select data source for line 4.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="line4adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
@@ -1024,6 +1034,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
     <Device type="custom" id="rcParamsDevice">
         <Name>Matplotlib Parameters</Name>
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="rcParamsLabel" type="label">
                 <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.
 
@@ -1053,6 +1065,8 @@ There are presently no configurations available for this device.
         <Name>Multiline Text</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="multilineTextDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.</Label>
             </Field>
@@ -1073,13 +1087,13 @@ There are presently no configurations available for this device.
 
             <Field id="thing" type="menu">
                 <Label>Source:</Label>
-                <List class="self" filter="" method="listGenerator" dynamicReload="true"/>
+                <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="thingState" type="menu">
                 <Label>Text to chart:</Label>
-                <List class="self" filter="" method="deviceStateGenerator" dynamicReload="true"/>
+                <List class="self" filter="" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="sourceSpace2" type="label"/>
@@ -1159,6 +1173,8 @@ There are presently no configurations available for this device.
         <Name>Polar Chart</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="polarChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).</Label>
             </Field>
@@ -1183,7 +1199,7 @@ There are presently no configurations available for this device.
 
             <Field id="thetaValue" type="menu" tooltip="Select data source for the direction value (theta).">
                 <Label>Direction Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="radiiValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
@@ -1192,7 +1208,7 @@ There are presently no configurations available for this device.
 
             <Field id="radiiValue" type="menu" tooltip="Select data source for the magnitude value (radii).">
                 <Label>Magnitude Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="sourceSpace2" type="label"/>
@@ -1289,6 +1305,8 @@ There are presently no configurations available for this device.
         <Name>Scatter Chart</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="scatterChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
@@ -1453,7 +1471,7 @@ There are presently no configurations available for this device.
 
             <Field id="group1Source" type="menu" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="group1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel1" visibleBindingValue="true"
@@ -1495,7 +1513,7 @@ There are presently no configurations available for this device.
 
             <Field id="group2Source" type="menu" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="group2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel2" visibleBindingValue="true"
@@ -1537,7 +1555,7 @@ There are presently no configurations available for this device.
 
             <Field id="group3Source" type="menu" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="group3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel3" visibleBindingValue="true"
@@ -1579,7 +1597,7 @@ There are presently no configurations available for this device.
 
             <Field id="group4Source" type="menu" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
                 <Label>Data Source:</Label>
-                <List class="self" filter="" method="getListOfFiles" dynamicReload="true"/>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
             <Field id="group4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true"
@@ -1661,6 +1679,8 @@ There are presently no configurations available for this device.
         <Name>Weather Forecast Chart</Name>
 
         <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
             <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Weather Forecast Charts only work with WUnderground Plugin Forecast Devices. Any available WUnderground devices are automatically added to the Source Device list.</Label>
             </Field>

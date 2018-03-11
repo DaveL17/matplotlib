@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <MenuItems>
 
-    <MenuItem id="killAllComms">
+    <MenuItem id="commsKillAll">
         <Name>Disable All Devices</Name>
-        <CallbackMethod>killAllComms</CallbackMethod>
+        <CallbackMethod>commsKillAll</CallbackMethod>
     </MenuItem>
 
-    <MenuItem id="unkillAllComms">
+    <MenuItem id="commsUnkillAll">
         <Name>Enable All Devices</Name>
-        <CallbackMethod>unkillAllComms</CallbackMethod>
+        <CallbackMethod>commsUnkillAll</CallbackMethod>
     </MenuItem>
 
     <MenuItem id="titleSeparator" type="separator"/>

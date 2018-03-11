@@ -1,3 +1,13 @@
+v0.5.07
+- Improves handling of nonsense values (-99 values).
+- Suppresses non-chart device types from displaying in Update Chart Actions.
+- Adds separators and labels to dropdown menus for context and visual clarity.
+- Improves code commenting and adds Sphinx compatability to docstrings.
+- Code consolidation.
+
+v0.5.06
+- Refactors code for better method naming convention.
+
 v0.5.05
 - Adds line chart device validation to disallow fill with steps line style.
 - Updates plugin update checker to use curl to overcome outdated security of
@@ -81,7 +91,7 @@ v0.4.09
 v0.4.08
 - Adds a new Action Item to refresh individual charts. Useful when a single
   data point changes (i.e., device state or variable value).
-- Makes the cleanUpString() method optional for multiline text charts.
+- Makes the cleanString() method optional for multiline text charts.
 - Removes the need to manually refresh the list of values to chart when
   selecting a data source for multiline text charts (removes the 'Refresh'
   button).

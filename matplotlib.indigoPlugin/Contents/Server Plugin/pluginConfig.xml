@@ -21,36 +21,36 @@
     <!-- The DPI warning flag is used to alert the user that selecting a DPI value that's too low will produce subpar results. The checkbox is used to
          allow a warning to be displayed but then also allow the user to save the value if they still want to. -->
     <Field id="dpiWarningFlag" type="checkbox" hidden="True">
-        <Label>Hidden</Label>
+        <Label>DPI Warning Flag</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
     <Field id="enableCustomLineSegments" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Hidden</Label>
+        <Label>Custom Line Segments</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
     <!-- The promoteCustomLineSegments flag element is set in the advanced settings menu. -->
     <Field id="promoteCustomLineSegments" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Hidden</Label>
+        <Label>Promote Custom Segments</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
     <!-- The logEachChartCompleted flag element is set in the advanced settings menu. -->
     <Field id="logEachChartCompleted" type="checkbox" defaultValue="true" hidden="True">
-        <Label>Hidden</Label>
+        <Label>Log Each Chart</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
     <!-- The snappyConfigMenus flag element is set in the advanced settings menu. -->
     <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Hidden</Label>
+        <Label>Snappy Menus</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
     <!-- The forceOriginLines flag element is set in the advanced settings menu. -->
     <Field id="forceOriginLines" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Hidden</Label>
+        <Label>Force Origin Lines</Label>
         <Description>Enable/Disable</Description>
     </Field>
 
@@ -69,6 +69,7 @@
         <Label>Refresh Interval:</Label>
         <List>
             <Option value="0">None - Manual Refresh Only</Option>
+    		<Option value="-1">%%separator%%</Option>
             <Option value="60">Every Minute</Option>
             <Option value="300">Every 5 Minutes</Option>
             <Option value="600">Every 10 Minutes</Option>
