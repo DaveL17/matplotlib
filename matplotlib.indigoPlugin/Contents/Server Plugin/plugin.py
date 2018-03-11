@@ -28,12 +28,6 @@ proper WUnderground devices.
 # TODO: Change generatorDeviceAndVariableList method to DLFramework
 # TODO: Make the log dict a global and empty it at appropriate times?
 
-# TODO: Split custom controls into devices/device states/variables?
-# TODO: Split custom controls into it's own plugin?
-# TODO: Custom range on level graphic?
-# TODO: Custom color based on value?
-
-# TODO: Check the order of all valuesDict and pluginPrefs methods for arg order
 # TODO: Note that when an exception happens, updating hangs on that chart and no other charts after that will update.
 # TODO: Polar: rather than balk at the number of observations, if the n is less than the settings, just plot n.
 # ================================== IMPORTS ==================================

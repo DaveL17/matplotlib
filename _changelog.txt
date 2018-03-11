@@ -2,7 +2,7 @@ v0.5.07
 - Improves handling of nonsense values (-99 values).
 - Suppresses non-chart device types from displaying in Update Chart Actions.
 - Adds separators and labels to dropdown menus for context and visual clarity.
-- Improves code commenting and adds Sphinx compatability to docstrings.
+- Improves code commenting and adds Sphinx compatibility to docstrings.
 - Code consolidation.
 
 v0.5.06
