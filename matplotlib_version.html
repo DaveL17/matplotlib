@@ -1,18 +1,18 @@
-Version: 0.5.07
+Version: 0.6.01
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
-A Matplotlib Plugin update is now available
-
-v0.5.07
-- Improves handling of nonsense values (-99 values).
-- Suppresses non-chart device types from displaying in Update Chart Actions.
-- Adds separators and labels to dropdown menus for context and visual clarity.
-- Improves code commenting and adds Sphinx compatibility to docstrings.
-- Code consolidation.
-
-v0.5.06
-- Refactors code for better method naming convention.
+- New Battery Health Device: plots the battery level of all Indigo devices
+  that report a battery level value.
+- Adds new daylight indicator to 24 hour forecast device. The default is to
+  display daylight on the chart; the setting can be disabled from the device
+  configuration dialog.
+- Adds delay between updates of CSV data and processing of charts to ensure
+  data writing steps have completed.
+- Improves polar device handling of condition where the number of csv
+  observations is less than the number wanted by the device.
+- Improves error handling for situations where a fatal error might cause a
+  device to hang during refresh.
 
 As always, if something doesn't seem quite right, please let me know.
 

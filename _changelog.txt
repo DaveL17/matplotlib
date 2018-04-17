@@ -1,3 +1,17 @@
+
+v0.6.01
+- New Battery Health Device: plots the battery level of all Indigo devices
+  that report a battery level value.
+- Adds new daylight indicator to 24 hour forecast device. The default is to
+  display daylight on the chart; the setting can be disabled from the device
+  configuration dialog.
+- Adds delay between updates of CSV data and processing of charts to ensure
+  data writing steps have completed.
+- Improves polar device handling of condition where the number of csv
+  observations is less than the number wanted by the device.
+- Improves error handling for situations where a fatal error might cause a
+  device to hang during refresh.
+
 v0.5.07
 - Improves handling of nonsense values (-99 values).
 - Suppresses non-chart device types from displaying in Update Chart Actions.

@@ -218,7 +218,7 @@
                 <Label>Number of Bars:</Label>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 
@@ -236,7 +236,7 @@
                 <Label>X Axis</Label>
             </Field>
 
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" tooltip="Check to display X axis grid.">
                 <Label>Grid</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -520,7 +520,116 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
     </Device>
 
-<!-- Calendar Device -->
+<!-- Battery Health Device -->
+    <Device type="custom" id="batteryHealthDevice">
+        <Name>Battery Health</Name>
+
+        <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="datteryDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <Field id="fileName" type="textfield" defaultValue="chart_battery.png" tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
+                <Label>Title:</Label>
+            </Field>
+
+            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None.">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <Field id="customSizeWidth" type="textfield" defaultValue="None" tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None.">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <!-- We need this value to exist in order to display the X axis label. We don't need a legend for the battery health device. -->
+            <Field id="showLegend" type="checkbox" defaultValue="false" hidden="true">
+                <Label>Grid</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" tooltip="Check to display X axis grid.">
+                <Label>Grid:</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="displayLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Display Controls:</Label>
+            </Field>
+
+            <Field id="displaySeparator" type="separator"/>
+
+            <Field id="healthyColor" type="colorpicker" defaultValue="00 00 CC"
+                   tooltip="Select preference for the color for devices with batteries that are at the healthy level.">
+                <Label>Healthy Color:</Label>
+            </Field>
+
+            <Field id="cautionLevel" type="textfield" defaultValue="10" tooltip="This value determines when bars will be set to caution level (integer).">
+                <Label>Caution Level:</Label>
+            </Field>
+
+            <Field id="cautionColor" type="colorpicker" defaultValue="FF FF 00"
+                   tooltip="Select preference for the color for devices with batteries that are at caution level.">
+                <Label>Caution Color:</Label>
+            </Field>
+
+            <Field id="warningLevel" type="textfield" defaultValue="5" tooltip="This value determines when bars will be set to warning level (integer).">
+                <Label>Warning Level:</Label>
+            </Field>
+
+            <Field id="warningColor" type="colorpicker" defaultValue="FF 00 00"
+                   tooltip="Select preference for the color for devices with batteries that are at the warning level.">
+                <Label>Warning Color:</Label>
+            </Field>
+
+            <Field id="showBatteryLevel" type="checkbox" defaultValue="true" tooltip="Check to display the current battery level for each device within the chart.">
+                <Label>Show Battery Level:</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
     <Device type="custom" id="calendarChartingDevice">
         <Name>Calendar</Name>
 
@@ -644,7 +753,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 
@@ -1140,7 +1249,7 @@ There are presently no configurations available for this device.
                 <Label>Placeholder:</Label>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="This is Where the Title Goes" tooltip="Enter the title of your chart. If you do not want a title to appear, leave the box blank.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 
@@ -1273,7 +1382,7 @@ There are presently no configurations available for this device.
                 <Label>Observations:</Label>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 
@@ -1368,7 +1477,7 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 <!--X Axis-->
@@ -1729,6 +1838,16 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="showDaytime" type="checkbox" defaultValue="true" tooltip="Check to highlight daytime hours.">
+                <Label>Plot Daylight?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="daytimeColor" type="colorpicker" defaultValue="33 33 33"
+                   tooltip="Select the color to be used to plot daylight hours.">
+                <Label>daytime Color:</Label>
+            </Field>
+
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
                 <Label>Legend?</Label>
                 <Description>Yes/No</Description>
@@ -1746,7 +1865,7 @@ There are presently no configurations available for this device.
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart.">
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Title:</Label>
             </Field>
 
