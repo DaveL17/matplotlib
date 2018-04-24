@@ -557,7 +557,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-                <Label>Axis Controls:</Label>
+                <Label>Axis Controls</Label>
             </Field>
 
             <Field id="xAxisSeparator" type="separator"/>
@@ -579,7 +579,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="displayLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-                <Label>Display Controls:</Label>
+                <Label>Display Controls</Label>
             </Field>
 
             <Field id="displaySeparator" type="separator"/>
@@ -589,17 +589,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Healthy Color:</Label>
             </Field>
 
-            <Field id="cautionLevel" type="textfield" defaultValue="10" tooltip="This value determines when bars will be set to caution level (integer).">
-                <Label>Caution Level:</Label>
-            </Field>
-
             <Field id="cautionColor" type="colorpicker" defaultValue="FF FF 00"
                    tooltip="Select preference for the color for devices with batteries that are at caution level.">
                 <Label>Caution Color:</Label>
-            </Field>
-
-            <Field id="warningLevel" type="textfield" defaultValue="5" tooltip="This value determines when bars will be set to warning level (integer).">
-                <Label>Warning Level:</Label>
             </Field>
 
             <Field id="warningColor" type="colorpicker" defaultValue="FF 00 00"
@@ -607,12 +599,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Warning Color:</Label>
             </Field>
 
+            <Field id="cautionLevel" type="textfield" defaultValue="10" tooltip="This value determines when bars will be set to caution level (integer).">
+                <Label>Caution Level:</Label>
+            </Field>
+
+            <Field id="warningLevel" type="textfield" defaultValue="5" tooltip="This value determines when bars will be set to warning level (integer).">
+                <Label>Warning Level:</Label>
+            </Field>
+
             <Field id="showBatteryLevel" type="checkbox" defaultValue="true" tooltip="Check to display the current battery level for each device within the chart.">
                 <Label>Show Battery Level:</Label>
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="excludedDevices" type="list">
+            <Field id="excludedDevices" type="list" rows="7" tooltip="Please select the devices to exclude.">
                 <Label>Excluded Devices:</Label>
                 <List class="self" filter="" method="getBatteryDeviceList"/>
             </Field>

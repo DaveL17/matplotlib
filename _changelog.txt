@@ -1,7 +1,12 @@
 
+v0.6.03 - [Not released]
+- Slightly revises placement of legend for 10 day and 24 hour forecast devices.
+- Base CSV file now created at the time new item added to CSV engine.
+
 v0.6.02 - [Not released]
 - Adds feature to battery health chart to select devices to exclude from the
   list of devices charted.
+- Fixes bug in grid setting for battery health chart.
 
 v0.6.01
 - New Battery Health Device: plots the battery level of all Indigo devices

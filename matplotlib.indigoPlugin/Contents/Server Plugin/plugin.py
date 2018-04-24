@@ -41,6 +41,7 @@ from dateutil.parser import parse as date_parse
 import logging
 import multiprocessing
 import numpy as np
+import os
 import traceback
 import re
 
@@ -77,7 +78,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.6.02"
+__version__   = "0.6.03"
 
 # =============================================================================
 
@@ -1051,9 +1052,10 @@ class Plugin(indigo.PluginBase):
             plt.suptitle(p_dict['chartTitle'], **k_dict['k_title_font'])
 
             # ========================== Format Grids =========================
-            # self.formatGrids(p_dict, k_dict)
-            for _ in (20, 40, 60, 80):
-                ax.axvline(x=_, color=p_dict['gridColor'], linestyle=':')
+            if dev.ownerProps.get('showxAxisGrid', False):
+                for _ in (20, 40, 60, 80):
+                    # ax.axvline(x=_, color=p_dict['gridColor'], linestyle=':')
+                    ax.axvline(x=_, color=p_dict['gridColor'], linestyle=self.pluginPrefs.get('gridStyle', ':'))
 
             # ========================= X Axis Label ==========================
             self.formatAxisXLabel(dev, p_dict, k_dict)
@@ -1862,7 +1864,7 @@ class Plugin(indigo.PluginBase):
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
-                legend = ax1.legend(headers, loc='upper right', bbox_to_anchor=(1.0, -0.1), ncol=1, prop={'size': float(p_dict['legendFontSize'])})
+                legend = ax1.legend(headers, loc='upper right', bbox_to_anchor=(1.0, -0.12), ncol=1, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)  # Note: frame alpha should be an int and not a string.
@@ -1983,7 +1985,7 @@ class Plugin(indigo.PluginBase):
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
-                legend = ax2.legend(headers, loc='upper left', bbox_to_anchor=(0.0, -0.1), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
+                legend = ax2.legend(headers, loc='upper left', bbox_to_anchor=(0.0, -0.12), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -2205,6 +2207,18 @@ class Plugin(indigo.PluginBase):
         except AttributeError, sub_error:
             self.logger.warning(u"Error adding item. {0}".format(sub_error))
 
+        # NEW =================================================================
+        # If the appropriate CSV file doesn't exist, create it and write the header line.
+
+        file_name = valuesDict['addValue']
+        full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], valuesDict['addValue'].encode("utf-8"))
+
+        if not os.path.isfile(full_path):
+
+            with open(full_path, 'w') as outfile:
+                outfile.write(u"{0},{1}\n".format('Timestamp', file_name))
+        # NEW =================================================================
+
         # Wipe the field values clean for the next element to be added.
         for key in ['addValue', 'addSource', 'addState']:
             valuesDict[key] = u""
@@ -2390,7 +2404,6 @@ class Plugin(indigo.PluginBase):
             if dev.deviceTypeId == 'csvEngine' and dev.enabled:
                 dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
-                import os
                 csv_dict_str  = dev.pluginProps['columnDict']   # {key: (Item Name, Source ID, Source State)}
                 csv_dict      = literal_eval(csv_dict_str)  # Convert column_dict from a string to a literal dict.
 
@@ -3838,7 +3851,7 @@ class Plugin(indigo.PluginBase):
                                 device_dict['No Battery Devices'] = 0
 
                             # The following line is used for testing the battery health code; it isn't needed in production.
-                            # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                            device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
 
                         except Exception as sub_error:
                             indigo.server.log(u"Error reading battery devices: {0}".format(sub_error))
