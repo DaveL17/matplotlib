@@ -1,4 +1,8 @@
 
+v0.6.02 - [Not released]
+- Adds feature to battery health chart to select devices to exclude from the
+  list of devices charted.
+
 v0.6.01
 - New Battery Health Device: plots the battery level of all Indigo devices
   that report a battery level value.

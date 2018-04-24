@@ -29,6 +29,7 @@ proper WUnderground devices.
 # TODO: Polar: rather than balk at the number of observations, if the n is less than the settings, just plot n.
 # TODO: When change made to CSV engine, generate CSV file if it doesn't already exist.
 # TODO: Give user control over legend placement and then use tight_layout everywhere.
+# TODO: Provide a way to chart a "best fit" line.
 
 # ================================== IMPORTS ==================================
 
@@ -76,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.6.01"
+__version__   = "0.6.02"
 
 # =============================================================================
 
@@ -3778,7 +3779,7 @@ class Plugin(indigo.PluginBase):
                                 self.logger.warning(u"{0}: Line {1} marker is suppressed to display annotations. "
                                                     u"To see the marker, disable annotations for this line.".format(dev.name, line))
                         except KeyError:
-                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.debug(u"[{0}] No corresponding annotation: 'line{1}Marker'".format(dev.name, line))
 
                     # ===================== Line Markers ======================
                     # Some line markers need to be adjusted due to their
@@ -3825,10 +3826,12 @@ class Plugin(indigo.PluginBase):
                     # ================= Battery Health Chart ==================
                     if dev.deviceTypeId == 'batteryHealthDevice':
 
-                        device_dict = {}
+                        device_dict  = {}
+                        exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
+
                         try:
                             for batt_dev in indigo.devices.itervalues():
-                                if batt_dev.batteryLevel is not None:
+                                if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                             if device_dict == {}:
@@ -3962,3 +3965,20 @@ class Plugin(indigo.PluginBase):
 
             plt.clf()
             plt.close('all')
+
+    def getBatteryDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
+        """
+        docstring placeholder
+
+        text placeholder
+
+        -----
+
+        """
+
+        batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
+
+        if len(batt_list) == 0:
+            batt_list = [(-1, 'No battery devices detected.'), ]
+
+        return batt_list
