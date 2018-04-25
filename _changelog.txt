@@ -1,6 +1,10 @@
 
+v0.6.04 - [Not released]
+- Polar charts will now plot when CSV records are less than the desired
+  number of observations.
+
 v0.6.03 - [Not released]
-- Slightly revises placement of legend for 10 day and 24 hour forecast devices.
+- Improves placement of legend for 10 day and 24 hour forecast devices.
 - Base CSV file now created at the time new item added to CSV engine.
 
 v0.6.02 - [Not released]

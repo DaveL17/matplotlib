@@ -26,8 +26,6 @@ proper WUnderground devices.
 # TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
 # TODO:   with extremely large number of observations.
 # TODO: Better trap for CSV data that doesn't have a properly formatted date item.
-# TODO: Polar: rather than balk at the number of observations, if the n is less than the settings, just plot n.
-# TODO: When change made to CSV engine, generate CSV file if it doesn't already exist.
 # TODO: Give user control over legend placement and then use tight_layout everywhere.
 # TODO: Provide a way to chart a "best fit" line.
 
@@ -78,7 +76,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.6.03"
+__version__   = "0.6.04"
 
 # =============================================================================
 
@@ -1446,8 +1444,9 @@ class Plugin(indigo.PluginBase):
                     return_queue.put({'Error': False, 'Log': log, 'Message': 'Skipped.', 'Name': dev.name})
                     return
 
-                # Create the array of grey scale for the intermediate lines and set the last one red. (MPL will accept string values '0' - '1' as grey scale, so we create a number of
-                # greys based on 1.0 / number of observations.)
+                # Create the array of grey scale for the intermediate lines and set the last
+                # one red. (MPL will accept string values '0' - '1' as grey scale, so we create
+                # a number of greys based on 1.0 / number of observations.)
                 color_increment = 1.0 / num_obs
                 color = color_increment
                 for item in range(0, num_obs, 1):
@@ -1514,14 +1513,14 @@ class Plugin(indigo.PluginBase):
                                              linewidth=2, alpha=1, zorder=9)
                 fig.gca().add_artist(max_wind_circle)
 
-                last_wind_circle = plt.Circle((0, 0), (p_dict['wind_speed'][num_obs - 1] * 0.99), transform=ax.transProjectionAffine + ax.transAxes, fill=False,
+                last_wind_circle = plt.Circle((0, 0), (p_dict['wind_speed'][-1] * 0.99), transform=ax.transProjectionAffine + ax.transAxes, fill=False,
                                               edgecolor=p_dict['currentWindColor'], linewidth=2, alpha=1, zorder=10)
                 fig.gca().add_artist(last_wind_circle)
 
                 # ========================== No Wind ==========================
                 # If latest obs is a speed of zero, plot something that we can
                 # see.
-                if p_dict['wind_speed'][num_obs - 1] == 0:
+                if p_dict['wind_speed'][-1] == 0:
                     zero_wind_circle = plt.Circle((0, 0), 0.15, transform=ax.transProjectionAffine + ax.transAxes, fill=True, facecolor=p_dict['currentWindColor'],
                                                   edgecolor=p_dict['currentWindColor'], linewidth=2, alpha=1, zorder=12)
                     fig.gca().add_artist(zero_wind_circle)
@@ -1562,7 +1561,7 @@ class Plugin(indigo.PluginBase):
                 kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': str(traceback.format_exc()), 'Name': dev.name})
 
         except Exception as sub_error:
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
@@ -3851,7 +3850,7 @@ class Plugin(indigo.PluginBase):
                                 device_dict['No Battery Devices'] = 0
 
                             # The following line is used for testing the battery health code; it isn't needed in production.
-                            device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                            # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
 
                         except Exception as sub_error:
                             indigo.server.log(u"Error reading battery devices: {0}".format(sub_error))
@@ -3981,12 +3980,18 @@ class Plugin(indigo.PluginBase):
 
     def getBatteryDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
-        docstring placeholder
+        Create a list of battery-powered devices
 
-        text placeholder
+        Creates a list of tuples that contains the device ID and device name of all
+        Indigo devices that report a batterLevel device property that is not None.
+        If no devices meet the criteria, a single tuple is returned as a place-
+        holder.
 
         -----
-
+        :param Indigo filter filter:
+        :param indigo.Dict valuesDict:
+        :param str typeId:
+        :param int targetId:
         """
 
         batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
