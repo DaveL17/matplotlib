@@ -1,6 +1,6 @@
 
 v0.6.04 - [Not released]
-- Polar charts will now plot when CSV records are less than the desired
+- Polar charts will now plot when CSV records are fewer than the desired
   number of observations.
 
 v0.6.03 - [Not released]
