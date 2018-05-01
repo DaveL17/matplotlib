@@ -236,7 +236,7 @@
                 <Label>X Axis</Label>
             </Field>
 
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" tooltip="Check to display X axis grid.">
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" tooltip="Check to display X axis grid.">
                 <Label>Grid</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -918,6 +918,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line1BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line1BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 1.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 <!-- Line 2 -->
             <Field id="lineLabel2" type="checkbox" defaultValue="false">
@@ -978,6 +988,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="plotLine2Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 2.">
+                <Label>Best Fit Color:</Label>
             </Field>
 
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
@@ -1042,6 +1062,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line3BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line3BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 3.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
             <Field id="line3Bottom" type="separator" visibleBindingId="lineLabel3" visibleBindingValue="true"/>
 <!-- Line 4 -->
             <Field id="lineLabel4" type="checkbox" defaultValue="false">
@@ -1101,6 +1131,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="plotLine4Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line4BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 4.">
+                <Label>Best Fit Color:</Label>
             </Field>
 
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
@@ -1622,6 +1662,16 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line1BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line1BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="groupLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for group 1.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
             <Field id="group1Bottom" type="separator" visibleBindingId="groupLabel1" visibleBindingValue="true"/>
 <!-- Group 2 -->
             <Field id="groupLabel2" type="checkbox" defaultValue="false">
@@ -1662,6 +1712,16 @@ There are presently no configurations available for this device.
             <Field id="plotGroup2Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="groupLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for group 2.">
+                <Label>Best Fit Color:</Label>
             </Field>
 
             <Field id="group2Bottom" type="separator" visibleBindingId="groupLabel2" visibleBindingValue="true"/>
@@ -1706,6 +1766,16 @@ There are presently no configurations available for this device.
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line3BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line3BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="groupLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for group 3.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
             <Field id="group3Bottom" type="separator" visibleBindingId="groupLabel3" visibleBindingValue="true"/>
 <!-- Group 4 -->
             <Field id="groupLabel4" type="checkbox" defaultValue="false">
@@ -1745,6 +1815,16 @@ There are presently no configurations available for this device.
             <Field id="plotGroup4Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line4BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="groupLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for group 4.">
+                <Label>Best Fit Color:</Label>
             </Field>
 
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">

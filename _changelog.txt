@@ -1,7 +1,10 @@
 
 v0.6.04 - [Not released]
+- New Feature: optional 'best fit line' for line and scatter charts.
 - Polar charts will now plot when CSV records are fewer than the desired
   number of observations.
+- Significantly reduces the amount of information written to the log unless
+  verbose logging is enabled.
 
 v0.6.03 - [Not released]
 - Improves placement of legend for 10 day and 24 hour forecast devices.
