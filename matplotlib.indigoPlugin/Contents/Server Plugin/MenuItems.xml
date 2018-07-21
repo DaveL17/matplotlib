@@ -16,7 +16,7 @@
     <MenuItem id="advancedSettings">
         <!--The advanced settings menu is used to manage more obscure plugin preferences. Adding an element here will require hooks in
             most, if not all of the following methods in the plugin.py file:
-            pluginConfig.xml (a hidden control to store the setting)
+            PluginConfig.xml (a hidden control to store the setting)
             getMenuActionConfigUiValues
             advancedSettingsMenu
             advancedSettingsExecuted-->

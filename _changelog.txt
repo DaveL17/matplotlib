@@ -1,16 +1,26 @@
 
-v0.6.04 - [Not released]
+v0.6.06
+- Adds two more lines to the line charting device.
+- Fixes bug where best fit line affected legend entries.
+
+v0.6.05
+- Fixes bug in Scatter Chart devices to plot points when marker is set to None.
+  (This is a bug in matplotlib, plugin overrides the behavior).
+- Fixes bug in naming of PluginConfig.xml (which caused problems on systems set
+  up as case sensitive.
+
+v0.6.04
 - New Feature: optional 'best fit line' for line and scatter charts.
 - Polar charts will now plot when CSV records are fewer than the desired
   number of observations.
 - Significantly reduces the amount of information written to the log unless
   verbose logging is enabled.
 
-v0.6.03 - [Not released]
+v0.6.03
 - Improves placement of legend for 10 day and 24 hour forecast devices.
 - Base CSV file now created at the time new item added to CSV engine.
 
-v0.6.02 - [Not released]
+v0.6.02
 - Adds feature to battery health chart to select devices to exclude from the
   list of devices charted.
 - Fixes bug in grid setting for battery health chart.

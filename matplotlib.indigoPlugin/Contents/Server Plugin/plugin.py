@@ -26,10 +26,10 @@ proper WUnderground devices.
 # TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
 # TODO:   with extremely large number of observations.
 # TODO: Better trap for CSV data that doesn't have a properly formatted date item.
-# TODO: Give user control over legend placement and then use tight_layout everywhere.
 # TODO: Possible to add custom labels to battery health chart? The rub is that when a new device is added or one's removed, the labels would no longer match up.
-# TODO: Scatter legend picks color from color and not marker color. When user uses both, the legend doesn't visually match the chart.
 
+# TODO: Move each chart device to its own thread (like GhostXML)
+# TODO: Implement a stale data tool
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -41,6 +41,9 @@ import logging
 import multiprocessing
 import numpy as np
 import os
+# from Queue import Queue
+# import threading
+# import time as t
 import traceback
 import re
 
@@ -77,7 +80,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.6.04"
+__version__   = "0.6.06"
 
 # =============================================================================
 
@@ -120,6 +123,9 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
+        self.pluginIsInitializing = True
+        self.pluginIsShuttingDown = False
+
         # ========================= Initialize Logger =========================
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
         self.debug      = True
@@ -131,9 +137,9 @@ class Plugin(indigo.PluginBase):
         self.updater = indigoPluginUpdateChecker.updateChecker(self, updater_url)
 
         # ==================== Initialize Global Variables ====================
-        self.final_data      = []
-        self.sleep_interval  = self.pluginPrefs.get('refreshInterval', 900)
-        self.verboseLogging  = self.pluginPrefs.get('verboseLogging', False)  # From advanced settings menu
+        self.final_data     = []
+        self.sleep_interval = self.pluginPrefs.get('refreshInterval', 900)
+        self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)  # From advanced settings menu
 
         # ====================== Initialize DLFramework =======================
         self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
@@ -158,6 +164,8 @@ class Plugin(indigo.PluginBase):
         #     pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True, suspend=False)
         # except:
         #     pass
+
+        self.pluginIsInitializing = False
 
     def __del__(self):
         indigo.PluginBase.__del__(self)
@@ -275,7 +283,7 @@ class Plugin(indigo.PluginBase):
                 # ============================ Line Charting Device ============================
                 if typeId == "lineChartingDevice":
 
-                    for _ in range(1, 5, 1):
+                    for _ in range(1, 7, 1):
                         valuesDict['line{0}BestFit'.format(_)]      = False
                         valuesDict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
                         valuesDict['line{0}Color'.format(_)]        = 'FF FF FF'
@@ -353,8 +361,9 @@ class Plugin(indigo.PluginBase):
             if self.pluginPrefs.get('snappyConfigMenus', False):
                 self.logger.debug(u"Enabling advanced feature: Snappy Config Menus.")
 
-                for key in ['barLabel1', 'barLabel2', 'barLabel3', 'barLabel4', 'lineLabel1', 'lineLabel2', 'lineLabel3',
-                            'lineLabel4', 'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
+                for key in ['barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
+                            'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
+                            'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
                             'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ]:
                     valuesDict[key] = False
 
@@ -414,7 +423,6 @@ class Plugin(indigo.PluginBase):
     def getPrefsConfigUiValues(self):
         """getPrefsConfigUiValues(self) is called when the plugin config dialog
         is called."""
-
 
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
@@ -504,10 +512,16 @@ class Plugin(indigo.PluginBase):
                                 props[prop] = 'FF FF FF'
 
             # Establish props for legacy devices
-            for _ in range(1, 5, 1):
+            for _ in range(1, 7, 1):
                 props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
                 props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), "")
                 props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
+                props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
+                props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), "")
+                props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
+                props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
+                props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
+                props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
 
             # Establishes props.isChart for legacy devices
             props_dict = {'csvEngine': False,
@@ -532,6 +546,7 @@ class Plugin(indigo.PluginBase):
         """ Plugin shutdown routines."""
 
         self.logger.debug(u"{0:*^40}".format(' Shut Down '))
+        self.pluginIsShuttingDown = True
 
     def validatePrefsConfigUi(self, valuesDict):
         """ Validate select plugin config menu settings."""
@@ -661,7 +676,7 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
                 return False, valuesDict, error_msg_dict
 
-            for line in range(1, 5, 1):
+            for line in range(1, 7, 1):
                 for char in valuesDict['line{0}adjuster'.format(line)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['line{0}adjuster'.format(line)] = u"Valid operators are +, -, *, /"
@@ -997,7 +1012,6 @@ class Plugin(indigo.PluginBase):
                 except ValueError:
                     x_values.append(0)
 
-                # y_values.append(key.replace(' - ', '\n'))  # <-- This line is specific to my install, as I name devices "Room - Device Name"
                 y_text.append(key)
 
                 # =================== Calculate Bar Colors ====================
@@ -1154,7 +1168,7 @@ class Plugin(indigo.PluginBase):
         try:
             self._logDicts(p_dict, k_dict)
 
-            for _ in range(1, 5, 1):
+            for _ in range(1, 7, 1):
                 p_dict['line{0}Color'.format(_)]        = r"#{0}".format(p_dict['line{0}Color'.format(_)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}MarkerColor'.format(_)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(_)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(_)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(_)].replace(' ', '').replace('#', ''))
@@ -1168,7 +1182,7 @@ class Plugin(indigo.PluginBase):
             self.formatAxisXticks(ax, p_dict, k_dict)
             self.formatAxisY(ax, p_dict, k_dict)
 
-            for line in range(1, 5, 1):
+            for line in range(1, 7, 1):
 
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
@@ -1200,10 +1214,6 @@ class Plugin(indigo.PluginBase):
                     ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)], markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
 
-                    # ===================== Best Fit Line =====================
-                    # if dev.pluginProps.get('line{0}BestFit'.format(line), False):
-                    #     self.plotBestFitLineSegments(ax, dates_to_plot, line, p_dict)
-
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
                     if p_dict['line{0}Fill'.format(line)]:
@@ -1226,6 +1236,7 @@ class Plugin(indigo.PluginBase):
             if self.verboseLogging:
                 log['Debug'].append(u"Display legend: {0}".format(p_dict['showLegend']))
 
+            # ================================== Legend ===================================
             if p_dict['showLegend']:
 
                 # Amend the headers if there are any custom legend entries defined.
@@ -1240,13 +1251,24 @@ class Plugin(indigo.PluginBase):
                     counter += 1
 
                 # Set the legend
-                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': float(p_dict['legendFontSize'])})
+                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            # ======================== Min/Max Lines ==========================
-            for line in range(1, 5, 1):
+            for line in range(1, 7, 1):
+                # Note that we do these after the legend is drawn so that these lines don't affect the legend.
+
+                # ===================== Best Fit Line =====================
+                if dev.pluginProps.get('line{0}BestFit'.format(line), False):
+                    self.plotBestFitLineSegments(ax, dates_to_plot, line, p_dict)
+
+                [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+
+                # ======================== Min/Max Lines ==========================
+                if p_dict['line{0}Fill'.format(line)]:
+                    ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
+
                 if p_dict['plotLine{0}Min'.format(line)]:
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_min'])
                 if p_dict['plotLine{0}Max'.format(line)]:
@@ -1599,6 +1621,12 @@ class Plugin(indigo.PluginBase):
                 # ====================== Plot the Points ======================
                 if p_dict['group{0}Source'.format(thing)] not in ["", "None"]:
 
+                    # There is a bug in matplotlib (fixed in newer versions) where points would not
+                    # plot if marker set to 'none'. This overrides the behavior.
+                    if p_dict['group{0}Marker'.format(thing)] == u'None':
+                        p_dict['group{0}Marker'.format(thing)] = '.'
+                        p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
+
                     data_column = self.getData('{0}{1}'.format(self.pluginPrefs['dataPath'].encode("utf-8"), p_dict['group{0}Source'.format(thing)].encode("utf-8")))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
@@ -1613,7 +1641,7 @@ class Plugin(indigo.PluginBase):
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
                     ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
-                               edgecolor=p_dict['group{0}MarkerColor'.format(thing)], zorder=10, **k_dict['k_line'])
+                               edgecolor=p_dict['group{0}MarkerColor'.format(thing)], linewidths=0.75, zorder=10, **k_dict['k_line'])
 
                     # ===================== Best Fit Line =====================
                     if dev.pluginProps.get('line{0}BestFit'.format(thing), False):
@@ -1638,16 +1666,17 @@ class Plugin(indigo.PluginBase):
 
                 headers = [_.decode('utf-8') for _ in p_dict['headers']]
                 for header in headers:
+
                     if p_dict['group{0}Legend'.format(counter)] == "":
                         final_headers.append(header)
                     else:
                         final_headers.append(p_dict['group{0}Legend'.format(counter)])
 
                     legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
-                                                        markerfacecolor=p_dict['group{0}Color'.format(counter)])))
+                                                        markerfacecolor=p_dict['group{0}Color'.format(counter)], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
                     counter += 1
 
-                legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, numpoints=1, prop={'size': float(p_dict['legendFontSize'])})
+                legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, numpoints=1, markerscale=0.6, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -1904,6 +1933,7 @@ class Plugin(indigo.PluginBase):
                 if p_dict['y_obs{0}'.format(line)]:
                     ax2.plot(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                              marker=p_dict['line{0}Marker'.format(line)], markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=(10 - line), **k_dict['k_line'])
+
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
                     if p_dict['line{0}Annotate'.format(line)]:
@@ -3393,7 +3423,7 @@ class Plugin(indigo.PluginBase):
         """
         color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
 
-        ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color)
+        ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color, zorder=1)
 
         return ax
 
@@ -3635,13 +3665,10 @@ class Plugin(indigo.PluginBase):
             # A specific chart id may be passed to the method. In that case,
             # refresh only that chart. Otherwise, chart_id is None and we refresh
             # all of the charts.
-            dev_list = []
             if not chart_id:
-                for dev in indigo.devices.itervalues('self'):
-                    if dev.deviceTypeId not in ['csvEngine', 'deviceControls']:
-                        dev_list.append(dev)
+                dev_list = [dev for dev in indigo.devices.itervalues('self') if dev.deviceTypeId not in ('csvEngine', 'deviceControls')]
             else:
-                dev_list.append(indigo.devices[int(chart_id)])
+                dev_list = [indigo.devices[int(chart_id)]]
 
             for dev in dev_list:
 
@@ -3703,9 +3730,14 @@ class Plugin(indigo.PluginBase):
 
                     p_dict.update(dev.pluginProps)
 
-                    for _ in ['bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed', 'x_obs1', 'x_obs2', 'x_obs3',
-                              'x_obs4', 'y_obs1', 'y_obs1_max', 'y_obs1_min', 'y_obs2', 'y_obs2_max', 'y_obs2_min', 'y_obs3', 'y_obs3_max', 'y_obs3_min', 'y_obs4', 'y_obs4_max',
-                              'y_obs4_min']:
+                    for _ in ['bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
+                              'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
+                              'y_obs1', 'y_obs1_max', 'y_obs1_min',
+                              'y_obs2', 'y_obs2_max', 'y_obs2_min',
+                              'y_obs3', 'y_obs3_max', 'y_obs3_min',
+                              'y_obs4', 'y_obs4_max', 'y_obs4_min',
+                              'y_obs5', 'y_obs5_max', 'y_obs5_min',
+                              'y_obs6', 'y_obs6_max', 'y_obs6_min']:
                         p_dict[_] = []
 
                     p_dict['fileName']  = ''
@@ -3765,7 +3797,7 @@ class Plugin(indigo.PluginBase):
 
                         # ==================== Best Fit Lines =====================
                         # Set the defaults for best fit lines in p_dict.
-                        for _ in range(1, 5, 1):
+                        for _ in range(1, 7, 1):
                             p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00')
 
                         # ==================== Phantom Labels =====================
@@ -3803,7 +3835,7 @@ class Plugin(indigo.PluginBase):
                         # ====================== Annotations ======================
                         # If the user wants annotations, we need to hide the line
                         # markers as we don't want to plot one on top of the other.
-                        for line in range(1, 5, 1):
+                        for line in range(1, 7, 1):
                             try:
                                 if p_dict['line{0}Annotate'.format(line)] and p_dict['line{0}Marker'.format(line)] != 'None':
                                     p_dict['line{0}Marker'.format(line)] = 'None'
@@ -4001,3 +4033,5 @@ class Plugin(indigo.PluginBase):
 
             plt.clf()
             plt.close('all')
+
+

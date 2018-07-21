@@ -24,7 +24,7 @@
 #           The url must be formatted like "http://www.domain.com/folder/updateFile.html"
 #           - daysBetweenChecks is optional and defaults to 1.  This controls how often the module
 #           will check for updates automatically.  They can always be checked for manually by running
-#           self.updater.checkVersionNow()
+#           self.updater.check_version_now()
 #
 #
 #   Then put the following in your startup method to see if a check is required at startup:

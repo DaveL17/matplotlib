@@ -167,7 +167,7 @@ class Formatter(object):
         format specifier.
         """
 
-        time_formatter = {'military': '%H:%M', 'standard': '%I:%M'}
+        time_formatter = {'military': '%H:%M', 'standard': '%I:%M', 'standard_am_pm': '%I:%M %p'}
         return time_formatter[self.pluginPrefs['uiTimeFormat']]
 
 
