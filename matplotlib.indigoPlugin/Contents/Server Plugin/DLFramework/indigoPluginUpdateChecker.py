@@ -123,7 +123,6 @@ class updateChecker(object):
 
                 # Try to grab the version file
                 try:
-                        # f = urlopen(self.fileUrl)
                         f = subprocess.Popen(["curl", "-k", self.fileUrl], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
                         out, err = f.communicate()
 
@@ -133,7 +132,6 @@ class updateChecker(object):
 
                 # Parse the file
                 try:
-                        # lines = f.read().split('\n')
                         lines = out.split('\n')
                         if lines[0].startswith('Version:'):
                                 latest_version = lines[0][8:].strip()

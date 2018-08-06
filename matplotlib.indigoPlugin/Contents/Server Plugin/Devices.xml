@@ -28,7 +28,7 @@
             <Field id="sep2" type="separator"/>
 
             <Field id="label5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Validate'.</Label>
+                <Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Add Item'.</Label>
             </Field>
 
             <Field id="addKey" type="textfield" hidden="true">

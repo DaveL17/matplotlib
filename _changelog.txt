@@ -1,4 +1,13 @@
 
+v0.7.02
+- Moves charting code into separate class.
+
+v0.7.01
+- Adjusts chart output logging for consistency between enabled and disabled
+  devices.
+- Fixes bug where legacy devices not updated for missing line5Annotate and
+  line6Annotate props.
+
 v0.6.06
 - Adds two more lines to the line charting device.
 - Fixes bug where best fit line affected legend entries.
