@@ -2,6 +2,7 @@
 v0.7.03
 - Fixes bug in setting of marker style for lines 5 and 6.
 - Fixes bug in setting of marker color for all lines.
+- Fixes bug in sorting of data source names for device configuration.
 - Code refinements.
 
 v0.7.02
