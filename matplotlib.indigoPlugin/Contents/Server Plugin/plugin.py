@@ -30,6 +30,10 @@ proper WUnderground devices.
 
 # TODO: Move each chart device to its own thread (like GhostXML)
 # TODO: Implement a stale data tool
+
+# TODO: When you start a new plot with multiple lines in it. As long as the lines have not changed their value
+# for several points on the X-axis the plot is made at 0 of the Y-axis. Even-though the values are much larger
+# eg 100 or 1000. The moment the variable changes a tiny bit, immediately it is plotted correctly.
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -80,7 +84,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.02"
+__version__   = "0.7.03"
 
 # =============================================================================
 
@@ -1311,42 +1315,34 @@ class Plugin(indigo.PluginBase):
         else:
             return [('None', 'Please select a source ID first')]
 
-    def formatMarkers(self, line1_marker, line2_marker, line3_marker, line4_marker):
+    def formatMarkers(self, p_dict):
         """
         Format matplotlib markers
 
         The devices.xml file cannot contain '<' or '>' as a value, as this conflicts
-        with the construction of the XML code.  Matplotlib needs these values for
+        with the construction of the XML code. Matplotlib needs these values for
         select built-in marker styles, so we need to change them to what MPL is
         expecting.
 
         -----
 
-        :param line1_marker:
-        :param line2_marker:
-        :param line3_marker:
-        :param line4_marker:
+        :param p_dict:
         """
 
         if self.verboseLogging:
             self.logger.threaddebug(u"Fixing the markers.")
 
+        markers     = ['line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker', 'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker']
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
 
-        for k, v in marker_dict.iteritems():
-            if line1_marker == k:
-                line1_marker = marker_dict[k]
+        for marker in markers:
+            try:
+                if p_dict[marker] in marker_dict.keys():
+                    p_dict[marker] = marker_dict[p_dict[marker]]
+            except KeyError:
+                pass
 
-            if line2_marker == k:
-                line2_marker = marker_dict[k]
-
-            if line3_marker == k:
-                line3_marker = marker_dict[k]
-
-            if line4_marker == k:
-                line4_marker = marker_dict[k]
-
-        return line1_marker, line2_marker, line3_marker, line4_marker
+        return p_dict
 
     def generatorDeviceStates(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
@@ -1577,7 +1573,7 @@ class Plugin(indigo.PluginBase):
         if self.verboseLogging:
             self.logger.threaddebug(u"File name list menu: {0}".format(file_name_list_menu))
 
-        return file_name_list_menu
+        return sorted(file_name_list_menu)
 
     def getFontList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
@@ -2200,23 +2196,7 @@ class Plugin(indigo.PluginBase):
                         # example, matplotlib uses '<', '>' and '.' as markers but storing these
                         # values will blow up the XML.  So we need to convert them. (See
                         # self.formatMarkers() method.)
-                        try:
-                            if p_dict['line1Marker'] != 'None' or p_dict['line2Marker'] != 'None' or p_dict['line3Marker'] != 'None:' or p_dict['line4Marker'] != 'None:':
-                                p_dict['line1Marker'], p_dict['line2Marker'], p_dict['line3Marker'], p_dict['line4Marker'] = self.formatMarkers(p_dict['line1Marker'],
-                                                                                                                                                p_dict['line2Marker'],
-                                                                                                                                                p_dict['line3Marker'],
-                                                                                                                                                p_dict['line4Marker'])
-                        except KeyError:
-                            pass
-
-                        try:
-                            if p_dict['group1Marker'] != 'None' or p_dict['group2Marker'] != 'None' or p_dict['group3Marker'] != 'None:' or p_dict['group4Marker'] != 'None:':
-                                p_dict['group1Marker'], p_dict['group2Marker'], p_dict['group3Marker'], p_dict['group4Marker'] = self.formatMarkers(p_dict['group1Marker'],
-                                                                                                                                                    p_dict['group2Marker'],
-                                                                                                                                                    p_dict['group3Marker'],
-                                                                                                                                                    p_dict['group4Marker'])
-                        except KeyError:
-                            pass
+                        p_dict = self.formatMarkers(p_dict)
 
                         if self.verboseLogging:
                             self.logger.debug(u"")
@@ -2767,7 +2747,8 @@ class MakeChart(object):
                     dates_to_plot = self.formatDates(p_dict['x_obs{0}'.format(line)])
 
                     ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
-                                 marker=p_dict['line{0}Marker'.format(line)], markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
+                                 marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
+                                 markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
@@ -3905,43 +3886,6 @@ class MakeChart(object):
 
         if p_dict['showyAxisGrid']:
             plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
-
-    def formatMarkers(self, line1_marker, line2_marker, line3_marker, line4_marker):
-        """
-        Format matplotlib markers
-
-        The devices.xml file cannot contain '<' or '>' as a value, as this conflicts
-        with the construction of the XML code.  Matplotlib needs these values for
-        select built-in marker styles, so we need to change them to what MPL is
-        expecting.
-
-        -----
-
-        :param line1_marker:
-        :param line2_marker:
-        :param line3_marker:
-        :param line4_marker:
-        """
-
-        if self.host_plugin.verboseLogging:
-            self.host_plugin.logger.threaddebug(u"Fixing the markers.")
-
-        marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
-
-        for k, v in marker_dict.iteritems():
-            if line1_marker == k:
-                line1_marker = marker_dict[k]
-
-            if line2_marker == k:
-                line2_marker = marker_dict[k]
-
-            if line3_marker == k:
-                line3_marker = marker_dict[k]
-
-            if line4_marker == k:
-                line4_marker = marker_dict[k]
-
-        return line1_marker, line2_marker, line3_marker, line4_marker
 
     def getData(self, data_source):
         """
