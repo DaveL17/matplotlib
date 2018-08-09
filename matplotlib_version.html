@@ -1,16 +1,14 @@
-Version: 0.6.06
+Version: 0.7.03
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
-v0.6.06
-- Adds two more lines to the line charting device.
-- Fixes bug where best fit line affected legend entries.
-
-v0.6.05
-- Fixes bug in Scatter Chart devices to plot points when marker is set to None.
-  (This is a bug in matplotlib, plugin overrides the behavior).
-- Fixes bug in naming of PluginConfig.xml (which caused problems on systems set
-  up as case sensitive.)
+v0.7.03
+- Fixes bug in setting of marker style for lines 5 and 6.
+- Fixes bug in setting of marker color for all lines.
+- Fixes bug in sorting of data source names for device configuration.
+- Adjusts chart output logging for consistency between enabled and disabled devices.
+- Fixes bug where legacy devices not updated for missing line5Annotate and line6Annotate props.
+- Code refinements.
 
 As always, if something doesn't seem quite right, please let me know.
 
