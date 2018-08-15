@@ -1,4 +1,12 @@
 
+v0.7.04
+- Moves refresh interval to chart settings. Users can now establish
+  individual refresh rates for each chart.
+- Adds weekly option to refresh interval.
+- Better sorting of CSV sources within device configuration dialogs.
+- Significantly reduces debug logging.
+- Code refinements.
+
 v0.7.03
 - Fixes bug in setting of marker style for lines 5 and 6.
 - Fixes bug in setting of marker color for all lines.
@@ -146,7 +154,7 @@ v0.4.09
 v0.4.08
 - Adds a new Action Item to refresh individual charts. Useful when a single
   data point changes (i.e., device state or variable value).
-- Makes the cleanString() method optional for multiline text charts.
+- Makes the clean_string() method optional for multiline text charts.
 - Removes the need to manually refresh the list of values to chart when
   selecting a data source for multiline text charts (removes the 'Refresh'
   button).

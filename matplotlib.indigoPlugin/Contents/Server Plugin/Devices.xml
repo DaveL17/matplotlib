@@ -21,6 +21,22 @@
                 <Label>Enter the number of observations that you would like to retain in your CSV files.</Label>
             </Field>
 
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
+            </Field>
+
             <Field id="addItemLabel" type="label" alignText="right">
                 <Label>Add Data Item</Label>
             </Field>
@@ -41,7 +57,7 @@
 
             <Field id="addSource" type="menu">
                 <Label>ID:</Label>
-                <List class="self" filter="" method="csvSource" dynamicReload="true"/>
+                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
@@ -50,10 +66,10 @@
                 <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
             </Field>
 
-            <Field id="csvItemAdd" type="button">
+            <Field id="csv_item_add" type="button">
                 <Label/>
                 <Title>Add Item</Title>
-                <CallbackMethod>csvItemAdd</CallbackMethod>
+                <CallbackMethod>csv_item_add</CallbackMethod>
             </Field>
 
             <Field id="numObsLabel" type="label" alignText="right">
@@ -66,10 +82,10 @@
                 <Label>Use this section to update or delete existing items.</Label>
             </Field>
 
-            <Field id="csvItemList" type="menu">
+            <Field id="csv_item_list" type="menu">
                 <Label>Item List</Label>
-                <List class="self" filter="" method="csvItemList" dynamicReload="true"/>
-                <CallbackMethod>csvItemSelect</CallbackMethod>
+                <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
+                <CallbackMethod>csv_item_select</CallbackMethod>
             </Field>
 
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
@@ -98,7 +114,7 @@
 
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
                 <Label>ID:</Label>
-                <List class="self" filter="" method="csvSource" dynamicReload="true"/>
+                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
@@ -107,20 +123,20 @@
                 <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
             </Field>
 
-            <Field id="csvItemUpdate" type="button" enabledBindingId="isColumnSelected">
+            <Field id="csv_item_update" type="button" enabledBindingId="isColumnSelected">
                 <Label/>
                 <Title>Update Item</Title>
-                <CallbackMethod>csvItemUpdate</CallbackMethod>
+                <CallbackMethod>csv_item_update</CallbackMethod>
             </Field>
 
             <Field id="label2.5" type="label" fontColor="darkgray" alignWithControl="true" fontSize="small">
                 <Label>or</Label>
             </Field>
 
-            <Field id="csvItemDelete" type="button" enabledBindingId="isColumnSelected">
+            <Field id="csv_item_delete" type="button" enabledBindingId="isColumnSelected">
                 <Label/>
                 <Title>Delete Item</Title>
-                <CallbackMethod>csvItemDelete</CallbackMethod>
+                <CallbackMethod>csv_item_delete</CallbackMethod>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>
@@ -162,6 +178,22 @@
 
             <Field id="fileName" type="textfield" defaultValue="chart_bar.png" tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
             </Field>
 
             <Field id="outputFileSpace" type="label"/>
@@ -537,6 +569,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
+            </Field>
+
             <Field id="chartControlsLabel" type="label" alignText="right">
                 <Label>Chart Controls</Label>
             </Field>
@@ -655,6 +703,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
+            </Field>
+
             <Field id="customSizeHeight" type="textfield" defaultValue="None"
                    tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None.">
                 <Label>Custom Height:</Label>
@@ -710,6 +774,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="fileName" type="textfield" defaultValue="chart_line.png" tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
             </Field>
 
             <Field id="outputFileSpace" type="label"/>
@@ -1384,6 +1464,22 @@ There are presently no configurations available for this device.
                 <Label>Output File Name:</Label>
             </Field>
 
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
+            </Field>
+
             <Field id="sourceSpace1" type="label"/>
 
             <Field id="sourceLabel" type="label" alignText="right">
@@ -1490,6 +1586,22 @@ There are presently no configurations available for this device.
 
             <Field id="fileName" type="textfield" defaultValue="chart_polar.png" tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
             </Field>
 
             <Field id="sourceSpace1" type="label"/>
@@ -1622,6 +1734,22 @@ There are presently no configurations available for this device.
 
             <Field id="fileName" type="textfield" defaultValue="chart_scatter.png" tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
             </Field>
 
             <Field id="outputFileSpace" type="label"/>
@@ -2036,6 +2164,22 @@ There are presently no configurations available for this device.
 
             <Field id="fileName" type="textfield" defaultValue="chart_forecast.png" tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                </List>
             </Field>
 
             <Field id="outputFileSpace" type="label"/>

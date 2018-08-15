@@ -9,6 +9,7 @@ Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
 import ast
 import indigo
 import operator as op
+import os
 import platform
 import sys
 
@@ -44,6 +45,7 @@ class Fogbert(object):
         indigo.server.log(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
         indigo.server.log(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
         indigo.server.log(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
+        indigo.server.log(u"{0:<31} {1}".format("Process ID:", os.getpid()))
         indigo.server.log(u"{0:=^130}".format(""))
 
     def convertDebugLevel(self, debug_val):
