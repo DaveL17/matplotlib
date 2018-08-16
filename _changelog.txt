@@ -1,7 +1,7 @@
 
 v0.7.04
-- Moves refresh interval to chart settings. Users can now establish
-  individual refresh rates for each chart.
+- Moves refresh interval to charts. Users can now establish individual
+  refresh rates for each chart separately.
 - Adds weekly option to refresh interval.
 - Better sorting of CSV sources within device configuration dialogs.
 - Significantly reduces debug logging.

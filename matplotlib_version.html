@@ -1,13 +1,12 @@
-Version: 0.7.03
+Version: 0.7.04
 EmailSubject: Matplotlib Indigo Plugin - Update Available
 EmailBody: The Matplotlib Plugin you are using has been updated.
 
-v0.7.03
-- Fixes bug in setting of marker style for lines 5 and 6.
-- Fixes bug in setting of marker color for all lines.
-- Fixes bug in sorting of data source names for device configuration.
-- Adjusts chart output logging for consistency between enabled and disabled devices.
-- Fixes bug where legacy devices not updated for missing line5Annotate and line6Annotate props.
+- Moves refresh interval to charts. Users can now establish individual
+  refresh rates for each chart separately.
+- Adds weekly option to refresh interval.
+- Better sorting of CSV sources within device configuration dialogs.
+- Significantly reduces debug logging.
 - Code refinements.
 
 As always, if something doesn't seem quite right, please let me know.

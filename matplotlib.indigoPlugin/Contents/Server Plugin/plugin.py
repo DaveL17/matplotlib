@@ -21,12 +21,11 @@ proper WUnderground devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
+# TODO: Implement a stale data tool
 # TODO: Independent Y2 axis.
 # TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
 # TODO:   with extremely large number of observations.
-# TODO: Possible to add custom labels to battery health chart? The rub is that when a new device is added or one's removed, the labels would no longer match up.
 # TODO: Wrap long names for battery health device?
-# TODO: Implement a stale data tool
 # TODO: New weather forecast charts to support any weather services
 
 # ================================== IMPORTS ==================================

@@ -234,4 +234,5 @@
     <Field id="verboseLoggingLabel" type="label" fontColor="black" fontSize="small" alignWithControl="True">
         <Label>Check this box to enable verbose logging. Checking this box will only affect the level and amount of information written to the plugin log file (it will not affect the amount of information written to the Indigo Event Log).</Label>
     </Field>
+
 </PluginConfig>
