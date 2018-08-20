@@ -1,4 +1,8 @@
 
+v0.7.05
+- Adds support for Fantastic Weather forecast devices.
+- Fixes bug in Refresh Charts menu item.
+
 v0.7.04
 - Moves refresh interval to charts. Users can now establish individual
   refresh rates for each chart separately.

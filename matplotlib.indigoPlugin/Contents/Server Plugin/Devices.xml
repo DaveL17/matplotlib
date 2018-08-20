@@ -2157,7 +2157,7 @@ There are presently no configurations available for this device.
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
-                <Label>Weather Forecast Charts only work with WUnderground Plugin Forecast Devices. Any available WUnderground devices are automatically added to the Source Device list.</Label>
+                <Label>Weather Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices.</Label>
             </Field>
 
             <Field id="topSeparator" type="separator"/>

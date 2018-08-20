@@ -102,7 +102,7 @@
 
     <MenuItem id="refreshChartsNow">
         <Name>Redraw Charts Now</Name>
-        <CallbackMethod>refreshTheCharts</CallbackMethod>
+        <CallbackMethod>refresh_the_charts_now</CallbackMethod>
     </MenuItem>
 
     <MenuItem id="checkVersionNow">

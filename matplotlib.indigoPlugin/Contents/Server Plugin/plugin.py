@@ -21,13 +21,15 @@ proper WUnderground devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
-# TODO: Implement a stale data tool
+# TODO: Implement a stale data tool.
 # TODO: Independent Y2 axis.
 # TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
 # TODO:   with extremely large number of observations.
 # TODO: Wrap long names for battery health device?
 # TODO: New weather forecast charts to support any weather services
 
+# TODO: Calculate the number of tick marks before trying to plot. Limit to csvEngine prefs.
+# TODO: Update charts now refactors last update so they get off their schedule.  Doesn't affect the data, just the redraw.
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -75,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.04"
+__version__   = "0.7.05"
 
 # =============================================================================
 
@@ -118,8 +120,9 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         super(Plugin, self).__init__(pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        self.pluginIsInitializing = True
-        self.pluginIsShuttingDown = False
+        self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
+        self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
+        self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
 
         # ========================= Initialize Logger =========================
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
@@ -175,6 +178,10 @@ class Plugin(indigo.PluginBase):
         pass
 
     def deviceStartComm(self, dev):
+
+        # If we're coming here from a sleep state, we need to ensure that the plugin
+        # shutdown global is in its proper state.
+        self.pluginIsShuttingDown = False
 
         # Check to see if the device profile has changed.
         dev.stateListOrDisplayStateIdChanged()
@@ -423,12 +430,13 @@ class Plugin(indigo.PluginBase):
         self.sleep(0.5)
 
         while True:
-            self.updater.checkVersionPoll()
+            if not self.pluginIsShuttingDown:
+                self.updater.checkVersionPoll()
 
-            self.csv_refresh()
-            self.refreshTheCharts()
+                self.csv_refresh()
+                self.refreshTheCharts()
 
-            self.sleep(15)
+                self.sleep(15)
 
     def startup(self):
 
@@ -1573,7 +1581,12 @@ class Plugin(indigo.PluginBase):
 
         forecast_source_menu = []
 
+        # We accept both WUnderground (legacy) and Fantastic Weather devices. We have to
+        # construct these one at a time.
         try:
+            for dev in indigo.devices.itervalues("com.fogbert.indigoplugin.fantasticwWeather"):
+                if dev.deviceTypeId in ['Daily', 'Hourly']:
+                    forecast_source_menu.append((dev.id, dev.name))
             for dev in indigo.devices.itervalues("com.fogbert.indigoplugin.wunderground"):
                 if dev.deviceTypeId in ['wundergroundTenDay', 'wundergroundHourly']:
                     forecast_source_menu.append((dev.id, dev.name))
@@ -1584,7 +1597,7 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"Forecast device list generated successfully: {0}".format(forecast_source_menu))
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
 
-        return forecast_source_menu
+        return sorted(forecast_source_menu, key=lambda s: s[1].lower())
 
     def getLineList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
@@ -1807,10 +1820,25 @@ class Plugin(indigo.PluginBase):
         :param indigo.pluginAction pluginAction:
         """
 
-        self.logger.info(u"{0:=^80}".format(' Refresh Single Chart Action '))
-        self.refreshTheCharts(pluginAction.deviceId)
+        dev_list = indigo.devices[pluginAction.deviceId]
+        self.refreshTheCharts(dev_list)
 
-    def refreshTheCharts(self, chart_id=None):
+    def refresh_the_charts_now(self):
+        """
+        Refresh all enabled charts
+
+        Refresh all enabled charts based on some user action (like an Indigo menu
+        call).
+
+        -----
+
+        :return:
+        """
+        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
+        self.skipRefreshDateUpdate = True
+        self.refreshTheCharts(devices_to_refresh)
+
+    def refreshTheCharts(self, dev_list=None):
         """
         Refreshes all the plugin chart devices.
 
@@ -1819,9 +1847,8 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param int chart_id: the dev.id for the chart to be refreshed.
+        :param list dev_list: list of devices to be refreshed.
         """
-
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)
         return_queue = multiprocessing.Queue()
 
@@ -1887,11 +1914,12 @@ class Plugin(indigo.PluginBase):
                 self.logger.threaddebug(u"{0:<19}{1}".format("Updated rcParams:  ", dict(plt.rcParams)))
                 self.logger.threaddebug(u"{0:<19}{1}".format("Updated p_dict: ", p_dict))
 
-            # A specific chart id may be passed to the method. In that case, refresh only
-            # that chart. Otherwise, chart_id is None and we refresh all of the charts.
-            if not chart_id:
+            # A list of chart ids may be passed to the method. In that case, refresh only
+            # those charts. Otherwise, chart_id is None and we evaluate all of the charts
+            # to see if they need to be updated.
+            if not dev_list:
 
-                devices_to_refresh = []
+                dev_list = []
                 for dev in indigo.devices.itervalues('self'):
 
                     if dev.deviceTypeId != 'csvEngine' and dev.enabled:
@@ -1900,13 +1928,9 @@ class Plugin(indigo.PluginBase):
                         refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
 
                         if refresh_needed:
-                            devices_to_refresh.append(dev)
+                            dev_list.append(dev)
 
-            else:
-
-                devices_to_refresh = [indigo.devices[int(chart_id)]]
-
-            for dev in devices_to_refresh:
+            for dev in dev_list:
 
                 dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
@@ -2199,13 +2223,22 @@ class Plugin(indigo.PluginBase):
                     self.processLogQueue(dev, return_queue)
 
                     dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-                    kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+
+                    # If we have manually asked for all charts to update, don't refresh the last
+                    # update time so that the charts will update on their own at the next refresh
+                    # cycle.
+                    if not self.skipRefreshDateUpdate:
+                        kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+
                     dev.updateStatesOnServer(kv_list)
 
                 except RuntimeError as sub_error:
                     self.logger.critical(u"[{0}] Critical Error: {1}".format(dev.name, sub_error))
                     self.logger.critical(u"Skipping device.")
                     dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+
+            # Ensure the flag is in the proper state for the next automatic refresh.
+            self.skipRefreshDateUpdate = False
 
         except Exception as sub_error:
             self.logger.threaddebug(u"{0}".format(unicode(sub_error)))
@@ -3171,9 +3204,35 @@ class MakeChart(object):
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
                     log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not be able to see it).".format(dev.name))
 
-            # ========================= Hourly Device =========================
-            if dev_type == 'wundergroundHourly':
-                pass
+            # ========================== Fantastic Hourly Device ==========================
+            if dev_type == 'Hourly':
+
+                for counter in range(1, 25, 1):
+                    if counter < 10:
+                        counter = '0{0}'.format(counter)
+
+                    epoch = state_list['h{0}_epoch'.format(counter)]
+                    time_stamp = dt.datetime.fromtimestamp(epoch)
+                    time_stamp = dt.datetime.strftime(time_stamp, "%Y-%m-%d %H:%M")
+                    p_dict['x_obs1'].append(time_stamp)
+
+                    p_dict['y_obs1'].append(state_list['h{0}_temperature'.format(counter)])
+                    p_dict['y_obs3'].append(state_list['h{0}_precipChance'.format(counter)])
+
+                    # Convert the date strings for charting.
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+
+                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
+                    if set(p_dict['y_obs3']) == {0.0}:
+                        p_dict['y_obs3'][0] = 1.0
+
+                    p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure that Matplotlib interprets the legend as a tuple.
+                    p_dict['headers_2']    = ('Precipitation',)
+                    p_dict['daytimeColor'] = r"#{0}".format(p_dict['daytimeColor'].replace(' ', '').replace('#', ''))
+
+            # ======================== WUnderground Hourly Device =========================
+            elif dev_type == 'wundergroundHourly':
+
                 for counter in range(1, 25, 1):
                     if counter < 10:
                         counter = '0{0}'.format(counter)
@@ -3192,9 +3251,30 @@ class MakeChart(object):
                     p_dict['headers_2']    = ('Precipitation',)
                     p_dict['daytimeColor'] = r"#{0}".format(p_dict['daytimeColor'].replace(' ', '').replace('#', ''))
 
-            # ======================== Ten Day Device =========================
+            # ========================== Fantastic Daily Device ===========================
+            elif dev_type == 'Daily':
+
+                for counter in range(1, 9, 1):
+                    if counter < 10:
+                        counter = '0{0}'.format(counter)
+                    p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
+                    p_dict['y_obs1'].append(state_list['d{0}_temperatureHigh'.format(counter)])
+                    p_dict['y_obs2'].append(state_list['d{0}_temperatureLow'.format(counter)])
+                    p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
+
+                    # Convert the date strings for charting.
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+
+                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
+                    if set(p_dict['y_obs3']) == {0.0}:
+                        p_dict['y_obs3'][0] = 1.0
+
+                    p_dict['headers_1']    = ('High Temperature', 'Low Temperature',)
+                    p_dict['headers_2']    = ('Precipitation',)
+
+            # ======================== WUnderground Ten Day Device ========================
             elif dev_type == 'wundergroundTenDay':
-                pass
+
                 for counter in range(1, 11, 1):
                     if counter < 10:
                         counter = '0{0}'.format(counter)
@@ -3214,7 +3294,7 @@ class MakeChart(object):
                     p_dict['headers_2']    = ('Precipitation',)
 
             else:
-                log['Warning'].append(u"This device type only supports WUnderground plugin forecast devices.")
+                log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
 
 # ============================= AX1 ==============================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
@@ -3301,25 +3381,26 @@ class MakeChart(object):
                 ax1.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax1.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
             # ======================= Sunrise / Sunset ========================
-            # Note that this highlights daytime.
+            # Note that this highlights daytime hours on the chart.
 
             daylight = dev.pluginProps.get('showDaytime', True)
 
-            if daylight and dev_type == 'wundergroundHourly':
+            if daylight and dev_type in ['Hourly', 'wundergroundHourly']:
+
                 sun_rise, sun_set = self.format_dates(sun_rise_set)
-                if self.host_plugin.verboseLogging:
-                    log['Debug'].append(u"Sunrise > Sunset: {0}".format(sun_rise > sun_set))
 
                 min_dates_to_plot = np.amin(dates_to_plot)
                 max_dates_to_plot = np.amax(dates_to_plot)
+                log['Debug'].append(u"min_dates_to_plot: {0}".format(min_dates_to_plot))
+                log['Debug'].append(u"max_dates_to_plot: {0}".format(max_dates_to_plot))
+                log['Debug'].append(u"sun_rise: {0}".format(sun_rise))
+                log['Debug'].append(u"sun_set: {0}".format(sun_set))
 
                 # We will only highlight daytime if the current values for sunrise and sunset
                 # fall within the limits of dates_to_plot. We add and subtract one second for
                 # each to account for microsecond rounding.
                 if (min_dates_to_plot - 1) < sun_rise < (max_dates_to_plot + 1) and (min_dates_to_plot - 1) < sun_set < (max_dates_to_plot + 1):
 
-                    if self.host_plugin.verboseLogging:
-                        log['Debug'].append(u"Highlighting daytime.")
                     # If sunrise is less than sunset, they are on the same day so we fill in
                     # between the two.
                     if sun_rise < sun_set:
@@ -3428,6 +3509,7 @@ class MakeChart(object):
             return_queue.put({'Error': False, 'Log': log, 'Message': 'updated successfully.', 'Name': dev.name})
 
         except (KeyError, ValueError) as sub_error:
+            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
             return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
