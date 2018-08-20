@@ -1834,9 +1834,10 @@ class Plugin(indigo.PluginBase):
 
         :return:
         """
-        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
         self.skipRefreshDateUpdate = True
+        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
         self.refreshTheCharts(devices_to_refresh)
+        self.logger.info(u"{0:=^80}".format(' Refresh Menu Action Complete '))
 
     def refreshTheCharts(self, dev_list=None):
         """
@@ -2187,7 +2188,7 @@ class Plugin(indigo.PluginBase):
                             self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
                         if __name__ == '__main__':
-                            p_multiline = multiprocessing.Process(name='p_multiline', target=MakeChart(self).chart__multiline_text, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                            p_multiline = multiprocessing.Process(name='p_multiline', target=MakeChart(self).chart_multiline_text, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
                             p_multiline.start()
                             p_multiline.join()
 
@@ -2254,9 +2255,10 @@ class Plugin(indigo.PluginBase):
 
         :param indigo.PluginAction action:
         """
-
-        self.refreshTheCharts()
-        self.logger.info(u"{0:=^80}".format(' Cycle complete. '))
+        self.skipRefreshDateUpdate = True
+        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
+        self.refreshTheCharts(devices_to_refresh)
+        self.logger.info(u"{0:=^80}".format(' Refresh Action Complete '))
 
 class MakeChart(object):
 
@@ -2753,7 +2755,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
-    def chart__multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
+    def chart_multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
         """
         Creates the multiline text charts
 
