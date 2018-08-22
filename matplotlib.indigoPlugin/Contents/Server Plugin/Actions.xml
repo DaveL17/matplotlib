@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <Actions>
-    <SupportURL>http://forums.indigodomo.com/viewforum.php?f=219</SupportURL>
+
+    <SupportURL>https://github.com/DaveL17/matplotlib/wiki</SupportURL>
 
     <!-- The device filter is excluding devices that aren't chart devices. -->
     <Action id="refreshAChartAction" deviceFilter="self, props.isChart" uiPath="DeviceActions">

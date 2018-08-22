@@ -18,18 +18,15 @@ proper WUnderground devices.
 # TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery levels.)
 # TODO: NEW -- Create a new device to plot with Y2. This is more complicated than it sounds.  Separate device type?
 # TODO: NEW -- Create an "error" chart with min/max/avg
+# TODO: NEW -- Create generic weather forecast charts to support any weather services
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
 # TODO: Implement a stale data tool.
-# TODO: Independent Y2 axis.
 # TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
 # TODO:   with extremely large number of observations.
 # TODO: Wrap long names for battery health device?
-# TODO: New weather forecast charts to support any weather services
 
-# TODO: Calculate the number of tick marks before trying to plot. Limit to csvEngine prefs.
-# TODO: Update charts now refactors last update so they get off their schedule.  Doesn't affect the data, just the redraw.
 # ================================== IMPORTS ==================================
 
 # Built-in modules
