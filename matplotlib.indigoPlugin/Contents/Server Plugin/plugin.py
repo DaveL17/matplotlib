@@ -74,7 +74,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.05"
+__version__   = "0.7.06"
 
 # =============================================================================
 
@@ -164,16 +164,19 @@ class Plugin(indigo.PluginBase):
     def __del__(self):
         indigo.PluginBase.__del__(self)
 
-# Indigo Methods ==============================================================
-
+    # =============================================================================
+    # ============================== Indigo Methods ===============================
+    # =============================================================================
     def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
 
         pass
 
+    # =============================================================================
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
 
         pass
 
+    # =============================================================================
     def deviceStartComm(self, dev):
 
         # If we're coming here from a sleep state, we need to ensure that the plugin
@@ -190,11 +193,13 @@ class Plugin(indigo.PluginBase):
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
+    # =============================================================================
     def deviceStopComm(self, dev):
 
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'}])
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
+    # =============================================================================
     def getDeviceConfigUiValues(self, valuesDict, typeId, devId):
 
         if self.verboseLogging:
@@ -356,6 +361,7 @@ class Plugin(indigo.PluginBase):
 
         return True
 
+    # =============================================================================
     def getDeviceStateList(self, dev):
 
         state_list = indigo.PluginBase.getDeviceStateList(self, dev)
@@ -373,6 +379,7 @@ class Plugin(indigo.PluginBase):
         else:
             return state_list
 
+    # =============================================================================
     def getMenuActionConfigUiValues(self, menuId):
 
         self.logger.debug(u"{0:*^80}".format(' Advanced Settings Menu '))
@@ -387,6 +394,7 @@ class Plugin(indigo.PluginBase):
 
         return settings, error_msg_dict
 
+    # =============================================================================
     def getPrefsConfigUiValues(self):
 
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
@@ -422,6 +430,7 @@ class Plugin(indigo.PluginBase):
 
         return plugin_prefs
 
+    # =============================================================================
     def runConcurrentThread(self):
 
         self.sleep(0.5)
@@ -435,6 +444,7 @@ class Plugin(indigo.PluginBase):
 
                 self.sleep(15)
 
+    # =============================================================================
     def startup(self):
 
         for dev in indigo.devices.itervalues("self"):
@@ -494,11 +504,13 @@ class Plugin(indigo.PluginBase):
         self.updater.checkVersionPoll()
         self.logger.debug(u"{0}{1}".format("Log Level = ", self.debugLevel))
 
+    # =============================================================================
     def shutdown(self):
 
         self.logger.debug(u"{0:*^40}".format(' Shut Down '))
         self.pluginIsShuttingDown = True
 
+    # =============================================================================
     def validatePrefsConfigUi(self, valuesDict):
 
         self.debugLevel = int(valuesDict['showDebugLevel'])
@@ -576,6 +588,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"Plugin preferences validated.")
         return True, valuesDict
 
+    # =============================================================================
     def validateDeviceConfigUi(self, valuesDict, typeId, devId):
 
         error_msg_dict = indigo.Dict()
@@ -693,8 +706,9 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"{0} settings validated.".format(dev.name))
         return True, valuesDict
 
-# Matplotlib Plugin methods ===================================================
-
+    # =============================================================================
+    # ============================== Plugin Methods ===============================
+    # =============================================================================
     def _dummyCallback(self, valuesDict=None, typeId="", targetId=0):
         """
         Dummy callback method to force dialog refreshes
@@ -712,6 +726,7 @@ class Plugin(indigo.PluginBase):
 
         pass
 
+    # =============================================================================
     def advancedSettingsExecuted(self, valuesDict, menuId):
         """
         Save advanced settings menu items to plugin props for storage
@@ -735,6 +750,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
         return True
 
+    # =============================================================================
     def advancedSettingsMenu(self, valuesDict, typeId="", devId=None):
         """
         Write advanced settings menu selections to the log
@@ -752,6 +768,7 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
         return
 
+    # =============================================================================
     def checkVersionNow(self):
         """
         Initiate plugin version update checker
@@ -765,6 +782,7 @@ class Plugin(indigo.PluginBase):
 
         self.updater.checkVersionNow()
 
+    # =============================================================================
     def commsKillAll(self):
         """
         Deactivate communication with all plugin devices
@@ -782,6 +800,7 @@ class Plugin(indigo.PluginBase):
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
 
+    # =============================================================================
     def commsUnkillAll(self):
         """
         Establish communication for all disabled plugin devices
@@ -799,6 +818,7 @@ class Plugin(indigo.PluginBase):
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
 
+    # =============================================================================
     def convert_custom_colors(self):
         """
         Convert legacy custom hex color values to raw color values
@@ -823,6 +843,7 @@ class Plugin(indigo.PluginBase):
                         else:
                             self.pluginPrefs[pref] = 'FF FF FF'
 
+    # =============================================================================
     def csv_item_add(self, valuesDict, typeId="", devId=None):
         """
         Add new item to CSV engine
@@ -901,6 +922,7 @@ class Plugin(indigo.PluginBase):
 
         return valuesDict, error_msg_dict
 
+    # =============================================================================
     def csv_item_delete(self, valuesDict, typeId="", devId=None):
         """
         Deletes items from the CSV Engine configuration dialog
@@ -938,6 +960,7 @@ class Plugin(indigo.PluginBase):
 
         return valuesDict
 
+    # =============================================================================
     def csv_item_list(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Construct the list of CSV items
@@ -970,6 +993,7 @@ class Plugin(indigo.PluginBase):
 
         return sorted(prop_list, key=lambda tup: tup[1])  # Return a list sorted by the value and not the key.
 
+    # =============================================================================
     def csv_item_update(self, valuesDict, typeId="", devId=None):
         """
         Updates items from the CSV Engine configuration dialog
@@ -1027,6 +1051,7 @@ class Plugin(indigo.PluginBase):
 
         return valuesDict, error_msg_dict
 
+    # =============================================================================
     def csv_item_select(self, valuesDict, typeId="", devId=None):
         """
         Populates CSV engine controls for updates and deletions
@@ -1060,6 +1085,7 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u"There was an error establishing a connection with the item you chose. {0}".format(sub_error))
         return valuesDict
 
+    # =============================================================================
     def csv_refresh(self):
         """
         Refreshes data for all CSV custom devices
@@ -1074,7 +1100,12 @@ class Plugin(indigo.PluginBase):
 
             if dev.deviceTypeId == 'csvEngine' and dev.enabled:
 
-                diff = dt.datetime.now() - dt.datetime.strptime(dev.states['csvLastUpdated'], "%Y-%m-%d %H:%M:%S.%f")
+                try:
+                    last_updated = dt.datetime.strptime(dev.states['csvLastUpdated'], "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    last_updated = dt.datetime(1970, 1, 1, 0, 0, 0, 0)
+
+                diff = dt.datetime.now() - last_updated
                 refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
 
                 if refresh_needed:
@@ -1166,6 +1197,7 @@ class Plugin(indigo.PluginBase):
             else:
                 pass
 
+    # =============================================================================
     def csv_source(self, typeId, valuesDict, devId, targetId):
         """
         Construct a list of devices and variables for the CSV engine
@@ -1197,6 +1229,7 @@ class Plugin(indigo.PluginBase):
 
         return list_
 
+    # =============================================================================
     def deviceStateValueList(self, typeId, valuesDict, devId, targetId):
         """
         Formulates list of device states for CSV engine
@@ -1240,6 +1273,7 @@ class Plugin(indigo.PluginBase):
         else:
             return [('None', 'Please select a source ID first')]
 
+    # =============================================================================
     def formatMarkers(self, p_dict):
         """
         Format matplotlib markers
@@ -1266,6 +1300,7 @@ class Plugin(indigo.PluginBase):
 
         return p_dict
 
+    # =============================================================================
     def generatorDeviceStates(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of device states for the provided device or variable id.
@@ -1293,6 +1328,7 @@ class Plugin(indigo.PluginBase):
         except KeyError:
             return [("Select a Source Above", "Select a Source Above")]
 
+    # =============================================================================
     def generatorDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of Indigo variables.
@@ -1315,6 +1351,7 @@ class Plugin(indigo.PluginBase):
 
         return self.Fogbert.deviceList()
 
+    # =============================================================================
     def generatorDeviceAndVariableList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Create a list of devices and variables for config menu controls
@@ -1340,6 +1377,7 @@ class Plugin(indigo.PluginBase):
 
         return self.Fogbert.deviceAndVariableList()
 
+    # =============================================================================
     def generatorVariableList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of Indigo variables.
@@ -1362,6 +1400,7 @@ class Plugin(indigo.PluginBase):
 
         return self.Fogbert.variableList()
 
+    # =============================================================================
     def getAxisList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of axis formats.
@@ -1391,6 +1430,7 @@ class Plugin(indigo.PluginBase):
 
         return axis_list_menu
 
+    # =============================================================================
     def getBatteryDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Create a list of battery-powered devices
@@ -1414,6 +1454,7 @@ class Plugin(indigo.PluginBase):
 
         return batt_list
 
+    # =============================================================================
     def getBinList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of bins for the X axis.
@@ -1441,6 +1482,7 @@ class Plugin(indigo.PluginBase):
 
         return bin_list_menu
 
+    # =============================================================================
     def getFileList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Get list of CSV files for various dropdown menus.
@@ -1479,6 +1521,7 @@ class Plugin(indigo.PluginBase):
         # return sorted(file_name_list_menu)
         return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
 
+    # =============================================================================
     def getFontList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Provide a list of font names for various dropdown menus.
@@ -1541,6 +1584,7 @@ class Plugin(indigo.PluginBase):
 
         return sorted(font_menu)
 
+    # =============================================================================
     def getFontSizeList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of font sizes.
@@ -1558,6 +1602,7 @@ class Plugin(indigo.PluginBase):
 
         return [(str(_), str(_)) for _ in np.arange(6, 21)]
 
+    # =============================================================================
     def getForecastSource(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Return a list of WUnderground devices for forecast chart devices
@@ -1596,6 +1641,7 @@ class Plugin(indigo.PluginBase):
 
         return sorted(forecast_source_menu, key=lambda s: s[1].lower())
 
+    # =============================================================================
     def getLineList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of line styles.
@@ -1623,6 +1669,7 @@ class Plugin(indigo.PluginBase):
                 ("steps-mid", "Steps Mid"),
                 ("steps-post", "Steps Post")]
 
+    # =============================================================================
     def getMarkerList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Returns a list of marker styles.
@@ -1665,6 +1712,7 @@ class Plugin(indigo.PluginBase):
                 ("|", "Vertical Line"),
                 ("x", "X")]
 
+    # =============================================================================
     def plotActionTest(self, pluginAction, dev, callerWaitingForResult):
         """
         Plugin API handler
@@ -1704,6 +1752,7 @@ class Plugin(indigo.PluginBase):
         if callerWaitingForResult:
             return {'success': True, 'message': u"Success"}
 
+    # =============================================================================
     def pluginEnvironmentLogger(self):
         """
         Log information about the plugin resource environment.
@@ -1726,6 +1775,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.info(u"{0:=^130}".format(""))
 
+    # =============================================================================
     def pluginErrorHandler(self, sub_error):
         """
         Centralized handling of traceback messages
@@ -1747,6 +1797,7 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"!!! {0}".format(line))
         self.logger.threaddebug(u"!" * 80)
 
+    # =============================================================================
     def processLogQueue(self, dev, return_queue):
         """
         Process output of multiprocessing queue messages
@@ -1783,6 +1834,7 @@ class Plugin(indigo.PluginBase):
             else:
                 self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
 
+    # =============================================================================
     def rcParamsDeviceUpdate(self, dev):
         """
         Update rcParams device with updated state values
@@ -1804,6 +1856,7 @@ class Plugin(indigo.PluginBase):
 
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
 
+    # =============================================================================
     def refreshAChartAction(self, pluginAction):
         """
         Refreshes an individual plugin chart device.
@@ -1820,6 +1873,7 @@ class Plugin(indigo.PluginBase):
         dev_list = indigo.devices[pluginAction.deviceId]
         self.refreshTheCharts(dev_list)
 
+    # =============================================================================
     def refresh_the_charts_now(self):
         """
         Refresh all enabled charts
@@ -1836,6 +1890,7 @@ class Plugin(indigo.PluginBase):
         self.refreshTheCharts(devices_to_refresh)
         self.logger.info(u"{0:=^80}".format(' Refresh Menu Action Complete '))
 
+    # =============================================================================
     def refreshTheCharts(self, dev_list=None):
         """
         Refreshes all the plugin chart devices.
@@ -2241,6 +2296,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.logger.threaddebug(u"{0}".format(unicode(sub_error)))
 
+    # =============================================================================
     def refreshTheChartsAction(self, action):
         """
         Called by an Indigo Action item.
@@ -2257,12 +2313,14 @@ class Plugin(indigo.PluginBase):
         self.refreshTheCharts(devices_to_refresh)
         self.logger.info(u"{0:=^80}".format(' Refresh Action Complete '))
 
+
 class MakeChart(object):
 
     def __init__(self, plugin):
         self.final_data = []
         self.host_plugin = plugin
 
+    # =============================================================================
     def _log_dicts(self, p_dict=None, k_dict=None):
         """
         Write parameters dicts to log under verbose logging
@@ -2279,6 +2337,7 @@ class MakeChart(object):
             self.host_plugin.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", p_dict))
             self.host_plugin.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", k_dict))
 
+    # =============================================================================
     def chart_bar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the bar charts
@@ -2421,6 +2480,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_battery_health(self, dev, device_dict, p_dict, k_dict, return_queue):
         """
         Creates the battery health charts
@@ -2545,6 +2605,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_calendar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the calendar charts
@@ -2593,6 +2654,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_line(self, dev, p_dict, k_dict, kv_list, return_queue):
         """
         Creates the line charts
@@ -2752,6 +2814,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
         """
         Creates the multiline text charts
@@ -2826,6 +2889,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_polar(self, dev, p_dict, k_dict, kv_list, return_queue):
         """
         Creates the polar charts
@@ -3018,6 +3082,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def chart_scatter(self, dev, p_dict, k_dict, kv_list, return_queue):
         """
         Creates the scatter charts
@@ -3162,6 +3227,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
 
+    # =============================================================================
     def chart_weather_forecast(self, dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue):
         """
         Creates the weather charts
@@ -3295,7 +3361,7 @@ class MakeChart(object):
             else:
                 log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
 
-# ============================= AX1 ==============================
+            # ============================= AX1 ==============================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             self.format_axis_x_ticks(ax1, p_dict, k_dict)
@@ -3410,7 +3476,7 @@ class MakeChart(object):
                         ax1.axvspan(min_dates_to_plot, sun_set, color=p_dict['daytimeColor'], alpha=0.15, zorder=1)
                         ax1.axvspan(sun_rise, max_dates_to_plot, color=p_dict['daytimeColor'], alpha=0.15, zorder=1)
 
-# ============================= AX2 ==============================
+            # ============================= AX2 ==============================
 
             # ======================= Temperatures Plot =======================
             # Create a second plot area and plot the temperatures.
@@ -3515,6 +3581,7 @@ class MakeChart(object):
             log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
             return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
 
+    # =============================================================================
     def clean_string(self, val):
         """
         Cleans long strings of whitespace and formats certain characters
@@ -3546,6 +3613,7 @@ class MakeChart(object):
 
         return val
 
+    # =============================================================================
     def convert_the_data(self, final_data):
         """
         Convert data into form that matplotlib can understand
@@ -3584,6 +3652,7 @@ class MakeChart(object):
         final_data = [[n[0], 'NaN'] if n[1] == '-99.0' else n for n in final_data]
         return final_data
 
+    # =============================================================================
     def format_axis_x_label(self, dev, p_dict, k_dict):
         """
         Format X axis label visibility and properties
@@ -3608,6 +3677,7 @@ class MakeChart(object):
 
         return ''
 
+    # =============================================================================
     def format_axis_x_scale(self, x_axis_bins):
         """
         Format X axis scale based on user setting
@@ -3651,6 +3721,7 @@ class MakeChart(object):
             plt.gca().xaxis.set_major_locator(mdate.YearLocator())
             plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
 
+    # =============================================================================
     def format_axis_x_ticks(self, ax, p_dict, k_dict):
         """
         Format X axis tick properties
@@ -3675,6 +3746,7 @@ class MakeChart(object):
 
         return ax
 
+    # =============================================================================
     def format_axis_y(self, ax, p_dict, k_dict):
         """
         Format Y1 axis display properties
@@ -3706,6 +3778,7 @@ class MakeChart(object):
 
         return ax
 
+    # =============================================================================
     def format_axis_y1_min_max(self, p_dict):
         """
         Format Y1 axis range limits
@@ -3746,6 +3819,7 @@ class MakeChart(object):
 
         plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
+    # =============================================================================
     def format_axis_y1_label(self, p_dict, k_dict):
         """
         Format Y1 axis labels
@@ -3760,6 +3834,7 @@ class MakeChart(object):
 
         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
+    # =============================================================================
     def format_axis_y_ticks(self, p_dict, k_dict):
         """
         Format Y axis tick marks
@@ -3783,6 +3858,7 @@ class MakeChart(object):
         except Exception:
             pass
 
+    # =============================================================================
     def format_axis_y2_label(self, p_dict, k_dict):
         """
         Format Y2 axis properties
@@ -3797,6 +3873,7 @@ class MakeChart(object):
 
         plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
 
+    # =============================================================================
     def format_dates(self, list_of_dates):
         """
         Convert date strings to date objects
@@ -3814,6 +3891,7 @@ class MakeChart(object):
 
         return dates_to_plot
 
+    # =============================================================================
     def format_grids(self, p_dict, k_dict):
         """
         Format matplotlib grids
@@ -3833,6 +3911,7 @@ class MakeChart(object):
         if p_dict['showyAxisGrid']:
             plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
+    # =============================================================================
     def get_data(self, data_source):
         """
         Retrieve data from CSV file.
@@ -3865,6 +3944,7 @@ class MakeChart(object):
 
         return final_data
 
+    # =============================================================================
     def make_chart_figure(self, width, height, p_dict):
         """
         Create the matplotlib figure object and create the main axes element.
@@ -3889,6 +3969,7 @@ class MakeChart(object):
         [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
         return ax
 
+    # =============================================================================
     def plot_best_fit_line_segments(self, ax, dates_to_plot, line, p_dict):
         """
         Adds best fit line segments to plots
@@ -3906,6 +3987,7 @@ class MakeChart(object):
 
         return ax
 
+    # =============================================================================
     def plot_custom_line_segments(self, ax, p_dict, k_dict):
         """
         Chart custom line segments handler
@@ -3948,6 +4030,7 @@ class MakeChart(object):
                 self.host_plugin.pluginErrorHandler(traceback.format_exc())
                 self.host_plugin.logger.warning(u"There is a problem with the custom segments settings. {0}".format(sub_error))
 
+    # =============================================================================
     def save_chart_image(self, plt, p_dict, k_dict):
         """
         Save the chart figure to a file.
@@ -3966,3 +4049,4 @@ class MakeChart(object):
 
             plt.clf()
             plt.close('all')
+    # =============================================================================

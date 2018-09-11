@@ -153,6 +153,7 @@
                 <TriggerLabel>CSV Data Last Updated</TriggerLabel>
                 <ControlPageLabel>CSV Data Last Updated</ControlPageLabel>
             </State>
+
             <State id="onOffState">
                 <ValueType>Boolean</ValueType>
                 <TriggerLabel>Device State</TriggerLabel>
