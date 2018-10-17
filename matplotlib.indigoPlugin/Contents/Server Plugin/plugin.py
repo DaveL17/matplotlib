@@ -1101,9 +1101,9 @@ class Plugin(indigo.PluginBase):
             if dev.deviceTypeId == 'csvEngine' and dev.enabled:
 
                 try:
-                    last_updated = dt.datetime.strptime(dev.states['csvLastUpdated'], "%Y-%m-%d %H:%M:%S.%f")
+                    last_updated = date_parse(dev.states['csvLastUpdated'])
                 except ValueError:
-                    last_updated = dt.datetime(1970, 1, 1, 0, 0, 0, 0)
+                    last_updated = date_parse('1970-01-01 00:00')
 
                 diff = dt.datetime.now() - last_updated
                 refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
@@ -1162,6 +1162,7 @@ class Plugin(indigo.PluginBase):
 
                         # Determine if the thing to be written is a device or variable.
                         try:
+                            state_to_write = u""
                             if not v[1]:
                                 self.logger.warning(u"Found CSV Data element with missing source ID. Please check to ensure all CSV sources are properly configured.")
                             elif int(v[1]) in indigo.devices:
@@ -1169,7 +1170,6 @@ class Plugin(indigo.PluginBase):
                             elif int(v[1]) in indigo.variables:
                                 state_to_write = u"{0}".format(indigo.variables[int(v[1])].value)
                             else:
-                                state_to_write = u""
                                 self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
 
                             # Give matplotlib something it can chew on if the value to be saved is 'None'
@@ -1177,7 +1177,7 @@ class Plugin(indigo.PluginBase):
                                 state_to_write = 'NaN'
 
                             # Write the latest value to the file.
-                            timestamp = u"{0}".format(indigo.server.getTime().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                            timestamp = u"{0}".format(indigo.server.getTime().strftime("%Y-%m-%d %H:%M:%S.%f"))
                             csv_file = open(full_path, 'a')
                             csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
                             csv_file.close()
@@ -1977,7 +1977,7 @@ class Plugin(indigo.PluginBase):
 
                     if dev.deviceTypeId != 'csvEngine' and dev.enabled:
 
-                        diff = dt.datetime.now() - dt.datetime.strptime(dev.states['chartLastUpdated'], "%Y-%m-%d %H:%M:%S.%f")
+                        diff = dt.datetime.now() - date_parse(dev.states['chartLastUpdated'])
                         refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
 
                         if refresh_needed:
