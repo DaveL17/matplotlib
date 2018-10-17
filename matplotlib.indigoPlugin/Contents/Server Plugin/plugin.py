@@ -74,7 +74,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.06"
+__version__   = "0.7.07"
 
 # =============================================================================
 
