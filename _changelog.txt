@@ -1,4 +1,8 @@
 
+v0.7.08
+- Adds Action item to update CSV device set to manual update only
+- Adds Action item to update CSV device set to manual update only for single CSV data source.
+
 v0.7.07
 - Fixes bug for rare circumstance where chart device's 'csvLastUpdated' state
   did not save in expected timestamp format.

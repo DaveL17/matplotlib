@@ -74,7 +74,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.07"
+__version__   = "0.7.08"
 
 # =============================================================================
 
@@ -1098,6 +1098,8 @@ class Plugin(indigo.PluginBase):
 
         for dev in indigo.devices.itervalues("self"):
 
+            refresh_interval = int(dev.pluginProps['refreshInterval'])
+
             if dev.deviceTypeId == 'csvEngine' and dev.enabled:
 
                 try:
@@ -1106,96 +1108,192 @@ class Plugin(indigo.PluginBase):
                     last_updated = date_parse('1970-01-01 00:00')
 
                 diff = dt.datetime.now() - last_updated
-                refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
+                refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
 
-                if refresh_needed:
+                if refresh_needed and refresh_interval != 0:
 
                     dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
-                    csv_dict_str = dev.pluginProps['columnDict']   # {key: (Item Name, Source ID, Source State)}
-                    csv_dict     = literal_eval(csv_dict_str)  # Convert column_dict from a string to a literal dict.
+                    csv_dict_str = dev.pluginProps['columnDict']  # {key: (Item Name, Source ID, Source State)}
+                    csv_dict     = literal_eval(csv_dict_str)     # Convert column_dict from a string to a literal dict.
 
-                    # Read through the dict and construct headers and data
-                    for k, v in sorted(csv_dict.items()):
+                    self.csv_refresh_process(dev, csv_dict)
 
-                        # Create a path variable that is based on the target folder and the CSV item name.
-                        full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
+    # =============================================================================
+    def csv_refresh_process(self, dev, csv_dict):
+        """
+        The csv_refresh_process() method processes CSV update requests
 
-                        # If the appropriate CSV file doesn't exist, create it and write the header line.
-                        if not os.path.isfile(full_path):
-                            csv_file = open(full_path, 'w')
-                            csv_file.write('{0},{1}\n'.format('Timestamp', v[0].encode("utf-8")))
-                            csv_file.close()
+        :param csv_dict:
+        :param dev:
+        :return:
+        """
+        # Read through the dict and construct headers and data
+        for k, v in sorted(csv_dict.items()):
 
-                        # Determine the length of the CSV file and truncate if needed.
-                        backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
-                        target_lines = int(dev.pluginProps['numLinesToKeep']) - 1
+            # Create a path variable that is based on the target folder and the CSV item name.
+            full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
 
-                        # Make a backup of the CSV file in case something goes wrong.
-                        try:
-                            import shutil
-                            shutil.copyfile(full_path, backup)
-                        except ImportError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"The CSV Engine facility requires the shutil module. {0}".format(sub_error))
-                        except Exception as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.critical(u"Unable to backup CSV file. {0}".format(sub_error))
+            # If the appropriate CSV file doesn't exist, create it and write the header line.
+            if not os.path.isfile(full_path):
+                csv_file = open(full_path, 'w')
+                csv_file.write('{0},{1}\n'.format('timestamp', v[0].encode("utf-8")))
+                csv_file.close()
 
-                        # Open the original file in read-only mode and count the number of lines.
-                        with open(full_path, 'r') as orig_file:
-                            lines = orig_file.readlines()
-                            orig_num_lines = sum(1 for _ in lines)
+            # Determine the length of the CSV file and truncate if needed.
+            backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
+            target_lines = int(dev.pluginProps['numLinesToKeep']) - 1
 
-                        # Write the file (retaining the header line and the last target_lines).
-                        if orig_num_lines > target_lines:
-                            with open(full_path, 'w') as new_file:
-                                new_file.writelines(lines[0:1])
-                                new_file.writelines(lines[(orig_num_lines - target_lines): orig_num_lines])
+            # Make a backup of the CSV file in case something goes wrong.
+            try:
+                import shutil
+                shutil.copyfile(full_path, backup)
+            except ImportError as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"The CSV Engine facility requires the shutil module. {0}".format(sub_error))
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.critical(u"Unable to backup CSV file. {0}".format(sub_error))
 
-                        # If all has gone well, delete the backup.
-                        try:
-                            os.remove(backup)
-                        except Exception as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"Unable to delete backup file. {0}".format(sub_error))
+            # Open the original file in read-only mode and count the number of lines.
+            with open(full_path, 'r') as orig_file:
+                lines = orig_file.readlines()
+                orig_num_lines = sum(1 for _ in lines)
 
-                        # Determine if the thing to be written is a device or variable.
-                        try:
-                            state_to_write = u""
-                            if not v[1]:
-                                self.logger.warning(u"Found CSV Data element with missing source ID. Please check to ensure all CSV sources are properly configured.")
-                            elif int(v[1]) in indigo.devices:
-                                state_to_write = u"{0}".format(indigo.devices[int(v[1])].states[v[2]])
-                            elif int(v[1]) in indigo.variables:
-                                state_to_write = u"{0}".format(indigo.variables[int(v[1])].value)
-                            else:
-                                self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
+            # Write the file (retaining the header line and the last target_lines).
+            if orig_num_lines > target_lines:
+                with open(full_path, 'w') as new_file:
+                    new_file.writelines(lines[0:1])
+                    new_file.writelines(lines[(orig_num_lines - target_lines): orig_num_lines])
 
-                            # Give matplotlib something it can chew on if the value to be saved is 'None'
-                            if state_to_write in ['None', None]:
-                                state_to_write = 'NaN'
+            # If all has gone well, delete the backup.
+            try:
+                os.remove(backup)
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Unable to delete backup file. {0}".format(sub_error))
 
-                            # Write the latest value to the file.
-                            timestamp = u"{0}".format(indigo.server.getTime().strftime("%Y-%m-%d %H:%M:%S.%f"))
-                            csv_file = open(full_path, 'a')
-                            csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
-                            csv_file.close()
+            # Determine if the thing to be written is a device or variable.
+            try:
+                state_to_write = u""
+                if not v[1]:
+                    self.logger.warning(u"Found CSV Data element with missing source ID. Please check to ensure all CSV sources are properly configured.")
+                elif int(v[1]) in indigo.devices:
+                    state_to_write = u"{0}".format(indigo.devices[int(v[1])].states[v[2]])
+                elif int(v[1]) in indigo.variables:
+                    state_to_write = u"{0}".format(indigo.variables[int(v[1])].value)
+                else:
+                    self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
 
-                        except ValueError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"Invalid Indigo ID. {0}".format(sub_error))
-                        except Exception as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"Invalid CSV definition. {0}".format(sub_error))
+                # Give matplotlib something it can chew on if the value to be saved is 'None'
+                if state_to_write in ['None', None]:
+                    state_to_write = 'NaN'
 
-                    dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
-                                              {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
-                    self.logger.info(u"[{0}] updated successfully.".format(dev.name))
-                    dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                # Write the latest value to the file.
+                timestamp = u"{0}".format(indigo.server.getTime().strftime("%Y-%m-%d %H:%M:%S.%f"))
+                csv_file = open(full_path, 'a')
+                csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
+                csv_file.close()
 
-            else:
-                pass
+            except ValueError as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Invalid Indigo ID. {0}".format(sub_error))
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Invalid CSV definition. {0}".format(sub_error))
+
+        dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
+                                  {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
+        self.logger.info(u"[{0}] updated successfully.".format(dev.name))
+        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+
+    # =============================================================================
+    def csv_refresh_device_action(self, pluginAction, dev, callerWaitingForResult):
+        """
+        Perform a manual refresh of a single CSV Device
+
+        This method will update all CSV sources associated with the selected CSV Engine
+        device
+
+        -----
+
+        :return:
+        """
+
+        dev = indigo.devices[int(pluginAction.props['targetDevice'])]
+
+        if dev.enabled:
+            csv_dict_str = dev.pluginProps['columnDict']  # {key: (Item Name, Source ID, Source State)}
+            csv_dict     = literal_eval(csv_dict_str)     # Convert column_dict from a string to a literal dict.
+
+            self.logger.info(unicode(csv_dict))
+            self.csv_refresh_process(dev, csv_dict)
+
+    # =============================================================================
+    def csv_refresh_source_action(self, pluginAction, dev, callerWaitingForResult):
+        """
+        Perform a manual refresh of a single CSV Source
+
+        -----
+
+        :return:
+        """
+
+        dev_id = int(pluginAction.props['targetDevice'])
+        dev    = indigo.devices[dev_id]
+
+        target_source = pluginAction.props['targetSource'].split('/')
+        self.logger.info(target_source)
+
+        if dev.enabled:
+            csv_dict = {u'k1': (target_source[0], int(target_source[1]), target_source[2])}
+
+            self.logger.info(unicode(csv_dict))
+            self.csv_refresh_process(dev, csv_dict)
+
+    # TODO: Changing the name of a CSV element will break a manual update action item.
+
+    # =============================================================================
+    def get_csv_device_list(self, filter="", valuesDict=None, typeId="", targetId=0):
+        """
+
+        value stored in 'targetDevice'
+
+        :param filter:
+        :param valuesDict:
+        :param typeId:
+        :param targetId:
+        :return:
+        """
+
+        # Return a list of tuples that contains only CSV devices set to manual refresh
+        # (refreshInterval = 0).
+        return [(dev.id, dev.name) for dev in indigo.devices.iter("self") if dev.deviceTypeId == "csvEngine" and dev.pluginProps['refreshInterval'] == "0"]
+
+    # =============================================================================
+    def get_csv_source_list(self, filter="", valuesDict=None, typeId="", targetId=0):
+        """
+
+        value stored in 'targetSource'
+
+        :param filter:
+        :param valuesDict:
+        :param typeId:
+        :param targetId:
+        :return:
+        """
+
+        if not valuesDict:
+            return []
+
+        # Once user selects a device ( see get_csv_device_list() ), populate the dropdown
+        # menu.
+        else:
+            target_device = int(valuesDict['targetDevice'])
+            dev           = indigo.devices[target_device]
+            dev_dict      = literal_eval(dev.pluginProps['columnDict'])
+
+            return [(dev_dict[k][0] + '/' + dev_dict[k][1] + '/' + dev_dict[k][2], dev_dict[k][0]) for k in dev_dict]
 
     # =============================================================================
     def csv_source(self, typeId, valuesDict, devId, targetId):
@@ -1482,7 +1580,7 @@ class Plugin(indigo.PluginBase):
 
         return bin_list_menu
 
-    # =============================================================================
+# =============================================================================
     def getFileList(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
         Get list of CSV files for various dropdown menus.
