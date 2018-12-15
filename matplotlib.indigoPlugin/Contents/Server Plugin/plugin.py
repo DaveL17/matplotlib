@@ -74,7 +74,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.08"
+__version__   = "0.7.09"
 
 # =============================================================================
 
@@ -1226,8 +1226,10 @@ class Plugin(indigo.PluginBase):
             csv_dict_str = dev.pluginProps['columnDict']  # {key: (Item Name, Source ID, Source State)}
             csv_dict     = literal_eval(csv_dict_str)     # Convert column_dict from a string to a literal dict.
 
-            self.logger.info(unicode(csv_dict))
             self.csv_refresh_process(dev, csv_dict)
+
+        else:
+            self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
 
     # =============================================================================
     def csv_refresh_source_action(self, pluginAction, dev, callerWaitingForResult):
@@ -1242,16 +1244,15 @@ class Plugin(indigo.PluginBase):
         dev_id = int(pluginAction.props['targetDevice'])
         dev    = indigo.devices[dev_id]
 
-        target_source = pluginAction.props['targetSource'].split('/')
-        self.logger.info(target_source)
-
         if dev.enabled:
-            csv_dict = {u'k1': (target_source[0], int(target_source[1]), target_source[2])}
+            target_source = pluginAction.props['targetSource']
+            temp_dict     = literal_eval(dev.pluginProps['columnDict'])
+            foo           = {target_source: temp_dict[target_source]}
 
-            self.logger.info(unicode(csv_dict))
-            self.csv_refresh_process(dev, csv_dict)
+            self.csv_refresh_process(dev, foo)
 
-    # TODO: Changing the name of a CSV element will break a manual update action item.
+        else:
+            self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
 
     # =============================================================================
     def get_csv_device_list(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -1293,7 +1294,7 @@ class Plugin(indigo.PluginBase):
             dev           = indigo.devices[target_device]
             dev_dict      = literal_eval(dev.pluginProps['columnDict'])
 
-            return [(dev_dict[k][0] + '/' + dev_dict[k][1] + '/' + dev_dict[k][2], dev_dict[k][0]) for k in dev_dict]
+            return [(k, dev_dict[k][0]) for k in dev_dict]
 
     # =============================================================================
     def csv_source(self, typeId, valuesDict, devId, targetId):

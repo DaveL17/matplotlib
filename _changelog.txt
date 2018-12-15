@@ -1,7 +1,12 @@
 
+v0.7.09
+- Settings for manual CSV refresh actions now retained when CSV Engine device
+  source names changed.
+
 v0.7.08
 - Adds Action item to update CSV device set to manual update only
-- Adds Action item to update CSV device set to manual update only for single CSV data source.
+- Adds Action item to update CSV device set to manual update only for single
+  CSV data source.
 
 v0.7.07
 - Fixes bug for rare circumstance where chart device's 'csvLastUpdated' state
