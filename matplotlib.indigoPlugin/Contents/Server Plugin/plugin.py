@@ -1212,11 +1212,16 @@ class Plugin(indigo.PluginBase):
         """
         Perform a manual refresh of a single CSV Device
 
-        This method will update all CSV sources associated with the selected CSV Engine
-        device
+        The csv_refresh_device_action() method will allow for the update of a single
+        CSV Engine device. This method will update all CSV sources associated with the
+        selected CSV Engine device each time the Action item is called. Only CSV Engine
+        devices set to a manual refresh interval will be presented.
 
         -----
 
+        :param pluginAction:
+        :param dev:
+        :param callerWaitingForResult:
         :return:
         """
 
@@ -1236,7 +1241,18 @@ class Plugin(indigo.PluginBase):
         """
         Perform a manual refresh of a single CSV Source
 
+        The csv_refresh_source_action() method will allow for the update of a single
+        CSV source from a CSV Engine device. When creating a new Action item, the user
+        selects a target CSV Engine device and then the available CSV sources will be
+        displayed. The user selects a single CSV source that will be updated each time
+        the Action is called. Only CSV Engine devices set to a manual refresh interval
+        will be presented.
+
         -----
+
+        :param pluginAction:
+        :param dev:
+        :param callerWaitingForResult:
 
         :return:
         """
@@ -1257,8 +1273,10 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def get_csv_device_list(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
+        Return a list of CSV Engine devices set to manual refresh
 
-        value stored in 'targetDevice'
+        The get_csv_device_list() method returns a list of CSV Engine devices with a
+        manual refresh interval.
 
         :param filter:
         :param valuesDict:
@@ -1268,14 +1286,16 @@ class Plugin(indigo.PluginBase):
         """
 
         # Return a list of tuples that contains only CSV devices set to manual refresh
-        # (refreshInterval = 0).
+        # (refreshInterval = 0) for config menu.
         return [(dev.id, dev.name) for dev in indigo.devices.iter("self") if dev.deviceTypeId == "csvEngine" and dev.pluginProps['refreshInterval'] == "0"]
 
     # =============================================================================
     def get_csv_source_list(self, filter="", valuesDict=None, typeId="", targetId=0):
         """
+        Return a list of CSV sources from CSV Engine devices set to manual refresh
 
-        value stored in 'targetSource'
+        The get_csv_source_list() method returns a list of CSV sources for the target
+        CSV Engine device.
 
         :param filter:
         :param valuesDict:
