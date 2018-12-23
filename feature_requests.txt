@@ -1,0 +1,22 @@
+===============================================================================
+Matplotlib Plugin Feature Requests
+===============================================================================
+
+===============================================================================
+2018-12-18  Autolog
+===============================================================================
+A minor usability feature request: When you select an item (ID: field), it
+lists all devices and variables and then list is displayed at the bottom of
+the variable list. This means (in my case) there is an awful lot of scrolling
+to do before getting to the devices. It would be useful to be able to select
+from a device list or variable list.
+
+===============================================================================
+2018-12-18  Autolog
+===============================================================================
+In the CSV Engine you can specify the number of Observations that you wish to
+keep in your CSV file.
+
+It would also be useful to able to specify a user specified data retention
+period (e.g. 24 hours) so that older entries get dropped off. This would then
+make it easy to display graphs for the last 24 hours for example.

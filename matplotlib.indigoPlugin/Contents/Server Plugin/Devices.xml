@@ -9,16 +9,17 @@
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
 
             <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
-                <Label>The CSV Engine Device is used to construct data files for charting.  The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
+                <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
             </Field>
 
             <Field id="topSeparator" type="separator"/>
+
             <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false">
                 <Label>Observations:</Label>
             </Field>
 
             <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the number of observations that you would like to retain in your CSV files.</Label>
+                <Label>Enter the maximum number of observations that you would like to retain in your CSV files.</Label>
             </Field>
 
             <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data?">
@@ -1227,6 +1228,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Select preference for the color of the best fit line for line 4.">
                 <Label>Best Fit Color:</Label>
             </Field>
+
+            <Field id="line4Bottom" type="separator" visibleBindingId="lineLabel4" visibleBindingValue="true"/>
 
 <!-- Line 5 -->
             <Field id="lineLabel5" type="checkbox" defaultValue="false">

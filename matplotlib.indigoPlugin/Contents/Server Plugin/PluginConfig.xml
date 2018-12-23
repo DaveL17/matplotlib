@@ -221,9 +221,6 @@
         <List class="self" filter="" method="getFontSizeList"/>
     </Field>
 
-    <!-- Notifications Template -->
-    <Template file="DLFramework/template_notifications.xml" />
-
     <!-- Debugging Template -->
     <Template file="DLFramework/template_debugging.xml" />
 

@@ -27,6 +27,9 @@ proper WUnderground devices.
 # TODO:   with extremely large number of observations.
 # TODO: Wrap long names for battery health device?
 
+# TODO: Remove plugin update checking from docs upon update
+# TODO: Remove matplotlib_version.html after deprecation
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -54,7 +57,7 @@ import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
 # Third-party modules
-from DLFramework import indigoPluginUpdateChecker
+# from DLFramework import indigoPluginUpdateChecker
 try:
     import indigo
 except ImportError as error:
@@ -74,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.09"
+__version__   = "0.7.10"
 
 # =============================================================================
 
@@ -127,10 +130,6 @@ class Plugin(indigo.PluginBase):
         self.debugLevel = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debugLevel)
 
-        # ===================== Initialize Update Checker =====================
-        updater_url  = "https://raw.githubusercontent.com/DaveL17/matplotlib/master/matplotlib_version.html"
-        self.updater = indigoPluginUpdateChecker.updateChecker(self, updater_url)
-
         # ==================== Initialize Global Variables ====================
         self.final_data     = []
         self.verboseLogging = self.pluginPrefs.get('verboseLogging', False)  # From advanced settings menu
@@ -152,6 +151,12 @@ class Plugin(indigo.PluginBase):
         # ============== Conform Custom Colors to Color Picker ================
         # See method for more info.
         self.convert_custom_colors()
+
+        # ======================== Clean Plugin Prefs =========================
+        # Remove legacy cruft from valuesDict. If any key exists in the current
+        # valuesDict, let's remove it.
+        self.pluginPrefs = self.clean_plugin_prefs(self.pluginPrefs)
+        indigo.server.savePluginPrefs()
 
         # ========================= Remote Debug Hook =========================
         # try:
@@ -437,11 +442,8 @@ class Plugin(indigo.PluginBase):
 
         while True:
             if not self.pluginIsShuttingDown:
-                self.updater.checkVersionPoll()
-
                 self.csv_refresh()
                 self.refreshTheCharts()
-
                 self.sleep(15)
 
     # =============================================================================
@@ -501,7 +503,6 @@ class Plugin(indigo.PluginBase):
 
             dev.replacePluginPropsOnServer(props)
 
-        self.updater.checkVersionPoll()
         self.logger.debug(u"{0}{1}".format("Log Level = ", self.debugLevel))
 
     # =============================================================================
@@ -518,7 +519,6 @@ class Plugin(indigo.PluginBase):
 
         error_msg_dict = indigo.Dict()
 
-        # ======================= Data and Chart Paths ========================
         for path_prop in ['chartPath', 'dataPath']:
             try:
                 if not valuesDict[path_prop].endswith('/'):
@@ -769,20 +769,158 @@ class Plugin(indigo.PluginBase):
         return
 
     # =============================================================================
-    def checkVersionNow(self):
+    def clean_plugin_prefs(self, prefs):
         """
-        Initiate plugin version update checker
+        Remove legacy keys from plugin prefs
 
-        The checkVersionNow() method will call the Indigo Plugin Update Checker based
-        on a user request.
+        Note that this does not affect device dicts.
 
-        -----
-
+        :return:
         """
 
-        self.updater.checkVersionNow()
+        list_of_keys_to_remove = [
+            'annotationColorOther',
+            'barLabel1',
+            'barLabel2',
+            'barLabel3',
+            'barLabel4',
+            'bar_colors',
+            'chart_height',
+            'chart_width',
+            'chartTitle',
+            'csv_item_add',
+            'customAxisLabelX',
+            'customAxisLabelY',
+            'customAxisLabelY2',
+            'customLineStyle',
+            'customSizeHeight',
+            'customSizeWidth',
+            'data_array',
+            'dates_to_plot',
+            'defaultColor',
+            'deviceControlsLabel',
+            'deviceControlsSeparator',
+            'dynamicDeviceList',
+            'emailLabel',
+            'enableCustomColors',
+            'enableCustomLineSegmentsSetting',
+            'fileName',
+            'fontColorOther',
+            'font_style',
+            'font_weight',
+            'foo',
+            'forecastSourceDevice',
+            'gridColorOther',
+            'line1Annotate',
+            'line1Color',
+            'line1ColorOther',
+            'line1Fill',
+            'line1Marker',
+            'line1MarkerColor',
+            'line1MarkerColorOther',
+            'line1Source',
+            'line1Style',
+            'line2Annotate',
+            'line2Color',
+            'line2ColorOther',
+            'line2Fill',
+            'line2Marker',
+            'line2MarkerColor',
+            'line2MarkerColorOther',
+            'line2Source',
+            'line2Style',
+            'line3Annotate',
+            'line3Color',
+            'line3ColorOther',
+            'line3Fill',
+            'line3Marker',
+            'line3MarkerColor',
+            'line3MarkerColorOther',
+            'line3Source',
+            'line3Style',
+            'line4Annotate',
+            'line4Color',
+            'line4ColorOther',
+            'line4Fill',
+            'line4Marker',
+            'line4MarkerColor',
+            'line4MarkerColorOther',
+            'line4Source',
+            'line4Style',
+            'lineLabel1',
+            'lineLabel2',
+            'lineLabel3',
+            'lineLabel4',
+            'offColor',
+            'onColor',
+            'plotLine1Max',
+            'plotLine1Min',
+            'plotLine2Max',
+            'plotLine2Min',
+            'plotLine3Max',
+            'plotLine3Min',
+            'plotLine4Max',
+            'plotLine4Min',
+            'notificationsHeaderSpace',
+            'notificationsLabel',
+            'saveSettingsLabel',
+            'saveSettingsSeparator',
+            'showLegend',
+            'showNotificationSettings',
+            'showxAxisGrid',
+            'showy2AxisGrid',
+            'showyAxisGrid',
+            'spineColorOther',
+            'test',
+            'tickColorOther',
+            'updaterEmail',
+            'updaterEmailsEnabled',
+            'updaterLastCheck',
+            'updaterLastVersionEmailed',
+            'wind_direction',
+            'wind_speed',
+            'x_obs1',
+            'x_obs2',
+            'x_obs3',
+            'x_obs4',
+            'y_obs1',
+            'y_obs1_max',
+            'y_obs1_min',
+            'y_obs2',
+            'y_obs2_max',
+            'y_obs2_min',
+            'y_obs3',
+            'y_obs3_max',
+            'y_obs3_min',
+            'y_obs4',
+            'y_obs4_max',
+            'y_obs4_min',
+            'xAxisBins',
+            'xAxisLabel',
+            'xAxisLabelFormat',
+            'y2AxisLabel',
+            'y2AxisMax',
+            'y2AxisMin',
+            'y2AxisPrecision',
+            'yAxisLabel',
+            'yAxisMax',
+            'yAxisMin',
+            'yAxisPrecision'
+        ]
+        list_of_removed_keys = []
 
-    # =============================================================================
+        # Iterate the keys to delete and delete them if they exist
+        for key in list_of_keys_to_remove:
+            if key in prefs.keys():
+                list_of_removed_keys.append(key)
+                del prefs[key]
+
+        # Log list of removed keys
+        if list_of_removed_keys:
+            self.logger.info(u"Performing maintenance - removing unneeded keys: {0}".format(list_of_removed_keys))
+
+        return prefs
+
     def commsKillAll(self):
         """
         Deactivate communication with all plugin devices
@@ -2093,11 +2231,12 @@ class Plugin(indigo.PluginBase):
 
                 dev_list = []
                 for dev in indigo.devices.itervalues('self'):
+                    refresh_interval = int(dev.pluginProps['refreshInterval'])
 
-                    if dev.deviceTypeId != 'csvEngine' and dev.enabled:
+                    if dev.deviceTypeId != 'csvEngine' and refresh_interval > 0 and dev.enabled:
 
                         diff = dt.datetime.now() - date_parse(dev.states['chartLastUpdated'])
-                        refresh_needed = diff > dt.timedelta(seconds=int(dev.pluginProps['refreshInterval']))
+                        refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
 
                         if refresh_needed:
                             dev_list.append(dev)
