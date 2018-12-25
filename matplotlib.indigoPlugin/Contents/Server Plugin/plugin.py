@@ -41,6 +41,7 @@ import logging
 import multiprocessing
 import numpy as np
 import os
+import pandas as pd
 import traceback
 import re
 
@@ -77,7 +78,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.10"
+__version__   = "0.7.11"
 
 # =============================================================================
 
@@ -1266,6 +1267,9 @@ class Plugin(indigo.PluginBase):
         :param dev:
         :return:
         """
+        target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
+        delta = int(dev.pluginProps.get('numLinesToKeepTime', '72'))
+
         # Read through the dict and construct headers and data
         for k, v in sorted(csv_dict.items()):
 
@@ -1278,11 +1282,8 @@ class Plugin(indigo.PluginBase):
                 csv_file.write('{0},{1}\n'.format('timestamp', v[0].encode("utf-8")))
                 csv_file.close()
 
-            # Determine the length of the CSV file and truncate if needed.
-            backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
-            target_lines = int(dev.pluginProps['numLinesToKeep']) - 1
-
             # Make a backup of the CSV file in case something goes wrong.
+            backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
             try:
                 import shutil
                 shutil.copyfile(full_path, backup)
@@ -1293,16 +1294,41 @@ class Plugin(indigo.PluginBase):
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.critical(u"Unable to backup CSV file. {0}".format(sub_error))
 
-            # Open the original file in read-only mode and count the number of lines.
-            with open(full_path, 'r') as orig_file:
-                lines = orig_file.readlines()
-                orig_num_lines = sum(1 for _ in lines)
+            # # Open the original file in read-only mode and count the number of lines.
+            # with open(full_path, 'r') as orig_file:
+            #     lines = orig_file.readlines()
+            #     orig_num_lines = sum(1 for _ in lines)
+            #
+            # # Write the file (retaining the header line and the last target_lines).
+            # if orig_num_lines > target_lines:
+            #     with open(full_path, 'w') as new_file:
+            #         new_file.writelines(lines[0:1])
+            #         new_file.writelines(lines[(orig_num_lines - target_lines): orig_num_lines])
 
-            # Write the file (retaining the header line and the last target_lines).
-            if orig_num_lines > target_lines:
-                with open(full_path, 'w') as new_file:
-                    new_file.writelines(lines[0:1])
-                    new_file.writelines(lines[(orig_num_lines - target_lines): orig_num_lines])
+            # =============================================================================
+            # New file limit code using pandas.
+
+            # Read CSV data into dataframe
+            df = pd.read_csv(full_path, delimiter=',')
+
+            # Change timestamp string to datetime
+            df['Timestamp'] = pd.to_datetime(df.iloc[:, 0], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
+
+            # Limit the file length to target time
+            if delta >= 0:
+                cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
+                df = df[df['Timestamp'] >= cut_off]
+
+            # Limit the file length to target lines
+            if target_lines >= 0:
+                self.logger.info(u"Num lines before - {0}".format(len(df)))
+                df = df.tail(target_lines)
+                self.logger.info(u"Num lines after - {0}".format(len(df)))
+
+            # Write CSV data to file
+            df.to_csv(full_path, sep=',', encoding='utf-8', index=False)
+
+            # =============================================================================
 
             # If all has gone well, delete the backup.
             try:
@@ -2025,6 +2051,7 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:=^130}".format(" Matplotlib Environment "))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
+        self.logger.info(u"{0:<31} {1}".format("Pandas version:", pd.__version__))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))

@@ -14,6 +14,7 @@
 
             <Field id="topSeparator" type="separator"/>
 
+            <!-- Number of lines to keep -->
             <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false">
                 <Label>Observations:</Label>
             </Field>
@@ -22,22 +23,21 @@
                 <Label>Enter the maximum number of observations that you would like to retain in your CSV files.</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                </List>
+            <!-- Number of lines to keep - time limit -->
+            <Field id="numLinesToKeepTime" type="textfield" defaultValue="72" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
+                <Label>Duration:</Label>
             </Field>
 
+            <Field id="numLinesToKeepTextTime" type="label" hidden="false" fontSize="small" alignWithControl="true">
+                <Label>Enter the maximum time duration to apply to your CSV files. For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
+            </Field>
+
+            <!-- Refresh interval -->
+            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data?">
+                <Label>Refresh Interval:</Label>
+            </Field>
+
+            <!-- Add Item-->
             <Field id="addItemLabel" type="label" alignText="right">
                 <Label>Add Data Item</Label>
             </Field>
@@ -73,6 +73,7 @@
                 <CallbackMethod>csv_item_add</CallbackMethod>
             </Field>
 
+            <!-- Edit item -->
             <Field id="numObsLabel" type="label" alignText="right">
                 <Label>Edit Data Item</Label>
             </Field>
