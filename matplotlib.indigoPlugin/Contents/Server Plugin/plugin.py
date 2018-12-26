@@ -78,7 +78,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.11"
+__version__   = "0.7.12"
 
 # =============================================================================
 
@@ -1043,9 +1043,7 @@ class Plugin(indigo.PluginBase):
         except AttributeError, sub_error:
             self.logger.warning(u"Error adding item. {0}".format(sub_error))
 
-        # NEW =================================================================
         # If the appropriate CSV file doesn't exist, create it and write the header line.
-
         file_name = valuesDict['addValue']
         full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], valuesDict['addValue'].encode("utf-8"))
 
@@ -1053,7 +1051,6 @@ class Plugin(indigo.PluginBase):
 
             with open(full_path, 'w') as outfile:
                 outfile.write(u"{0},{1}\n".format('Timestamp', file_name))
-        # NEW =================================================================
 
         # Wipe the field values clean for the next element to be added.
         for key in ['addValue', 'addSource', 'addState']:
@@ -1263,108 +1260,114 @@ class Plugin(indigo.PluginBase):
         """
         The csv_refresh_process() method processes CSV update requests
 
+         We import shutil here so that users who don't use CSV Engines don't need
+         to import it.
+
+        -----
+
         :param csv_dict:
         :param dev:
         :return:
         """
+
+        import shutil
+
         target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
-        delta = int(dev.pluginProps.get('numLinesToKeepTime', '72'))
+        delta        = int(dev.pluginProps.get('numLinesToKeepTime', '72'))
 
         # Read through the dict and construct headers and data
         for k, v in sorted(csv_dict.items()):
 
             # Create a path variable that is based on the target folder and the CSV item name.
+            # TODO: create some nice default here using .get()
             full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
+            backup    = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
 
-            # If the appropriate CSV file doesn't exist, create it and write the header line.
+            # ============================= Create (if needed) ============================
+            # If the appropriate CSV file doesn't exist, create it and write the header
+            # line.
             if not os.path.isfile(full_path):
                 csv_file = open(full_path, 'w')
                 csv_file.write('{0},{1}\n'.format('timestamp', v[0].encode("utf-8")))
                 csv_file.close()
 
+            # =============================== Create Backup ===============================
             # Make a backup of the CSV file in case something goes wrong.
-            backup = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
             try:
-                import shutil
                 shutil.copyfile(full_path, backup)
+
             except ImportError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"The CSV Engine facility requires the shutil module. {0}".format(sub_error))
+
             except Exception as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.critical(u"Unable to backup CSV file. {0}".format(sub_error))
 
-            # # Open the original file in read-only mode and count the number of lines.
-            # with open(full_path, 'r') as orig_file:
-            #     lines = orig_file.readlines()
-            #     orig_num_lines = sum(1 for _ in lines)
-            #
-            # # Write the file (retaining the header line and the last target_lines).
-            # if orig_num_lines > target_lines:
-            #     with open(full_path, 'w') as new_file:
-            #         new_file.writelines(lines[0:1])
-            #         new_file.writelines(lines[(orig_num_lines - target_lines): orig_num_lines])
-
-            # =============================================================================
-            # New file limit code using pandas.
-
+            # ================================= Load Data =================================
             # Read CSV data into dataframe
             df = pd.read_csv(full_path, delimiter=',')
+            column_names = list(df)
+            self.logger.info(u"[{0}] Num lines before - {1}".format(column_names[1], len(df)))
 
             # Change timestamp string to datetime
             df['Timestamp'] = pd.to_datetime(df.iloc[:, 0], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
 
+            # ============================== Limit for Time ===============================
             # Limit the file length to target time
             if delta >= 0:
                 cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
                 df = df[df['Timestamp'] >= cut_off]
 
-            # Limit the file length to target lines
-            if target_lines >= 0:
-                self.logger.info(u"Num lines before - {0}".format(len(df)))
-                df = df.tail(target_lines)
-                self.logger.info(u"Num lines after - {0}".format(len(df)))
-
-            # Write CSV data to file
-            df.to_csv(full_path, sep=',', encoding='utf-8', index=False)
-
-            # =============================================================================
-
-            # If all has gone well, delete the backup.
-            try:
-                os.remove(backup)
-            except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.warning(u"Unable to delete backup file. {0}".format(sub_error))
-
+            # ============================ Add New Observation ============================
             # Determine if the thing to be written is a device or variable.
             try:
                 state_to_write = u""
                 if not v[1]:
                     self.logger.warning(u"Found CSV Data element with missing source ID. Please check to ensure all CSV sources are properly configured.")
+
                 elif int(v[1]) in indigo.devices:
                     state_to_write = u"{0}".format(indigo.devices[int(v[1])].states[v[2]])
+
                 elif int(v[1]) in indigo.variables:
                     state_to_write = u"{0}".format(indigo.variables[int(v[1])].value)
+
                 else:
                     self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
 
                 # Give matplotlib something it can chew on if the value to be saved is 'None'
-                if state_to_write in ['None', None]:
+                if state_to_write in ['None', None, u""]:
                     state_to_write = 'NaN'
 
-                # Write the latest value to the file.
-                timestamp = u"{0}".format(indigo.server.getTime().strftime("%Y-%m-%d %H:%M:%S.%f"))
-                csv_file = open(full_path, 'a')
-                csv_file.write("{0},{1}\n".format(timestamp, state_to_write))
-                csv_file.close()
+                df.loc[len(df)] = [dt.datetime.now(), state_to_write]
 
             except ValueError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Invalid Indigo ID. {0}".format(sub_error))
+
             except Exception as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.warning(u"Invalid CSV definition. {0}".format(sub_error))
+
+            # ============================= Limit for Length ==============================
+            # If the dataframe (with the newest observation) is now too long, lets trim it
+            # for length.
+            if target_lines >= 0:
+                df = df.tail(target_lines)
+
+            # ================================ Write Data =================================
+            # Write CSV data to file
+            df.to_csv(full_path, sep=',', encoding='utf-8', index=False)
+            self.logger.info(u"[{0}] Num lines after - {1}".format(column_names[1], len(df)))
+
+            # =============================== Delete Backup ===============================
+            # If all has gone well, delete the backup.
+            try:
+                os.remove(backup)
+
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.warning(u"Unable to delete backup file. {0}".format(sub_error))
 
         dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                   {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
@@ -2052,7 +2055,6 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
         self.logger.info(u"{0:<31} {1}".format("Pandas version:", pd.__version__))
-        self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin version:", self.pluginVersion))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
         if self.verboseLogging:
@@ -2434,7 +2436,7 @@ class Plugin(indigo.PluginBase):
                         try:
                             if p_dict['line{0}Annotate'.format(line)] and p_dict['line{0}Marker'.format(line)] != 'None':
                                 p_dict['line{0}Marker'.format(line)] = 'None'
-                                self.logger.warning(u"{0}: Line {1} marker is suppressed to display annotations. "
+                                self.logger.warning(u"[{0}] Line {1} marker is suppressed to display annotations. "
                                                     u"To see the marker, disable annotations for this line.".format(dev.name, line))
                         except KeyError:
                             self.logger.debug(u"[{0}] No corresponding annotation: 'line{1}Marker'".format(dev.name, line))

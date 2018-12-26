@@ -20,3 +20,5 @@ keep in your CSV file.
 It would also be useful to able to specify a user specified data retention
 period (e.g. 24 hours) so that older entries get dropped off. This would then
 make it easy to display graphs for the last 24 hours for example.
+
+DaveL17 - this feature was added with build v0.7.11.
