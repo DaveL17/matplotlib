@@ -11,6 +11,8 @@ the variable list. This means (in my case) there is an awful lot of scrolling
 to do before getting to the devices. It would be useful to be able to select
 from a device list or variable list.
 
+DaveL17 - this feature was added with build v0.7.13.
+
 ===============================================================================
 2018-12-18  Autolog
 ===============================================================================

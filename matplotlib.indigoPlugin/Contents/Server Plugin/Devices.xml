@@ -45,7 +45,7 @@
             <Field id="sep2" type="separator"/>
 
             <Field id="label5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Add Item'.</Label>
+                <Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
             </Field>
 
             <Field id="addKey" type="textfield" hidden="true">
@@ -59,6 +59,16 @@
             <Field id="addSource" type="menu">
                 <Label>ID:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="addSourceElement" type="menu" defaultValue="A">
+                <Label>Filter:</Label>
+                <List>
+                    <Option value="A">Show All</Option>
+                    <Option value="D">Devices Only</Option>
+                    <Option value="V">Variables Only</Option>
+                </List>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 

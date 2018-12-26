@@ -1,5 +1,9 @@
 
 v0.7.12
+- Adds filter to CSV Engine Add Device controls to allow source menu to be
+  filtered to show all sources, just devices, or just variables.
+
+v0.7.12
 - Consolidates csv_refresh_process() under pandas.
 
 v0.7.11

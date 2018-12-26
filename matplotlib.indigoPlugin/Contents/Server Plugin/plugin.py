@@ -78,7 +78,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.12"
+__version__   = "0.7.13"
 
 # =============================================================================
 
@@ -219,6 +219,7 @@ class Plugin(indigo.PluginBase):
                 valuesDict['addItemFieldsCompleted'] = False
                 valuesDict['addKey']                 = ""
                 valuesDict['addSource']              = ""
+                valuesDict['addSourceElement']       = "A"
                 valuesDict['addState']               = ""
                 valuesDict['addValue']               = ""
                 valuesDict['csv_item_list']          = ""
@@ -1053,6 +1054,7 @@ class Plugin(indigo.PluginBase):
                 outfile.write(u"{0},{1}\n".format('Timestamp', file_name))
 
         # Wipe the field values clean for the next element to be added.
+        valuesDict['addSourceElement'] = "A"
         for key in ['addValue', 'addSource', 'addState']:
             valuesDict[key] = u""
 
@@ -1279,7 +1281,7 @@ class Plugin(indigo.PluginBase):
         for k, v in sorted(csv_dict.items()):
 
             # Create a path variable that is based on the target folder and the CSV item name.
-            # TODO: create some nice default here using .get()
+            # TODO: create some nice default here using .get()?
             full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
             backup    = "{0}{1} copy.csv".format(self.pluginPrefs['dataPath'], v[0].encode("utf-8"))
 
@@ -1288,13 +1290,15 @@ class Plugin(indigo.PluginBase):
             # line.
             if not os.path.isfile(full_path):
                 csv_file = open(full_path, 'w')
-                csv_file.write('{0},{1}\n'.format('timestamp', v[0].encode("utf-8")))
+                csv_file.write('{0},{1}\n'.format('Timestamp', v[0].encode("utf-8")))
                 csv_file.close()
+                self.sleep(1)
 
             # =============================== Create Backup ===============================
             # Make a backup of the CSV file in case something goes wrong.
             try:
                 shutil.copyfile(full_path, backup)
+                self.sleep(.5)
 
             except ImportError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
@@ -1308,7 +1312,6 @@ class Plugin(indigo.PluginBase):
             # Read CSV data into dataframe
             df = pd.read_csv(full_path, delimiter=',')
             column_names = list(df)
-            self.logger.info(u"[{0}] Num lines before - {1}".format(column_names[1], len(df)))
 
             # Change timestamp string to datetime
             df['Timestamp'] = pd.to_datetime(df.iloc[:, 0], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
@@ -1339,6 +1342,7 @@ class Plugin(indigo.PluginBase):
                 if state_to_write in ['None', None, u""]:
                     state_to_write = 'NaN'
 
+                # Add the newest observation to the end of the dataframe.
                 df.loc[len(df)] = [dt.datetime.now(), state_to_write]
 
             except ValueError as sub_error:
@@ -1350,15 +1354,14 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(u"Invalid CSV definition. {0}".format(sub_error))
 
             # ============================= Limit for Length ==============================
-            # If the dataframe (with the newest observation) is now too long, lets trim it
-            # for length.
+            # The dataframe (with the newest observation included) may now be too long.
+            # So we trim it for length.
             if target_lines >= 0:
                 df = df.tail(target_lines)
 
             # ================================ Write Data =================================
             # Write CSV data to file
             df.to_csv(full_path, sep=',', encoding='utf-8', index=False)
-            self.logger.info(u"[{0}] Num lines after - {1}".format(column_names[1], len(df)))
 
             # =============================== Delete Backup ===============================
             # If all has gone well, delete the backup.
@@ -1507,11 +1510,20 @@ class Plugin(indigo.PluginBase):
 
         list_ = list()
 
-        [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
-        [list_.append((dev.id, u"(D) {0}".format(dev.name))) for dev in indigo.devices.iter()]
+        if valuesDict.get('addSourceElement', 'A') == "D":
+            [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
+            [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
 
-        [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
-        [list_.append((var.id, u"(V) {0}".format(var.name))) for var in indigo.variables.iter()]
+        elif valuesDict.get('addSourceElement', 'A') == "V":
+            [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
+            [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
+
+        else:
+            [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
+            [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
+
+            [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
+            [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
 
         return list_
 
