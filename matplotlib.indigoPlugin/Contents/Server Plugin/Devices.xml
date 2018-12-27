@@ -33,8 +33,12 @@
             </Field>
 
             <!-- Refresh interval -->
-            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data?">
+            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data? (in seconds)">
                 <Label>Refresh Interval:</Label>
+            </Field>
+
+            <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
+                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes).</Label>
             </Field>
 
             <!-- Add Item-->

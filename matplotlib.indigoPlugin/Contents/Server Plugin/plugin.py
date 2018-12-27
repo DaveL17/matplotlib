@@ -30,6 +30,8 @@ proper WUnderground devices.
 # TODO: Remove plugin update checking from docs upon update
 # TODO: Remove matplotlib_version.html after deprecation
 
+# TODO: Limit CSV refresh interval to > 60 seconds
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -78,7 +80,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.13"
+__version__   = "0.7.14"
 
 # =============================================================================
 
@@ -1298,7 +1300,6 @@ class Plugin(indigo.PluginBase):
             # Make a backup of the CSV file in case something goes wrong.
             try:
                 shutil.copyfile(full_path, backup)
-                self.sleep(.5)
 
             except ImportError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
@@ -1314,13 +1315,13 @@ class Plugin(indigo.PluginBase):
             column_names = list(df)
 
             # Change timestamp string to datetime
-            df['Timestamp'] = pd.to_datetime(df.iloc[:, 0], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
+            df[column_names[0]] = pd.to_datetime(df[column_names[0]], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
 
             # ============================== Limit for Time ===============================
             # Limit the file length to target time
             if delta >= 0:
                 cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
-                df = df[df['Timestamp'] >= cut_off]
+                df = df[df[column_names[0]] >= cut_off]
 
             # ============================ Add New Observation ============================
             # Determine if the thing to be written is a device or variable.
@@ -1343,7 +1344,7 @@ class Plugin(indigo.PluginBase):
                     state_to_write = 'NaN'
 
                 # Add the newest observation to the end of the dataframe.
-                df.loc[len(df)] = [dt.datetime.now(), state_to_write]
+                df.loc[len(df) + 1] = [dt.datetime.now(), state_to_write]
 
             except ValueError as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
@@ -1355,8 +1356,8 @@ class Plugin(indigo.PluginBase):
 
             # ============================= Limit for Length ==============================
             # The dataframe (with the newest observation included) may now be too long.
-            # So we trim it for length.
-            if target_lines >= 0:
+            # If it is, we trim it for length.
+            if target_lines >= 0 and len(df) > target_lines:
                 df = df.tail(target_lines)
 
             # ================================ Write Data =================================
