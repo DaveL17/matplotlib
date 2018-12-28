@@ -21,16 +21,11 @@ proper WUnderground devices.
 # TODO: NEW -- Create generic weather forecast charts to support any weather services
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
-# TODO: Consider ways to make variable CSV data file lengths or user settings to vary the number of observations shown (could be date range or number of obs).
-# TODO: Implement a stale data tool.
-# TODO: Trap condition where there are too many observations to plot (i.e., too many x axis values). What would this mean? User could do very wide line chart
-# TODO:   with extremely large number of observations.
 # TODO: Wrap long names for battery health device?
+# TODO: consider adding override to single chart refresh action to ignore comm disabled
 
 # TODO: Remove plugin update checking from docs upon update
 # TODO: Remove matplotlib_version.html after deprecation
-
-# TODO: Limit CSV refresh interval to > 60 seconds
 
 # ================================== IMPORTS ==================================
 
@@ -1808,17 +1803,19 @@ class Plugin(indigo.PluginBase):
             for file_name in glob.glob(u"{0}{1}".format(source_path, '*.csv')):
                 final_filename = os.path.basename(file_name)
                 file_name_list_menu.append((final_filename, final_filename[:-4]))
-            file_name_list_menu.append('None')
+
+            # Sort the file list
+            file_name_list_menu = sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
+
+            # Add 'None' as an option, and show it first in list
+            file_name_list_menu = [(u"None", u"None"), (u"-5", u"%%separator%%")] + file_name_list_menu
 
         except IOError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.critical(u"Error generating file list: {0}".format(sub_error))
 
-        if self.verboseLogging:
-            self.logger.threaddebug(u"File name list menu: {0}".format(file_name_list_menu))
-
-        # return sorted(file_name_list_menu)
-        return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
+        # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
+        return file_name_list_menu
 
     # =============================================================================
     def getFontList(self, filter="", valuesDict=None, typeId="", targetId=0):
@@ -2169,8 +2166,12 @@ class Plugin(indigo.PluginBase):
         :param indigo.pluginAction pluginAction:
         """
 
-        dev_list = indigo.devices[pluginAction.deviceId]
-        self.refreshTheCharts(dev_list)
+        dev = indigo.devices[pluginAction.deviceId]
+
+        if dev.enabled:
+            self.refreshTheCharts(dev)
+        else:
+            self.logger.warning(u"Action will have no effect: [chart {0} is disabled.".format(dev.name))
 
     # =============================================================================
     def refresh_the_charts_now(self):
@@ -2272,6 +2273,7 @@ class Plugin(indigo.PluginBase):
             if not dev_list:
 
                 dev_list = []
+
                 for dev in indigo.devices.itervalues('self'):
                     refresh_interval = int(dev.pluginProps['refreshInterval'])
 
