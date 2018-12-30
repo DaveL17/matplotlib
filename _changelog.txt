@@ -1,4 +1,7 @@
 
+v0.7.15
+- Adds filter to CSV Engine Edit Data Item controls.
+
 v0.7.14
 - In data source menus for chart devices, moves the option 'None' to the top
   of the menu list.

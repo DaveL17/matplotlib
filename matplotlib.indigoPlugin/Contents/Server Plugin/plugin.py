@@ -23,9 +23,11 @@ proper WUnderground devices.
 
 # TODO: Wrap long names for battery health device?
 # TODO: consider adding override to single chart refresh action to ignore comm disabled
+# TODO: Reduce log sizes (move maximum stuff to verbose logging)
 
 # TODO: Remove plugin update checking from docs upon update
 # TODO: Remove matplotlib_version.html after deprecation
+# TODO: CSV Engine Edit Item List is not case insensitive.
 
 # ================================== IMPORTS ==================================
 
@@ -75,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.14"
+__version__   = "0.7.15"
 
 # =============================================================================
 
@@ -222,6 +224,7 @@ class Plugin(indigo.PluginBase):
                 valuesDict['csv_item_list']          = ""
                 valuesDict['editKey']                = ""
                 valuesDict['editSource']             = ""
+                valuesDict['editSourceElement']      = "A"
                 valuesDict['editState']              = ""
                 valuesDict['editValue']              = ""
                 valuesDict['isColumnSelected']       = False
@@ -1051,7 +1054,9 @@ class Plugin(indigo.PluginBase):
                 outfile.write(u"{0},{1}\n".format('Timestamp', file_name))
 
         # Wipe the field values clean for the next element to be added.
-        valuesDict['addSourceElement'] = "A"
+        for key in ['addSourceElement', 'editSourceElement']:
+            valuesDict[key] = "A"
+
         for key in ['addValue', 'addSource', 'addState']:
             valuesDict[key] = u""
 
@@ -1524,6 +1529,47 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
+    def csv_source_edit(self, typeId, valuesDict, devId, targetId):
+        """
+        Construct a list of devices and variables for the CSV engine
+
+        Constructs a list of devices and variables for the user to select within the
+        CSV engine configuration dialog box. Devices and variables are listed in
+        alphabetical order with devices first and then variables. Devices are prepended
+        with '(D)' and variables with '(V)'. Category labels are also included for
+        visual clarity.
+
+        -----
+
+        :param str typeId:
+        :param indigo.Dict valuesDict:
+        :param int devId:
+        :param int targetId:
+        """
+
+        if self.verboseLogging:
+            self.logger.threaddebug(u"valuesDict: {0}".format(dict(valuesDict)))
+
+        list_ = list()
+
+        if valuesDict.get('editSourceElement', 'A') == "D":
+            [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
+            [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
+
+        elif valuesDict.get('editSourceElement', 'A') == "V":
+            [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
+            [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
+
+        else:
+            [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
+            [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
+
+            [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
+            [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
+
+        return list_
+
+    # =============================================================================
     def deviceStateValueList(self, typeId, valuesDict, devId, targetId):
         """
         Formulates list of device states for CSV engine
@@ -1549,9 +1595,9 @@ class Plugin(indigo.PluginBase):
                 elif int(valuesDict['addSource']) in indigo.variables:
                     return [('value', 'value')]
                 else:
-                    return [('None', 'Enter a Valid ID Number')]
+                    return [('None', u'Please select a source first')]
             except ValueError:
-                return [('None', 'Enter a Valid ID Number')]
+                return [('None', u'Please select a source first')]
 
         if valuesDict['editSource'] != u'':
             try:
@@ -1561,11 +1607,11 @@ class Plugin(indigo.PluginBase):
                 elif int(valuesDict['editSource']) in indigo.variables:
                     return [('value', 'value')]
                 else:
-                    return [('None', 'Enter a Valid ID Number')]
+                    return [('None', u'Please select a source first')]
             except ValueError:
-                return [('None', 'Enter a Valid ID Number')]
+                return [('None', u'Please select a source first')]
         else:
-            return [('None', 'Please select a source ID first')]
+            return [('None', u'Please select a source first')]
 
     # =============================================================================
     def formatMarkers(self, p_dict):

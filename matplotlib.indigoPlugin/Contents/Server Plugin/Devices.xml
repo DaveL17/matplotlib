@@ -60,12 +60,6 @@
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="addSource" type="menu">
-                <Label>ID:</Label>
-                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
-            </Field>
-
             <Field id="addSourceElement" type="menu" defaultValue="A">
                 <Label>Filter:</Label>
                 <List>
@@ -73,6 +67,12 @@
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="addSource" type="menu">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
@@ -95,21 +95,21 @@
             <Field id="sep1" type="separator"/>
 
             <Field id="label0.5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to update or delete existing items.</Label>
+                <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
             </Field>
 
             <Field id="csv_item_list" type="menu">
-                <Label>Item List</Label>
+                <Label>CSV Item List:</Label>
                 <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
                 <CallbackMethod>csv_item_select</CallbackMethod>
             </Field>
 
-            <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
-                <Label>is an item selected?</Label>
+            <Field id="sep3" type="label" alignWithControl="true">
+                <Label> </Label>
             </Field>
 
-            <Field id="label1" type="label" fontColor="darkgray" fontSize="small" alignWithControl="true">
-                <Label>This is a list of all existing items the plugin is tracking.  It will only display those items that have been created by the CSV device.  Select an item from this list to update its values or delete it from the plugin.</Label>
+            <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
+                <Label>is an item selected?</Label>
             </Field>
 
             <Field id="columnDict" type="textfield" defaultValue="{'k0': ('None', 'None', 'None')}" hidden="true">
@@ -128,9 +128,19 @@
                 <Label>Title:</Label>
             </Field>
 
+            <Field id="editSourceElement" type="menu" defaultValue="A">
+                <Label>Filter:</Label>
+                <List>
+                    <Option value="A">Show All</Option>
+                    <Option value="D">Devices Only</Option>
+                    <Option value="V">Variables Only</Option>
+                </List>
+                <CallbackMethod>_dummyCallback</CallbackMethod>
+            </Field>
+
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
-                <Label>ID:</Label>
-                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
                 <CallbackMethod>_dummyCallback</CallbackMethod>
             </Field>
 
