@@ -60,7 +60,7 @@
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="addSourceElement" type="menu" defaultValue="A">
+            <Field id="addSourceFilter" type="menu" defaultValue="A">
                 <Label>Filter:</Label>
                 <List>
                     <Option value="A">Show All</Option>
@@ -128,7 +128,7 @@
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="editSourceElement" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
+            <Field id="editSourceFilter" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
                 <Label>Filter:</Label>
                 <List>
                     <Option value="A">Show All</Option>
