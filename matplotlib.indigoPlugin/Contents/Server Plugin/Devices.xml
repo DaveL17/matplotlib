@@ -78,7 +78,7 @@
 
             <Field id="addState" type="menu">
                 <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
+                <List class="self" filter="" method="deviceStateValueListAdd" dynamicReload="true"/>
             </Field>
 
             <Field id="csv_item_add" type="button">
@@ -105,7 +105,7 @@
             </Field>
 
             <Field id="sep3" type="label" alignWithControl="true">
-                <Label> </Label>
+                <Label/>
             </Field>
 
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
@@ -128,7 +128,7 @@
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="editSourceElement" type="menu" defaultValue="A">
+            <Field id="editSourceElement" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
                 <Label>Filter:</Label>
                 <List>
                     <Option value="A">Show All</Option>
@@ -146,7 +146,7 @@
 
             <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
                 <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueList" dynamicReload="true"/>
+                <List class="self" filter="" method="deviceStateValueListEdit" dynamicReload="true"/>
             </Field>
 
             <Field id="csv_item_update" type="button" enabledBindingId="isColumnSelected">

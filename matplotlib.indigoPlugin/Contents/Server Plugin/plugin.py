@@ -77,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.15"
+__version__   = "0.7.16"
 
 # =============================================================================
 
@@ -1570,7 +1570,7 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
-    def deviceStateValueList(self, typeId, valuesDict, devId, targetId):
+    def deviceStateValueListAdd(self, typeId, valuesDict, devId, targetId):
         """
         Formulates list of device states for CSV engine
 
@@ -1589,25 +1589,59 @@ class Plugin(indigo.PluginBase):
 
         if valuesDict['addSource'] != u'':
             try:
-                if int(valuesDict['addSource']) in indigo.devices:
+                # User has selected an Indigo device element and then set the filter to Variables only.
+                if int(valuesDict['addSource']) in indigo.devices and valuesDict['editSourceElement'] == "V":
+                    return [('None', u'Please select a source first')]
+
+                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
+                elif int(valuesDict['addSource']) in indigo.devices and valuesDict['editSourceElement'] != "V":
                     dev = indigo.devices[int(valuesDict['addSource'])]
                     return [x for x in dev.states.keys() if ".ui" not in x]
+
                 elif int(valuesDict['addSource']) in indigo.variables:
                     return [('value', 'value')]
+
                 else:
                     return [('None', u'Please select a source first')]
+
             except ValueError:
                 return [('None', u'Please select a source first')]
 
+        else:
+            return [('None', u'Please select a source first')]
+
+    # =============================================================================
+    def deviceStateValueListEdit(self, typeId, valuesDict, devId, targetId):
+        """
+        Formulates list of device states for CSV engine
+
+        Once a user selects a device or variable within the CSV engine configuration
+        dialog, we need to obtain the relevant device states to chose from. If the
+        user selects a variable, we simply return the variable value identifier. The
+        return is a list of tuples of the form:
+
+        -----
+
+        :param str typeId:
+        :param indigo.Dict valuesDict:
+        :param int devId:
+        :param int targetId:
+        """
+
         if valuesDict['editSource'] != u'':
             try:
-                if int(valuesDict['editSource']) in indigo.devices:
+                # User has selected an Indigo device element and then set the filter to Variables only.
+                if int(valuesDict['editSource']) in indigo.devices and valuesDict['editSourceElement'] == "V":
+                    return [('None', u'Please select a source first')]
+
+                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
+                elif int(valuesDict['editSource']) in indigo.devices and valuesDict['editSourceElement'] != "V":
                     dev = indigo.devices[int(valuesDict['editSource'])]
                     return [x for x in dev.states.keys() if ".ui" not in x]
+
                 elif int(valuesDict['editSource']) in indigo.variables:
                     return [('value', 'value')]
-                else:
-                    return [('None', u'Please select a source first')]
+
             except ValueError:
                 return [('None', u'Please select a source first')]
         else:
@@ -1635,6 +1669,7 @@ class Plugin(indigo.PluginBase):
             try:
                 if p_dict[marker] in marker_dict.keys():
                     p_dict[marker] = marker_dict[p_dict[marker]]
+
             except KeyError:
                 pass
 
@@ -1854,7 +1889,7 @@ class Plugin(indigo.PluginBase):
             file_name_list_menu = sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
 
             # Add 'None' as an option, and show it first in list
-            file_name_list_menu = [(u"None", u"None"), (u"-5", u"%%separator%%")] + file_name_list_menu
+            file_name_list_menu = file_name_list_menu + [(u"-5", u"%%separator%%"), (u"None", u"None")]
 
         except IOError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())

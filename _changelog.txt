@@ -1,4 +1,9 @@
 
+v0.7.16
+- Moves 'None' option on chart Data Source menu to bottom of list (to follow
+  Indigo UI design.)
+- Refines behavior of filters in CSV Engine configuration dialog.
+
 v0.7.15
 - Adds filter to CSV Engine Edit Data Item controls.
 
