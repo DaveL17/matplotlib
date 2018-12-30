@@ -24,7 +24,7 @@
             </Field>
 
             <!-- Number of lines to keep - time limit -->
-            <Field id="numLinesToKeepTime" type="textfield" defaultValue="72" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
+            <Field id="numLinesToKeepTime" type="textfield" defaultValue="7200" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
                 <Label>Duration:</Label>
             </Field>
 

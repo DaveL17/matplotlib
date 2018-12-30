@@ -1,4 +1,7 @@
 
+v0.7.18
+- Ups the duration limit default to 7200 hours.
+
 v0.7.17
 - Refines behavior of filters in CSV Engine configuration dialog.
 
