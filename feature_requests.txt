@@ -3,7 +3,19 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
-2018-12-18  Autolog
+2019-01-04  Autolog
+===============================================================================
+I would like to be able to specify a different scale on the Y2 axis - Is this
+possible, if not can I request another feature addition?  :)
+
+My use case is mapping thermostat values; multiple Temperatures and Heat
+Setpoints. I use the range -5 deg C to 35 deg C for the Y1 axis. I would like
+to map the thermostat valve opening value on the Y2 scale from 0% (fully
+closed) to 100% (fully open). I would then be able to easily correlate the
+valve opening against the temperature.
+
+===============================================================================
+2018-12-18  Autolog  [COMPLETE]
 ===============================================================================
 A minor usability feature request: When you select an item (ID: field), it
 lists all devices and variables and then list is displayed at the bottom of
@@ -14,7 +26,7 @@ from a device list or variable list.
 DaveL17 - this feature was added with build v0.7.13.
 
 ===============================================================================
-2018-12-18  Autolog
+2018-12-18  Autolog  [COMPLETE]
 ===============================================================================
 In the CSV Engine you can specify the number of Observations that you wish to
 keep in your CSV file.

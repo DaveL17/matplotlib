@@ -36,7 +36,7 @@
         <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
           <Label>CSV Engine Device:</Label>
           <List class="self" filter="self" method="get_csv_device_list"/>
-          <CallbackMethod>_dummyCallback</CallbackMethod>
+          <CallbackMethod>__dummyCallback</CallbackMethod>
         </Field>
 
         <Field id="targetSource" type="menu" tooltip="Please select a source to be updated.">

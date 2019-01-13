@@ -24,21 +24,21 @@
             </Field>
 
             <!-- Number of lines to keep - time limit -->
-            <Field id="numLinesToKeepTime" type="textfield" defaultValue="7200" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
+            <Field id="numLinesToKeepTime" type="textfield" defaultValue="" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
                 <Label>Duration:</Label>
             </Field>
 
             <Field id="numLinesToKeepTextTime" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the maximum time duration to apply to your CSV files. For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
+                <Label>Enter the maximum time duration to apply to your CSV files (in hours). For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
             </Field>
 
             <!-- Refresh interval -->
-            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="How frequently would you like the plugin to update the CSV data? (in seconds)">
+            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="Please enter how frequently would you like the plugin to update the CSV data (in seconds).">
                 <Label>Refresh Interval:</Label>
             </Field>
 
             <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes).</Label>
+                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes). Leave empty or enter a value of zero to elect manual refresh only.</Label>
             </Field>
 
             <!-- Add Item-->
@@ -67,13 +67,13 @@
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
+                <CallbackMethod>__dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="addSource" type="menu">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
+                <CallbackMethod>__dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="addState" type="menu">
@@ -135,13 +135,13 @@
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
+                <CallbackMethod>__dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
+                <CallbackMethod>__dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
@@ -975,7 +975,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line1adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+            <Field id="line1adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 1.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1031,9 +1031,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line1BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line1BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 1.">
-                <Label>Best Fit Color:</Label>
+                <Label>Best Fit Color:</Label>`
             </Field>
 
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
@@ -1048,7 +1048,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line2adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+            <Field id="line2adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 2.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1104,7 +1104,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line2BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line2BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 2.">
                 <Label>Best Fit Color:</Label>
             </Field>
@@ -1121,7 +1121,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line3adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+            <Field id="line3adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 3.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1177,7 +1177,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line3BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line3BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 3.">
                 <Label>Best Fit Color:</Label>
             </Field>
@@ -1194,7 +1194,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line4adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Line 1 adjuster tooltip.">
+            <Field id="line4adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 4.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1249,7 +1249,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line4BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 4.">
                 <Label>Best Fit Color:</Label>
             </Field>
@@ -1266,7 +1266,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line5adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Line 5 adjuster tooltip.">
+            <Field id="line5adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 5.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1322,7 +1322,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line5BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel5" visibleBindingValue="true"
+            <Field id="line5BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line5BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 5.">
                 <Label>Best Fit Color:</Label>
             </Field>
@@ -1339,7 +1339,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="line6adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Line 5 adjuster tooltip.">
+            <Field id="line6adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 6.">
                 <Label>Adjustment Factor</Label>
             </Field>
 
@@ -1395,12 +1395,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line6BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="lineLabel6" visibleBindingValue="true"
+            <Field id="line6BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line6BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 6.">
                 <Label>Best Fit Color:</Label>
             </Field>
-
-            <Field id="line6Bottom" type="separator" visibleBindingId="lineLabel6" visibleBindingValue="true"/>
 
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
@@ -1520,7 +1518,7 @@ There are presently no configurations available for this device.
             <Field id="thing" type="menu">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>
-                <CallbackMethod>_dummyCallback</CallbackMethod>
+                <CallbackMethod>__dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="thingState" type="menu">
