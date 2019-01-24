@@ -24,6 +24,10 @@ proper WUnderground devices.
 # TODO: Remove plugin update checking from docs upon update
 # TODO: Remove matplotlib_version.html after deprecation
 
+# TODO: Fill error
+#  https://stackoverflow.com/a/44647485/2827397
+#  https://forums.indigodomo.com/viewtopic.php?f=219&t=21931
+
 # TODO: Clean up device props.  Note that some props get established automatically and we don't necessarily want that.
 #     props = self.devicesTypeDict['rcParamsDevice']["ConfigUIRawXml"]
 #     props = ET.ElementTree(ET.fromstring(props))
@@ -41,19 +45,19 @@ proper WUnderground devices.
 #
 #     self.logger.info(unicode(dict(props)))
 
+# TODO: the CSV Engine update set to 2 minutes takes 2 minutes 1.1 seconds to update
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
 from ast import literal_eval
-from csv import reader
+import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
-import xml.etree.ElementTree as ET
 import logging
 import multiprocessing
 import numpy as np
 import os
-import pandas as pd
 import traceback
 import unicodedata
 import re
@@ -71,7 +75,6 @@ import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
 # Third-party modules
-# from DLFramework import indigoPluginUpdateChecker
 try:
     import indigo
 except ImportError as error:
@@ -91,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.20"
+__version__   = "0.7.22"
 
 # =============================================================================
 
@@ -134,9 +137,22 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         super(Plugin, self).__init__(pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
+        # ==================== Initialize Global Variables ====================
         self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
         self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
         self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
+
+        self.final_data = []
+
+        # ====================== Initialize DLFramework =======================
+        self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
+        self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
+
+        # Log pluginEnvironment information when plugin is first started
+        self.Fogbert.pluginEnvironmentLogger()
+
+        # ======================= Log More Plugin Info ========================
+        self.pluginEnvironmentLogger()
 
         # ========================= Initialize Logger =========================
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
@@ -150,26 +166,12 @@ class Plugin(indigo.PluginBase):
         else:
             self.plugin_file_handler.setLevel(10)
 
-        # ==================== Initialize Global Variables ====================
-        self.final_data     = []
-
-        # ====================== Initialize DLFramework =======================
-        self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
-        self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
-
-        # Log pluginEnvironment information when plugin is first started
-        self.Fogbert.pluginEnvironment()
-
-        # ======================= Log More Plugin Info ========================
-        self.pluginEnvironmentLogger()
-        self.logger.threaddebug(u"Initial Plugin Prefs: {0}".format(dict(self.pluginPrefs)))
-
         # ============== Conform Custom Colors to Color Picker ================
         # See method for more info.
         self.convert_custom_colors()
 
         # ======================== Clean Plugin Prefs =========================
-        # Remove legacy cruft from plugin prefs.
+        # Remove legacy cruft from plugin prefs. We do devices later.
         self.pluginPrefs = self.__clean_prefs(self.pluginPrefs)
         indigo.server.savePluginPrefs()
 
@@ -190,21 +192,34 @@ class Plugin(indigo.PluginBase):
     def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
 
         dev = indigo.devices[devId]
-        self.logger.threaddebug(u"[{0}] Final valuesDict: {1}".format(dev.name, dict(valuesDict)))
+
+        if not userCancelled:
+            self.logger.threaddebug(u"[{0}] Final device valuesDict: {1}".format(dev.name, dict(valuesDict)))
+            self.logger.threaddebug(u"Configuration complete.")
+        else:
+            self.logger.threaddebug(u"User cancelled.")
+
         return True
 
     # =============================================================================
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
 
-        if valuesDict['verboseLogging']:
-            self.plugin_file_handler.setLevel(5)
-            self.logger.warning(u"Verbose logging is on. It is best not to leave this checked for very long.")
-        else:
-            self.plugin_file_handler.setLevel(10)
-            self.logger.info(u"Verbose logging is off.")
+        if not userCancelled:
+            self.pluginPrefs = valuesDict
 
-        self.logger.threaddebug(u"Final valuesDict: {0}".format(dict(valuesDict)))
-        self.pluginPrefs = valuesDict
+            if valuesDict['verboseLogging']:
+                self.plugin_file_handler.setLevel(5)
+                self.logger.warning(u"Verbose logging is on. It is best not to leave this checked for very long.")
+            else:
+                self.plugin_file_handler.setLevel(10)
+                self.logger.info(u"Verbose logging is off.")
+
+            self.logger.threaddebug(u"Final plugin valuesDict: {0}".format(dict(valuesDict)))
+            self.logger.threaddebug(u"Configuration complete.")
+
+        else:
+            self.logger.threaddebug(u"User cancelled.")
+
         return True
 
     # =============================================================================
@@ -217,6 +232,7 @@ class Plugin(indigo.PluginBase):
         # If chartLastUpdated is empty, set it to the epoch
         if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
             dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
+            self.logger.threaddebug(u"CSV last update unknow. Coercing update.")
 
         # If the refresh interval is greater than zero
         if dev.deviceTypeId != 'rcParamsDevice' and int(dev.pluginProps['refreshInterval']) > 0:
@@ -271,7 +287,7 @@ class Plugin(indigo.PluginBase):
 
         dev = indigo.devices[int(devId)]
 
-        self.logger.threaddebug(u"[{0}] Initial valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] Getting device config props: {1}".format(dev.name, dict(valuesDict)))
 
         try:
 
@@ -449,13 +465,15 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def getMenuActionConfigUiValues(self, menuId):
 
-        settings     = indigo.Dict()
+        settings       = indigo.Dict()
         error_msg_dict = indigo.Dict()
+
+        self.logger.threaddebug(u"Getting menu action config prefs: {0}".format(dict(settings)))
+
         settings['enableCustomLineSegments']  = self.pluginPrefs.get('enableCustomLineSegments', False)
         settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
         settings['snappyConfigMenus']         = self.pluginPrefs.get('snappyConfigMenus', False)
         settings['forceOriginLines']          = self.pluginPrefs.get('forceOriginLines', False)
-        self.logger.threaddebug(u"Advanced settings menu initial prefs: {0}".format(dict(settings)))
 
         return settings, error_msg_dict
 
@@ -466,7 +484,7 @@ class Plugin(indigo.PluginBase):
         # Subsequent calls will pass the established dict.
         plugin_prefs = self.pluginPrefs
 
-        self.logger.threaddebug(u"Initial Plugin Prefs: {0}".format(dict(plugin_prefs)))
+        self.logger.threaddebug(u"Getting plugin Prefs: {0}".format(dict(plugin_prefs)))
 
         # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
         defaults_dict = {'backgroundColor': '00 00 00',
@@ -510,6 +528,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def shutdown(self):
 
+        self.logger.threaddebug(u"Shutdown call.")
         self.pluginIsShuttingDown = True
 
     # =============================================================================
@@ -520,12 +539,15 @@ class Plugin(indigo.PluginBase):
 
         error_msg_dict = indigo.Dict()
 
+        self.logger.threaddebug(u"Validating plugin configuration parameters.")
+
         for path_prop in ['chartPath', 'dataPath']:
             try:
                 if not valuesDict[path_prop].endswith('/'):
                     error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
                     error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
                     return False, valuesDict, error_msg_dict
+
             except AttributeError:
                 self.pluginErrorHandler(traceback.format_exc())
                 error_msg_dict[path_prop]       = u"The  path must end with a forward slash '/'."
@@ -540,6 +562,7 @@ class Plugin(indigo.PluginBase):
             if not valuesDict['chartResolution'] or valuesDict['chartResolution'] == "" or str(valuesDict['chartResolution']).isspace():
                 valuesDict['chartResolution'] = "100"
                 self.logger.warning(u"No resolution value entered. Resetting resolution to 100 DPI.")
+
             # If warning flag and the value is potentially too small.
             elif valuesDict['dpiWarningFlag'] and 0 < int(valuesDict['chartResolution']) < 80:
                 error_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
@@ -554,6 +577,7 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
                 error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is less than 0."
                 return False, valuesDict, error_msg_dict
+
         except ValueError:
             self.pluginErrorHandler(traceback.format_exc())
             error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
@@ -594,6 +618,8 @@ class Plugin(indigo.PluginBase):
 
         error_msg_dict = indigo.Dict()
         dev = indigo.devices[int(devId)]
+
+        self.logger.threaddebug(u"Validating device configuration parameters.")
 
         # ============================ CSV Engine =============================
         if typeId == 'csvEngine':
@@ -718,6 +744,7 @@ class Plugin(indigo.PluginBase):
                 valuesDict[limit_prop] = 'None'
                 return False, valuesDict, error_msg_dict
 
+        self.logger.threaddebug(u"Preferences validated successfully.")
         return True, valuesDict
 
     # =============================================================================
@@ -749,7 +776,7 @@ class Plugin(indigo.PluginBase):
                         if 'color' in prop.lower():
                             if props[prop] in ['#custom', 'custom']:
 
-                                self.logger.threaddebug(u"Resetting device preferences for custom colors to new color picker.")
+                                self.logger.threaddebug(u"Resetting legacy device preferences for custom colors to new color picker.")
 
                                 if props[u'{0}Other'.format(prop)]:
                                     props[prop] = props[u'{0}Other'.format(prop)]
@@ -757,7 +784,7 @@ class Plugin(indigo.PluginBase):
                                 else:
                                     props[prop] = 'FF FF FF'
 
-                # Establish props for legacy devices
+                # Establish props for legacy devices. If they exist, we leave them alone.
                 for _ in range(1, 7, 1):
                     props['line{0}Annotate'.format(_)]     = props.get('line{0}Annotate'.format(_), False)
                     props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
@@ -770,6 +797,7 @@ class Plugin(indigo.PluginBase):
                     props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
                     props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
 
+                # TODO: Check logic -- csvEngine devices shouldn't reach this code.
                 # Establishes props.isChart for legacy devices
                 props_dict = {'csvEngine': False,
                               'barChartingDevice': True,
@@ -787,16 +815,20 @@ class Plugin(indigo.PluginBase):
                 # Establish refresh interval for legacy devices. If the prop isn't present, we
                 # set it equal to the user's current global refresh rate.
                 if 'refreshInterval' not in props.keys():
+                    self.logger.threaddebug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
                     props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
 
                 # Update server
                 dev.replacePluginPropsOnServer(props)
 
+            # TODO: set isChart here for these kind of devices
             elif dev.deviceTypeId in ['csvEngine', 'rcParamsDevice']:
                 # Remove legacy cruft from csv engine and rcParams device props
                 props = dev.pluginProps
                 props = self.__clean_prefs(props)
                 dev.replacePluginPropsOnServer(props)
+
+        self.logger.threaddebug(u"Plugin maintenance complete.")
 
     def __clean_prefs(self, prefs):
         """
@@ -998,11 +1030,11 @@ class Plugin(indigo.PluginBase):
         return prefs
 
     # =============================================================================
-    def __dummyCallback(self, valuesDict=None, typeId="", targetId=0):
+    def dummyCallback(self, valuesDict=None, typeId="", targetId=0):
         """
         Dummy callback method to force dialog refreshes
 
-        The purpose of the __dummyCallback method is to provide something for
+        The purpose of the dummyCallback method is to provide something for
         configuration dialogs to call in order to force a refresh of any dynamic
         controls (dynamicReload=True).
 
@@ -1014,6 +1046,21 @@ class Plugin(indigo.PluginBase):
         """
 
         pass
+
+    # =============================================================================
+    def __log_dicts(self, dev=None):
+        """
+        Write parameters dicts to log under verbose logging
+
+        Simple method to write rcParm and kwarg dicts to debug log.
+
+        -----
+
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        """
+
+        self.logger.threaddebug(u"[{0:<19}] props:  {1}".format(dev.name, dict(dev.ownerProps)))
 
     # =============================================================================
     def advancedSettingsExecuted(self, valuesDict, menuId):
@@ -1065,6 +1112,7 @@ class Plugin(indigo.PluginBase):
         -----
 
         """
+        self.logger.info(u"Stopping communication with all plugin devices.")
 
         for dev in indigo.devices.itervalues("self"):
             try:
@@ -1083,6 +1131,8 @@ class Plugin(indigo.PluginBase):
         -----
 
         """
+
+        self.logger.info(u"Starting communication with all plugin devices.")
 
         for dev in indigo.devices.itervalues("self"):
             try:
@@ -1107,6 +1157,9 @@ class Plugin(indigo.PluginBase):
         """
 
         if '#custom' in self.pluginPrefs.values():
+
+            self.logger.threaddebug(u"Converting legacy custom color values.")
+
             for pref in self.pluginPrefs:
                 if 'color' in pref.lower():
                     if self.pluginPrefs[pref] in['#custom', 'custom']:
@@ -1132,7 +1185,7 @@ class Plugin(indigo.PluginBase):
         """
 
         dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] csv item add valuesDict: {1}".format(dev.name, dict(valuesDict)))
 
         error_msg_dict = indigo.Dict()
 
@@ -1210,7 +1263,7 @@ class Plugin(indigo.PluginBase):
         """
 
         dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] csv item delete valuesDict: {1}".format(dev.name, dict(valuesDict)))
 
         column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
@@ -1258,10 +1311,10 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.error(u"Error generating CSV item list. {0}".format(sub_error))
+            self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, result))
             prop_list = []
 
         result = sorted(prop_list, key=lambda tup: tup[1].lower())  # Return a list sorted by the value and not the key. Case insensitive sort.
-        self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, result))
         return result
 
     # =============================================================================
@@ -1280,7 +1333,7 @@ class Plugin(indigo.PluginBase):
         """
 
         dev = indigo.devices[devId]
-        self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] csv item update valuesDict: {1}".format(dev.name, dict(valuesDict)))
 
         error_msg_dict = indigo.Dict()
         column_dict  = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
@@ -1317,7 +1370,8 @@ class Plugin(indigo.PluginBase):
                 new_dict[k] = v
         column_dict = new_dict
 
-        valuesDict['columnDict'] = str(column_dict)  # Convert column_dict back to a string for storage.
+        # Convert column_dict back to a string for storage.
+        valuesDict['columnDict'] = str(column_dict)
 
         return valuesDict, error_msg_dict
 
@@ -1339,7 +1393,7 @@ class Plugin(indigo.PluginBase):
         """
 
         dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] csv item select valuesDict: {1}".format(dev.name, dict(valuesDict)))
 
         try:
             column_dict                    = literal_eval(valuesDict['columnDict'])
@@ -1382,10 +1436,15 @@ class Plugin(indigo.PluginBase):
 
                 if refresh_needed and refresh_interval != 0:
 
+                    self.__log_dicts(dev)
+
                     dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
-                    csv_dict_str = dev.pluginProps['columnDict']  # {key: (Item Name, Source ID, Source State)}
-                    csv_dict     = literal_eval(csv_dict_str)     # Convert column_dict from a string to a literal dict.
+                    # {key: (Item Name, Source ID, Source State)}
+                    csv_dict_str = dev.pluginProps['columnDict']
+
+                    # Convert column_dict from a string to a literal dict.
+                    csv_dict = literal_eval(csv_dict_str)
 
                     self.logger.threaddebug(u"[{0}] Refreshing CSV Device: {1}".format(dev.name, dict(csv_dict)))
                     self.csv_refresh_process(dev, csv_dict)
@@ -1444,34 +1503,28 @@ class Plugin(indigo.PluginBase):
 
                 # ================================= Load Data =================================
                 # Read CSV data into dataframe
-                df = pd.read_csv(full_path, delimiter=',', encoding='utf-8')
+                with open(full_path) as in_file:
+                    raw_data = [row for row in csv.reader(in_file, delimiter=',')]
 
-                # Coerce all column name 'Timestamp' to 'timestamp'
-                df.columns = [c.lower() if c == 'Timestamp' else c for c in df.columns]
-                column_names = list(df)
+                # Split the headers and the data
+                column_names = raw_data[:1]
+                data         = raw_data[1:]
 
-                # Change timestamp string to datetime
-                try:
-                    # TODO: switching from .astype() to dateutil in attempt to fix Berts' and mclass' data error.
-                    # df[column_names[0]] = pd.to_datetime(df[column_names[0]], errors='coerce', format="%Y-%m-%d %H:%M:%S.%f").astype(dt.datetime)
-                    df[column_names[0]] = [date_parse(obs) for obs in df[column_names[0]]]
-
-                except Exception as error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.critical(u"{0}".format(error))
-                    if 'cannot assemble with duplicate keys' in error:
-                        self.logger.critical(u"Check source csv file for duplicate headers.")
+                # Coerce header 0 to be 'Timestamp'
+                if column_names[0][0] != u'Timestamp':
+                    column_names[0][0] = u'Timestamp'
 
                 # ============================== Limit for Time ===============================
-                # Limit the file length to target time
+                # Limit data by time
                 if delta >= 0:
-                    cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
-                    df = df[df[column_names[0]] >= cut_off]
+                    cut_off = dt.datetime.now() - dt.timedelta(hours=10000)
+                    data = [row for row in data if date_parse(row[0]) >= cut_off]
 
                 # ============================ Add New Observation ============================
                 # Determine if the thing to be written is a device or variable.
                 try:
                     state_to_write = u""
+
                     if not v[1]:
                         self.logger.warning(u"Found CSV Data element with missing source ID. Please check to ensure all CSV sources are properly configured.")
 
@@ -1488,8 +1541,9 @@ class Plugin(indigo.PluginBase):
                     if state_to_write in ['None', None, u""]:
                         state_to_write = 'NaN'
 
-                    # Add the newest observation to the end of the dataframe.
-                    df = df.append({column_names[0]: dt.datetime.now(), column_names[1]: state_to_write}, ignore_index=True)
+                    # Add the newest observation to the end of the data list.
+                    now = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
+                    data.append([now, state_to_write])
 
                 except ValueError as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
@@ -1502,12 +1556,15 @@ class Plugin(indigo.PluginBase):
                 # ============================= Limit for Length ==============================
                 # The dataframe (with the newest observation included) may now be too long.
                 # If it is, we trim it for length.
-                if target_lines >= 0 and len(df) > target_lines:
-                    df = df.tail(target_lines)
+                if 0 <= target_lines < len(data):
+                    data = data[len(data) - target_lines:]
 
                 # ================================ Write Data =================================
                 # Write CSV data to file
-                df.to_csv(full_path, sep=',', encoding='utf-8', index=False)
+                with open(full_path, 'w') as out_file:
+                    writer = csv.writer(out_file, delimiter=',')
+                    writer.writerows(column_names)
+                    writer.writerows(data)
 
                 # =============================== Delete Backup ===============================
                 # If all has gone well, delete the backup.
@@ -1520,6 +1577,7 @@ class Plugin(indigo.PluginBase):
 
             dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                       {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
+
             self.logger.info(u"[{0}] CSV data updated successfully.".format(dev.name))
             dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
@@ -1528,7 +1586,8 @@ class Plugin(indigo.PluginBase):
             self.logger.critical(u"{0}".format(error))
 
         except Exception as error:
-            pass
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"{0}".format(error))
 
     # =============================================================================
     def csv_refresh_device_action(self, pluginAction, dev, callerWaitingForResult):
@@ -1551,8 +1610,12 @@ class Plugin(indigo.PluginBase):
         dev = indigo.devices[int(pluginAction.props['targetDevice'])]
 
         if dev.enabled:
-            csv_dict_str = dev.pluginProps['columnDict']  # {key: (Item Name, Source ID, Source State)}
-            csv_dict     = literal_eval(csv_dict_str)     # Convert column_dict from a string to a literal dict.
+
+            # {key: (Item Name, Source ID, Source State)}
+            csv_dict_str = dev.pluginProps['columnDict']
+
+            # Convert column_dict from a string to a literal dict.
+            csv_dict = literal_eval(csv_dict_str)
 
             self.csv_refresh_process(dev, csv_dict)
 
@@ -1589,6 +1652,7 @@ class Plugin(indigo.PluginBase):
             foo           = {target_source: temp_dict[target_source]}
 
             self.csv_refresh_process(dev, foo)
+            self.logger.info(u"CSV refresh source action complete.")
 
         else:
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
@@ -1812,7 +1876,8 @@ class Plugin(indigo.PluginBase):
         :param p_dict:
         """
 
-        markers     = ['line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker', 'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker']
+        markers     = ['line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker',
+                       'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker']
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
 
         for marker in markers:
@@ -2301,11 +2366,11 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:=^135}".format(" Matplotlib Environment "))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
-        self.logger.info(u"{0:<31} {1}".format("Pandas version:", pd.__version__))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
 
         self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
+        self.logger.threaddebug(u"Initial Plugin Prefs: {0}".format(dict(self.pluginPrefs)))
         self.logger.info(u"{0:=^135}".format(""))
 
     # =============================================================================
@@ -2326,8 +2391,10 @@ class Plugin(indigo.PluginBase):
 
         sub_error = sub_error.splitlines()
         self.logger.critical(u"{0:!^80}".format(" TRACEBACK "))
+
         for line in sub_error:
             self.logger.critical(u"!!! {0}".format(line))
+
         self.logger.critical(u"!" * 80)
 
     # =============================================================================
@@ -2450,7 +2517,7 @@ class Plugin(indigo.PluginBase):
             p_dict['tick_right']  = 'off'
             p_dict['tick_top']    = 'off'
 
-            # ======================== rcParams overrides =========================
+            # ============================ rcParams overrides =============================
             plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
             plt.rcParams['lines.linewidth']  = float(self.pluginPrefs.get('lineWeight', '1'))
             plt.rcParams['savefig.dpi']      = int(self.pluginPrefs.get('chartResolution', '100'))
@@ -2471,7 +2538,7 @@ class Plugin(indigo.PluginBase):
             p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
             p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
 
-            # ========================= Background color ==========================
+            # ============================= Background color ==============================
             if not self.pluginPrefs.get('backgroundColorOther', 'false'):
                 p_dict['transparent_charts'] = False
                 p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
@@ -2482,7 +2549,7 @@ class Plugin(indigo.PluginBase):
                 p_dict['transparent_charts'] = True
                 p_dict['backgroundColor'] = '#000000'
 
-            # ========================== Plot Area color ==========================
+            # ============================== Plot Area color ==============================
             if not self.pluginPrefs.get('faceColorOther', 'false'):
                 p_dict['transparent_filled'] = True
                 p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
@@ -2513,11 +2580,9 @@ class Plugin(indigo.PluginBase):
 
             for dev in dev_list:
 
-                self.logger.threaddebug(u"dev_list: {0}".format(list(dev_list)))
-
                 dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
-                # ===================== Custom Font Sizes =====================
+                # ============================= Custom Font Sizes =============================
                 # Custom font sizes for retina/non-retina adjustments.
                 try:
                     if dev.pluginProps['customSizeFont']:
@@ -2528,7 +2593,7 @@ class Plugin(indigo.PluginBase):
                     # Not all devices may support this feature.
                     pass
 
-                # ========================== kwargs ===========================
+                # ================================== kwargs ===================================
                 # Note: PyCharm wants attribute values to be strings. This is not always what
                 # Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
                 k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
@@ -2567,7 +2632,7 @@ class Plugin(indigo.PluginBase):
                     k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'edgecolor': p_dict['backgroundColor'], 'facecolor': p_dict['backgroundColor'], 'format': None,
                                             'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None, 'transparent': p_dict['transparent_charts']}
 
-                # ================== matplotlib.rc overrides ==================
+                # ========================== matplotlib.rc overrides ==========================
                 plt.rc('font', **k_dict['k_base_font'])
 
                 p_dict.update(dev.pluginProps)
@@ -2591,29 +2656,33 @@ class Plugin(indigo.PluginBase):
                     kv_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
                     p_dict.update(dev.pluginProps)
 
-                    # ============= Limit number of observations ==============
+                    # ======================= Limit number of observations ========================
                     try:
                         p_dict['numObs'] = int(p_dict['numObs'])
+
                     except KeyError:
                         # Only some devices will have their own numObs.
                         pass
+
                     except ValueError:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.warning(u"The number of observations must be a positive number.")
 
-                    # ================== Custom Square Size ===================
+                    # ============================ Custom Square Size =============================
                     try:
                         if p_dict['customSizePolar'] == 'None':
                             pass
                         else:
                             p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
+
                     except KeyError:
                         pass
+
                     except ValueError:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.warning(u"Custom size must be a positive number or None.")
 
-                    # =================== Extra Wide Chart ====================
+                    # ============================= Extra Wide Chart ==============================
                     try:
                         if p_dict['rectWide']:
                             p_dict['chart_height'] = float(p_dict['rectChartWideHeight'])
@@ -2625,7 +2694,7 @@ class Plugin(indigo.PluginBase):
                         # Not all devices will have these keys
                         pass
 
-                    # ====================== Custom Size ======================
+                    # ================================ Custom Size ================================
                     # If the user has specified a custom size, let's override
                     # with their custom setting.
                     try:
@@ -2637,12 +2706,12 @@ class Plugin(indigo.PluginBase):
                         # Not all devices will have these keys
                         pass
 
-                    # ==================== Best Fit Lines =====================
+                    # ============================== Best Fit Lines ===============================
                     # Set the defaults for best fit lines in p_dict.
                     for _ in range(1, 7, 1):
                         p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00')
 
-                    # ==================== Phantom Labels =====================
+                    # ============================== Phantom Labels ===============================
                     # Since users may or may not include axis labels and
                     # because we want to ensure that all plot areas present
                     # in the same way, we need to create 'phantom' labels that
@@ -2676,7 +2745,7 @@ class Plugin(indigo.PluginBase):
                         # Not all devices will contain these keys
                         pass
 
-                    # ====================== Annotations ======================
+                    # ================================ Annotations ================================
                     # If the user wants annotations, we need to hide the line
                     # markers as we don't want to plot one on top of the other.
                     for line in range(1, 7, 1):
@@ -2689,24 +2758,25 @@ class Plugin(indigo.PluginBase):
                             # Not all devices will contain these keys
                             pass
 
-                    # ===================== Line Markers ======================
+                    # =============================== Line Markers ================================
                     # Some line markers need to be adjusted due to their inherent value. For
-                    # example, matplotlib uses '<', '>' and '.' as markers but storing these
-                    # values will blow up the XML.  So we need to convert them. (See
-                    # self.formatMarkers() method.)
+                    # example, matplotlib uses '<', '>' and '.' as markers but storing these values
+                    # will blow up the XML.  So we need to convert them. (See self.formatMarkers()
+                    # method.)
                     p_dict = self.formatMarkers(p_dict)
 
                     # Note that the logging of p_dict and k_dict are handled within the thread.
                     self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
+                    self.__log_dicts(dev)
 
-                    # ==================== rcParams Device ====================
+                    # ============================== rcParams Device ==============================
                     if dev.deviceTypeId == 'rcParamsDevice':
                         self.rcParamsDeviceUpdate(dev)
 
                     # For the time being, we're running each device through its
                     # own process synchronously; parallel processing may come later.
 
-                    # ====================== Bar Charts =======================
+                    # ================================ Bar Charts =================================
                     if dev.deviceTypeId == 'barChartingDevice':
 
                         if __name__ == '__main__':
@@ -2714,7 +2784,7 @@ class Plugin(indigo.PluginBase):
                             p_bar.start()
                             p_bar.join()
 
-                    # ================= Battery Health Chart ==================
+                    # =========================== Battery Health Chart ============================
                     if dev.deviceTypeId == 'batteryHealthDevice':
 
                         device_dict  = {}
@@ -2739,7 +2809,7 @@ class Plugin(indigo.PluginBase):
                             p_battery.start()
                             p_battery.join()
 
-                    # ==================== Calendar Charts ====================
+                    # ============================== Calendar Charts ==============================
                     if dev.deviceTypeId == "calendarChartingDevice":
 
                         if __name__ == '__main__':
@@ -2747,7 +2817,7 @@ class Plugin(indigo.PluginBase):
                             p_calendar.start()
                             p_calendar.join()
 
-                    # ====================== Line Charts ======================
+                    # ================================ Line Charts ================================
                     if dev.deviceTypeId == "lineChartingDevice":
 
                         if __name__ == '__main__':
@@ -2755,7 +2825,7 @@ class Plugin(indigo.PluginBase):
                             p_line.start()
                             p_line.join()
 
-                    # ==================== Multiline Text =====================
+                    # ============================== Multiline Text ===============================
                     if dev.deviceTypeId == 'multiLineText':
 
                         # Get the text to plot. We do this here so we don't need to send all the
@@ -2776,7 +2846,7 @@ class Plugin(indigo.PluginBase):
                             p_multiline.start()
                             p_multiline.join()
 
-                    # ===================== Polar Charts ======================
+                    # =============================== Polar Charts ================================
                     if dev.deviceTypeId == "polarChartingDevice":
 
                         if __name__ == '__main__':
@@ -2784,7 +2854,7 @@ class Plugin(indigo.PluginBase):
                             p_polar.start()
                             p_polar.join()
 
-                    # ==================== Scatter Charts =====================
+                    # ============================== Scatter Charts ===============================
                     if dev.deviceTypeId == "scatterChartingDevice":
 
                         if __name__ == '__main__':
@@ -2792,7 +2862,7 @@ class Plugin(indigo.PluginBase):
                             p_scatter.start()
                             p_scatter.join()
 
-                    # ================ Weather Forecast Charts ================
+                    # ========================== Weather Forecast Charts ==========================
                     if dev.deviceTypeId == "forecastChartingDevice":
 
                         dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
@@ -2804,7 +2874,7 @@ class Plugin(indigo.PluginBase):
                             p_weather.start()
                             p_weather.join()
 
-                    # =============== Process the output queue ================
+                    # ========================= Process the output queue ==========================
                     self.processLogQueue(dev, return_queue)
 
                     dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
@@ -2826,8 +2896,8 @@ class Plugin(indigo.PluginBase):
             self.skipRefreshDateUpdate = False
 
         except Exception as sub_error:
-            self.logger.critical(u"{0}".format(unicode(sub_error)))
             self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"{0}".format(unicode(sub_error)))
 
     # =============================================================================
     def refreshTheChartsAction(self, action):
@@ -2843,7 +2913,9 @@ class Plugin(indigo.PluginBase):
         """
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
+
         self.refreshTheCharts(devices_to_refresh)
+
         self.logger.info(u"{0:=^80}".format(' Refresh Action Complete '))
 
 
@@ -2852,22 +2924,6 @@ class MakeChart(object):
     def __init__(self, plugin):
         self.final_data = []
         self.host_plugin = plugin
-
-    # =============================================================================
-    def __log_dicts(self, p_dict=None, k_dict=None):
-        """
-        Write parameters dicts to log under verbose logging
-
-        Simple method to write rcParm and kwarg dicts to debug log.
-
-        -----
-
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        """
-
-        self.host_plugin.logger.threaddebug(u"{0:<19}{1}".format("p_dict: ", p_dict))
-        self.host_plugin.logger.threaddebug(u"{0:<19}{1}".format("k_dict: ", k_dict))
 
     # =============================================================================
     def chart_bar(self, dev, p_dict, k_dict, return_queue):
@@ -2881,14 +2937,12 @@ class MakeChart(object):
         :param indigo.Device dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param indigo.List kv_list: device state values for updating
         :param multiprocessing.queues.Queue return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            self.__log_dicts(p_dict, k_dict)
 
             num_obs                   = p_dict['numObs']
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
@@ -3162,7 +3216,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            self.__log_dicts(p_dict, k_dict)
 
             import calendar
             calendar.setfirstweekday(int(dev.pluginProps['firstDayOfWeek']))
@@ -3215,7 +3268,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            self.__log_dicts(p_dict, k_dict)
 
             for _ in range(1, 7, 1):
                 p_dict['line{0}Color'.format(_)]        = r"#{0}".format(p_dict['line{0}Color'.format(_)].replace(' ', '').replace('#', ''))
@@ -3379,8 +3431,6 @@ class MakeChart(object):
 
             import textwrap
 
-            self.__log_dicts(p_dict, k_dict)
-
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['textColor']       = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
@@ -3460,7 +3510,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            self.__log_dicts(p_dict, k_dict)
 
             num_obs                    = p_dict['numObs']
             p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
@@ -3610,7 +3659,6 @@ class MakeChart(object):
 
                 # ======================= Display Grids =======================
                 # Grids are always on for polar wind charts.
-                log['Threaddebug'].append(u"Display grids[X / Y]: always on")
 
                 # ======================== Chart Title ========================
                 plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
@@ -3652,7 +3700,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            self.__log_dicts(p_dict, k_dict)
 
             # ======================= p_dict Overrides ========================
             for _ in range(1, 5, 1):
@@ -3803,8 +3850,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-
-            self.__log_dicts(p_dict, k_dict)
 
             p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
@@ -4053,10 +4098,6 @@ class MakeChart(object):
             ax1.yaxis.tick_right()
             ax2.yaxis.tick_left()
 
-            log['Threaddebug'].append(u"Y1 Max: {0}  Y1 Min: {1}  Y1 Diff: {2}".format(max(p_dict['data_array']),
-                                                                                       min(p_dict['data_array']),
-                                                                                       max(p_dict['data_array']) - min(p_dict['data_array'])))
-
             # =================== Temperature Axis Min/Max ====================
             if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
                 y_axis_min = float(p_dict['yAxisMin'])
@@ -4147,18 +4188,15 @@ class MakeChart(object):
         :param str val:
         """
 
-        self.host_plugin.logger.threaddebug(u"Length of initial string: {0}".format(len(val)))
-
         # List of (elements, replacements)
-        clean_list = [(' am ', ' AM '), (' pm ', ' PM '), ('*', ' '), ('\u000A', ' '), ('...', ' '), ('/ ', '/'), (' /', '/'), ('/', ' / ')]
+        clean_list = [(' am ', ' AM '), (' pm ', ' PM '), ('*', ' '), ('\u000A', ' '),
+                      ('...', ' '), ('/ ', '/'), (' /', '/'), ('/', ' / ')]
 
         # Take the old, and replace it with the new.
         for (old, new) in clean_list:
             val = val.replace(old, new)
 
         val = ' '.join(val.split())  # Eliminate spans of whitespace.
-
-        self.host_plugin.logger.threaddebug(u"Length of final string: {0}".format(len(val)))
 
         return val
 
@@ -4178,19 +4216,8 @@ class MakeChart(object):
         :param list final_data: the data to be charted.
         """
 
-        converter = {'true': 1,
-                     'false': 0,
-                     'open': 1,
-                     'closed': 0,
-                     'on': 1,
-                     'off': 0,
-                     'locked': 1,
-                     'unlocked': 0,
-                     'up': 1,
-                     'down': 0,
-                     '1': 1,
-                     '0': 0,
-                     'heat': 1}
+        converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
+                     'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1}
 
         def is_number(s):
             try:
@@ -4509,7 +4536,7 @@ class MakeChart(object):
 
         -----
 
-        :param str data_source:
+        :param unicode data_source:
         """
 
         final_data = []
@@ -4517,7 +4544,7 @@ class MakeChart(object):
         try:
             # Get the data
             with open(data_source, "r") as data_file:
-                csv_data = reader(data_file, delimiter=',')
+                csv_data = csv.reader(data_file, delimiter=',')
 
                 # Convert the csv object to a list
                 [final_data.append(item) for item in csv_data]
@@ -4559,6 +4586,7 @@ class MakeChart(object):
         ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
         ax.margins(0.04, 0.05)
         [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+
         return ax
 
     # =============================================================================
@@ -4597,7 +4625,6 @@ class MakeChart(object):
         # Plot the custom lines if needed.  Note that these need to be plotted after
         # the legend is established, otherwise some of the characteristics of the
         # min/max lines will take over the legend props.
-        self.host_plugin.logger.threaddebug(u"Custom line segments ({0}): {1}".format(p_dict['enableCustomLineSegments'], p_dict['customLineSegments']))
 
         if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ["", "None"]:
             try:
@@ -4615,7 +4642,7 @@ class MakeChart(object):
                         if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(constants_to_plot[0])
 
-                return cls
+                    return cls
 
             except Exception as sub_error:
                 self.host_plugin.pluginErrorHandler(traceback.format_exc())

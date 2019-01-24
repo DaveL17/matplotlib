@@ -67,13 +67,13 @@
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
-                <CallbackMethod>__dummyCallback</CallbackMethod>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="addSource" type="menu">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
-                <CallbackMethod>__dummyCallback</CallbackMethod>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="addState" type="menu">
@@ -135,13 +135,13 @@
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
-                <CallbackMethod>__dummyCallback</CallbackMethod>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
-                <CallbackMethod>__dummyCallback</CallbackMethod>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
@@ -1518,7 +1518,7 @@ There are presently no configurations available for this device.
             <Field id="thing" type="menu">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>
-                <CallbackMethod>__dummyCallback</CallbackMethod>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="thingState" type="menu">

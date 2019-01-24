@@ -3,6 +3,27 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-01-21  Autolog
+===============================================================================
+Another useful feature to add to the mix, especially if you are going to
+roll-your-own rather than using pandas, would be to be able to specify a period
+on the CSV file. My TRV plugin is creating CSV files for the measurements over
+the last say 24 hours. At times I would like to view the last 3 hours in more
+detail. The only reasonable way to do this at the moment is to create 2 sets of
+CSV file. If you could specify a period in the chart then that would save
+having to do this. My processing adds an entry to the CSV file for the start
+of the period (based on the last one dropped off) so that graph lines are
+always generated from the graph origin.
+
+===============================================================================
+2019-01-21  Autolog
+===============================================================================
+I had incorrectly assumed that if the checkbox for a line wasn't ticked that
+the line was disabled - it isn't. You have to select None for the data source.
+The main disadvantage of this approach is that you can't temporarily disable a
+line without remembering the data item you were trying to graph.
+
+===============================================================================
 2019-01-04  Autolog
 ===============================================================================
 I would like to be able to specify a different scale on the Y2 axis - Is this

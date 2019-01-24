@@ -8,6 +8,7 @@ Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
 
 import ast
 import indigo
+import logging
 import operator as op
 import os
 import platform
@@ -28,6 +29,8 @@ class Fogbert(object):
         self.plugin.debugLog(u"Initializing DLFramework...")
         self.pluginPrefs = plugin.pluginPrefs
 
+        self.plugin.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
+
     def pluginEnvironment(self):
         """
         The pluginEnvironment method prints selected information about the
@@ -47,6 +50,28 @@ class Fogbert(object):
         indigo.server.log(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
         indigo.server.log(u"{0:<31} {1}".format("Process ID:", os.getpid()))
         indigo.server.log(u"{0:=^130}".format(""))
+
+    def pluginEnvironmentLogger(self):
+        """
+        The pluginEnvironment method prints selected information about the
+        pluginEnvironment that the plugin is running in. It pulls some of this
+        information from the calling plugin and some from the server
+        pluginEnvironment.  This method differs from the pluginEnvironment
+        method in that it leverages Indigo's logging hooks using the Python
+        Logger framework.
+        """
+        self.plugin.logger.debug(u"DLFramework pluginEnvironment method called.")
+
+        self.plugin.logger.info(u"")
+        self.plugin.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Plugin name:", self.plugin.pluginDisplayName))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Plugin version:", self.plugin.pluginVersion))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Plugin ID:", self.plugin.pluginId))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Indigo version:", indigo.server.version))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
+        self.plugin.logger.info(u"{0:<31} {1}".format("Process ID:", os.getpid()))
+        self.plugin.logger.info(u"{0:=^130}".format(""))
 
     def convertDebugLevel(self, debug_val):
         """

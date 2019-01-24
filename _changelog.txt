@@ -1,4 +1,12 @@
 
+v0.7.22
+- Removes dependence on pandas library
+- Code refinements.
+
+v0.7.21
+- Removes default location from plugin preferences for data and chart save
+  locations.
+
 v0.7.20
 - Improves resiliency in dealing with malformed CSV files.
 - Adds new date formats for chart axes:

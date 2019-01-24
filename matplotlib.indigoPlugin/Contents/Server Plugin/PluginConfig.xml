@@ -55,12 +55,12 @@
     </Field>
 
     <!-- Chart Output Location -->
-    <Field id="dataPath" type="textfield" defaultValue="/Library/Application Support/Perceptive Automation/Indigo 7/Logs/com.fogbert.indigoplugin.matplotlib/"
-           tooltip="Enter the path to the folder where you want to store your charting data.">
+    <Field id="dataPath" type="textfield" defaultValue=""
+           tooltip="Enter the path to the folder where you want to store your csv data.">
         <Label>Save Data Files To:</Label>
     </Field>
 
-    <Field id="chartPath" type="textfield" defaultValue="/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/"
+    <Field id="chartPath" type="textfield" defaultValue="/Library/Application Support/Perceptive Automation/Indigo 7.2/IndigoWebServer/images/controls/static/"
            tooltip="Enter the path to the folder where your charts should be saved.">
         <Label>Save Images To:</Label>
     </Field>
