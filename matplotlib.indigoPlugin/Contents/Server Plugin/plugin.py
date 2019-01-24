@@ -94,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.22"
+__version__   = "0.7.23"
 
 # =============================================================================
 
@@ -1518,7 +1518,14 @@ class Plugin(indigo.PluginBase):
                 # Limit data by time
                 if delta >= 0:
                     cut_off = dt.datetime.now() - dt.timedelta(hours=10000)
-                    data = [row for row in data if date_parse(row[0]) >= cut_off]
+                    time_data = [row for row in data if date_parse(row[0]) >= cut_off]
+
+                    # If all records are older than the delta, return the original data (so
+                    # there's something to chart) and send a warning to the log.
+                    if len(time_data) == 0:
+                        self.logger.warning(u"[{0} - {1}] all CSV data are older than the time limit. Returning original data.".format(dev.name, column_names[0][1]))
+                    else:
+                        data = time_data
 
                 # ============================ Add New Observation ============================
                 # Determine if the thing to be written is a device or variable.

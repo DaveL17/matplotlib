@@ -1,6 +1,10 @@
 
+v0.7.23
+- If all CSV data are older than the time limit, return the original data and
+  warn user.
+
 v0.7.22
-- Removes dependence on pandas library
+- Removes dependence on pandas library.
 - Code refinements.
 
 v0.7.21
