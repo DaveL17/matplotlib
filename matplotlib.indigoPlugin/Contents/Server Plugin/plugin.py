@@ -17,35 +17,18 @@ proper WUnderground devices.
 
 # TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery levels.)
 # TODO: NEW -- Create an "error" chart with min/max/avg
+# TODO: NEW -- Create a floating bar chart
 # TODO: NEW -- Create generic weather forecast charts to support any weather services
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
+# TODO: NEW -- Add config dialog to rcparams device that's generated automatically?
+
 # TODO: Wrap long names for battery health device?
-
-# TODO: Remove plugin update checking from docs upon update
 # TODO: Remove matplotlib_version.html after deprecation
+# TODO: if the csv save location is a share, and the share is unreachable, it blows up.
+# TODO: Add facility to have different Y1 and Y2.  Add a new group of controls (like Y1) for Y2 and
+#  then have a control to allow user to elect when Y axis to assign the line to.
 
-# TODO: Fill error
-#  https://stackoverflow.com/a/44647485/2827397
-#  https://forums.indigodomo.com/viewtopic.php?f=219&t=21931
-
-# TODO: Clean up device props.  Note that some props get established automatically and we don't necessarily want that.
-#     props = self.devicesTypeDict['rcParamsDevice']["ConfigUIRawXml"]
-#     props = ET.ElementTree(ET.fromstring(props))
-#
-#     current_fields = []
-#
-#     for prop in props.findall('Field'):
-#         id = unicode(prop.get('id'))
-#         current_fields.append(id)
-#
-#     self.logger.info(unicode(current_fields))
-#
-#     if dev.deviceTypeId == 'rcParamsDevice':
-#         props = dev.pluginProps
-#
-#     self.logger.info(unicode(dict(props)))
-
-# TODO: the CSV Engine update set to 2 minutes takes 2 minutes 1.1 seconds to update
+# TODO: Feature Requests!!
 
 # ================================== IMPORTS ==================================
 
@@ -98,12 +81,14 @@ __version__   = "0.7.23"
 
 # =============================================================================
 
+install_path = indigo.server.getInstallFolderPath()
+
 kDefaultPluginPrefs = {
     u'backgroundColor': "00 00 00",
     u'backgroundColorOther': False,
-    u'chartPath': "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/",
+    u'chartPath': u"{0}/IndigoWebServer/images/controls/static/".format(install_path),
     u'chartResolution': 100,
-    u'dataPath': "{0}/com.fogbert.indigoplugin.matplotlib/".format(indigo.server.getLogsFolderPath()),
+    u'dataPath': u"{0}/Logs/com.fogbert.indigoplugin.matplotlib/".format(install_path),
     u'enableCustomLineSegments': False,
     u'faceColor': "00 00 00",
     u'faceColorOther': False,
@@ -137,24 +122,24 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         super(Plugin, self).__init__(pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        # ==================== Initialize Global Variables ====================
+        # ======================== Initialize Global Variables ========================
         self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
         self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
         self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
 
         self.final_data = []
 
-        # ====================== Initialize DLFramework =======================
+        # ========================== Initialize DLFramework ===========================
         self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
         self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
 
         # Log pluginEnvironment information when plugin is first started
         self.Fogbert.pluginEnvironmentLogger()
 
-        # ======================= Log More Plugin Info ========================
+        # =========================== Log More Plugin Info ============================
         self.pluginEnvironmentLogger()
 
-        # ========================= Initialize Logger =========================
+        # ============================= Initialize Logger =============================
         self.plugin_file_handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s', datefmt='%Y-%m-%d %H:%M:%S'))
         self.debug_level = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debug_level)
@@ -166,16 +151,16 @@ class Plugin(indigo.PluginBase):
         else:
             self.plugin_file_handler.setLevel(10)
 
-        # ============== Conform Custom Colors to Color Picker ================
+        # =================== Conform Custom Colors to Color Picker ===================
         # See method for more info.
         self.convert_custom_colors()
 
-        # ======================== Clean Plugin Prefs =========================
+        # ============================ Clean Plugin Prefs =============================
         # Remove legacy cruft from plugin prefs. We do devices later.
-        self.pluginPrefs = self.__clean_prefs(self.pluginPrefs)
-        indigo.server.savePluginPrefs()
+        # self.pluginPrefs = self.__clean_prefs(self.pluginPrefs)
+        # indigo.server.savePluginPrefs()
 
-        # ========================= Remote Debug Hook =========================
+        # ============================= Remote Debug Hook =============================
         # try:
         #     pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True, suspend=False)
         # except:
@@ -235,21 +220,27 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"CSV last update unknow. Coercing update.")
 
         # If the refresh interval is greater than zero
-        if dev.deviceTypeId != 'rcParamsDevice' and int(dev.pluginProps['refreshInterval']) > 0:
-            dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
+        # Note that we check for the existence of the device state before trying to
+        # update it due to how Indigo processes devices when their source plugin has
+        # been changed (i.e., assigning an existing device to a new plugin instance.)
 
-        # If the device is set to manual only.
-        elif int(dev.pluginProps['refreshInterval']) == 0 or dev.pluginProps['refreshInterval'] == '':
-            dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Manual'}])
+        if 'onOffState' in dev.states:
 
-        else:
-            dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ' '}])
+            if dev.deviceTypeId != 'rcParamsDevice' and int(dev.pluginProps['refreshInterval']) > 0:
+                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
+
+            # If the device is set to manual only.
+            elif int(dev.pluginProps['refreshInterval']) == 0 or dev.pluginProps['refreshInterval'] == '':
+                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Manual'}])
+
+            else:
+                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ' '}])
 
         dev.stateListOrDisplayStateIdChanged()
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
         # TODO: isolate this function and fold it into the __clean_prefs method.
-        # ==============================================================
+        # =============================================================================
         # current_prefs = []
         # dead_prefs = []
         #
@@ -291,6 +282,9 @@ class Plugin(indigo.PluginBase):
 
         try:
 
+            # ===================== Prepare CSV Engine Config Window ======================
+            # Put certain props in a state that we expect when the config dialog is first
+            # opened.
             if typeId == "csvEngine":
                 valuesDict['addItemFieldsCompleted'] = False
                 valuesDict['addKey']                 = ""
@@ -306,19 +300,23 @@ class Plugin(indigo.PluginBase):
                 valuesDict['editValue']              = ""
                 valuesDict['isColumnSelected']       = False
                 valuesDict['previousKey']            = ""
+
                 return valuesDict
 
-            # For existing devices
-            if dev.configured:
+            # # ============================= Fix Custom Colors =============================
+            # # For existing devices
+            # if dev.configured:
+            #
+            #     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+            #     for prop in valuesDict:
+            #         if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(valuesDict[prop])):
+            #             s = valuesDict[prop]
+            #             valuesDict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
 
-                # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
-                for prop in valuesDict:
-                    if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(valuesDict[prop])):
-                        s = valuesDict[prop]
-                        valuesDict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
-
-            # For new devices, force certain defaults that don't carry from devices.xml. This seems to be especially important for
-            # menu items built with callbacks and colorpicker controls that don't appear to accept defaultValue.
+            # ========================== Set Config UI Defaults ===========================
+            # For new devices, force certain defaults that don't carry from devices.xml.
+            # This seems to be especially important for menu items built with callbacks and
+            # colorpicker controls that don't appear to accept defaultValue.
             if not dev.configured:
 
                 valuesDict['refreshInterval'] = '900'
@@ -336,7 +334,7 @@ class Plugin(indigo.PluginBase):
                     valuesDict['xAxisBins']           = 'daily'
                     valuesDict['xAxisLabelFormat']    = '%A'
 
-                # =========================== Battery Health Device ============================
+                # =========================== Battery Health Device ===========================
                 if typeId == "batteryHealthDevice":
                     valuesDict['healthyColor']     = '00 00 CC'
                     valuesDict['cautionLevel']     = '10'
@@ -345,11 +343,11 @@ class Plugin(indigo.PluginBase):
                     valuesDict['warningColor']     = 'FF 00 00'
                     valuesDict['showBatteryLevel'] = 'true'
 
-                # ========================== Calendar Charting Device ==========================
+                # ========================== Calendar Charting Device =========================
                 if typeId == "calendarChartingDevice":
-                    valuesDict['fontSize'] = 16
+                    valuesDict['fontSize'] = 12
 
-                # ============================ Line Charting Device ============================
+                # ============================ Line Charting Device ===========================
                 if typeId == "lineChartingDevice":
 
                     for _ in range(1, 7, 1):
@@ -367,13 +365,13 @@ class Plugin(indigo.PluginBase):
                     valuesDict['xAxisBins']           = 'daily'
                     valuesDict['xAxisLabelFormat']    = '%A'
 
-                # =========================== Multiline Text Device ============================
+                # =========================== Multiline Text Device ===========================
                 if typeId == "multiLineText":
                     valuesDict['textColor']  = "FF 00 FF"
                     valuesDict['thing']      = 'None'
                     valuesDict['thingState'] = 'None'
 
-                # =========================== Polar Charting Device ============================
+                # =========================== Polar Charting Device ===========================
                 if typeId == "polarChartingDevice":
                     valuesDict['customTickFontSize']  = 8
                     valuesDict['customTitleFontSize'] = 10
@@ -382,7 +380,7 @@ class Plugin(indigo.PluginBase):
                     valuesDict['radiiValue']          = 'None'
                     valuesDict['thetaValue']          = 'None'
 
-                # ========================== Scatter Charting Device ===========================
+                # ========================== Scatter Charting Device ==========================
                 if typeId == "scatterChartingDevice":
 
                     for _ in range(1, 5, 1):
@@ -399,11 +397,10 @@ class Plugin(indigo.PluginBase):
                     valuesDict['xAxisBins']           = 'daily'
                     valuesDict['xAxisLabelFormat']    = '%A'
 
-                # ========================== Weather Forecast Device ===========================
+                # ========================== Weather Forecast Device ==========================
                 if typeId == "forecastChartingDevice":
 
                     for _ in range(1, 3, 1):
-                        valuesDict['line{0}Color'.format(_)]       = 'FF 33 33'
                         valuesDict['line{0}Marker'.format(_)]      = 'None'
                         valuesDict['line{0}MarkerColor'.format(_)] = 'FF FF FF'
                         valuesDict['line{0}Style'.format(_)]       = '-'
@@ -412,6 +409,8 @@ class Plugin(indigo.PluginBase):
                     valuesDict['customTickFontSize']   = 8
                     valuesDict['customTitleFontSize']  = 10
                     valuesDict['forecastSourceDevice'] = 'None'
+                    valuesDict['line1Color']           = 'FF 33 33'
+                    valuesDict['line2Color']           = '00 00 FF'
                     valuesDict['line3Color']           = '99 CC FF'
                     valuesDict['line3MarkerColor']     = 'FF FF FF'
                     valuesDict['xAxisBins']            = 'daily'
@@ -431,10 +430,10 @@ class Plugin(indigo.PluginBase):
             if self.pluginPrefs.get('snappyConfigMenus', False):
                 self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
 
-                for key in ['barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
+                for key in ('barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
                             'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
                             'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
-                            'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ]:
+                            'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
                     valuesDict[key] = False
 
             return valuesDict
@@ -483,7 +482,6 @@ class Plugin(indigo.PluginBase):
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
         plugin_prefs = self.pluginPrefs
-
         self.logger.threaddebug(u"Getting plugin Prefs: {0}".format(dict(plugin_prefs)))
 
         # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically need to be set here (the others can be set directly by the XML.)
@@ -541,7 +539,8 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Validating plugin configuration parameters.")
 
-        for path_prop in ['chartPath', 'dataPath']:
+        # ================================= Data Path =================================
+        for path_prop in ('chartPath', 'dataPath'):
             try:
                 if not valuesDict[path_prop].endswith('/'):
                     error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
@@ -549,14 +548,13 @@ class Plugin(indigo.PluginBase):
                     return False, valuesDict, error_msg_dict
 
             except AttributeError:
-                self.pluginErrorHandler(traceback.format_exc())
-                error_msg_dict[path_prop]       = u"The  path must end with a forward slash '/'."
+                error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
                 error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
                 return False, valuesDict, error_msg_dict
 
-        # ========================= Chart Resolution ==========================
-        # Note that chart resolution includes a warning feature that will pass
-        # the value after the warning is cleared.
+        # ============================= Chart Resolution ==============================
+        # Note that chart resolution includes a warning feature that will pass the
+        # value after the warning is cleared.
         try:
             # If value is null, a null string, or all whitespace.
             if not valuesDict['chartResolution'] or valuesDict['chartResolution'] == "" or str(valuesDict['chartResolution']).isspace():
@@ -573,40 +571,38 @@ class Plugin(indigo.PluginBase):
             # If no warning flag and the value is good.
             elif not valuesDict['dpiWarningFlag'] or int(valuesDict['chartResolution']) >= 80:
                 pass
+
             else:
                 error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
-                error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is less than 0."
+                error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
                 return False, valuesDict, error_msg_dict
 
         except ValueError:
-            self.pluginErrorHandler(traceback.format_exc())
             error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
-            error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nYou have entered a chart resolution value that is not an integer."
+            error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
             return False, valuesDict, error_msg_dict
 
-        # ========================= Chart Dimensions ==========================
-        for dimension_prop in ['rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize']:
+        # ============================= Chart Dimensions ==============================
+        for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize'):
             try:
                 if float(valuesDict[dimension_prop]) < 75:
                     error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
-                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is less than 75 pixels."
+                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be greater than 75 pixels"
                     return False, valuesDict, error_msg_dict
             except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
                 error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
-                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nYou have entered a dimension value that is not a real number."
+                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be a real number."
                 return False, valuesDict, error_msg_dict
 
-        # ============================ Line Weight ============================
+        # ================================ Line Weight ================================
         try:
             if float(valuesDict['lineWeight']) <= 0:
-                error_msg_dict['lineWeight']    = u"The line weight value must be greater than 0."
-                error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is less than 0."
+                error_msg_dict['lineWeight']    = u"The line weight value must be greater than zero."
+                error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be greater than zero"
                 return False, valuesDict, error_msg_dict
         except ValueError:
-            self.pluginErrorHandler(traceback.format_exc())
             error_msg_dict['lineWeight']    = u"The line weight value must be a real number."
-            error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nYou have entered a line weight value that is not a real number."
+            error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be a real number"
             return False, valuesDict, error_msg_dict
 
         valuesDict['dpiWarningFlag'] = True
@@ -621,126 +617,258 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Validating device configuration parameters.")
 
-        # ============================ CSV Engine =============================
-        if typeId == 'csvEngine':
-
-            # Will catch strings and floats
-            try:
-                int(valuesDict['numLinesToKeep'])
-            except ValueError:
-                error_msg_dict['numLinesToKeep'] = u"The observation value must be an integer."
-                error_msg_dict['showAlertText'] = u"Observation Value Error.\n\nThe observation value must be an integer."
-                return False, valuesDict, error_msg_dict
-
-            # CSV needs at least 1 observation
-            if int(valuesDict['numLinesToKeep']) < 1:
-                error_msg_dict['numLinesToKeep'] = u"Your CSV files must contain at least one observation."
-                error_msg_dict['showAlertText'] = u"Observation Value Error.\n\nYour CSV files must contain at least one observation in order to be able to generate a chart."
-                return False, valuesDict, error_msg_dict
-
-            self.logger.threaddebug(u"[{0}] Settings validated successfully.".format(dev.name))
-            return True, valuesDict
-
-        # ===================== Multiline Text Validation =====================
-        # Note that multiline text devices don't require the same validation as
-        # the graphical chart types require.
-        if typeId == 'multiLineText':
-
-            if not valuesDict['thing']:
-                error_msg_dict['thing'] = u"You must select a data source."
-                error_msg_dict['showAlertText'] = u"Source Error.\n\nYou must select a text source for charting."
-                return False, valuesDict, error_msg_dict
-
-            if not valuesDict['thingState']:
-                error_msg_dict['thingState'] = u"You must select a data source."
-                error_msg_dict['showAlertText'] = u"Text to Chart Error.\n\nYou must select a text source for charting."
-                return False, valuesDict, error_msg_dict
-
-            self.logger.debug(u"{0} settings validated successfully.".format(dev.name))
-            return True, valuesDict
-
-        # ======================= Bar Chart Validation ========================
+        # ================================= Bar Chart =================================
+        # =============================================================================
         if typeId == 'barChartingDevice':
-            if valuesDict['bar1Source'] == 'None':
+
+            bar_1_source = valuesDict['bar1Source']
+
+            # Must select at least one source (bar 1)
+            if bar_1_source == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
                 return False, valuesDict, error_msg_dict
 
-        # ======================= Line Chart Validation =======================
+            try:
+                # Bar width must be greater than 0. Will also trap strings.
+                bar_width = float(valuesDict['barWidth'])
+
+                if not bar_width >= 0:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+                error_msg_dict['showAlertText'] = u"Bar Width Error.\n\nYou must enter a bar width greater than 0."
+                return False, valuesDict, error_msg_dict
+
+        # =========================== Battery Health Chart ============================
+        # =============================================================================
+        if typeId == 'batteryHealthDevice':
+
+            for prop in ('cautionLevel', 'warningLevel'):
+                try:
+                    # Bar width must be greater than 0. Will also trap strings.
+                    alert_level = float(valuesDict[prop])
+
+                    if not 0 <= alert_level <= 100:
+                        raise ValueError
+
+                except ValueError:
+                    error_msg_dict[prop] = u"Alert levels must between 0 and 100 (integer)."
+                    error_msg_dict['showAlertText'] = u"Alert Level Error.\n\nYou must enter an alert level between 0 and 100 (integer)."
+                    return False, valuesDict, error_msg_dict
+
+        # ============================== Calendar Chart ===============================
+        # =============================================================================
+        # There are currently no unique validation steps needed for calendar devices
+        if typeId == 'calendarChartingDevice':
+            pass
+
+        # ================================ CSV Engine =================================
+        # =============================================================================
+        if typeId == 'csvEngine':
+
+            # ========================== Number of Observations ===========================
+            try:
+                # Will catch strings and floats cast as strings
+                obs = int(valuesDict['numLinesToKeep'])
+
+                # Must be 1 or greater
+                if obs < 1:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['numLinesToKeep'] = u"The observation value must be a whole number integer greater than zero."
+                error_msg_dict['showAlertText'] = u"Observation Value Error.\n\nThe observation value must be a whole number integer greater than zero."
+                return False, valuesDict, error_msg_dict
+
+            # ================================= Duration ==================================
+            try:
+                duration = float(valuesDict['numLinesToKeepTime'])
+
+                # Must be zero or greater
+                if duration < 0:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['numLinesToKeepTime'] = u"The duration value must be an integer or float greater than zero."
+                error_msg_dict['showAlertText'] = u"Duration Value Error.\n\nThe observation value must be an integer or float greater than zero."
+                return False, valuesDict, error_msg_dict
+
+            self.logger.threaddebug(u"[{0}] Settings validated successfully.".format(dev.name))
+
+            # ============================= Refresh Interval ==============================
+            try:
+                refresh = int(valuesDict['refreshInterval'])
+
+                # Must be zero or greater
+                if refresh < 0:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['refreshInterval'] = u"The refresh interval must be a whole number integer and greater than zero."
+                error_msg_dict['showAlertText'] = u"Refresh interval Value Error.\n\nThe observation value must be a whole number integer and greater than zero."
+                return False, valuesDict, error_msg_dict
+
+        # ================================ Line Chart =================================
+        # =============================================================================
         if typeId == 'lineChartingDevice':
+
+            # There must be at least 1 source selected
             if valuesDict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
                 return False, valuesDict, error_msg_dict
 
+            # Iterate for each line group (1-6).
             for line in range(1, 7, 1):
+
+                # Line adjustment values
                 for char in valuesDict['line{0}adjuster'.format(line)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['line{0}adjuster'.format(line)] = u"Valid operators are +, -, *, /"
                         error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
                         return False, valuesDict, error_msg_dict
 
+                # Fill is illegal for the steps line type
                 if valuesDict['line{0}Style'.format(line)] == 'steps' and valuesDict['line{0}Fill'.format(line)]:
                     error_msg_dict['line{0}Fill'.format(line)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['line{0}Style'.format(line)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
                     return False, valuesDict, error_msg_dict
 
-        # ====================== Polar Chart Validation =======================
+        # ============================== Multiline Text ===============================
+        # =============================================================================
+        if typeId == 'multiLineText':
+
+            for prop in ('thing', 'thingState'):
+
+                # A data source must be selected
+                if not valuesDict[prop] or valuesDict[prop] == 'None':
+                    error_msg_dict[prop] = u"You must select a data source."
+                    error_msg_dict['showAlertText'] = u"Source Error.\n\nYou must select a text source for charting."
+                    return False, valuesDict, error_msg_dict
+
+            try:
+                # Number of characters. Will catch strings and floats
+                characters = int(valuesDict['numberOfCharacters'])
+
+                # Must be zero or greater
+                if characters < 1:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number greater than zero (integer)."
+                error_msg_dict['showAlertText'] = u"Number of Characters Error.\n\nThe number of characters must be a positive number greater than zero (integer)."
+                return False, valuesDict, error_msg_dict
+
+            # Figure width and height.
+            for prop in ('figureWidth', 'figureHeight'):
+                try:
+                    # Will catch strings and floats
+                    figure_size = int(valuesDict[prop])
+
+                    # Must be zero or greater
+                    if figure_size < 1:
+                        raise ValueError
+
+                except ValueError:
+                    error_msg_dict[prop] = u"The figure width and height must be positive whole numbers greater than zero (pixels)."
+                    error_msg_dict['showAlertText'] = u"Figure Dimensions Error.\n\nThe figure width and height must be positive whole numbers greater than zero (pixels)."
+                    return False, valuesDict, error_msg_dict
+
+            # Font size
+            try:
+                # Will catch strings
+                font_size = float(valuesDict['multilineFontSize'])
+
+                # Must be zero or greater
+                if font_size < 0:
+                    raise ValueError
+
+            except ValueError:
+                error_msg_dict['multilineFontSize'] = u"The font size must be a positive real number greater than zero."
+                error_msg_dict['showAlertText'] = u"Font Size Error.\n\nThe font size must be a positive real number greater than zero."
+                return False, valuesDict, error_msg_dict
+
+        # ================================ Polar Chart ================================
+        # =============================================================================
         if typeId == 'polarChartingDevice':
+
             if not valuesDict['thetaValue']:
-                error_msg_dict['thetaValue'] = u"You must select a data source."
+                error_msg_dict['thetaValue'] = u"You must select a direction source."
                 error_msg_dict['showAlertText'] = u"Direction Source Error.\n\nYou must select a direction source for charting."
                 return False, valuesDict, error_msg_dict
 
             if not valuesDict['radiiValue']:
-                error_msg_dict['radiiValue'] = u"You must select a data source."
+                error_msg_dict['radiiValue'] = u"You must select a magnitude source."
                 error_msg_dict['showAlertText'] = u"Magnitude Source Error.\n\nYou must select a magnitude source for charting."
                 return False, valuesDict, error_msg_dict
 
-        # ===================== Scatter Chart Validation ======================
+            # Number of observations
+            try:
+                # Will catch strings and floats
+                num_obs = int(valuesDict['numObs'])
+
+                # Must be 1 or greater
+                if num_obs < 1:
+                    error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number integer)."
+                    error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nYou must specify at least 1 observation (must be a whole number integer)."
+                    return False, valuesDict, error_msg_dict
+
+            except ValueError:
+                error_msg_dict['numObs'] = u"The number of observations must be a whole number integer)."
+                error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nThe number of observations must be a whole number integer)."
+                return False, valuesDict, error_msg_dict
+
+        # =============================== Scatter Chart ===============================
+        # =============================================================================
         if typeId == 'scatterChartingDevice':
+
             if not valuesDict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
                 return False, valuesDict, error_msg_dict
 
-        # ===================== Weather Chart Validation ======================
+        # =============================== Weather Chart ===============================
+        # =============================================================================
         if typeId == 'forecastChartingDevice':
+
             if not valuesDict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
                 error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
                 return False, valuesDict, error_msg_dict
 
-        # ========================== All Chart Types ==========================
-        # The following validation blocks are applied to all graphical chart
-        # device types.
+        # ============================== All Chart Types ==============================
+        # =============================================================================
+        # The following validation blocks are applied to all graphical chart device
+        # types.
 
-        # ====================== Chart Custom Dimensions ======================
+        # ========================== Chart Custom Dimensions ==========================
         # Check to see that custom chart dimensions conform to valid types
-        for custom_dimension_prop in ['customSizeHeight', 'customSizeWidth', 'customSizePolar']:
+        for custom_dimension_prop in ('customSizeHeight', 'customSizeWidth', 'customSizePolar'):
             try:
                 if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 75:
                     error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
                     error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
                     return False, valuesDict, error_msg_dict
+
             except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
                 error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number."
                 error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is not a real number."
-                valuesDict[custom_dimension_prop] = 'None'
+                valuesDict[custom_dimension_prop]     = 'None'
                 return False, valuesDict, error_msg_dict
 
-        # ============================ Axis Limits ============================
+        # ================================ Axis Limits ================================
         # Check to see that each axis limit matches one of the accepted formats
-        for limit_prop in ['yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin']:
+        for limit_prop in ('yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin'):
             try:
-                if limit_prop in valuesDict.keys() and valuesDict[limit_prop] not in ['None', '0']:
+                if limit_prop in valuesDict.keys() and valuesDict[limit_prop] not in ('None', '0'):
                     float(valuesDict[limit_prop])
+
             except ValueError:
-                self.pluginErrorHandler(traceback.format_exc())
-                error_msg_dict[limit_prop]      = u"An axis limit must be a real number or None."
-                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\nA valid axis limit must be in the form of a real number or None."
+                error_msg_dict[limit_prop]      = u"The axis limit must be a real number or None."
+                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\nA valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, valuesDict[limit_prop])
                 valuesDict[limit_prop] = 'None'
                 return False, valuesDict, error_msg_dict
 
@@ -750,99 +878,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     # ============================== Plugin Methods ===============================
     # =============================================================================
-    def __maintenance(self):
-        """
-        Remove legacy keys from plugin prefs
-
-        Note that this does not affect device dicts.
-
-        :return:
-        """
-
-        for dev in indigo.devices.itervalues("self"):
-
-            if dev.deviceTypeId not in ['csvEngine', 'rcParamsDevice']:
-                props = dev.pluginProps
-
-                # Initially, the plugin was constructed with a standard set of
-                # colors that could be overwritten by electing to set a custom
-                # color value. With the inclusion of the color picker control, this
-                # was no longer needed. So we try to set the color field to the
-                # custom value. This block is for device color preferences. They
-                # should be updated whether or not the device is enabled in the
-                # Indigo UI.
-                if '#custom' in props.values() or 'custom' in props.values():
-                    for prop in props:
-                        if 'color' in prop.lower():
-                            if props[prop] in ['#custom', 'custom']:
-
-                                self.logger.threaddebug(u"Resetting legacy device preferences for custom colors to new color picker.")
-
-                                if props[u'{0}Other'.format(prop)]:
-                                    props[prop] = props[u'{0}Other'.format(prop)]
-
-                                else:
-                                    props[prop] = 'FF FF FF'
-
-                # Establish props for legacy devices. If they exist, we leave them alone.
-                for _ in range(1, 7, 1):
-                    props['line{0}Annotate'.format(_)]     = props.get('line{0}Annotate'.format(_), False)
-                    props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
-                    props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), "")
-                    props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
-                    props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
-                    props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), "")
-                    props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
-                    props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
-                    props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
-                    props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
-
-                # TODO: Check logic -- csvEngine devices shouldn't reach this code.
-                # Establishes props.isChart for legacy devices
-                props_dict = {'csvEngine': False,
-                              'barChartingDevice': True,
-                              'batteryHealthDevice': True,
-                              'calendarChartingDevice': True,
-                              'lineChartingDevice': True,
-                              'rcParamsDevice': False,
-                              'multiLineText': True,
-                              'polarChartingDevice': True,
-                              'scatterChartingDevice': True,
-                              'forecastChartingDevice': True}
-
-                props['isChart'] = props_dict[dev.deviceTypeId]
-
-                # Establish refresh interval for legacy devices. If the prop isn't present, we
-                # set it equal to the user's current global refresh rate.
-                if 'refreshInterval' not in props.keys():
-                    self.logger.threaddebug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
-                    props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
-
-                # Update server
-                dev.replacePluginPropsOnServer(props)
-
-            # TODO: set isChart here for these kind of devices
-            elif dev.deviceTypeId in ['csvEngine', 'rcParamsDevice']:
-                # Remove legacy cruft from csv engine and rcParams device props
-                props = dev.pluginProps
-                props = self.__clean_prefs(props)
-                dev.replacePluginPropsOnServer(props)
-
-        self.logger.threaddebug(u"Plugin maintenance complete.")
-
-    def __clean_prefs(self, prefs):
+    def __clean_prefs(self, dev_name, prefs):
         """
         Remove legacy keys from plugin and device prefs
 
         -----
 
+        :param unicode dev_name:
+        :param dict prefs:
         :return:
         """
 
-        # TODO: this method will query the server to get the current device config. Could
-        #   unpack the XML and be sure that the device matches. Danger?
-
-        list_of_keys_to_remove = [
+        list_of_removed_keys = []
+        list_of_keys_to_remove = (
             'annotationColorOther',
             'bar_colors',
             'barLabel1',
@@ -1014,8 +1062,7 @@ class Plugin(indigo.PluginBase):
             'yAxisMax',
             'yAxisMin',
             'yAxisPrecision'
-        ]
-        list_of_removed_keys = []
+        )
 
         # Iterate the keys to delete and delete them if they exist
         for key in list_of_keys_to_remove:
@@ -1025,9 +1072,113 @@ class Plugin(indigo.PluginBase):
 
         # Log list of removed keys
         if list_of_removed_keys:
-            self.logger.debug(u"Performing maintenance - removing unneeded keys: {0}".format(list_of_removed_keys))
+            self.logger.debug(u"[{0}] Performing maintenance - removing unneeded keys: {1}".format(dev_name, list_of_removed_keys))
 
         return prefs
+
+    def __maintenance(self):
+        """
+        Remove legacy keys from plugin prefs
+
+        -----
+
+        :return:
+        """
+
+        for dev in indigo.devices.itervalues("self"):
+
+            props = dev.pluginProps
+
+            # ================================ All Devices ================================
+            is_chart_dict = {'barChartingDevice': True,
+                             'batteryHealthDevice': True,
+                             'calendarChartingDevice': True,
+                             'csvEngine': False,
+                             'forecastChartingDevice': True,
+                             'lineChartingDevice': True,
+                             'multiLineText': True,
+                             'polarChartingDevice': True,
+                             'rcParamsDevice': False,
+                             'scatterChartingDevice': True}
+
+            props['isChart'] = is_chart_dict[dev.deviceTypeId]
+
+            # =============================== Chart Devices ===============================
+            if dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
+
+                # ============================= Fix Custom Colors =============================
+                if dev.configured:
+
+                    # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+                    for prop in props:
+                        if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(props[prop])):
+                            self.logger.threaddebug(u"[{0}] Refactoring color property: ({1})".format(dev.name, prop))
+                            props[prop] = u'{0} {1} {2}'.format(prop[0:3], prop[3:5], prop[5:7]).replace('#', '')
+
+                # ======================== Reset Legacy Color Settings ========================
+                # Initially, the plugin was constructed with a standard set of colors that
+                # could be overwritten by electing to set a custom color value. With the
+                # inclusion of the color picker control, this was no longer needed. So we try
+                # to set the color field to the custom value. This block is for device color
+                # preferences. They should be updated whether or not the device is enabled in
+                # the Indigo UI.
+                if '#custom' in props.values() or 'custom' in props.values():
+                    for prop in props:
+                        if 'color' in prop.lower():
+                            if props[prop] in ('#custom', 'custom'):
+
+                                self.logger.threaddebug(u"Resetting legacy device preferences for custom colors to new color picker.")
+
+                                if props[u'{0}Other'.format(prop)]:
+                                    props[prop] = props[u'{0}Other'.format(prop)]
+
+                                else:
+                                    props[prop] = 'FF FF FF'
+
+                # ==================== Establish Props for Legacy Devices =====================
+                # If they exist, we leave them alone.
+                for _ in range(1, 7, 1):
+                    props['line{0}Annotate'.format(_)]     = props.get('line{0}Annotate'.format(_), False)
+                    props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
+                    props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), False)
+                    props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
+                    props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
+                    props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), "")
+                    props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
+                    props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
+                    props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
+                    props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
+
+                    # ======================== Correct Improper Prop Types ========================
+                    # Some early devices were created with the device prop as the wrong type. Let's
+                    # go ahead and fix those.
+                    if dev.deviceTypeId == 'lineChartingDevice':
+
+                        # Convert any best fit line props to bool
+                        if not isinstance(props['line{0}BestFit'.format(_)], bool):
+                            self.logger.info(u"[{0}] Resetting line chart best fit property to boolean for line {1}.".format(dev.name, _))
+                            if props['line{0}BestFit'.format(_)] in ('False', 'false'):
+                                props['line{0}BestFit'.format(_)] = False
+                            elif props['line{0}BestFit'.format(_)] in ('True', 'true'):
+                                props['line{0}BestFit'.format(_)] = True
+
+                # =============== Establish Refresh Interval for Legacy Devices ===============
+                # Establish refresh interval for legacy devices. If the prop isn't present, we
+                # set it equal to the user's current global refresh rate.
+                if 'refreshInterval' not in props.keys():
+                    self.logger.threaddebug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
+                    props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
+
+            # ============================= Non-chart Devices =============================
+            elif dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
+
+                # Remove legacy cruft from csv engine and rcParams device props
+                props = self.__clean_prefs(dev.name, props)
+
+            # ============================= Update the Server =============================
+            dev.replacePluginPropsOnServer(props)
+
+        self.logger.threaddebug(u"Plugin maintenance complete.")
 
     # =============================================================================
     def dummyCallback(self, valuesDict=None, typeId="", targetId=0):
@@ -1042,7 +1193,6 @@ class Plugin(indigo.PluginBase):
 
         :param str typeId:
         :param indigo.Dict valuesDict:
-        :param int devId:
         """
 
         pass
@@ -1194,7 +1344,9 @@ class Plugin(indigo.PluginBase):
             lister = [0]
             num_lister = []
 
-            # Add data item validation.  Will not allow add until all three conditions are met.
+            # ================================ Validation =================================
+            # Add data item validation.  Will not allow add until all three conditions are
+            # met.
             if valuesDict['addValue'] == "":
                 error_msg_dict['addValue'] = u"Please enter a title value for your CSV data element."
                 error_msg_dict['showAlertText'] = u"Title Error.\n\nA title is required for each CSV data element."
@@ -1239,10 +1391,10 @@ class Plugin(indigo.PluginBase):
                 outfile.write(u"{0},{1}\n".format('Timestamp', file_name).encode("utf-8"))
 
         # Wipe the field values clean for the next element to be added.
-        for key in ['addSourceFilter', 'editSourceFilter']:
+        for key in ('addSourceFilter', 'editSourceFilter'):
             valuesDict[key] = "A"
 
-        for key in ['addValue', 'addSource', 'addState']:
+        for key in ('addValue', 'addSource', 'addState'):
             valuesDict[key] = u""
 
         return valuesDict, error_msg_dict
@@ -1311,7 +1463,6 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.error(u"Error generating CSV item list. {0}".format(sub_error))
-            self.logger.threaddebug(u"[{0}] valuesDict: {1}".format(dev.name, result))
             prop_list = []
 
         result = sorted(prop_list, key=lambda tup: tup[1].lower())  # Return a list sorted by the value and not the key. Case insensitive sort.
@@ -1470,6 +1621,7 @@ class Plugin(indigo.PluginBase):
 
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
             delta        = int(dev.pluginProps.get('numLinesToKeepTime', '72'))
+            cycle_time   = dt.datetime.now()
 
             # Read through the dict and construct headers and data
             for k, v in sorted(csv_dict.items()):
@@ -1481,6 +1633,13 @@ class Plugin(indigo.PluginBase):
                 # ============================= Create (if needed) ============================
                 # If the appropriate CSV file doesn't exist, create it and write the header
                 # line.
+                if not os.path.isdir(self.pluginPrefs['dataPath']):
+                    try:
+                        os.makedirs(self.pluginPrefs['dataPath'])
+                        self.logger.warning(u"Target data folder does not exist. Creating it.")
+                    except IOError:
+                        self.logger.critical(u"Target data folder does not exist and the plugin is unable to create it.")
+
                 if not os.path.isfile(full_path):
                     self.logger.debug(u"CSV does not exist. Creating: {0}".format(full_path))
                     csv_file = open(full_path, 'w')
@@ -1523,7 +1682,7 @@ class Plugin(indigo.PluginBase):
                     # If all records are older than the delta, return the original data (so
                     # there's something to chart) and send a warning to the log.
                     if len(time_data) == 0:
-                        self.logger.warning(u"[{0} - {1}] all CSV data are older than the time limit. Returning original data.".format(dev.name, column_names[0][1]))
+                        self.logger.debug(u"[{0} - {1}] all CSV data are older than the time limit. Returning original data.".format(dev.name, column_names[0][1].decode('utf-8')))
                     else:
                         data = time_data
 
@@ -1545,11 +1704,11 @@ class Plugin(indigo.PluginBase):
                         self.logger.critical(u"The settings for CSV Engine data element '{0}' are not valid: [dev: {1}, state/value: {2}]".format(v[0], v[1], v[2]))
 
                     # Give matplotlib something it can chew on if the value to be saved is 'None'
-                    if state_to_write in ['None', None, u""]:
+                    if state_to_write in ('None', None, u""):
                         state_to_write = 'NaN'
 
                     # Add the newest observation to the end of the data list.
-                    now = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
+                    now = dt.datetime.strftime(cycle_time, '%Y-%m-%d %H:%M:%S.%f')
                     data.append([now, state_to_write])
 
                 except ValueError as sub_error:
@@ -1883,8 +2042,8 @@ class Plugin(indigo.PluginBase):
         :param p_dict:
         """
 
-        markers     = ['line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker',
-                       'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker']
+        markers     = ('line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker',
+                       'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker')
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
 
         for marker in markers:
@@ -2228,11 +2387,11 @@ class Plugin(indigo.PluginBase):
         # construct these one at a time.
         try:
             for dev in indigo.devices.itervalues("com.fogbert.indigoplugin.fantasticwWeather"):
-                if dev.deviceTypeId in ['Daily', 'Hourly']:
+                if dev.deviceTypeId in ('Daily', 'Hourly'):
                     forecast_source_menu.append((dev.id, dev.name))
 
             for dev in indigo.devices.itervalues("com.fogbert.indigoplugin.wunderground"):
-                if dev.deviceTypeId in ['wundergroundTenDay', 'wundergroundHourly']:
+                if dev.deviceTypeId in ('wundergroundTenDay', 'wundergroundHourly'):
                     forecast_source_menu.append((dev.id, dev.name))
 
         except Exception as sub_error:
@@ -2644,14 +2803,14 @@ class Plugin(indigo.PluginBase):
 
                 p_dict.update(dev.pluginProps)
 
-                for _ in ['bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
+                for _ in ('bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
                           'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
                           'y_obs1', 'y_obs1_max', 'y_obs1_min',
                           'y_obs2', 'y_obs2_max', 'y_obs2_min',
                           'y_obs3', 'y_obs3_max', 'y_obs3_min',
                           'y_obs4', 'y_obs4_max', 'y_obs4_min',
                           'y_obs5', 'y_obs5_max', 'y_obs5_min',
-                          'y_obs6', 'y_obs6_max', 'y_obs6_min']:
+                          'y_obs6', 'y_obs6_max', 'y_obs6_min'):
                     p_dict[_] = []
 
                 p_dict['fileName']  = ''
@@ -2704,14 +2863,15 @@ class Plugin(indigo.PluginBase):
                     # ================================ Custom Size ================================
                     # If the user has specified a custom size, let's override
                     # with their custom setting.
-                    try:
-                        if p_dict['customSizeHeight'] != 'None':
-                            p_dict['chart_height'] = float(p_dict['customSizeHeight'])
-                        if p_dict['customSizeWidth'] != 'None':
-                            p_dict['chart_width'] = float(p_dict['customSizeWidth'])
-                    except KeyError:
-                        # Not all devices will have these keys
-                        pass
+                    if p_dict['customSizeChart']:
+                        try:
+                            if p_dict['customSizeHeight'] != 'None':
+                                p_dict['chart_height'] = float(p_dict['customSizeHeight'])
+                            if p_dict['customSizeWidth'] != 'None':
+                                p_dict['chart_width'] = float(p_dict['customSizeWidth'])
+                        except KeyError:
+                            # Not all devices will have these keys
+                            pass
 
                     # ============================== Best Fit Lines ===============================
                     # Set the defaults for best fit lines in p_dict.
@@ -2960,7 +3120,7 @@ class MakeChart(object):
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            # ========================= Format Axes ===========================
+            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict)
             self.format_axis_y(ax, p_dict, k_dict)
 
@@ -2971,7 +3131,7 @@ class MakeChart(object):
                     log['Info'].append(u"[{0}] Bar {0} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
                 # Plot the bars
-                if p_dict['bar{0}Source'.format(thing)] not in ["", "None"]:
+                if p_dict['bar{0}Source'.format(thing)] not in ("", "None"):
 
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
@@ -2986,9 +3146,16 @@ class MakeChart(object):
                     # Convert the date strings for charting.
                     dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)])
 
+                    # If the user sets the width to 0, this will perform an introspection of the
+                    # dates to plot and get the minimum of the difference between the dates.
+                    if float(p_dict['barWidth']) == 0.0:
+                        width = np.min(np.diff(dates_to_plot)) * 0.8
+                    else:
+                        width = float(p_dict['barWidth'])
+
                     # Plot the bar.
                     # Note: hatching is not supported in the PNG backend.
-                    ax.bar(dates_to_plot[num_obs * -1:], p_dict['y_obs{0}'.format(thing)][num_obs * -1:], align='center', width=float(p_dict['barWidth']),
+                    ax.bar(dates_to_plot[num_obs * -1:], p_dict['y_obs{0}'.format(thing)][num_obs * -1:], align='center', width=width,
                            color=p_dict['bar{0}Color'.format(thing)], edgecolor=p_dict['bar{0}Color'.format(thing)], **k_dict['k_bar'])
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
@@ -2998,22 +3165,22 @@ class MakeChart(object):
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(thing)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            # ======================== Y1 Axis Min/Max ========================
-            self.format_axis_y1_min_max(p_dict)
+            # ============================== Y1 Axis Min/Max ==============================
+            log = self.format_axis_y1_min_max(p_dict, log)
 
-            # ========================= X Axis Label ==========================
+            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict)
 
-            # ========================= Y Axis Label ==========================
+            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict)
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            # ====================== Legend Properties ========================
-            # Legend should be plotted before any other lines are plotted (like
-            # averages or custom line segments).
+            # ============================= Legend Properties =============================
+            # Legend should be plotted before any other lines are plotted (like averages or
+            # custom line segments).
 
             if p_dict['showLegend']:
 
@@ -3033,7 +3200,7 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            # ======================== Min/Max Lines ==========================
+            # =============================== Min/Max Lines ===============================
             # Note that these need to be plotted after the legend is
             # established, otherwise some of the characteristics of the min/max
             # lines will take over the legend props.
@@ -3045,19 +3212,19 @@ class MakeChart(object):
                 if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            # ===================== Custom Line Segments ======================
+            # =========================== Custom Line Segments ============================
             self.plot_custom_line_segments(ax, p_dict, k_dict)
 
-            # ========================== Format Grids =========================
+            # =============================== Format Grids ================================
             self.format_grids(p_dict, k_dict)
 
-            # ========================== Chart Title ==========================
+            # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
-            # ======================= Custom Y Ticks ==========================
+            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict)
 
-            # ========================== Save Image ===========================
+            # ================================ Save Image =================================
             # plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
             self.save_chart_image(plt, p_dict, k_dict)
@@ -3115,7 +3282,7 @@ class MakeChart(object):
 
                 y_text.append(key)
 
-                # =================== Calculate Bar Colors ====================
+                # =========================== Calculate Bar Colors ============================
                 # Create a list of colors for the bars based on battery health
                 try:
                     battery_level = float(value)
@@ -3132,13 +3299,13 @@ class MakeChart(object):
             # Create a range of values to plot on the Y axis, since we can't plot on device names.
             y_values = np.arange(len(y_text))
 
-            # ======================== Plot the Figure ========================
+            # ============================== Plot the Figure ==============================
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # Adding 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting it off the axis.
             ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
 
-            # ========================== Data Labels ==========================
+            # ================================ Data Labels ================================
             # Plot data labels inside or outside depending on bar length
             if show_level:
                 for _ in range(len(y_values)):
@@ -3147,24 +3314,24 @@ class MakeChart(object):
                     else:
                         plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88), xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
 
-            # ========================== Chart Title ==========================
+            # ================================ Chart Title ================================
             # plt.title(p_dict['chartTitle'], location='center', **k_dict['k_title_font'])
             plt.suptitle(p_dict['chartTitle'], **k_dict['k_title_font'])
 
-            # ========================== Format Grids =========================
+            # =============================== Format Grids ================================
             if dev.ownerProps.get('showxAxisGrid', False):
                 for _ in (20, 40, 60, 80):
                     ax.axvline(x=_, color=p_dict['gridColor'], linestyle=self.host_plugin.pluginPrefs.get('gridStyle', ':'))
 
-            # ========================= X Axis Label ==========================
+            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict)
             ax.xaxis.set_ticks_position('bottom')
 
-            # ======================== X Axis Min/Max =========================
+            # ============================== X Axis Min/Max ===============================
             # We want the X axis scale to always be 0-100.
             plt.xlim(xmin=0, xmax=100)
 
-            # ========================= Y Axis Label ==========================
+            # =============================== Y Axis Label ================================
             # Hide major tick labels and right side ticks.
             ax.set_yticklabels('')
             ax.yaxis.set_ticks_position('left')
@@ -3174,11 +3341,11 @@ class MakeChart(object):
             ax.set_yticks([n for n in range(1, len(y_values) + 1)], minor=True)
             ax.set_yticklabels(y_text, minor=True)
 
-            # ======================== Y Axis Min/Max =========================
+            # ============================== Y Axis Min/Max ===============================
             # We never want the Y axis to go lower than 0.
             plt.ylim(ymin=0)
 
-            # ============================ Spines =============================
+            # ================================== Spines ===================================
             # Hide all but the bottom spine.
             for spine in ('left', 'top', 'right'):
                 ax.spines[spine].set_visible(False)
@@ -3187,6 +3354,7 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
+            # ================================ Save Image =================================
             # Output the file
             plt.tight_layout()
             self.save_chart_image(plt, p_dict, k_dict)
@@ -3238,8 +3406,7 @@ class MakeChart(object):
             ax.axes.get_yaxis().set_visible(False)
             ax.axis('off')
 
-            # ========================== Save Image ===========================
-            # plt.tight_layout(pad=1)
+            # ================================ Save Image =================================
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.9, hspace=None, wspace=None)
             self.save_chart_image(plt, p_dict, k_dict)
 
@@ -3286,7 +3453,7 @@ class MakeChart(object):
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            # ========================= Format Axes ===========================
+            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict)
             self.format_axis_y(ax, p_dict, k_dict)
 
@@ -3296,10 +3463,11 @@ class MakeChart(object):
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
                     log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
-                # ====================== Plot the lines =======================
-                if p_dict['line{0}Source'.format(line)] not in ["", "None"]:
+                # ============================== Plot the Lines ===============================
+                if p_dict['line{0}Source'.format(line)] not in ("", "None"):
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
+                    log['Threaddebug'].append(u"{0}".format(data_column))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -3308,7 +3476,7 @@ class MakeChart(object):
                         p_dict['x_obs{0}'.format(line)].append(element[0])
                         p_dict['y_obs{0}'.format(line)].append(float(element[1]))
 
-                    # ==================== Adjustment Factor ====================
+                    # ============================= Adjustment Factor =============================
                     if dev.pluginProps['line{0}adjuster'.format(line)] != "":
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(line)]:
@@ -3328,14 +3496,14 @@ class MakeChart(object):
                     if p_dict['line{0}Fill'.format(line)]:
                         ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
-                    # ====================== Annotations ======================
+                    # ================================ Annotations ================================
                     if p_dict['line{0}Annotate'.format(line)]:
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            # ======================== Y1 Axis Min/Max ========================
+            # ============================== Y1 Axis Min/Max ==============================
             # Min and Max are not 'None'.
-            self.format_axis_y1_min_max(p_dict)
+            log = self.format_axis_y1_min_max(p_dict, log)
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -3362,18 +3530,27 @@ class MakeChart(object):
                 frame.set_alpha(0)
 
             for line in range(1, 7, 1):
-                # Note that we do these after the legend is drawn so that these lines don't affect the legend.
+                # Note that we do these after the legend is drawn so that these lines
+                # don't affect the legend.
 
-                # ===================== Best Fit Line =====================
+                # We need to reload the dates to ensure that they match the line being plotted
+                dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
+
+                # =============================== Best Fit Line ===============================
                 if dev.pluginProps.get('line{0}BestFit'.format(line), False):
                     self.plot_best_fit_line_segments(ax, dates_to_plot, line, p_dict)
 
                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
-                # ======================== Min/Max Lines ==========================
+                # =============================== Fill Between ================================
                 if p_dict['line{0}Fill'.format(line)]:
+                    # matplotlib.pyplot.fill_between(x, y1, y2=0, where=None, interpolate=False, step=None, *, data=None, **kwargs)
+                    # x = dates_to_plot
+                    # y1 = 0
+                    # y2 = p_dict['y_obs{0}'.format(line)]
                     ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
+                # =============================== Min/Max Lines ===============================
                 if p_dict['plotLine{0}Min'.format(line)]:
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_min'])
                 if p_dict['plotLine{0}Max'.format(line)]:
@@ -3385,20 +3562,19 @@ class MakeChart(object):
 
             self.format_grids(p_dict, k_dict)
 
-            # ========================== Chart Title ==========================
+            # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
-            # ========================= X Axis Label ==========================
+            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict)
 
-            # ========================= Y Axis Label ==========================
+            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict)
 
-            # ======================= Custom Y Ticks ==========================
+            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict)
 
-            # ========================== Save Image ===========================
-            # plt.tight_layout(pad=1)
+            # ================================ Save Image =================================
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
             self.save_chart_image(plt, p_dict, k_dict)
 
@@ -3408,7 +3584,7 @@ class MakeChart(object):
             else:
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+        except (KeyError, IndexError, ValueError, UnicodeEncodeError):
             return_queue.put({'Error': True, 'Log': log, 'Message': str(traceback.format_exc()), 'Name': dev.name})
 
         except Exception as sub_error:
@@ -3471,11 +3647,10 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            # ========================== Chart Title ==========================
+            # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
-            # ========================== Save Image ===========================
-            # plt.tight_layout(pad=1)
+            # ================================ Save Image =================================
             plt.subplots_adjust(top=0.9, bottom=0.05, left=0.02, right=0.98, hspace=None, wspace=None)
             self.save_chart_image(plt, p_dict, k_dict)
 
@@ -3524,11 +3699,11 @@ class MakeChart(object):
             p_dict['currentWindColor'] = r"#{0}".format(p_dict['currentWindColor'].replace(' ', '').replace('#', ''))
             p_dict['maxWindColor']     = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
 
-            # ====================== Column Headings ======================
-            # Pull the column headings for the labels, then delete the row
-            # from self.final_data.
-            theta_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'], p_dict['thetaValue'])  # The name of the theta file.
-            radii_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'], p_dict['radiiValue'])  # The name of the radii file.
+            # ============================== Column Headings ==============================
+            # Pull the column headings for the labels, then delete the row from
+            # self.final_data.
+            theta_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'], p_dict['thetaValue'].encode('utf-8'))  # The name of the theta file.
+            radii_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'], p_dict['radiiValue'].encode('utf-8'))  # The name of the radii file.
 
             if theta_path != 'None' and radii_path != 'None':
 
@@ -3583,7 +3758,7 @@ class MakeChart(object):
                 p_dict['wind_direction'] = np.radians(p_dict['wind_direction'])
                 wind = zip(p_dict['wind_direction'], p_dict['wind_speed'], p_dict['bar_colors'])
 
-                # ====================== Customizations =======================
+                # ============================== Customizations ===============================
                 size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
                 plt.figure(figsize=(size, size))
                 ax = plt.subplot(111, polar=True)                                 # Create subplot
@@ -3594,28 +3769,47 @@ class MakeChart(object):
                 ax.spines['polar'].set_visible(False)                             # Show or hide the plot spine
                 ax.set_axis_bgcolor(p_dict['faceColor'])                          # Color the background of the plot area.
 
-                # ====================== Create the Plot ======================
-                # Note: zorder of the plot must be >2.01 for the plot to be
-                # above the grid (the grid defaults to z = 2.)
+                # ============================== Create the Plot ==============================
+                # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the
+                # grid defaults to z = 2.)
                 for w in wind:
                     ax.plot((0, w[0]), (0, w[1]), color=w[2], linewidth=2, zorder=3)
 
-                # Right-size the grid (must be done after the plot), and customize the tick labels.
-                if max(p_dict['wind_speed']) <= 5:
-                    ax.yaxis.set_ticks(np.arange(1, 5, 1))
-                    ax.set_rgrids([1, 2, 3, 4, 5], **k_dict['k_rgrids'])
-                elif 5 < max(p_dict['wind_speed']) <= 10:
-                    ax.yaxis.set_ticks(np.arange(2, 10, 2))
-                    ax.set_rgrids([2, 4, 6, 8, 10], **k_dict['k_rgrids'])
-                elif 10 < max(p_dict['wind_speed']) <= 20:
-                    ax.yaxis.set_ticks(np.arange(5, 20, 5))
-                    ax.set_rgrids([5, 10, 15, 20, 25], **k_dict['k_rgrids'])
-                elif 20 < max(p_dict['wind_speed']) <= 50:
-                    ax.yaxis.set_ticks(np.arange(10, 50, 10))
-                    ax.set_rgrids([10, 20, 30, 40, 50], **k_dict['k_rgrids'])
-                elif 50 < max(p_dict['wind_speed']):
+                # Right-size the grid (must be done after the plot), and customize the tick
+                # labels. The defaul covers anything over 50.
+                ticks = np.arange(20, 100, 20)
+                grids = range(20, 120, 20)
+
+                if max_wind_speed <= 5:
+                    ticks = np.arange(1, 5, 1)
+                    grids = range(1, 6, 1)
+
+                elif 5 < max_wind_speed <= 10:
+                    ticks = np.arange(2, 10, 2)
+                    grids = range(2, 12, 2)
+
+                elif 10 < max_wind_speed <= 20:
+                    ticks = np.arange(5, 20, 5)
+                    grids = range(5, 30, 5)
+
+                elif 20 < max_wind_speed <= 30:
+                    ticks = np.arange(6, 30, 6)
+                    grids = range(6, 36, 6)
+
+                elif 30 < max_wind_speed <= 40:
+                    ticks = np.arange(8, 40, 8)
+                    grids = range(8, 48, 8)
+
+                elif 40 < max_wind_speed <= 50:
+                    ticks = np.arange(10, 50, 10)
+                    grids = range(10, 60, 10)
+
+                elif 50 < max_wind_speed:
                     plt.text(0.5, 0.5, u"Holy crap!", color='FF FF FF', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
                              bbox=dict(facecolor='red', alpha='0.5'))
+
+                ax.yaxis.set_ticks(ticks)
+                ax.set_rgrids(grids, **k_dict['k_rgrids'])
 
                 # If the user wants to hide tick labels, lets do that.
                 if p_dict['xHideLabels']:
@@ -3623,12 +3817,11 @@ class MakeChart(object):
                 if p_dict['yHideLabels']:
                     ax.axes.yaxis.set_ticklabels([])
 
-                # ================== Current Obs / Max Wind ===================
-                # Note that we reduce the value of the circle plot so that it
-                # appears when transparent charts are enabled (otherwise the
-                # circle is obscured. The transform can be done one of two
-                # ways: access the private attribute "ax.transData._b", or
-                # "ax.transProjectionAffine + ax.transAxes".
+                # ========================== Current Obs / Max Wind ===========================
+                # Note that we reduce the value of the circle plot so that it appears when
+                # transparent charts are enabled (otherwise the circle is obscured. The
+                # transform can be done one of two ways: access the private attribute
+                # "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
                 fig = plt.gcf()
                 max_wind_circle = plt.Circle((0, 0), (max(p_dict['wind_speed']) * 0.99), transform=ax.transProjectionAffine + ax.transAxes, fill=False, edgecolor=p_dict['maxWindColor'],
                                              linewidth=2, alpha=1, zorder=9)
@@ -3638,23 +3831,22 @@ class MakeChart(object):
                                               edgecolor=p_dict['currentWindColor'], linewidth=2, alpha=1, zorder=10)
                 fig.gca().add_artist(last_wind_circle)
 
-                # ========================== No Wind ==========================
-                # If latest obs is a speed of zero, plot something that we can
-                # see.
+                # ================================== No Wind ==================================
+                # If latest obs is a speed of zero, plot something that we can see.
                 if p_dict['wind_speed'][-1] == 0:
                     zero_wind_circle = plt.Circle((0, 0), 0.15, transform=ax.transProjectionAffine + ax.transAxes, fill=True, facecolor=p_dict['currentWindColor'],
                                                   edgecolor=p_dict['currentWindColor'], linewidth=2, alpha=1, zorder=12)
                     fig.gca().add_artist(zero_wind_circle)
 
-                # ================== Transparent Chart Fill ===================
+                # ========================== Transparent Chart Fill ===========================
                 if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                     ylim = ax.get_ylim()
                     patch = plt.Circle((0, 0), ylim[1], transform=ax.transProjectionAffine + ax.transAxes, fill=True, facecolor=p_dict['faceColor'], linewidth=1, alpha=1, zorder=1)
                     fig.gca().add_artist(patch)
 
-                # ===================== Legend Properties =====================
-                # Legend should be plotted before any other lines are plotted (like
-                # averages or custom line segments).
+                # ============================= Legend Properties =============================
+                # Legend should be plotted before any other lines are plotted (like averages or
+                # custom line segments).
 
                 if p_dict['showLegend']:
                     legend = ax.legend(([u"Current", u"Maximum"]), loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2, prop={'size': float(p_dict['legendFontSize'])})
@@ -3664,13 +3856,13 @@ class MakeChart(object):
                     frame = legend.get_frame()
                     frame.set_alpha(0)
 
-                # ======================= Display Grids =======================
+                # =============================== Display Grids ===============================
                 # Grids are always on for polar wind charts.
 
-                # ======================== Chart Title ========================
+                # ================================ Chart Title ================================
                 plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
 
-                # ========================== Save Image ===========================
+                # ================================ Save Image =================================
                 # plt.tight_layout(pad=1)
                 plt.subplots_adjust(top=0.95, bottom=0.15, left=0.15, right=0.85, hspace=None, wspace=None)
                 self.save_chart_image(plt, p_dict, k_dict)
@@ -3708,7 +3900,7 @@ class MakeChart(object):
 
         try:
 
-            # ======================= p_dict Overrides ========================
+            # ============================= p_dict Overrides ==============================
             for _ in range(1, 5, 1):
                 p_dict['group{0}Color'.format(_)]       = r"#{0}".format(p_dict['group{0}Color'.format(_)].replace(' ', '').replace('#', ''))
                 p_dict['group{0}MarkerColor'.format(_)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(_)].replace(' ', '').replace('#', ''))
@@ -3719,7 +3911,7 @@ class MakeChart(object):
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            # ========================= Format Axes ===========================
+            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict)
             self.format_axis_y(ax, p_dict, k_dict)
 
@@ -3729,8 +3921,8 @@ class MakeChart(object):
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor']:
                     log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
-                # ====================== Plot the Points ======================
-                if p_dict['group{0}Source'.format(thing)] not in ["", "None"]:
+                # ============================== Plot the Points ==============================
+                if p_dict['group{0}Source'.format(thing)] not in ("", "None"):
 
                     # There is a bug in matplotlib (fixed in newer versions) where points would not
                     # plot if marker set to 'none'. This overrides the behavior.
@@ -3754,17 +3946,17 @@ class MakeChart(object):
                     ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
                                edgecolor=p_dict['group{0}MarkerColor'.format(thing)], linewidths=0.75, zorder=10, **k_dict['k_line'])
 
-                    # ===================== Best Fit Line =====================
+                    # =============================== Best Fit Line ===============================
                     if dev.pluginProps.get('line{0}BestFit'.format(thing), False):
                         self.plot_best_fit_line_segments(ax, dates_to_plot, thing, p_dict)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)]]
 
-            # ======================== Y1 Axis Min/Max ========================
+            # ============================== Y1 Axis Min/Max ==============================
             # Min and Max are not 'None'.
-            self.format_axis_y1_min_max(p_dict)
+            log = self.format_axis_y1_min_max(p_dict, log)
 
-            # ============================ Legend =============================
+            # ================================== Legend ===================================
             if p_dict['showLegend']:
 
                 # Amend the headers if there are any custom legend entries defined.
@@ -3790,7 +3982,7 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            # ========================== Min / Max ==========================
+            # ================================= Min / Max =================================
             for thing in range(1, 5, 1):
                 if p_dict['plotGroup{0}Min'.format(thing)]:
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(thing)]), color=p_dict['group{0}Color'.format(thing)], **k_dict['k_min'])
@@ -3803,19 +3995,19 @@ class MakeChart(object):
 
             self.format_grids(p_dict, k_dict)
 
-            # ======================== Chart Title ========================
+            # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
-            # ========================= X Axis Label ==========================
+            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict)
 
-            # ========================= Y Axis Label ==========================
+            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict)
 
-            # ======================= Custom Y Ticks ==========================
+            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict)
 
-            # ========================== Save Image ===========================
+            # ================================ Save Image =================================
             # plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
             self.save_chart_image(plt, p_dict, k_dict)
@@ -3849,7 +4041,7 @@ class MakeChart(object):
         :param str dev_type: device type name
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param list state_list: the data to plot
+        :param dict state_list: the data to plot
         :param tuple sun_rise_set: tuple of sunrise/sunset times
         :param multiprocessing.queues.Queue return_queue: logging queue
         """
@@ -3857,7 +4049,6 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-
             p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
@@ -3965,13 +4156,13 @@ class MakeChart(object):
             else:
                 log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
 
-            # ============================= AX1 ==============================
+            # ==================================== AX1 ====================================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             self.format_axis_x_ticks(ax1, p_dict, k_dict)
             self.format_axis_y(ax1, p_dict, k_dict)
 
-            # ====================== Precipitation Bars =======================
+            # ============================ Precipitation Bars =============================
             # The width of the bars is a percentage of a day, so we need to
             # account for instances where the unit of time could be hours to
             # months or years.
@@ -3988,7 +4179,7 @@ class MakeChart(object):
                     for xy in zip(dates_to_plot, p_dict['y_obs3']):
                         ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            # ======================== Precip Min/Max =========================
+            # ============================== Precip Min/Max ===============================
             if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
                 y2_axis_min = float(p_dict['y2AxisMin'])
                 y2_axis_max = float(p_dict['y2AxisMax'])
@@ -4020,21 +4211,20 @@ class MakeChart(object):
 
             plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
-            # ========================= X1 Axis Label ==========================
+            # =============================== X1 Axis Label ===============================
             self.format_axis_x_label(dev, p_dict, k_dict)
 
-            # ========================= Y1 Axis Label ==========================
+            # =============================== Y1 Axis Label ===============================
             # Note we're plotting Y2 label on ax1. We do this because we want the
             # precipitation bars to be under the temperature plot but we want the
             # precipitation scale to be on the right side.
             plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
             ax1.yaxis.set_label_position('right')
 
-            # ======================= Legend Properties =======================
-            # (note that we need a separate instance of this code for each
-            # subplot. This one controls the precipitation subplot.)
-            # Legend should be plotted before any other lines are plotted (like
-            # averages or custom line segments).
+            # ============================= Legend Properties =============================
+            # (note that we need a separate instance of this code for each subplot. This
+            # one controls the precipitation subplot.) Legend should be plotted before any
+            # other lines are plotted (like averages or custom line segments).
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
@@ -4045,16 +4235,16 @@ class MakeChart(object):
 
             self.format_grids(p_dict, k_dict)
 
-            # ==================== Transparent Charts Fill ====================
+            # ========================== Transparent Charts Fill ==========================
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax1.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax1.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            # ======================= Sunrise / Sunset ========================
+            # ============================= Sunrise / Sunset ==============================
             # Note that this highlights daytime hours on the chart.
 
             daylight = dev.pluginProps.get('showDaytime', True)
 
-            if daylight and dev_type in ['Hourly', 'wundergroundHourly']:
+            if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
                 sun_rise, sun_set = self.format_dates(sun_rise_set)
 
@@ -4076,9 +4266,9 @@ class MakeChart(object):
                         ax1.axvspan(min_dates_to_plot, sun_set, color=p_dict['daytimeColor'], alpha=0.15, zorder=1)
                         ax1.axvspan(sun_rise, max_dates_to_plot, color=p_dict['daytimeColor'], alpha=0.15, zorder=1)
 
-            # ============================= AX2 ==============================
+            # ==================================== AX2 ====================================
 
-            # ======================= Temperatures Plot =======================
+            # ============================= Temperatures Plot =============================
             # Create a second plot area and plot the temperatures.
             ax2 = ax1.twinx()
             ax2.margins(0.04, 0.05)  # This needs to remain or the margins get screwy (they don't carry over from ax1).
@@ -4105,7 +4295,7 @@ class MakeChart(object):
             ax1.yaxis.tick_right()
             ax2.yaxis.tick_left()
 
-            # =================== Temperature Axis Min/Max ====================
+            # ========================= Temperature Axis Min/Max ==========================
             if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
                 y_axis_min = float(p_dict['yAxisMin'])
                 y_axis_max = float(p_dict['yAxisMax'])
@@ -4136,21 +4326,20 @@ class MakeChart(object):
                         y_axis_max = max(p_dict['data_array']) * 1.10
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
-            # ========================= Y2 Axis Label ==========================
+            # =============================== Y2 Axis Label ===============================
             # Note we're plotting Y1 label on ax2. We do this because we want the
             # temperature lines to be over the precipitation bars but we want the
             # temperature scale to be on the left side.
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])  # Note we're plotting Y1 label on ax2
             ax2.yaxis.set_label_position('left')
 
-            # ========================== Chart Title ==========================
+            # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
-            # ======================= Legend Properties =======================
-            # (note that we need a separate instance of this code for each
-            # subplot. This one controls the temperatures subplot.)
-            # Legend should be plotted before any other lines are plotted (like
-            # averages or custom line segments).
+            # ============================= Legend Properties =============================
+            # (note that we need a separate instance of this code for each subplot. This
+            # one controls the temperatures subplot.) Legend should be plotted before any
+            # other lines are plotted (like averages or custom line segments).
 
             if p_dict['showLegend']:
                 headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
@@ -4161,7 +4350,7 @@ class MakeChart(object):
 
             self.format_grids(p_dict, k_dict)
 
-            # ========================== Save Image ===========================
+            # ================================ Save Image =================================
             plt.tight_layout(pad=1)
             plt.subplots_adjust(bottom=0.2)
             self.save_chart_image(plt, p_dict, k_dict)
@@ -4196,8 +4385,15 @@ class MakeChart(object):
         """
 
         # List of (elements, replacements)
-        clean_list = [(' am ', ' AM '), (' pm ', ' PM '), ('*', ' '), ('\u000A', ' '),
-                      ('...', ' '), ('/ ', '/'), (' /', '/'), ('/', ' / ')]
+        clean_list = ((' am ', ' AM '),
+                      (' pm ', ' PM '),
+                      ('*', ' '),
+                      ('\u000A', ' '),
+                      ('...', ' '),
+                      ('/ ', '/'),
+                      (' /', '/'),
+                      ('/', ' / ')
+                      )
 
         # Take the old, and replace it with the new.
         for (old, new) in clean_list:
@@ -4268,10 +4464,17 @@ class MakeChart(object):
         # Test to see if any data element is a valid numeric and replace it with 'NaN'
         # if it isn't.
 
-        # Data element contains an invalid string element:
-        # All proper strings like 'off' and 'true' should already have been converted
-        # with self.convert_the_data() above.
+        # Preserve the header row.
+        headers = final_data[0]
+        del final_data[0]
+
+        # Data element contains an invalid string element. All proper strings like
+        # 'off' and 'true' should already have been converted with
+        # self.convert_the_data() above.
         final_data = [(item[0], 'NaN') if not is_number(item[1]) else item for item in final_data]
+
+        # Put the header row back in.
+        final_data.insert(0, headers)
 
         return final_data, log
 
@@ -4295,7 +4498,7 @@ class MakeChart(object):
             plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
             return u"[{0}] No call for legend. Formatting X label.".format(dev.name)
 
-        if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ['', 'null']:
+        if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
             return u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name)
 
         return ''
@@ -4402,7 +4605,7 @@ class MakeChart(object):
         return ax
 
     # =============================================================================
-    def format_axis_y1_min_max(self, p_dict):
+    def format_axis_y1_min_max(self, p_dict, log):
         """
         Format Y1 axis range limits
 
@@ -4413,33 +4616,44 @@ class MakeChart(object):
         -----
 
         :param dict p_dict:
+        :param dict log:
         """
-        if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
-            y_axis_min = float(p_dict['yAxisMin'])
-            y_axis_max = float(p_dict['yAxisMax'])
 
-        elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
-            y_axis_min = float(p_dict['yAxisMin'])
-            y_axis_max = max(p_dict['data_array'])
+        try:
+            # Min and Max are not 'None'
+            if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
+                y_axis_min = float(p_dict['yAxisMin']) * 0.75
+                y_axis_max = float(p_dict['yAxisMax']) * 1.25
 
-        elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
-            y_axis_min = min(p_dict['data_array'])
-            y_axis_max = float(p_dict['yAxisMax'])
+            # Min is not 'None and max is 'None'
+            elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
+                y_axis_min = float(p_dict['yAxisMin'])
+                y_axis_max = max(p_dict['data_array']) * 1.25
 
-        else:
-            if max(p_dict['data_array']) - min(p_dict['data_array']) == 0:
-                y_axis_min = 0
-                y_axis_max = 1
+            # Min is 'None' and Max is not 'None'
+            elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
+                y_axis_min = min(p_dict['data_array']) * 0.75
+                y_axis_max = float(p_dict['yAxisMax'])
 
-            elif max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
-                y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
-                y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
-
+            # Both min and max are 'None'
             else:
-                y_axis_min = min(p_dict['data_array']) * 0.98
-                y_axis_max = max(p_dict['data_array']) * 1.02
+                if max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
+                    y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
+                    y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
 
-        plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
+                else:
+                    y_axis_min = min(p_dict['data_array']) * 0.98
+                    y_axis_max = max(p_dict['data_array']) * 1.02
+
+            plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
+
+            return log
+
+        except ValueError:
+
+            log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
+
+            return log
 
     # =============================================================================
     def format_axis_y1_label(self, p_dict, k_dict):
@@ -4633,7 +4847,7 @@ class MakeChart(object):
         # the legend is established, otherwise some of the characteristics of the
         # min/max lines will take over the legend props.
 
-        if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ["", "None"]:
+        if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
             try:
                 constants_to_plot = literal_eval(p_dict['customLineSegments'])
                 for element in constants_to_plot:

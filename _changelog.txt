@@ -1,7 +1,35 @@
 
 v0.7.23
-- If all CSV data are older than the time limit, return the original data and
-  warn user.
+- Adds choice to set bar width to make it simpler for first time device
+  creation. If the value is set to zero, the plugin will attempt to set an
+  attractive bar width automatically. Zero is now the new default for new bar
+  chart devices.
+- Changes menu items from "En/Disable All Devices" to "En/Disable All Plugin
+  Devices".
+- Changes default font for Calendar Devices to 12 pt (to better fit the default
+  image size for non-retina screens.)
+- Changes behavior of custom size chart checkbox so that now, custom size
+  values will only be honored when the custom size checkbox is checked.
+- Improves validation of plugin device configuration settings.
+- Improves setting of Y1 limits and better handles condition where limits set
+  improperly when all observations are the same value.
+- Updates CSV device validation for duration (data to keep).
+- Updates behavior so that if all CSV data are older than the time limit,
+  the plugin will return the original data and warn the user.
+- Refines grid settings for Polar Chart Devices
+- Fixes bug in Line Chart devices where customizations (like best fit or fill)
+  would result in an 'argument dimensions are incompatible' error.
+- Fixes bug in default line color settings for Weather Forecast devices.
+- Fixes bug in new CSV data source names that contain extended Unicode
+  characters.
+- Fixes bug in new and existing Polar Chart data source names that contain
+  extended Unicode characters.
+- Fixes bug where data header name was converted to 'NaN' while data quality
+  repairs were made.
+- Fixes bug where line chart best fit property incorrectly stored as a string.
+  Will convert legacy devices in this state to boolean.
+- Changes Python lists to tuples where possible to improve speed.
+- Code refinements.
 
 v0.7.22
 - Removes dependence on pandas library.

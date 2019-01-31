@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -16,7 +16,7 @@ import sys
 
 __author__ = "DaveL17"
 __build__ = "Unused"
-__copyright__ = "Copyright 2017 DaveL17"
+__copyright__ = "Copyright 2017-2019 DaveL17"
 __license__ = "MIT"
 __title__ = "DLFramework"
 __version__ = "0.1.01"

@@ -3,7 +3,7 @@
 
     <SupportURL>https://github.com/DaveL17/matplotlib/wiki</SupportURL>
 
-    <!-- CSV Devices -->
+    <!-- ========================= Refresh CSV Device ========================= -->
 
     <Action id="refresh_csv_device" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Device</Name>
@@ -24,6 +24,8 @@
       </ConfigUI>
       <CallbackMethod>csv_refresh_device_action</CallbackMethod>
     </Action>
+
+    <!-- ========================= Refresh CSV Source ========================= -->
 
     <Action id="refresh_csv_source" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Source</Name>
@@ -55,7 +57,7 @@
     <!-- Separator -->
     <Action id="sep1" uiPath="DeviceActions"/>
 
-    <!-- Chart Devices -->
+    <!-- =========================== Chart Devices ============================ -->
 
     <!-- The device filter is excluding devices that aren't chart devices. -->
     <Action id="refreshAChartAction" deviceFilter="self, props.isChart" uiPath="DeviceActions">
@@ -68,7 +70,7 @@
       <CallbackMethod>refreshTheChartsAction</CallbackMethod>
     </Action>
 
-<!-- Hidden Actions -->
+    <!-- =========================== Hidden Actions =========================== -->
 
     <Action id="refreshTheChartsAPI" uiPath="hidden">
       <Name>API Action to Draw Simple Chart</Name>

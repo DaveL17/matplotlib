@@ -15,7 +15,7 @@
             <Field id="topSeparator" type="separator"/>
 
             <!-- Number of lines to keep -->
-            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false">
+            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false"  tooltip="Please enter the maximum number of observations you would like to retain in your CSV files.">
                 <Label>Observations:</Label>
             </Field>
 
@@ -24,7 +24,7 @@
             </Field>
 
             <!-- Number of lines to keep - time limit -->
-            <Field id="numLinesToKeepTime" type="textfield" defaultValue="" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
+            <Field id="numLinesToKeepTime" type="textfield" defaultValue="0" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
                 <Label>Duration:</Label>
             </Field>
 
@@ -49,14 +49,14 @@
             <Field id="sep2" type="separator"/>
 
             <Field id="label5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to add a new item. Enter a title and a device or variable ID and then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
+                <Label>Use this section to add a new item. Enter a title and select a device or variable and its companion value then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
             </Field>
 
             <Field id="addKey" type="textfield" hidden="true">
                 <Label>Key:</Label>
             </Field>
 
-            <Field id="addValue" type="textfield">
+            <Field id="addValue" type="textfield" tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
                 <Label>Title:</Label>
             </Field>
 
@@ -273,7 +273,7 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of observations for the chart (integer).">
+            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of bars for the chart (integer). Enter zero to plot all observations.">
                 <Label>Number of Bars:</Label>
             </Field>
 
@@ -281,7 +281,8 @@
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="barWidth" type="textfield" defaultValue="0.1" tooltip="To control the width of the bars, enter a float greater than zero.">
+            <Field id="barWidth" type="textfield" defaultValue="0"
+                   tooltip="To control the width of the bars. Zero will cause bar width to be set automatically. Enter a float greater than zero to set it manually.">
                 <Label>Width of Bars:</Label>
             </Field>
 
@@ -755,7 +756,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Width:</Label>
             </Field>
 
-            <Field id="fontSize" type="menu" tooltip="Select the size of the font to use for the calendar plot.">
+            <Field id="fontSize" type="menu" default="12" tooltip="Select the size of the font to use for the calendar plot.">
                 <Label>Font Size:</Label>
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
