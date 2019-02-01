@@ -76,6 +76,7 @@
     </Field>
 
     <Field id="rectChartSeparator" type="separator"/>
+
     <!-- Chart Height -->
     <Field id="rectChartHeight" type="textfield" defaultValue="250" tooltip="Enter your preference for the height of your chart in pixels (250).">
         <Label>Chart Height:</Label>
@@ -224,7 +225,7 @@
     <!-- Debugging Template -->
     <Template file="DLFramework/template_debugging.xml" />
 
-    <Field id="verboseLogging" type="checkbox" hidden="False">
+    <Field id="verboseLogging" type="checkbox" defaultValue="false" hidden="False">
         <Label>Verbose Logging</Label>
         <Description>Enable/Disable</Description>
     </Field>

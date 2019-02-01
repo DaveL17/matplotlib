@@ -77,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.23"
+__version__   = "0.7.24"
 
 # =============================================================================
 
@@ -89,6 +89,7 @@ kDefaultPluginPrefs = {
     u'chartPath': u"{0}/IndigoWebServer/images/controls/static/".format(install_path),
     u'chartResolution': 100,
     u'dataPath': u"{0}/Logs/com.fogbert.indigoplugin.matplotlib/".format(install_path),
+    u'dpiWarningFlag': False,
     u'enableCustomLineSegments': False,
     u'faceColor': "00 00 00",
     u'faceColorOther': False,
@@ -114,7 +115,8 @@ kDefaultPluginPrefs = {
     u'sqChartSize': 250,
     u'tickColor': "88 88 88",
     u'tickFontSize': 8,
-    u'tickSize': 4
+    u'tickSize': 4,
+    u'verboseLogging': False
 }
 
 
@@ -190,7 +192,6 @@ class Plugin(indigo.PluginBase):
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
 
         if not userCancelled:
-            self.pluginPrefs = valuesDict
 
             if valuesDict['verboseLogging']:
                 self.plugin_file_handler.setLevel(5)
@@ -201,6 +202,10 @@ class Plugin(indigo.PluginBase):
 
             self.logger.threaddebug(u"Final plugin valuesDict: {0}".format(dict(valuesDict)))
             self.logger.threaddebug(u"Configuration complete.")
+
+            # Ensure that self.pluginPrefs includes any recent changes.
+            for k in valuesDict:
+                self.pluginPrefs[k] = valuesDict[k]
 
         else:
             self.logger.threaddebug(u"User cancelled.")
