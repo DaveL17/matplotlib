@@ -79,7 +79,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.25"
+__version__   = "0.7.26"
 
 # =============================================================================
 
@@ -2665,7 +2665,7 @@ class Plugin(indigo.PluginBase):
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
         self.refreshTheCharts(devices_to_refresh)
-        self.logger.info(u"{0:=^80}".format(' Refresh Menu Action Complete '))
+        self.logger.info(u"{0:=^80}".format(' Redraw Charts Now Menu Action Complete '))
 
     # =============================================================================
     def refreshTheCharts(self, dev_list=None):

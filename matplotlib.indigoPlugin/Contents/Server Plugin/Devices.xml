@@ -3,7 +3,7 @@
 
 <!-- CSV Engine -->
     <Device type="custom" id="csvEngine">
-        <Name>CSV Engine</Name>
+        <Name>CSV Engine Device</Name>
         <ConfigUI>
 
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
@@ -602,7 +602,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
 <!-- Battery Health Device -->
     <Device type="custom" id="batteryHealthDevice">
-        <Name>Battery Health</Name>
+        <Name>Battery Health Chart</Name>
 
         <ConfigUI>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
@@ -643,12 +643,18 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Title:</Label>
             </Field>
 
-            <Field id="customSizeHeight" type="textfield" defaultValue="None"
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
                    tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None.">
                 <Label>Custom Height:</Label>
             </Field>
 
-            <Field id="customSizeWidth" type="textfield" defaultValue="None" tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None.">
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"  visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None.">
                 <Label>Custom Width:</Label>
             </Field>
 
@@ -736,7 +742,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
 <!-- Calendar Charting Device -->
     <Device type="custom" id="calendarChartingDevice">
-        <Name>Calendar</Name>
+        <Name>Calendar Chart</Name>
 
         <ConfigUI>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
@@ -1497,7 +1503,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
 <!-- rcParams Text Device -->
     <Device type="custom" id="rcParamsDevice">
-        <Name>Matplotlib Parameters</Name>
+        <Name>Matplotlib Parameters Device</Name>
         <ConfigUI>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
@@ -1527,7 +1533,7 @@ There are presently no configurations available for this device.
 
 <!-- Multiline Text Device -->
     <Device type="custom" id="multiLineText">
-        <Name>Multiline Text</Name>
+        <Name>Multiline Text Chart</Name>
 
         <ConfigUI>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>

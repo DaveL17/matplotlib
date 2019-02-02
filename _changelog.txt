@@ -1,3 +1,7 @@
+v0.7.26
+- Revises chart device names for consistency.
+- Fixes bug in battery chart device "KeyError: 'customSizeChart'. "
+
 v0.7.25
 - Adds choice to bar, line and scatter charts to suppress the plotting of
   individual data elements. The data and all settings are retained.
