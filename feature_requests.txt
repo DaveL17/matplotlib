@@ -16,14 +16,6 @@ of the period (based on the last one dropped off) so that graph lines are
 always generated from the graph origin.
 
 ===============================================================================
-2019-01-21  Autolog
-===============================================================================
-I had incorrectly assumed that if the checkbox for a line wasn't ticked that
-the line was disabled - it isn't. You have to select None for the data source.
-The main disadvantage of this approach is that you can't temporarily disable a
-line without remembering the data item you were trying to graph.
-
-===============================================================================
 2019-01-04  Autolog
 ===============================================================================
 I would like to be able to specify a different scale on the Y2 axis - Is this
@@ -34,6 +26,16 @@ Setpoints. I use the range -5 deg C to 35 deg C for the Y1 axis. I would like
 to map the thermostat valve opening value on the Y2 scale from 0% (fully
 closed) to 100% (fully open). I would then be able to easily correlate the
 valve opening against the temperature.
+
+===============================================================================
+2019-01-21  Autolog  [complete]
+===============================================================================
+I had incorrectly assumed that if the checkbox for a line wasn't ticked that
+the line was disabled - it isn't. You have to select None for the data source.
+The main disadvantage of this approach is that you can't temporarily disable a
+line without remembering the data item you were trying to graph.
+
+DaveL17 - this feature was added to bar, line and scatter charts in v0.7.24.
 
 ===============================================================================
 2018-12-18  Autolog  [COMPLETE]

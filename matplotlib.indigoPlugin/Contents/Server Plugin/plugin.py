@@ -30,6 +30,8 @@ proper WUnderground devices.
 
 # TODO: Feature Requests!!
 
+# TODO: add logging for suppressed items (bar, line, scatter)
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -77,7 +79,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.24"
+__version__   = "0.7.25"
 
 # =============================================================================
 
@@ -1153,6 +1155,9 @@ class Plugin(indigo.PluginBase):
                     props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
                     props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
                     props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
+                    props['suppressBar{0}'.format(_)]      = props.get('suppressBar{0}'.format(_), False)
+                    props['suppressLine{0}'.format(_)]     = props.get('suppressLine{0}'.format(_), False)
+                    props['suppressGroup{0}'.format(_)]    = props.get('suppressGroup{0}'.format(_), False)
 
                     # ======================== Correct Improper Prop Types ========================
                     # Some early devices were created with the device prop as the wrong type. Let's
@@ -3133,10 +3138,14 @@ class MakeChart(object):
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor']:
-                    log['Info'].append(u"[{0}] Bar {0} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
+                    log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
-                # Plot the bars
-                if p_dict['bar{0}Source'.format(thing)] not in ("", "None"):
+                # If the bar is suppressed, remind the user they suppressed it.
+                if p_dict['suppressBar{0}'.format(thing)]:
+                    log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, thing))
+
+                # Plot the bars.  If 'suppressBar{thing} is True, we skip it.
+                if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not p_dict['suppressBar{0}'.format(thing)]:
 
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
@@ -3468,8 +3477,13 @@ class MakeChart(object):
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
                     log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
+                # If the line is suppressed, remind the user they suppressed it.
+                if p_dict['suppressLine{0}'.format(line)]:
+                    log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, line))
+
                 # ============================== Plot the Lines ===============================
-                if p_dict['line{0}Source'.format(line)] not in ("", "None"):
+                # Plot the lines. If p_dict['suppressLine{0}'] is True, we skip it.
+                if p_dict['line{0}Source'.format(line)] not in ("", "None") and not p_dict['suppressLine{0}'.format(line)]:
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"{0}".format(data_column))
@@ -3926,8 +3940,13 @@ class MakeChart(object):
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor']:
                     log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
+                # If the group is suppressed, remind the user they suppressed it.
+                if p_dict['suppressGroup{0}'.format(thing)]:
+                    log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, thing))
+
                 # ============================== Plot the Points ==============================
-                if p_dict['group{0}Source'.format(thing)] not in ("", "None"):
+                # Plot the groups. If p_dict['suppressGroup{0}'] is True, we skip it.
+                if p_dict['group{0}Source'.format(thing)] not in ("", "None") and not p_dict['suppressGroup{0}'.format(thing)]:
 
                     # There is a bug in matplotlib (fixed in newer versions) where points would not
                     # plot if marker set to 'none'. This overrides the behavior.

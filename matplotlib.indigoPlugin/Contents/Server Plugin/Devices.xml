@@ -412,6 +412,11 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="suppressBar1" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
 <!-- Bar 2 -->
             <Field id="bar2Top" type="separator" visibleBindingId="barLabel1" visibleBindingValue="true"/>
 
@@ -446,6 +451,11 @@
 
             <Field id="plotBar2Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="suppressBar2" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -484,6 +494,11 @@
 
             <Field id="plotBar3Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="suppressBar3" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -526,6 +541,11 @@
 
             <Field id="plotBar4Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
                 <Label>Plot Max</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="suppressBar4" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1037,6 +1057,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Best Fit Color:</Label>`
             </Field>
 
+            <Field id="suppressLine1" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 
 <!-- Line 2 -->
@@ -1108,6 +1133,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line2BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line2BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 2.">
                 <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressLine2" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
@@ -1183,6 +1213,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Best Fit Color:</Label>
             </Field>
 
+            <Field id="suppressLine3" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="line3Bottom" type="separator" visibleBindingId="lineLabel3" visibleBindingValue="true"/>
 
 <!-- Line 4 -->
@@ -1253,6 +1288,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line4BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 4.">
                 <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressLine4" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="line4Bottom" type="separator" visibleBindingId="lineLabel4" visibleBindingValue="true"/>
@@ -1326,6 +1366,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line5BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line5BestFit" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for line 5.">
                 <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressLine5" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="line5Bottom" type="separator" visibleBindingId="lineLabel5" visibleBindingValue="true"/>
@@ -1420,6 +1465,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Select preference for the style of your chart's custom line segments.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="suppressLine6" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>
@@ -1978,7 +2028,13 @@ There are presently no configurations available for this device.
                 <Label>Best Fit Color:</Label>
             </Field>
 
+            <Field id="suppressGroup1" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
+                <Label>Suppress Group</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="group1Bottom" type="separator" visibleBindingId="groupLabel1" visibleBindingValue="true"/>
+
 <!-- Group 2 -->
             <Field id="groupLabel2" type="checkbox" defaultValue="false">
                 <Label>Group 2</Label>
@@ -2030,7 +2086,13 @@ There are presently no configurations available for this device.
                 <Label>Best Fit Color:</Label>
             </Field>
 
+            <Field id="suppressGroup2" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
+                <Label>Suppress Group</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="group2Bottom" type="separator" visibleBindingId="groupLabel2" visibleBindingValue="true"/>
+
 <!-- Group 3 -->
             <Field id="groupLabel3" type="checkbox" defaultValue="false">
                 <Label>Group 3</Label>
@@ -2082,7 +2144,13 @@ There are presently no configurations available for this device.
                 <Label>Best Fit Color:</Label>
             </Field>
 
+            <Field id="suppressGroup3" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
+                <Label>Suppress Group</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="group3Bottom" type="separator" visibleBindingId="groupLabel3" visibleBindingValue="true"/>
+
 <!-- Group 4 -->
             <Field id="groupLabel4" type="checkbox" defaultValue="false">
                 <Label>Group 4</Label>
@@ -2131,6 +2199,11 @@ There are presently no configurations available for this device.
             <Field id="line4BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the color of the best fit line for group 4.">
                 <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressGroup4" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
+                <Label>Suppress Group</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
