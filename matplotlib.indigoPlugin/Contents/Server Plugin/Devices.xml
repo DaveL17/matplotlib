@@ -1,197 +1,8 @@
 <?xml version="1.0"?>
 <Devices>
 
-<!-- CSV Engine -->
-    <Device type="custom" id="csvEngine">
-        <Name>CSV Engine Device</Name>
-        <ConfigUI>
-
-            <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
-
-            <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
-                <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
-            </Field>
-
-            <Field id="topSeparator" type="separator"/>
-
-            <!-- Number of lines to keep -->
-            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false"  tooltip="Please enter the maximum number of observations you would like to retain in your CSV files.">
-                <Label>Observations:</Label>
-            </Field>
-
-            <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the maximum number of observations that you would like to retain in your CSV files.</Label>
-            </Field>
-
-            <!-- Number of lines to keep - time limit -->
-            <Field id="numLinesToKeepTime" type="textfield" defaultValue="0" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
-                <Label>Duration:</Label>
-            </Field>
-
-            <Field id="numLinesToKeepTextTime" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the maximum time duration to apply to your CSV files (in hours). For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
-            </Field>
-
-            <!-- Refresh interval -->
-            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="Please enter how frequently would you like the plugin to update the CSV data (in seconds).">
-                <Label>Refresh Interval:</Label>
-            </Field>
-
-            <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes). Leave empty or enter a value of zero to elect manual refresh only.</Label>
-            </Field>
-
-            <!-- Add Item-->
-            <Field id="addItemLabel" type="label" alignText="right">
-                <Label>Add Data Item</Label>
-            </Field>
-
-            <Field id="sep2" type="separator"/>
-
-            <Field id="label5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to add a new item. Enter a title and select a device or variable and its companion value then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
-            </Field>
-
-            <Field id="addKey" type="textfield" hidden="true">
-                <Label>Key:</Label>
-            </Field>
-
-            <Field id="addValue" type="textfield" tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
-                <Label>Title:</Label>
-            </Field>
-
-            <Field id="addSourceFilter" type="menu" defaultValue="A">
-                <Label>Filter:</Label>
-                <List>
-                    <Option value="A">Show All</Option>
-                    <Option value="D">Devices Only</Option>
-                    <Option value="V">Variables Only</Option>
-                </List>
-                <CallbackMethod>dummyCallback</CallbackMethod>
-            </Field>
-
-            <Field id="addSource" type="menu">
-                <Label>Data Source:</Label>
-                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
-                <CallbackMethod>dummyCallback</CallbackMethod>
-            </Field>
-
-            <Field id="addState" type="menu">
-                <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueListAdd" dynamicReload="true"/>
-            </Field>
-
-            <Field id="csv_item_add" type="button">
-                <Label/>
-                <Title>Add Item</Title>
-                <CallbackMethod>csv_item_add</CallbackMethod>
-            </Field>
-
-            <!-- Edit item -->
-            <Field id="numObsLabel" type="label" alignText="right">
-                <Label>Edit Data Item</Label>
-            </Field>
-
-            <Field id="sep1" type="separator"/>
-
-            <Field id="label0.5" type="label" fontColor="black" fontSize="small">
-                <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
-            </Field>
-
-            <Field id="csv_item_list" type="menu">
-                <Label>CSV Item List:</Label>
-                <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
-                <CallbackMethod>csv_item_select</CallbackMethod>
-            </Field>
-
-            <Field id="sep3" type="label" alignWithControl="true">
-                <Label/>
-            </Field>
-
-            <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
-                <Label>is an item selected?</Label>
-            </Field>
-
-            <Field id="columnDict" type="textfield" defaultValue="{'k0': ('None', 'None', 'None')}" hidden="true">
-                <Label>Dict to Hold Column List:</Label>
-            </Field>
-
-            <Field id="editKey" type="textfield" readonly="true" hidden="true" enabledBindingId="isColumnSelected">
-                <Label>Key:</Label>
-            </Field>
-
-            <Field id="previousKey" type="textfield" hidden="true">
-                <Label>Previous Key:</Label>
-            </Field>
-
-            <Field id="editValue" type="textfield" enabledBindingId="isColumnSelected">
-                <Label>Title:</Label>
-            </Field>
-
-            <Field id="editSourceFilter" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
-                <Label>Filter:</Label>
-                <List>
-                    <Option value="A">Show All</Option>
-                    <Option value="D">Devices Only</Option>
-                    <Option value="V">Variables Only</Option>
-                </List>
-                <CallbackMethod>dummyCallback</CallbackMethod>
-            </Field>
-
-            <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
-                <Label>Data Source:</Label>
-                <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
-                <CallbackMethod>dummyCallback</CallbackMethod>
-            </Field>
-
-            <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
-                <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueListEdit" dynamicReload="true"/>
-            </Field>
-
-            <Field id="csv_item_update" type="button" enabledBindingId="isColumnSelected">
-                <Label/>
-                <Title>Update Item</Title>
-                <CallbackMethod>csv_item_update</CallbackMethod>
-            </Field>
-
-            <Field id="label2.5" type="label" fontColor="darkgray" alignWithControl="true" fontSize="small">
-                <Label>or</Label>
-            </Field>
-
-            <Field id="csv_item_delete" type="button" enabledBindingId="isColumnSelected">
-                <Label/>
-                <Title>Delete Item</Title>
-                <CallbackMethod>csv_item_delete</CallbackMethod>
-            </Field>
-
-            <Field id="bottomSeparator" type="separator"/>
-
-            <Field id="label6" type="label" fontColor="red" fontSize="small" alignText="left">
-                <Label>Note that changes made in this dialog will not be fully committed until you click the "Save" button.</Label>
-            </Field>
-
-        </ConfigUI>
-
-        <States>
-            <State id="csvLastUpdated">
-                <ValueType>String</ValueType>
-                <TriggerLabel>CSV Data Last Updated</TriggerLabel>
-                <ControlPageLabel>CSV Data Last Updated</ControlPageLabel>
-            </State>
-
-            <State id="onOffState">
-                <ValueType>Boolean</ValueType>
-                <TriggerLabel>Device State</TriggerLabel>
-                <ControlPageLabel>Device State</ControlPageLabel>
-            </State>
-        </States>
-        <UiDisplayStateId>onOffState</UiDisplayStateId>
-
-    </Device>
-
 <!-- Bar Charting Device -->
-    <Device type="custom" id="barChartingDevice">
+    <Device id="barChartingDevice" type="custom">
         <Name>Bar Chart</Name>
         <ConfigUI>
 
@@ -601,7 +412,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
     </Device>
 
 <!-- Battery Health Device -->
-    <Device type="custom" id="batteryHealthDevice">
+    <Device id="batteryHealthDevice" type="custom">
         <Name>Battery Health Chart</Name>
 
         <ConfigUI>
@@ -741,7 +552,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
     </Device>
 
 <!-- Calendar Charting Device -->
-    <Device type="custom" id="calendarChartingDevice">
+    <Device id="calendarChartingDevice" type="custom">
         <Name>Calendar Chart</Name>
 
         <ConfigUI>
@@ -814,7 +625,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
     </Device>
 
 <!-- Line Charting Device -->
-    <Device type="custom" id="lineChartingDevice">
+    <Device id="lineChartingDevice" type="custom">
         <Name>Line Chart</Name>
 
         <ConfigUI>
@@ -1501,38 +1312,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- rcParams Text Device -->
-    <Device type="custom" id="rcParamsDevice">
-        <Name>Matplotlib Parameters Device</Name>
-        <ConfigUI>
-            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
-
-            <Field id="rcParamsLabel" type="label">
-                <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.
-
-There are presently no configurations available for this device.
-                </Label>
-            </Field>
-
-        </ConfigUI>
-        <States>
-            <State id="chartLastUpdated">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Chart Last Updated</TriggerLabel>
-                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
-            </State>
-            <State id="onOffState">
-                <ValueType>Boolean</ValueType>
-                <TriggerLabel>Device State</TriggerLabel>
-                <ControlPageLabel>Device State</ControlPageLabel>
-            </State>
-        </States>
-        <UiDisplayStateId>onOffState</UiDisplayStateId>
-
-    </Device>
-
 <!-- Multiline Text Device -->
-    <Device type="custom" id="multiLineText">
+    <Device id="multiLineText" type="custom">
         <Name>Multiline Text Chart</Name>
 
         <ConfigUI>
@@ -1656,7 +1437,7 @@ There are presently no configurations available for this device.
     </Device>
 
 <!-- Polar Charting Device -->
-    <Device type="custom" id="polarChartingDevice">
+    <Device id="polarChartingDevice" type="custom">
         <Name>Polar Chart</Name>
 
         <ConfigUI>
@@ -1804,7 +1585,7 @@ There are presently no configurations available for this device.
     </Device>
 
 <!-- Scatter Charting Device -->
-    <Device type="custom" id="scatterChartingDevice">
+    <Device id="scatterChartingDevice" type="custom">
         <Name>Scatter Chart</Name>
 
         <ConfigUI>
@@ -2257,7 +2038,7 @@ There are presently no configurations available for this device.
     </Device>
 
 <!-- Forecast Charting Device -->
-    <Device type="custom" id="forecastChartingDevice">
+    <Device id="forecastChartingDevice" type="custom">
         <Name>Weather Forecast Chart</Name>
 
         <ConfigUI>
@@ -2595,6 +2376,225 @@ There are presently no configurations available for this device.
             </State>
         </States>
         <UiDisplayStateId>onOffState</UiDisplayStateId>
+    </Device>
+
+<!-- CSV Engine -->
+    <Device id="csvEngine" type="custom">
+        <Name>CSV Engine Device</Name>
+        <ConfigUI>
+
+            <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
+
+            <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
+                <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- Number of lines to keep -->
+            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false"  tooltip="Please enter the maximum number of observations you would like to retain in your CSV files.">
+                <Label>Observations:</Label>
+            </Field>
+
+            <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
+                <Label>Enter the maximum number of observations that you would like to retain in your CSV files.</Label>
+            </Field>
+
+            <!-- Number of lines to keep - time limit -->
+            <Field id="numLinesToKeepTime" type="textfield" defaultValue="0" hidden="false" tooltip="Please enter a maximum duration time (in hours).">
+                <Label>Duration:</Label>
+            </Field>
+
+            <Field id="numLinesToKeepTextTime" type="label" hidden="false" fontSize="small" alignWithControl="true">
+                <Label>Enter the maximum time duration to apply to your CSV files (in hours). For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
+            </Field>
+
+            <!-- Refresh interval -->
+            <Field id="refreshInterval" type="textfield" defaultValue="900" tooltip="Please enter how frequently would you like the plugin to update the CSV data (in seconds).">
+                <Label>Refresh Interval:</Label>
+            </Field>
+
+            <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
+                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes). Leave empty or enter a value of zero to elect manual refresh only.</Label>
+            </Field>
+
+            <!-- Add Item-->
+            <Field id="addItemLabel" type="label" alignText="right">
+                <Label>Add Data Item</Label>
+            </Field>
+
+            <Field id="sep2" type="separator"/>
+
+            <Field id="label5" type="label" fontColor="black" fontSize="small">
+                <Label>Use this section to add a new item. Enter a title and select a device or variable and its companion value then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
+            </Field>
+
+            <Field id="addKey" type="textfield" hidden="true">
+                <Label>Key:</Label>
+            </Field>
+
+            <Field id="addValue" type="textfield" tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
+                <Label>Title:</Label>
+            </Field>
+
+            <Field id="addSourceFilter" type="menu" defaultValue="A">
+                <Label>Filter:</Label>
+                <List>
+                    <Option value="A">Show All</Option>
+                    <Option value="D">Devices Only</Option>
+                    <Option value="V">Variables Only</Option>
+                </List>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="addSource" type="menu">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="addState" type="menu">
+                <Label>Data:</Label>
+                <List class="self" filter="" method="deviceStateValueListAdd" dynamicReload="true"/>
+            </Field>
+
+            <Field id="csv_item_add" type="button">
+                <Label/>
+                <Title>Add Item</Title>
+                <CallbackMethod>csv_item_add</CallbackMethod>
+            </Field>
+
+            <!-- Edit item -->
+            <Field id="numObsLabel" type="label" alignText="right">
+                <Label>Edit Data Item</Label>
+            </Field>
+
+            <Field id="sep1" type="separator"/>
+
+            <Field id="label0.5" type="label" fontColor="black" fontSize="small">
+                <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
+            </Field>
+
+            <Field id="csv_item_list" type="menu">
+                <Label>CSV Item List:</Label>
+                <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
+                <CallbackMethod>csv_item_select</CallbackMethod>
+            </Field>
+
+            <Field id="sep3" type="label" alignWithControl="true">
+                <Label/>
+            </Field>
+
+            <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
+                <Label>is an item selected?</Label>
+            </Field>
+
+            <Field id="columnDict" type="textfield" defaultValue="{'k0': ('None', 'None', 'None')}" hidden="true">
+                <Label>Dict to Hold Column List:</Label>
+            </Field>
+
+            <Field id="editKey" type="textfield" readonly="true" hidden="true" enabledBindingId="isColumnSelected">
+                <Label>Key:</Label>
+            </Field>
+
+            <Field id="previousKey" type="textfield" hidden="true">
+                <Label>Previous Key:</Label>
+            </Field>
+
+            <Field id="editValue" type="textfield" enabledBindingId="isColumnSelected">
+                <Label>Title:</Label>
+            </Field>
+
+            <Field id="editSourceFilter" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
+                <Label>Filter:</Label>
+                <List>
+                    <Option value="A">Show All</Option>
+                    <Option value="D">Devices Only</Option>
+                    <Option value="V">Variables Only</Option>
+                </List>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
+                <Label>Data:</Label>
+                <List class="self" filter="" method="deviceStateValueListEdit" dynamicReload="true"/>
+            </Field>
+
+            <Field id="csv_item_update" type="button" enabledBindingId="isColumnSelected">
+                <Label/>
+                <Title>Update Item</Title>
+                <CallbackMethod>csv_item_update</CallbackMethod>
+            </Field>
+
+            <Field id="label2.5" type="label" fontColor="darkgray" alignWithControl="true" fontSize="small">
+                <Label>or</Label>
+            </Field>
+
+            <Field id="csv_item_delete" type="button" enabledBindingId="isColumnSelected">
+                <Label/>
+                <Title>Delete Item</Title>
+                <CallbackMethod>csv_item_delete</CallbackMethod>
+            </Field>
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="label6" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Note that changes made in this dialog will not be fully committed until you click the "Save" button.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="csvLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>CSV Data Last Updated</TriggerLabel>
+                <ControlPageLabel>CSV Data Last Updated</ControlPageLabel>
+            </State>
+
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
+<!-- rcParams Text Device -->
+    <Device id="rcParamsDevice" type="custom">
+        <Name>Matplotlib Parameters Device</Name>
+        <ConfigUI>
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="rcParamsLabel" type="label">
+                <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.
+
+There are presently no configurations available for this device.
+                </Label>
+            </Field>
+
+        </ConfigUI>
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
     </Device>
 
 </Devices>

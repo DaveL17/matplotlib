@@ -32,6 +32,10 @@ proper WUnderground devices.
 
 # TODO: add logging for suppressed items (bar, line, scatter)
 
+# TODO: bar and polar charts error out when one of the data sources has only 1 observation. Adding a second observation cleared the error.  It was the first of two data points.
+#     Matplotlib Critical Error       [Matplotlib - Bar Chart] [Matplotlib - Bar Chart] Error (zero-size array to reduction operation minimum which has no identity)
+# TODO: what happens to polar charts when the two files don't have the same number of observations?
+
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -79,7 +83,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.26"
+__version__   = "0.7.27"
 
 # =============================================================================
 
@@ -447,6 +451,7 @@ class Plugin(indigo.PluginBase):
 
         except KeyError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
+            self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         return True
 
@@ -1279,7 +1284,7 @@ class Plugin(indigo.PluginBase):
                 indigo.device.enable(dev, value=False)
             except Exception as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
+                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more information.".format(sub_error))
 
     # =============================================================================
     def commsUnkillAll(self):
@@ -1299,7 +1304,7 @@ class Plugin(indigo.PluginBase):
                 indigo.device.enable(dev, value=True)
             except Exception as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms. Error: {0}".format(sub_error))
+                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more information.".format(sub_error))
 
     # =============================================================================
     def convert_custom_colors(self):
@@ -1389,7 +1394,8 @@ class Plugin(indigo.PluginBase):
             valuesDict['columnDict'] = str(new_dict)  # Convert column_dict back to a string and prepare it for storage.
 
         except AttributeError, sub_error:
-            self.logger.error(u"Error adding CSV item. {0}".format(sub_error))
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error adding CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
         file_name = valuesDict['addValue']
@@ -1432,9 +1438,10 @@ class Plugin(indigo.PluginBase):
         try:
             valuesDict["editKey"] = valuesDict["csv_item_list"]
             del column_dict[valuesDict['editKey']]
+
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error deleting CSV item. {0}".format(sub_error))
+            self.logger.error(u"[{0}] Error deleting CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         valuesDict['csv_item_list'] = ""
         valuesDict['editKey']     = ""
@@ -1472,7 +1479,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error generating CSV item list. {0}".format(sub_error))
+            self.logger.error(u"[{0}] Error generating CSV item list: {0}. See plugin log for more information.".format(dev.name, sub_error))
             prop_list = []
 
         result = sorted(prop_list, key=lambda tup: tup[1].lower())  # Return a list sorted by the value and not the key. Case insensitive sort.
@@ -1521,7 +1528,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error updating CSV item: {0}".format(sub_error))
+            self.logger.error(u"[{0}] Error updating CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         # Remove any empty entries as they're not going to do any good anyway.
         new_dict = {}
@@ -1567,7 +1574,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"There was an error establishing a connection with the item you chose. {0}".format(sub_error))
+            self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose: {1}. See plugin log for more information.".format(dev.name, sub_error))
         return valuesDict
 
     # =============================================================================
@@ -1589,6 +1596,7 @@ class Plugin(indigo.PluginBase):
 
                 try:
                     last_updated = date_parse(dev.states['csvLastUpdated'])
+
                 except ValueError:
                     last_updated = date_parse('1970-01-01 00:00')
 
@@ -1647,8 +1655,10 @@ class Plugin(indigo.PluginBase):
                     try:
                         os.makedirs(self.pluginPrefs['dataPath'])
                         self.logger.warning(u"Target data folder does not exist. Creating it.")
+
                     except IOError:
-                        self.logger.critical(u"Target data folder does not exist and the plugin is unable to create it.")
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
 
                 if not os.path.isfile(full_path):
                     self.logger.debug(u"CSV does not exist. Creating: {0}".format(full_path))
@@ -1664,11 +1674,11 @@ class Plugin(indigo.PluginBase):
 
                 except ImportError as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"The CSV Engine facility requires the shutil module. {0}".format(sub_error))
+                    self.logger.error(u"[{0}] The CSV Engine facility requires the shutil module: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                 except Exception as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"Unable to backup CSV file. {0}".format(sub_error))
+                    self.logger.error(u"[{0}] Unable to backup CSV file: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                 # ================================= Load Data =================================
                 # Read CSV data into dataframe
@@ -1723,11 +1733,11 @@ class Plugin(indigo.PluginBase):
 
                 except ValueError as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"Invalid Indigo ID. {0}".format(sub_error))
+                    self.logger.error(u"[{0}] Invalid Indigo ID: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                 except Exception as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"Invalid CSV definition. {0}".format(sub_error))
+                    self.logger.error(u"[{0}] Invalid CSV definition: {1}".format(dev.name, sub_error))
 
                 # ============================= Limit for Length ==============================
                 # The dataframe (with the newest observation included) may now be too long.
@@ -1749,7 +1759,7 @@ class Plugin(indigo.PluginBase):
 
                 except Exception as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"Unable to delete backup file. {0}".format(sub_error))
+                    self.logger.error(u"[{0}] Unable to delete backup file. {1}".format(dev.name, sub_error))
 
             dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                       {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
@@ -1757,13 +1767,13 @@ class Plugin(indigo.PluginBase):
             self.logger.info(u"[{0}] CSV data updated successfully.".format(dev.name))
             dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
-        except ValueError as error:
+        except ValueError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}".format(error))
+            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
-        except Exception as error:
+        except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}".format(error))
+            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
     # =============================================================================
     def csv_refresh_device_action(self, pluginAction, dev, callerWaitingForResult):
@@ -2288,7 +2298,7 @@ class Plugin(indigo.PluginBase):
 
         except IOError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error generating file list: {0}".format(sub_error))
+            self.logger.error(u"Error generating file list: {0}. See plugin log for more information.".format(sub_error))
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
@@ -2322,7 +2332,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error building font list.  Returning generic list. {0}".format(sub_error))
+            self.logger.error(u"Error building font list.  Returning generic list. {0}. See plugin log for more information.".format(sub_error))
 
             font_menu = ['Arial',
                          'Apple Chancery',
@@ -2406,7 +2416,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error getting list of forecast devices. {0}".format(sub_error))
+            self.logger.error(u"Error getting list of forecast devices: {0}. See plugin log for more information.".format(sub_error))
 
         self.logger.threaddebug(u"Forecast device list generated successfully: {0}".format(forecast_source_menu))
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
@@ -2518,10 +2528,11 @@ class Plugin(indigo.PluginBase):
             plt.savefig(u"{0}{1}".format(pluginAction.props['path'], pluginAction.props['filename']))
             plt.close('all')
 
-        except Exception as err:
+        except Exception as sub_error:
             if callerWaitingForResult:
-                self.logger.error(u"Error: {0}".format(err))
-                return {'success': False, 'message': u"{0}".format(err)}
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"[{0}] Error: {0}. See plugin log for more information.".format(dev.name, sub_error))
+                return {'success': False, 'message': u"{0}".format(sub_error)}
 
         if callerWaitingForResult:
             return {'success': True, 'message': u"Success"}
@@ -2840,32 +2851,35 @@ class Plugin(indigo.PluginBase):
                         # Only some devices will have their own numObs.
                         pass
 
-                    except ValueError:
+                    except ValueError as sub_error:
                         self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.warning(u"The number of observations must be a positive number.")
+                        self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                     # ============================ Custom Square Size =============================
                     try:
                         if p_dict['customSizePolar'] == 'None':
                             pass
+
                         else:
                             p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
+
+                    except ValueError as sub_error:
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.warning(u"[{0}] Custom size must be a positive number or None: {1}".format(dev.name, sub_error))
 
                     except KeyError:
                         pass
 
-                    except ValueError:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.warning(u"Custom size must be a positive number or None.")
-
                     # ============================= Extra Wide Chart ==============================
                     try:
-                        if p_dict['rectWide']:
+                        if p_dict.get('rectWide', False):
                             p_dict['chart_height'] = float(p_dict['rectChartWideHeight'])
                             p_dict['chart_width']  = float(p_dict['rectChartWideWidth'])
+
                         else:
                             p_dict['chart_height'] = float(p_dict['rectChartHeight'])
                             p_dict['chart_width']  = float(p_dict['rectChartWidth'])
+
                     except KeyError:
                         # Not all devices will have these keys
                         pass
@@ -2873,12 +2887,14 @@ class Plugin(indigo.PluginBase):
                     # ================================ Custom Size ================================
                     # If the user has specified a custom size, let's override
                     # with their custom setting.
-                    if p_dict['customSizeChart']:
+                    if p_dict.get('customSizeChart', False):
                         try:
                             if p_dict['customSizeHeight'] != 'None':
                                 p_dict['chart_height'] = float(p_dict['customSizeHeight'])
+
                             if p_dict['customSizeWidth'] != 'None':
                                 p_dict['chart_width'] = float(p_dict['customSizeWidth'])
+
                         except KeyError:
                             # Not all devices will have these keys
                             pass
@@ -2979,7 +2995,8 @@ class Plugin(indigo.PluginBase):
                             # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
 
                         except Exception as sub_error:
-                            self.logger.error(u"Error reading battery devices: {0}".format(sub_error))
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
 
                         if __name__ == '__main__':
                             p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
@@ -3065,7 +3082,8 @@ class Plugin(indigo.PluginBase):
                     dev.updateStatesOnServer(kv_list)
 
                 except RuntimeError as sub_error:
-                    self.logger.critical(u"[{0}] Critical Error: {1}".format(dev.name, sub_error))
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
                     self.logger.critical(u"Skipping device.")
                     dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
@@ -3074,7 +3092,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"{0}".format(unicode(sub_error)))
+            self.logger.critical(u"[{0}] Error: {0}. See plugin log for more information.".format(unicode(sub_error)))
 
     # =============================================================================
     def refreshTheChartsAction(self, action):
@@ -3250,11 +3268,12 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"[{0}] Error ({1})".format(dev.name, sub_error)})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_battery_health(self, dev, device_dict, p_dict, k_dict, return_queue):
@@ -3291,6 +3310,7 @@ class MakeChart(object):
             for key, value in sorted(device_dict.iteritems(), reverse=True):
                 try:
                     x_values.append(float(value))
+
                 except ValueError:
                     x_values.append(0)
 
@@ -3300,13 +3320,16 @@ class MakeChart(object):
                 # Create a list of colors for the bars based on battery health
                 try:
                     battery_level = float(value)
+
                 except ValueError:
                     battery_level = 0
 
                 if battery_level <= warning_level:
                     bar_colors.append(warning_color)
+
                 elif warning_level < battery_level <= caution_level:
                     bar_colors.append(caution_color)
+
                 else:
                     bar_colors.append(healthy_color)
 
@@ -3380,11 +3403,12 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_calendar(self, dev, p_dict, k_dict, return_queue):
@@ -3431,11 +3455,12 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_line(self, dev, p_dict, k_dict, kv_list, return_queue):
@@ -3603,12 +3628,13 @@ class MakeChart(object):
             else:
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError):
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(traceback.format_exc()), 'Name': dev.name})
+        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
@@ -3680,11 +3706,12 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_polar(self, dev, p_dict, k_dict, kv_list, return_queue):
@@ -3893,11 +3920,12 @@ class MakeChart(object):
                     return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(traceback.format_exc()), 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_scatter(self, dev, p_dict, k_dict, kv_list, return_queue):
@@ -4043,11 +4071,12 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, ValueError) as sub_error:
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_weather_forecast(self, dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue):
@@ -4386,12 +4415,13 @@ class MakeChart(object):
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
         except (KeyError, ValueError) as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
-            return_queue.put({'Error': True, 'Log': log, 'Message': str(sub_error), 'Name': dev.name})
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            log['Critical'].append(u"[{0}] Fatal error: {1}".format(dev.name, sub_error))
-            return_queue.put({'Error': True, 'Log': log, 'Message': sub_error, 'Name': dev.name})
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def clean_string(self, val):
@@ -4450,6 +4480,7 @@ class MakeChart(object):
             try:
                 float(s)
                 return True
+
             except ValueError:
                 pass
 
@@ -4673,9 +4704,10 @@ class MakeChart(object):
 
             return log
 
-        except ValueError:
-
+        except ValueError as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
+            log['Warning'].append(u"Error: {0}. See plugin log for more information.".format(sub_error))
 
             return log
 
@@ -4715,6 +4747,7 @@ class MakeChart(object):
             else:
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
             plt.yticks(marks, labels)
+
         except Exception:
             pass
 
@@ -4804,7 +4837,7 @@ class MakeChart(object):
         except Exception as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
             final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
-            log['Warning'].append(u"Error downloading CSV data. {0}".format(sub_error))
+            log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more information.".format(sub_error))
 
             return final_data, log
 
@@ -4891,7 +4924,7 @@ class MakeChart(object):
 
             except Exception as sub_error:
                 self.host_plugin.pluginErrorHandler(traceback.format_exc())
-                self.host_plugin.logger.warning(u"There is a problem with the custom segments settings. {0}".format(sub_error))
+                self.host_plugin.logger.warning(u"There is a problem with the custom line segments settings. {0}. See plugin log for more information.".format(sub_error))
 
     # =============================================================================
     def save_chart_image(self, plt, p_dict, k_dict):

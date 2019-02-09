@@ -1,3 +1,8 @@
+v0.7.27
+- Reorders plugin device model list when editing device.
+- Improves error logging.
+- Cleans up XML attributes.
+
 v0.7.26
 - Revises chart device names for consistency.
 - Fixes bug in battery chart device "KeyError: 'customSizeChart'. "
