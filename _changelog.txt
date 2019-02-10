@@ -1,3 +1,6 @@
+v0.7.28
+- Improved conversion of legacy line fill properties to bool type.
+
 v0.7.27
 - Reorders plugin device model list when editing device.
 - Improves error logging.

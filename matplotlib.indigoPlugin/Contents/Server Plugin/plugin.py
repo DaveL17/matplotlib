@@ -83,7 +83,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.27"
+__version__   = "0.7.28"
 
 # =============================================================================
 
@@ -1155,7 +1155,7 @@ class Plugin(indigo.PluginBase):
                     props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), False)
                     props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
                     props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
-                    props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), "")
+                    props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), False)
                     props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
                     props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
                     props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
@@ -1172,10 +1172,18 @@ class Plugin(indigo.PluginBase):
                         # Convert any best fit line props to bool
                         if not isinstance(props['line{0}BestFit'.format(_)], bool):
                             self.logger.info(u"[{0}] Resetting line chart best fit property to boolean for line {1}.".format(dev.name, _))
-                            if props['line{0}BestFit'.format(_)] in ('False', 'false'):
+                            if props['line{0}BestFit'.format(_)] in ('False', 'false', ''):
                                 props['line{0}BestFit'.format(_)] = False
                             elif props['line{0}BestFit'.format(_)] in ('True', 'true'):
                                 props['line{0}BestFit'.format(_)] = True
+
+                        # Convert any fill line props to bool
+                        if not isinstance(props['line{0}Fill'.format(_)], bool):
+                            self.logger.info(u"[{0}] Resetting line chart fill property to boolean for line {1}.".format(dev.name, _))
+                            if props['line{0}Fill'.format(_)] in ('False', 'false', ''):
+                                props['line{0}Fill'.format(_)] = False
+                            elif props['line{0}Fill'.format(_)] in ('True', 'true'):
+                                props['line{0}Fill'.format(_)] = True
 
                 # =============== Establish Refresh Interval for Legacy Devices ===============
                 # Establish refresh interval for legacy devices. If the prop isn't present, we
