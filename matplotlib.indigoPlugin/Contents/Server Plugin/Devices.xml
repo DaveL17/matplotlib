@@ -1263,6 +1263,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Best Fit Color:</Label>
             </Field>
 
+            <Field id="suppressLine6" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
             </Field>
@@ -1282,11 +1287,6 @@ number and the color value should be enclosed in double quotes. Multiple entries
                    tooltip="Select preference for the style of your chart's custom line segments.">
                 <Label>Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
-
-            <Field id="suppressLine6" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
-                <Description>Yes/No</Description>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>

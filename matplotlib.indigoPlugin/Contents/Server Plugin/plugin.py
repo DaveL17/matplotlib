@@ -28,20 +28,14 @@ proper WUnderground devices.
 # TODO: Add facility to have different Y1 and Y2.  Add a new group of controls (like Y1) for Y2 and
 #  then have a control to allow user to elect when Y axis to assign the line to.
 
-# TODO: Feature Requests!!
-
-# TODO: add logging for suppressed items (bar, line, scatter)
-
 # TODO: bar and polar charts error out when one of the data sources has only 1 observation. Adding a second observation cleared the error.  It was the first of two data points.
 #     Matplotlib Critical Error       [Matplotlib - Bar Chart] [Matplotlib - Bar Chart] Error (zero-size array to reduction operation minimum which has no identity)
 
 # TODO: what happens to polar charts when the two files don't have the same number of observations?
 
-# TODO: for each time the plugin cycles, compare the current plugin config to the one we've stored locally. If it's different, log it.
-
 # TODO: test multiple CSV engines and multiple writes to the same csv file (trap IOError?)
 
-# TODO: is best fit line bombing because there are sometimes only one observation?
+# TODO: line 6 suppression checkbox isn't showing.
 
 # ================================== IMPORTS ==================================
 
@@ -90,7 +84,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.29"
+__version__   = "0.7.30"
 
 # =============================================================================
 
@@ -208,17 +202,12 @@ class Plugin(indigo.PluginBase):
 
             if valuesDict['verboseLogging']:
                 self.plugin_file_handler.setLevel(5)
-                self.logger.warning(u"Verbose logging is on. It is best not to leave this checked for very long.")
+                self.logger.warning(u"Verbose logging is on. It is best not to leave this turned on for very long.")
             else:
                 self.plugin_file_handler.setLevel(10)
                 self.logger.info(u"Verbose logging is off.")
 
-            self.logger.threaddebug(u"Final plugin valuesDict: {0}".format(dict(valuesDict)))
             self.logger.threaddebug(u"Configuration complete.")
-
-            # Ensure that self.pluginPrefs includes any recent changes.
-            for k in valuesDict:
-                self.pluginPrefs[k] = valuesDict[k]
 
         else:
             self.logger.threaddebug(u"User cancelled.")
@@ -551,10 +540,12 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def validatePrefsConfigUi(self, valuesDict):
 
+        changed_keys   = ()
+        config_changed = False
+        error_msg_dict = indigo.Dict()
+
         self.debug_level = int(valuesDict['showDebugLevel'])
         self.indigo_log_handler.setLevel(self.debug_level)
-
-        error_msg_dict = indigo.Dict()
 
         self.logger.threaddebug(u"Validating plugin configuration parameters.")
 
@@ -623,6 +614,17 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['lineWeight']    = u"The line weight value must be a real number."
             error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be a real number"
             return False, valuesDict, error_msg_dict
+
+        # TODO: consider adding this feature to DLFramework and including in all plugins.
+        # ============================== Log All Changes ==============================
+        # Log any changes to the plugin preferences.
+        for key in valuesDict.keys():
+            if valuesDict[key] != self.pluginPrefs[key]:
+                config_changed = True
+                changed_keys += (u"{0}".format(key), u"Old: {0}".format(self.pluginPrefs[key]), u"New: {0}".format(valuesDict[key]),)
+
+        if config_changed:
+            self.logger.threaddebug(u"valuesDict changed: {0}".format(changed_keys))
 
         valuesDict['dpiWarningFlag'] = True
         self.logger.threaddebug(u"Preferences validated successfully.")
@@ -2650,7 +2652,7 @@ class Plugin(indigo.PluginBase):
                         self.logger.critical(u"[{0}] {1}".format(dev.name, thing))
 
             if result['Error']:
-                self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
+                self.logger.warning(u"[{0}] {1}".format(dev.name, result['Message']))
             else:
                 self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
 
