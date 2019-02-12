@@ -15,21 +15,26 @@ proper WUnderground devices.
 
 # =================================== TO DO ===================================
 
-# TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery levels.)
+# TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like
+#              device battery levels.)
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Create a floating bar chart
-# TODO: NEW -- Create generic weather forecast charts to support any weather services
-# TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
-# TODO: NEW -- Add config dialog to rcparams device that's generated automatically?
+# TODO: NEW -- Create generic weather forecast charts to support any weather
+#              services
+# TODO: NEW -- Standard chart types with pre-populated data that link to types
+#              of Indigo devices.
+# TODO: NEW -- Add config dialog to rcparams device that's generated
+#              automatically?
+# TODO: Support substitutions for certain fields (like save location).
 
 # TODO: Wrap long names for battery health device?
-# TODO: Remove matplotlib_version.html after deprecation
-# TODO: if the csv save location is a share, and the share is unreachable, it blows up.
-# TODO: Add facility to have different Y1 and Y2.  Add a new group of controls (like Y1) for Y2 and
-#  then have a control to allow user to elect when Y axis to assign the line to.
+# TODO: Add facility to have different Y1 and Y2.  Add a new group of controls
+#       (like Y1) for Y2 and then have a control to allow user to elect when Y
+#       axis to assign the line to.
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
-# TODO: Add a test to ensure that save folders are accessible when validating plugin prefs
-
+# TODO: Remove matplotlib_version.html after deprecation
+# TODO: if the csv save location is a share, and the share is unreachable, it
+#       blows up.
 # ================================== IMPORTS ==================================
 
 # Built-in modules
@@ -77,7 +82,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.31"
+__version__   = "0.7.32"
 
 # =============================================================================
 
@@ -434,7 +439,8 @@ class Plugin(indigo.PluginBase):
                             'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
                             'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
                             'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
-                    valuesDict[key] = False
+                    if key in valuesDict.keys():
+                        valuesDict[key] = False
 
             return valuesDict
 
@@ -1164,29 +1170,30 @@ class Plugin(indigo.PluginBase):
                                 else:
                                     props[prop] = 'FF FF FF'
 
+                # TODO: this code improperly set these props for *all* chart devices. Fix That.
                 # ==================== Establish Props for Legacy Devices =====================
                 # If they exist, we leave them alone.
+                # for _ in range(1, 7, 1):
+                #     props['line{0}Annotate'.format(_)]     = props.get('line{0}Annotate'.format(_), False)
+                #     props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
+                #     props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), False)
+                #     props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
+                #     props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
+                #     props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), False)
+                #     props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
+                #     props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
+                #     props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
+                #     props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
+                #     props['suppressBar{0}'.format(_)]      = props.get('suppressBar{0}'.format(_), False)
+                #     props['suppressLine{0}'.format(_)]     = props.get('suppressLine{0}'.format(_), False)
+                #     props['suppressGroup{0}'.format(_)]    = props.get('suppressGroup{0}'.format(_), False)
+
+                # ======================== Correct Improper Prop Types ========================
+                # Some early devices were created with the device prop as the wrong type. Let's
+                # go ahead and fix those.
                 for _ in range(1, 7, 1):
-                    props['line{0}Annotate'.format(_)]     = props.get('line{0}Annotate'.format(_), False)
-                    props['line{0}adjuster'.format(_)]     = props.get('line{0}adjuster'.format(_), "")
-                    props['line{0}BestFit'.format(_)]      = props.get('line{0}BestFit'.format(_), False)
-                    props['line{0}BestFitColor'.format(_)] = props.get('line{0}BestFitColor'.format(_), "FF 00 00")
-                    props['line{0}Color'.format(_)]        = props.get('line{0}Color'.format(_), "FF 00 00")
-                    props['line{0}Fill'.format(_)]         = props.get('line{0}Fill'.format(_), False)
-                    props['line{0}MarkerColor'.format(_)]  = props.get('line{0}MarkerColor'.format(_), "FF 00 00")
-                    props['line{0}Source'.format(_)]       = props.get('line{0}Source'.format(_), "")
-                    props['plotLine{0}Max'.format(_)]      = props.get('plotLine{0}Max'.format(_), False)
-                    props['plotLine{0}Min'.format(_)]      = props.get('plotLine{0}Min'.format(_), False)
-                    props['suppressBar{0}'.format(_)]      = props.get('suppressBar{0}'.format(_), False)
-                    props['suppressLine{0}'.format(_)]     = props.get('suppressLine{0}'.format(_), False)
-                    props['suppressGroup{0}'.format(_)]    = props.get('suppressGroup{0}'.format(_), False)
-
-                    # ======================== Correct Improper Prop Types ========================
-                    # Some early devices were created with the device prop as the wrong type. Let's
-                    # go ahead and fix those.
-                    if dev.deviceTypeId == 'lineChartingDevice':
-
-                        # Convert any best fit line props to bool
+                    # Fix Type: Convert any best fit line props to bool
+                    if 'line{0}BestFit'.format(_) in dev.ownerProps.keys():
                         if not isinstance(props['line{0}BestFit'.format(_)], bool):
                             self.logger.info(u"[{0}] Resetting line chart best fit property to boolean for line {1}.".format(dev.name, _))
                             if props['line{0}BestFit'.format(_)] in ('False', 'false', ''):
@@ -1194,13 +1201,68 @@ class Plugin(indigo.PluginBase):
                             elif props['line{0}BestFit'.format(_)] in ('True', 'true'):
                                 props['line{0}BestFit'.format(_)] = True
 
-                        # Convert any fill line props to bool
+                    # Fix Type: Convert any fill line props to bool
+                    if 'line{0}Fill'.format(_) in dev.ownerProps.keys():
                         if not isinstance(props['line{0}Fill'.format(_)], bool):
                             self.logger.info(u"[{0}] Resetting line chart fill property to boolean for line {1}.".format(dev.name, _))
                             if props['line{0}Fill'.format(_)] in ('False', 'false', ''):
                                 props['line{0}Fill'.format(_)] = False
                             elif props['line{0}Fill'.format(_)] in ('True', 'true'):
                                 props['line{0}Fill'.format(_)] = True
+
+                if dev.deviceTypeId == 'barChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('line', 'group', 'suppressLine', 'suppressGroup', 'plotLine')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'calendarChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'lineChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'group', 'suppressBar', 'suppressGroup')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'multiLineText':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'polarChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'scatterChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'plotLine', 'suppressBar', 'suppressLine')):
+                            del props[prop]
+
+                elif dev.deviceTypeId == 'forecastChartingDevice':
+
+                    # Delete bad props
+                    for prop in props.keys():
+                        if prop.startswith(('bar', 'group',
+                                            'line4', 'line5', 'line6',
+                                            'lineLabel4', 'lineLabel5', 'lineLabel6',
+                                            'plotLine4', 'plotLine5', 'plotLine6',
+                                            'suppressBar', 'suppressGroup',
+                                            'suppressLine4', 'suppressLine5', 'suppressLine6')):
+                            del props[prop]
 
                 # =============== Establish Refresh Interval for Legacy Devices ===============
                 # Establish refresh interval for legacy devices. If the prop isn't present, we
@@ -1291,6 +1353,7 @@ class Plugin(indigo.PluginBase):
 
         for dev in indigo.devices.itervalues("self"):
             try:
+                dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 indigo.device.enable(dev, value=False)
             except Exception as sub_error:
                 self.pluginErrorHandler(traceback.format_exc())

@@ -1,3 +1,9 @@
+v0.7.32
+- Further improves maintenance of legacy props in all chart devices.
+- Set all device UI icons to off state when comm killed through plugin menu
+  action.
+- Fixed bug in snappy config menus which created unneeded device props.
+
 v0.7.31
 - Fixed bug in bar chart config dialog where X axis grid setting not hiding
   properly.
