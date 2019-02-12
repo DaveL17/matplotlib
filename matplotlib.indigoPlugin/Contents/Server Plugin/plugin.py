@@ -34,7 +34,14 @@ proper WUnderground devices.
 
 # TODO: bar and polar charts error out when one of the data sources has only 1 observation. Adding a second observation cleared the error.  It was the first of two data points.
 #     Matplotlib Critical Error       [Matplotlib - Bar Chart] [Matplotlib - Bar Chart] Error (zero-size array to reduction operation minimum which has no identity)
+
 # TODO: what happens to polar charts when the two files don't have the same number of observations?
+
+# TODO: for each time the plugin cycles, compare the current plugin config to the one we've stored locally. If it's different, log it.
+
+# TODO: test multiple CSV engines and multiple writes to the same csv file (trap IOError?)
+
+# TODO: is best fit line bombing because there are sometimes only one observation?
 
 # ================================== IMPORTS ==================================
 
@@ -83,7 +90,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.28"
+__version__   = "0.7.29"
 
 # =============================================================================
 
@@ -1088,6 +1095,21 @@ class Plugin(indigo.PluginBase):
 
         return prefs
 
+    # =============================================================================
+    def __log_dicts(self, dev=None):
+        """
+        Write parameters dicts to log under verbose logging
+
+        Simple method to write rcParm and kwarg dicts to debug log.
+
+        -----
+
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        """
+
+        self.logger.threaddebug(u"[{0:<19}] Props: {1}".format(dev.name, dict(dev.ownerProps)))
+
     def __maintenance(self):
         """
         Remove legacy keys from plugin prefs
@@ -1219,21 +1241,6 @@ class Plugin(indigo.PluginBase):
         """
 
         pass
-
-    # =============================================================================
-    def __log_dicts(self, dev=None):
-        """
-        Write parameters dicts to log under verbose logging
-
-        Simple method to write rcParm and kwarg dicts to debug log.
-
-        -----
-
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        """
-
-        self.logger.threaddebug(u"[{0:<19}] props:  {1}".format(dev.name, dict(dev.ownerProps)))
 
     # =============================================================================
     def advancedSettingsExecuted(self, valuesDict, menuId):
@@ -2555,18 +2562,32 @@ class Plugin(indigo.PluginBase):
 
         -----
 
+        :var int chart_devices:
+        :var int csv_devices:
         """
 
+        chart_devices = 0
+        csv_engines   = 0
+
+        # ========================== Get Plugin Device Load ===========================
+        for dev in indigo.devices.iter('self'):
+            if dev.ownerProps['isChart']:
+                chart_devices += 1
+            elif dev.deviceTypeId == 'csvEngine':
+                csv_engines += 1
+
         self.logger.info(u"")
-        self.logger.info(u"{0:=^135}".format(" Matplotlib Environment "))
+        self.logger.info(u"{0:{1}^135}".format(" Matplotlib Environment ", "="))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib version:", plt.matplotlib.__version__))
         self.logger.info(u"{0:<31} {1}".format("Numpy version:", np.__version__))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib RC Path:", plt.matplotlib.matplotlib_fname()))
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')))
-
         self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
-        self.logger.threaddebug(u"Initial Plugin Prefs: {0}".format(dict(self.pluginPrefs)))
-        self.logger.info(u"{0:=^135}".format(""))
+        self.logger.info(u"{0:<31} {1}".format("Number of Chart Devices:", chart_devices))
+        self.logger.info(u"{0:<31} {1}".format("Number of CSV Engine Devices:", csv_engines))
+
+        self.logger.threaddebug(u"Initial Plugin Prefs: {0:<31}".format(dict(self.pluginPrefs)))
+        self.logger.info(u"{0:{1}^135}".format("", "="))
 
     # =============================================================================
     def pluginErrorHandler(self, sub_error):
@@ -2614,15 +2635,19 @@ class Plugin(indigo.PluginBase):
             for event in result['Log']:
                 for thing in result['Log'][event]:
                     if event == 'Threaddebug':
-                        self.logger.threaddebug(thing)
+                        self.logger.threaddebug(u"[{0}] {1}".format(dev.name, thing))
+
                     elif event == 'Debug':
-                        self.logger.debug(thing)
+                        self.logger.debug(u"[{0}] {1}".format(dev.name, thing))
+
                     elif event == 'Info':
-                        self.logger.info(thing)
+                        self.logger.info(u"[{0}] {1}".format(dev.name, thing))
+
                     elif event == 'Warning':
-                        self.logger.warning(thing)
+                        self.logger.warning(u"[{0}] {1}".format(dev.name, thing))
+
                     else:
-                        self.logger.critical(thing)
+                        self.logger.critical(u"[{0}] {1}".format(dev.name, thing))
 
             if result['Error']:
                 self.logger.critical(u"[{0}] {1}".format(dev.name, result['Message']))
@@ -2684,7 +2709,7 @@ class Plugin(indigo.PluginBase):
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
         self.refreshTheCharts(devices_to_refresh)
-        self.logger.info(u"{0:=^80}".format(' Redraw Charts Now Menu Action Complete '))
+        self.logger.info(u"{0:{1}^80}".format(' Redraw Charts Now Menu Action Complete ', '='))
 
     # =============================================================================
     def refreshTheCharts(self, dev_list=None):
@@ -2991,20 +3016,20 @@ class Plugin(indigo.PluginBase):
                         device_dict  = {}
                         exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
 
-                        try:
-                            for batt_dev in indigo.devices.itervalues():
+                        for batt_dev in indigo.devices.itervalues():
+                            try:
                                 if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                            if device_dict == {}:
-                                device_dict['No Battery Devices'] = 0
+                                if device_dict == {}:
+                                    device_dict['No Battery Devices'] = 0
 
-                            # The following line is used for testing the battery health code; it isn't needed in production.
-                            # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                                # The following line is used for testing the battery health code; it isn't needed in production.
+                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
 
-                        except Exception as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
+                            except Exception as sub_error:
+                                self.pluginErrorHandler(traceback.format_exc())
+                                self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
 
                         if __name__ == '__main__':
                             p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
@@ -3119,7 +3144,7 @@ class Plugin(indigo.PluginBase):
 
         self.refreshTheCharts(devices_to_refresh)
 
-        self.logger.info(u"{0:=^80}".format(' Refresh Action Complete '))
+        self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
 
 
 class MakeChart(object):
@@ -3175,6 +3200,7 @@ class MakeChart(object):
 
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
+                    log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -3519,7 +3545,7 @@ class MakeChart(object):
                 if p_dict['line{0}Source'.format(line)] not in ("", "None") and not p_dict['suppressLine{0}'.format(line)]:
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
-                    log['Threaddebug'].append(u"{0}".format(data_column))
+                    log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -3673,14 +3699,19 @@ class MakeChart(object):
             p_dict['figureWidth']     = float(dev.pluginProps['figureWidth'])
             p_dict['figureHeight']    = float(dev.pluginProps['figureHeight'])
 
-            # If the value to be plotted is empty, use the default text from the device configuration.
+            # If the value to be plotted is empty, use the default text from the device
+            # configuration.
             if len(text_to_plot) <= 1:
                 text_to_plot = unicode(p_dict['defaultText'])
+
             else:
-                # The clean_string method tries to remove some potential ugliness from the text to be plotted. It's optional--defaulted to on. No need to call this if the default text
-                # is used.
+                # The clean_string method tries to remove some potential ugliness from the text
+                # to be plotted. It's optional--defaulted to on. No need to call this if the
+                # default text is used.
                 if p_dict['cleanTheText']:
                     text_to_plot = self.clean_string(text_to_plot)
+
+            log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
             # Wrap the text and prepare it for plotting.
             text_to_plot = textwrap.fill(text_to_plot, int(p_dict['numberOfCharacters']), replace_whitespace=p_dict['cleanTheText'])
@@ -3766,6 +3797,8 @@ class MakeChart(object):
                 self.final_data.append(theta)
                 radii, log = self.get_data(radii_path, log)
                 self.final_data.append(radii)
+
+                log['Threaddebug'].append(u"Data: {0}".format(self.final_data))
 
                 # Pull out the header information out of the data.
                 del self.final_data[0][0]
@@ -3991,6 +4024,7 @@ class MakeChart(object):
                         p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['group{0}Source'.format(thing)].encode("utf-8")), log)
+                    log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -4216,6 +4250,8 @@ class MakeChart(object):
 
             else:
                 log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
+
+            log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
 
             # ==================================== AX1 ====================================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
@@ -4483,6 +4519,8 @@ class MakeChart(object):
 
         converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
                      'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1}
+        now       = dt.datetime.now()
+        now_text  = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
 
         def is_number(s):
             try:
@@ -4514,13 +4552,19 @@ class MakeChart(object):
         # one and alert the user. This helps avoid nasty surprises down the line.
 
         # ============================= CSV File is Empty =============================
+        # Adds header and one observation. Length of CSV file goes from zero to two.
         if len(final_data) < 1:
-            final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
+            # TODO: deleted code
+            final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
+            # final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
             log['Warning'].append(u'CSV file is empty. File: {0}'.format(data_source))
 
         # ===================== CSV File has Headers but no Data ======================
+        # Adds one observation. Length of CSV file goes from one to two.
         if len(final_data) < 2:
-            final_data.append(('1970-01-01 00:00:00', 0))
+            # TODO: deleted code
+            final_data.append((now_text, 0))
+            # final_data.append(('1970-01-01 00:00:00', 0))
             log['Warning'].append(u'CSV file does not have sufficient information to make a useful plot. File: {0}'.format(data_source))
 
         # =============================== Malformed CSV ===============================
@@ -4826,6 +4870,8 @@ class MakeChart(object):
         """
 
         final_data = []
+        now        = dt.datetime.now()
+        now_text   = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
 
         try:
             # Get the data
@@ -4844,7 +4890,9 @@ class MakeChart(object):
         # can process without dying.
         except Exception as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
+            # TODO: deleted code
+            # final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
+            final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
             log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more information.".format(sub_error))
 
             return final_data, log
@@ -4887,11 +4935,18 @@ class MakeChart(object):
         -----
 
         """
-        color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
+        try:
+            color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
 
-        ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color, zorder=1)
+            ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color, zorder=1)
 
-        return ax
+            return ax
+
+        except TypeError as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.logger.threaddebug(u"p_dict: {0}.".format(p_dict))
+            self.host_plugin.logger.threaddebug(u"dates_to_plot: {0}.".format(dates_to_plot))
+            self.host_plugin.logger.warning(u"There is a problem with the best fit line segments settings. Error: {0}. See plugin log for more information.".format(sub_error))
 
     # =============================================================================
     def plot_custom_line_segments(self, ax, p_dict, k_dict):
@@ -4948,9 +5003,15 @@ class MakeChart(object):
         :param dict k_dict:
         """
 
-        if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
-            plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+        try:
+            if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
+                plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-            plt.clf()
-            plt.close('all')
+                plt.clf()
+                plt.close('all')
+
+        except RuntimeError as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.logger.warning(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See plugin log for more information.".format(sub_error))
+
     # =============================================================================

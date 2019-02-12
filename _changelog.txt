@@ -1,3 +1,14 @@
+v0.7.29
+- Improves resiliency to CSV files that contain 1 or fewer observations.
+- Changes the default timestamp from the epoch to current time (retains the
+  epoch as the default device last refresh).
+- Adds trap for RuntimeError when trying to save chart image to address
+  the 'too many ticks' error.
+- Adds trap for TypeError when trying to generate a best fit line segment to
+  address the 'int' object is not iterable error.
+- Adds number of chart devices and CSV engine devices to plugin environment
+  logging.
+
 v0.7.28
 - Improved conversion of legacy line fill properties to bool type.
 

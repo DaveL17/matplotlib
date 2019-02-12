@@ -3,6 +3,14 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-01-21  Busta999
+===============================================================================
+Legend extended so it can run all the way across the bottom of the graph - at
+the moment it wraps to a second line even though it is only using the middle
+half of the graph - if all 6 lines are used and text is too long it wraps
+rather than - see below.
+
+===============================================================================
 2019-01-21  Autolog
 ===============================================================================
 Another useful feature to add to the mix, especially if you are going to
