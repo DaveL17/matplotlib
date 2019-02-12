@@ -1,7 +1,12 @@
+v0.7.31
+- Fixed bug in bar chart config dialog where X axis grid setting not hiding
+  properly.
+
 v0.7.30
 - Improves logging of plugin prefs when changes made using configuration
   dialog.
-- Fixes placement of line 6 suppression option in line chart device configuration dialog.
+- Fixes placement of line 6 suppression option in line chart device
+  configuration dialog.
 
 v0.7.29
 - Improves resiliency to CSV files that contain 1 or fewer observations.

@@ -107,7 +107,7 @@
                 <Label>X Axis</Label>
             </Field>
 
-            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" tooltip="Check to display X axis grid.">
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
                 <Label>Grid</Label>
                 <Description>Yes/No</Description>
             </Field>

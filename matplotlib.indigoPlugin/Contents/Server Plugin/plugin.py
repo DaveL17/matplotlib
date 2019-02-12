@@ -27,15 +27,8 @@ proper WUnderground devices.
 # TODO: if the csv save location is a share, and the share is unreachable, it blows up.
 # TODO: Add facility to have different Y1 and Y2.  Add a new group of controls (like Y1) for Y2 and
 #  then have a control to allow user to elect when Y axis to assign the line to.
-
-# TODO: bar and polar charts error out when one of the data sources has only 1 observation. Adding a second observation cleared the error.  It was the first of two data points.
-#     Matplotlib Critical Error       [Matplotlib - Bar Chart] [Matplotlib - Bar Chart] Error (zero-size array to reduction operation minimum which has no identity)
-
-# TODO: what happens to polar charts when the two files don't have the same number of observations?
-
-# TODO: test multiple CSV engines and multiple writes to the same csv file (trap IOError?)
-
-# TODO: line 6 suppression checkbox isn't showing.
+# TODO: Iterate CSV engine devices and warn if any are writing to same file.
+# TODO: Add a test to ensure that save folders are accessible when validating plugin prefs
 
 # ================================== IMPORTS ==================================
 
@@ -84,7 +77,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.30"
+__version__   = "0.7.31"
 
 # =============================================================================
 
@@ -3203,6 +3196,8 @@ class MakeChart(object):
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
                     log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
+
+                    # Pull the headers
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -3548,6 +3543,8 @@ class MakeChart(object):
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
+
+                    # Pull the headers
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 
@@ -4027,6 +4024,8 @@ class MakeChart(object):
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['group{0}Source'.format(thing)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
+
+                    # Pull the headers
                     p_dict['headers'].append(data_column[0][1])
                     del data_column[0]
 

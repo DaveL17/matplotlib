@@ -3,7 +3,16 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
-2019-01-21  Busta999
+2019-02-12  Rogue Proliator
+===============================================================================
+Include a facility to import/export constructed chart devices and have some
+option to dump the Properties to JSON or XML.  Then create a generic import
+that can read those in... that way you don't have to maintain any particular
+import/export -- it just exports/imports all plugin props it finds on the
+device and/or XML file during import.
+
+===============================================================================
+2019-02-10  Busta999
 ===============================================================================
 Legend extended so it can run all the way across the bottom of the graph - at
 the moment it wraps to a second line even though it is only using the middle
