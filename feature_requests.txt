@@ -3,7 +3,7 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
-2019-02-12  Rogue Proliator
+2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
 option to dump the Properties to JSON or XML.  Then create a generic import

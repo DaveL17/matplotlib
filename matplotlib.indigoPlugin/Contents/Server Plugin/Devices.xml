@@ -1372,7 +1372,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sourceSeparator2" type="separator"/>
 
-            <Field id="textAreaBorder" type="checkbox" defaultValue="100" tooltip="Chedck this box if you would like a border around your image.">
+            <Field id="textAreaBorder" type="checkbox" defaultValue="false" tooltip="Check this box if you would like a border around your image.">
                 <Label>Border?</Label>
                 <Description>Yes/No</Description>
             </Field>
