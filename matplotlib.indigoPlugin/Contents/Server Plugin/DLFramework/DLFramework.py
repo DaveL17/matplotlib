@@ -36,12 +36,13 @@ class Fogbert(object):
         The pluginEnvironment method prints selected information about the
         pluginEnvironment that the plugin is running in. It pulls some of this
         information from the calling plugin and some from the server
-        pluginEnvironment.
+        pluginEnvironment. It uses the legacy "indigo.server.log" method to
+        write to the log.
         """
         self.plugin.debugLog(u"DLFramework pluginEnvironment method called.")
 
         indigo.server.log(u"")
-        indigo.server.log(u"{0:=^130}".format(" Initializing New Plugin Session "))
+        indigo.server.log(u"{0:{1}^135}".format(" Initializing New Plugin Session ", "="))
         indigo.server.log(u"{0:<31} {1}".format("Plugin name:", self.plugin.pluginDisplayName))
         indigo.server.log(u"{0:<31} {1}".format("Plugin version:", self.plugin.pluginVersion))
         indigo.server.log(u"{0:<31} {1}".format("Plugin ID:", self.plugin.pluginId))
@@ -49,21 +50,21 @@ class Fogbert(object):
         indigo.server.log(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
         indigo.server.log(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
         indigo.server.log(u"{0:<31} {1}".format("Process ID:", os.getpid()))
-        indigo.server.log(u"{0:=^130}".format(""))
+        indigo.server.log(u"{0:{1}^135}".format("", "="))
 
     def pluginEnvironmentLogger(self):
         """
-        The pluginEnvironment method prints selected information about the
-        pluginEnvironment that the plugin is running in. It pulls some of this
-        information from the calling plugin and some from the server
-        pluginEnvironment.  This method differs from the pluginEnvironment
+        The pluginEnvironmentLogger method prints selected information about
+        the pluginEnvironment that the plugin is running in. It pulls some of
+        this information from the calling plugin and some from the server
+        pluginEnvironment. This method differs from the pluginEnvironment
         method in that it leverages Indigo's logging hooks using the Python
         Logger framework.
         """
         self.plugin.logger.debug(u"DLFramework pluginEnvironment method called.")
 
         self.plugin.logger.info(u"")
-        self.plugin.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))
+        self.plugin.logger.info(u"{0:{1}^135}".format(" Initializing New Plugin Session ", "="))
         self.plugin.logger.info(u"{0:<31} {1}".format("Plugin name:", self.plugin.pluginDisplayName))
         self.plugin.logger.info(u"{0:<31} {1}".format("Plugin version:", self.plugin.pluginVersion))
         self.plugin.logger.info(u"{0:<31} {1}".format("Plugin ID:", self.plugin.pluginId))
@@ -71,7 +72,7 @@ class Fogbert(object):
         self.plugin.logger.info(u"{0:<31} {1}".format("Python version:", sys.version.replace('\n', '')))
         self.plugin.logger.info(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
         self.plugin.logger.info(u"{0:<31} {1}".format("Process ID:", os.getpid()))
-        self.plugin.logger.info(u"{0:=^130}".format(""))
+        self.plugin.logger.info(u"{0:{1}^135}".format("", "="))
 
     def convertDebugLevel(self, debug_val):
         """

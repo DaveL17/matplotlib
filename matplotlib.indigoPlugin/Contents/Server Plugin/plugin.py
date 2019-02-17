@@ -26,13 +26,13 @@ proper WUnderground devices.
 # TODO: NEW -- Add config dialog to rcparams device that's generated
 #              automatically?
 # TODO: Support substitutions for certain fields (like save location).
-# TODO: Try to molify annotation collisions.
+# TODO: Try to address annotation collisions.
 
+# TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Wrap long names for battery health device?
 # TODO: Add facility to have different Y1 and Y2.  Add a new group of controls
 #       (like Y1) for Y2 and then have a control to allow user to elect when Y
 #       axis to assign the line to.
-# TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Remove matplotlib_version.html after deprecation
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
@@ -54,7 +54,6 @@ import numpy as np
 import os
 import traceback
 import unicodedata
-import re
 
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
@@ -209,7 +208,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(u"Verbose logging is on. It is best not to leave this turned on for very long.")
             else:
                 self.plugin_file_handler.setLevel(10)
-                self.logger.info(u"Verbose logging is off.")
+                self.logger.info(u"Verbose logging is off.  It is best to leave this turned off unless directed.")
 
             self.logger.threaddebug(u"Configuration complete.")
 
@@ -228,7 +227,7 @@ class Plugin(indigo.PluginBase):
         # If chartLastUpdated is empty, set it to the epoch
         if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
             dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
-            self.logger.threaddebug(u"CSV last update unknow. Coercing update.")
+            self.logger.threaddebug(u"CSV last update unknown. Coercing update.")
 
         # If the refresh interval is greater than zero
         # Note that we check for the existence of the device state before trying to
@@ -249,34 +248,6 @@ class Plugin(indigo.PluginBase):
 
         dev.stateListOrDisplayStateIdChanged()
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-
-        # TODO: isolate this function and fold it into the __clean_prefs method.
-        # =============================================================================
-        # current_prefs = []
-        # dead_prefs = []
-        #
-        # # Get the device's current Devices.xml config
-        # config_prefs = self.devicesTypeDict[dev.deviceTypeId]["ConfigUIRawXml"]
-        # config_prefs = ET.ElementTree(ET.fromstring(config_prefs))
-        #
-        # # Iterate the XML to get the field IDs
-        # for pref in config_prefs.findall('Field'):
-        #     dev_id = unicode(pref.get('id'))
-        #     current_prefs.append(dev_id)
-        #
-        # self.logger.info(u"Current config prefs: {0}".format(sorted(current_prefs)))
-        #
-        # Get the device's current config. There may be prefs here that are not
-        # in Devices.xml but are still valid (they may have been added dynamically).
-        # dev_prefs = dev.pluginProps
-        # self.logger.info(u"Current device prefs: {0}".format(sorted(dict(dev_prefs).keys())))
-        #
-        # # prefs in the device that aren't in the config
-        # for pref in dev_prefs:
-        #     if pref not in current_prefs:
-        #         dead_prefs.append(pref)
-        #
-        # self.logger.info(u"Device prefs not in current config: {0}".format(sorted(dead_prefs)))
 
     # =============================================================================
     def deviceStopComm(self, dev):

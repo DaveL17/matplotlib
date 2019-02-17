@@ -444,3 +444,32 @@ class Maintain(object):
 
             self.plugin.logger.debug(u"[{0}] prefs cleaned.".format(dev.name))
 
+    # def clean_dev_props(self, dev):
+    #
+    #     import xml.etree.ElementTree as ET
+    #
+    #     current_prefs = []
+    #     dead_prefs = []
+    #
+    #     # Get the device's current Devices.xml config
+    #     config_prefs = self.plugin.devicesTypeDict[dev.deviceTypeId]["ConfigUIRawXml"]
+    #     config_prefs = ET.ElementTree(ET.fromstring(config_prefs))
+    #
+    #     # Iterate the XML to get the field IDs
+    #     for pref in config_prefs.findall('Field'):
+    #         dev_id = unicode(pref.get('id'))
+    #         current_prefs.append(dev_id)
+    #
+    #     self.plugin.logger.info(u"Current config prefs: {0}".format(sorted(current_prefs)))
+    #
+    #     # Get the device's current config. There may be prefs here that are not
+    #     # in Devices.xml but are still valid (they may have been added dynamically).
+    #     dev_prefs = dev.pluginProps
+    #     self.plugin.logger.info(u"Current device prefs: {0}".format(sorted(dict(dev_prefs).keys())))
+    #
+    #     # prefs in the device that aren't in the config
+    #     for pref in dev_prefs:
+    #         if pref not in current_prefs:
+    #             dead_prefs.append(pref)
+    #
+    #     self.plugin.logger.info(u"Device prefs not in current config: {0}".format(sorted(dead_prefs)))
