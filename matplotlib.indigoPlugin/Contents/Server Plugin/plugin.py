@@ -36,6 +36,15 @@ proper WUnderground devices.
 # TODO: Remove matplotlib_version.html after deprecation
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
+
+# TODO: Check custom line segments. Are they broken?
+# TODO: Line hiding not properly handled for legacy devices.
+# TODO: double-check that the CSV duration setting is working properly.
+# TODO: Add logging to the CSV engine routines
+
+# TODO: look at locks for CSV refresh
+# TODO: look at queue for CSV tasks rather than synchronous
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -84,7 +93,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.33"
+__version__   = "0.7.34"
 
 # =============================================================================
 
@@ -501,6 +510,13 @@ class Plugin(indigo.PluginBase):
                 self.csv_refresh()
                 self.refreshTheCharts()
                 self.sleep(15)
+
+    # =============================================================================
+    def sendDevicePing(self, devId, suppressLogging):
+
+        indigo.server.log(u"Matplotlib Plugin devices do not support the ping function.")
+
+        return {'result': 'Failure'}
 
     # =============================================================================
     def startup(self):
@@ -1743,7 +1759,7 @@ class Plugin(indigo.PluginBase):
             import shutil
 
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
-            delta        = int(dev.pluginProps.get('numLinesToKeepTime', '72'))
+            delta        = float(dev.pluginProps.get('numLinesToKeepTime', '72'))
             cycle_time   = dt.datetime.now()
 
             # Read through the dict and construct headers and data
@@ -1801,7 +1817,7 @@ class Plugin(indigo.PluginBase):
                 # ============================== Limit for Time ===============================
                 # Limit data by time
                 if delta >= 0:
-                    cut_off = dt.datetime.now() - dt.timedelta(hours=10000)
+                    cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
                     time_data = [row for row in data if date_parse(row[0]) >= cut_off]
 
                     # If all records are older than the delta, return the original data (so
@@ -4891,6 +4907,7 @@ class MakeChart(object):
             marks = [float(_) for _ in p_dict['customTicksY'].split(",")]
             if p_dict['customTicksLabelY'] == "":
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
+
             else:
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
             plt.yticks(marks, labels)

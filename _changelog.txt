@@ -1,3 +1,6 @@
+v0.7.34
+- Fixes bug in duration setting for CSV devices.
+
 v0.7.33
 - Further improves maintenance of legacy props in all chart devices.
 - Moves maintenance tasks to separate module.
