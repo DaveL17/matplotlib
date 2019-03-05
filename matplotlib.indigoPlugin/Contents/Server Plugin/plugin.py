@@ -37,11 +37,8 @@ proper WUnderground devices.
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
 
-# TODO: Check custom line segments. Are they broken?
 # TODO: Line hiding not properly handled for legacy devices.
-# TODO: double-check that the CSV duration setting is working properly.
 # TODO: Add logging to the CSV engine routines
-
 # TODO: look at locks for CSV refresh
 # TODO: look at queue for CSV tasks rather than synchronous
 
@@ -93,7 +90,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.34"
+__version__   = "0.7.35"
 
 # =============================================================================
 
@@ -5095,7 +5092,7 @@ class MakeChart(object):
                         if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(constants_to_plot[0])
 
-                    return cls
+                return cls
 
             except Exception as sub_error:
                 self.host_plugin.pluginErrorHandler(traceback.format_exc())

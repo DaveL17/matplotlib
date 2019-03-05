@@ -1,3 +1,7 @@
+v0.7.35
+- Fixes bug in custom line segments where only the first custom line is
+  plotted.
+
 v0.7.34
 - Fixes bug in duration setting for CSV devices.
 
