@@ -13,6 +13,16 @@ example, it can create WUnderground plugin forecast charts if linked to the
 proper WUnderground devices.
 """
 
+# =================================== Notes ===================================
+# - Memory Leak
+#   There is a known issue with the version of Matplotlib shipping at the time
+#   this plugin was developed that caused a memory leak that would ultimately
+#   cause the plugin to crash. Two significant steps were taken to address
+#   this. First, we import 'matplotlib.use('AGG')' which is thought to isolate
+#   the leak. Second, we run each plot update in its own process and then
+#   ultimately destroy the process when it's finished. These two steps seem to
+#   allow the plugin to run indefinitely without running out of resources.
+
 # =================================== TO DO ===================================
 
 # TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like
@@ -90,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.37"
+__version__   = "0.7.38"
 
 # =============================================================================
 
@@ -504,6 +514,16 @@ class Plugin(indigo.PluginBase):
 
         while True:
             if not self.pluginIsShuttingDown:
+
+                # ========================== Clean Up Old Processes ===========================
+                # If all goes according to plan, this will join() all completed processes. Any
+                # processes that are still running (if any) will be listed to the log
+                zombies = multiprocessing.active_children()  # Will join any zombie processes.
+
+                if len(zombies) > 0:
+                    self.logger.warning(u"Active child processes: {0}".format(zombies))
+
+                # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
                 self.refreshTheCharts()
                 self.sleep(15)
@@ -4236,17 +4256,13 @@ class MakeChart(object):
         # ============================= CSV File is Empty =============================
         # Adds header and one observation. Length of CSV file goes from zero to two.
         if len(final_data) < 1:
-            # TODO: deleted code
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
-            # final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
             log['Warning'].append(u'CSV file is empty. File: {0}'.format(data_source))
 
         # ===================== CSV File has Headers but no Data ======================
         # Adds one observation. Length of CSV file goes from one to two.
         if len(final_data) < 2:
-            # TODO: deleted code
             final_data.append((now_text, 0))
-            # final_data.append(('1970-01-01 00:00:00', 0))
             log['Warning'].append(u'CSV file does not have sufficient information to make a useful plot. File: {0}'.format(data_source))
 
         # =============================== Malformed CSV ===============================
@@ -4573,8 +4589,6 @@ class MakeChart(object):
         # can process without dying.
         except Exception as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            # TODO: deleted code
-            # final_data.extend([('timestamp', 'placeholder'), ('1970-01-01 00:00:00', 0)])
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
             log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more information.".format(sub_error))
 

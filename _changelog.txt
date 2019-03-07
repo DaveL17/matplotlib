@@ -1,3 +1,6 @@
+v0.7.38
+- Adds process garbage collection to runConcurrentThread().
+
 v0.7.37
 - Chart update processes are no longer blocking.
 - Puts CSV refreshing back in the main thread.
