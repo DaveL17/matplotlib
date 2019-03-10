@@ -51,6 +51,7 @@ proper WUnderground devices.
 # TODO: Add logging to the CSV engine routines
 
 # TODO: Consider dropping the backup csv component to reduce I/O.
+# TODO: Stop traceback for CSV engine device where it has no data sources.
 
 # ================================== IMPORTS ==================================
 
@@ -100,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.38"
+__version__   = "0.7.39"
 
 # =============================================================================
 
@@ -202,12 +203,12 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     # ============================== Indigo Methods ===============================
     # =============================================================================
-    def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
+    def closedDeviceConfigUi(self, values_dict=None, user_cancelled=False, type_id="", dev_id=0):
 
-        dev = indigo.devices[devId]
+        dev = indigo.devices[dev_id]
 
-        if not userCancelled:
-            self.logger.threaddebug(u"[{0}] Final device valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        if not user_cancelled:
+            self.logger.threaddebug(u"[{0}] Final device values_dict: {1}".format(dev.name, dict(values_dict)))
             self.logger.threaddebug(u"Configuration complete.")
         else:
             self.logger.threaddebug(u"User cancelled.")
@@ -215,11 +216,11 @@ class Plugin(indigo.PluginBase):
         return True
 
     # =============================================================================
-    def closedPrefsConfigUi(self, valuesDict, userCancelled):
+    def closedPrefsConfigUi(self, values_dict=None, user_cancelled=False):
 
-        if not userCancelled:
+        if not user_cancelled:
 
-            if valuesDict['verboseLogging']:
+            if values_dict['verboseLogging']:
                 self.plugin_file_handler.setLevel(5)
                 self.logger.warning(u"Verbose logging is on. It is best not to leave this turned on for very long.")
             else:
@@ -272,44 +273,44 @@ class Plugin(indigo.PluginBase):
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
     # =============================================================================
-    def getDeviceConfigUiValues(self, valuesDict, typeId, devId):
+    def getDeviceConfigUiValues(self, values_dict, type_id="", dev_id=0):
 
-        dev = indigo.devices[int(devId)]
+        dev = indigo.devices[int(dev_id)]
 
-        self.logger.threaddebug(u"[{0}] Getting device config props: {1}".format(dev.name, dict(valuesDict)))
+        self.logger.threaddebug(u"[{0}] Getting device config props: {1}".format(dev.name, dict(values_dict)))
 
         try:
 
             # ===================== Prepare CSV Engine Config Window ======================
             # Put certain props in a state that we expect when the config dialog is first
             # opened.
-            if typeId == "csvEngine":
-                valuesDict['addItemFieldsCompleted'] = False
-                valuesDict['addKey']                 = ""
-                valuesDict['addSource']              = ""
-                valuesDict['addSourceFilter']        = "A"
-                valuesDict['addState']               = ""
-                valuesDict['addValue']               = ""
-                valuesDict['csv_item_list']          = ""
-                valuesDict['editKey']                = ""
-                valuesDict['editSource']             = ""
-                valuesDict['editSourceFilter']       = "A"
-                valuesDict['editState']              = ""
-                valuesDict['editValue']              = ""
-                valuesDict['isColumnSelected']       = False
-                valuesDict['previousKey']            = ""
+            if type_id == "csvEngine":
+                values_dict['addItemFieldsCompleted'] = False
+                values_dict['addKey']                 = ""
+                values_dict['addSource']              = ""
+                values_dict['addSourceFilter']        = "A"
+                values_dict['addState']               = ""
+                values_dict['addValue']               = ""
+                values_dict['csv_item_list']          = ""
+                values_dict['editKey']                = ""
+                values_dict['editSource']             = ""
+                values_dict['editSourceFilter']       = "A"
+                values_dict['editState']              = ""
+                values_dict['editValue']              = ""
+                values_dict['isColumnSelected']       = False
+                values_dict['previousKey']            = ""
 
-                return valuesDict
+                return values_dict
 
             # # ============================= Fix Custom Colors =============================
             # # For existing devices
             # if dev.configured:
             #
             #     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
-            #     for prop in valuesDict:
-            #         if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(valuesDict[prop])):
-            #             s = valuesDict[prop]
-            #             valuesDict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
+            #     for prop in values_dict:
+            #         if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(values_dict[prop])):
+            #             s = values_dict[prop]
+            #             values_dict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
 
             # ========================== Set Config UI Defaults ===========================
             # For new devices, force certain defaults that don't carry from devices.xml.
@@ -317,110 +318,110 @@ class Plugin(indigo.PluginBase):
             # colorpicker controls that don't appear to accept defaultValue.
             if not dev.configured:
 
-                valuesDict['refreshInterval'] = '900'
+                values_dict['refreshInterval'] = '900'
 
                 # ============================ Bar Charting Device ============================
-                if typeId == "barChartingDevice":
+                if type_id == "barChartingDevice":
 
                     for _ in range(1, 5, 1):
-                        valuesDict['bar{0}Color'.format(_)]  = 'FF FF FF'
-                        valuesDict['bar{0}Source'.format(_)] = 'None'
+                        values_dict['bar{0}Color'.format(_)]  = 'FF FF FF'
+                        values_dict['bar{0}Source'.format(_)] = 'None'
 
-                    valuesDict['customLineStyle']     = '-'
-                    valuesDict['customTickFontSize']  = 8
-                    valuesDict['customTitleFontSize'] = 10
-                    valuesDict['xAxisBins']           = 'daily'
-                    valuesDict['xAxisLabelFormat']    = '%A'
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisBins']           = 'daily'
+                    values_dict['xAxisLabelFormat']    = '%A'
 
                 # =========================== Battery Health Device ===========================
-                if typeId == "batteryHealthDevice":
-                    valuesDict['healthyColor']     = '00 00 CC'
-                    valuesDict['cautionLevel']     = '10'
-                    valuesDict['cautionColor']     = 'FF FF 00'
-                    valuesDict['warningLevel']     = '5'
-                    valuesDict['warningColor']     = 'FF 00 00'
-                    valuesDict['showBatteryLevel'] = 'true'
+                if type_id == "batteryHealthDevice":
+                    values_dict['healthyColor']     = '00 00 CC'
+                    values_dict['cautionLevel']     = '10'
+                    values_dict['cautionColor']     = 'FF FF 00'
+                    values_dict['warningLevel']     = '5'
+                    values_dict['warningColor']     = 'FF 00 00'
+                    values_dict['showBatteryLevel'] = 'true'
 
                 # ========================== Calendar Charting Device =========================
-                if typeId == "calendarChartingDevice":
-                    valuesDict['fontSize'] = 12
+                if type_id == "calendarChartingDevice":
+                    values_dict['fontSize'] = 12
 
                 # ============================ Line Charting Device ===========================
-                if typeId == "lineChartingDevice":
+                if type_id == "lineChartingDevice":
 
                     for _ in range(1, 7, 1):
-                        valuesDict['line{0}BestFit'.format(_)]      = False
-                        valuesDict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
-                        valuesDict['line{0}Color'.format(_)]        = 'FF FF FF'
-                        valuesDict['line{0}Marker'.format(_)]       = 'None'
-                        valuesDict['line{0}MarkerColor'.format(_)]  = 'FF FF FF'
-                        valuesDict['line{0}Source'.format(_)]       = 'None'
-                        valuesDict['line{0}Style'.format(_)]        = '-'
+                        values_dict['line{0}BestFit'.format(_)]      = False
+                        values_dict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
+                        values_dict['line{0}Color'.format(_)]        = 'FF FF FF'
+                        values_dict['line{0}Marker'.format(_)]       = 'None'
+                        values_dict['line{0}MarkerColor'.format(_)]  = 'FF FF FF'
+                        values_dict['line{0}Source'.format(_)]       = 'None'
+                        values_dict['line{0}Style'.format(_)]        = '-'
 
-                    valuesDict['customLineStyle']     = '-'
-                    valuesDict['customTickFontSize']  = 8
-                    valuesDict['customTitleFontSize'] = 10
-                    valuesDict['xAxisBins']           = 'daily'
-                    valuesDict['xAxisLabelFormat']    = '%A'
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisBins']           = 'daily'
+                    values_dict['xAxisLabelFormat']    = '%A'
 
                 # =========================== Multiline Text Device ===========================
-                if typeId == "multiLineText":
-                    valuesDict['textColor']  = "FF 00 FF"
-                    valuesDict['thing']      = 'None'
-                    valuesDict['thingState'] = 'None'
+                if type_id == "multiLineText":
+                    values_dict['textColor']  = "FF 00 FF"
+                    values_dict['thing']      = 'None'
+                    values_dict['thingState'] = 'None'
 
                 # =========================== Polar Charting Device ===========================
-                if typeId == "polarChartingDevice":
-                    valuesDict['customTickFontSize']  = 8
-                    valuesDict['customTitleFontSize'] = 10
-                    valuesDict['currentWindColor']    = 'FF 33 33'
-                    valuesDict['maxWindColor']        = '33 33 FF'
-                    valuesDict['radiiValue']          = 'None'
-                    valuesDict['thetaValue']          = 'None'
+                if type_id == "polarChartingDevice":
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['currentWindColor']    = 'FF 33 33'
+                    values_dict['maxWindColor']        = '33 33 FF'
+                    values_dict['radiiValue']          = 'None'
+                    values_dict['thetaValue']          = 'None'
 
                 # ========================== Scatter Charting Device ==========================
-                if typeId == "scatterChartingDevice":
+                if type_id == "scatterChartingDevice":
 
                     for _ in range(1, 5, 1):
-                        valuesDict['line{0}BestFit'.format(_)]      = False
-                        valuesDict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
-                        valuesDict['group{0}Color'.format(_)]       = 'FF FF FF'
-                        valuesDict['group{0}Marker'.format(_)]      = '.'
-                        valuesDict['group{0}MarkerColor'.format(_)] = 'FF FF FF'
-                        valuesDict['group{0}Source'.format(_)]      = 'None'
+                        values_dict['line{0}BestFit'.format(_)]      = False
+                        values_dict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
+                        values_dict['group{0}Color'.format(_)]       = 'FF FF FF'
+                        values_dict['group{0}Marker'.format(_)]      = '.'
+                        values_dict['group{0}MarkerColor'.format(_)] = 'FF FF FF'
+                        values_dict['group{0}Source'.format(_)]      = 'None'
 
-                    valuesDict['customLineStyle']     = '-'
-                    valuesDict['customTickFontSize']  = 8
-                    valuesDict['customTitleFontSize'] = 10
-                    valuesDict['xAxisBins']           = 'daily'
-                    valuesDict['xAxisLabelFormat']    = '%A'
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisBins']           = 'daily'
+                    values_dict['xAxisLabelFormat']    = '%A'
 
                 # ========================== Weather Forecast Device ==========================
-                if typeId == "forecastChartingDevice":
+                if type_id == "forecastChartingDevice":
 
                     for _ in range(1, 3, 1):
-                        valuesDict['line{0}Marker'.format(_)]      = 'None'
-                        valuesDict['line{0}MarkerColor'.format(_)] = 'FF FF FF'
-                        valuesDict['line{0}Style'.format(_)]       = '-'
+                        values_dict['line{0}Marker'.format(_)]      = 'None'
+                        values_dict['line{0}MarkerColor'.format(_)] = 'FF FF FF'
+                        values_dict['line{0}Style'.format(_)]       = '-'
 
-                    valuesDict['customLineStyle']      = '-'
-                    valuesDict['customTickFontSize']   = 8
-                    valuesDict['customTitleFontSize']  = 10
-                    valuesDict['forecastSourceDevice'] = 'None'
-                    valuesDict['line1Color']           = 'FF 33 33'
-                    valuesDict['line2Color']           = '00 00 FF'
-                    valuesDict['line3Color']           = '99 CC FF'
-                    valuesDict['line3MarkerColor']     = 'FF FF FF'
-                    valuesDict['xAxisBins']            = 'daily'
-                    valuesDict['xAxisLabelFormat']     = '%A'
-                    valuesDict['showDaytime']          = 'true'
-                    valuesDict['daytimeColor']         = '33 33 33'
+                    values_dict['customLineStyle']      = '-'
+                    values_dict['customTickFontSize']   = 8
+                    values_dict['customTitleFontSize']  = 10
+                    values_dict['forecastSourceDevice'] = 'None'
+                    values_dict['line1Color']           = 'FF 33 33'
+                    values_dict['line2Color']           = '00 00 FF'
+                    values_dict['line3Color']           = '99 CC FF'
+                    values_dict['line3MarkerColor']     = 'FF FF FF'
+                    values_dict['xAxisBins']            = 'daily'
+                    values_dict['xAxisLabelFormat']     = '%A'
+                    values_dict['showDaytime']          = 'true'
+                    values_dict['daytimeColor']         = '33 33 33'
 
             if self.pluginPrefs.get('enableCustomLineSegments', False):
-                valuesDict['enableCustomLineSegmentsSetting'] = True
+                values_dict['enableCustomLineSegmentsSetting'] = True
                 self.logger.threaddebug(u"Enabling advanced feature: Custom Line Segments.")
             else:
-                valuesDict['enableCustomLineSegmentsSetting'] = False
+                values_dict['enableCustomLineSegmentsSetting'] = False
 
             # If Snappy Config Menus are enabled, reset all device config dialogs to a
             # minimized state (all sub-groups minimized upon open.) Otherwise, leave them
@@ -432,10 +433,10 @@ class Plugin(indigo.PluginBase):
                             'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
                             'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
                             'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
-                    if key in valuesDict.keys():
-                        valuesDict[key] = False
+                    if key in values_dict.keys():
+                        values_dict[key] = False
 
-            return valuesDict
+            return values_dict
 
         except KeyError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
@@ -462,7 +463,7 @@ class Plugin(indigo.PluginBase):
             return state_list
 
     # =============================================================================
-    def getMenuActionConfigUiValues(self, menuId):
+    def getMenuActionConfigUiValues(self, menu_id=0):
 
         settings       = indigo.Dict()
         error_msg_dict = indigo.Dict()
@@ -529,7 +530,7 @@ class Plugin(indigo.PluginBase):
                 self.sleep(15)
 
     # =============================================================================
-    def sendDevicePing(self, devId, suppressLogging):
+    def sendDevicePing(self, dev_id=0, suppress_logging=False):
 
         indigo.server.log(u"Matplotlib Plugin devices do not support the ping function.")
 
@@ -547,13 +548,13 @@ class Plugin(indigo.PluginBase):
         self.pluginIsShuttingDown = True
 
     # =============================================================================
-    def validatePrefsConfigUi(self, valuesDict):
+    def validatePrefsConfigUi(self, values_dict=None):
 
         changed_keys   = ()
         config_changed = False
         error_msg_dict = indigo.Dict()
 
-        self.debug_level = int(valuesDict['showDebugLevel'])
+        self.debug_level = int(values_dict['showDebugLevel'])
         self.indigo_log_handler.setLevel(self.debug_level)
 
         self.logger.threaddebug(u"Validating plugin configuration parameters.")
@@ -561,107 +562,110 @@ class Plugin(indigo.PluginBase):
         # ================================= Data Path =================================
         for path_prop in ('chartPath', 'dataPath'):
             try:
-                if not valuesDict[path_prop].endswith('/'):
+                if not values_dict[path_prop].endswith('/'):
                     error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
                     error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
             except AttributeError:
                 error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
                 error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # ============================= Chart Resolution ==============================
         # Note that chart resolution includes a warning feature that will pass the
         # value after the warning is cleared.
         try:
             # If value is null, a null string, or all whitespace.
-            if not valuesDict['chartResolution'] or valuesDict['chartResolution'] == "" or str(valuesDict['chartResolution']).isspace():
-                valuesDict['chartResolution'] = "100"
+            if not values_dict['chartResolution'] or values_dict['chartResolution'] == "" or str(values_dict['chartResolution']).isspace():
+                values_dict['chartResolution'] = "100"
                 self.logger.warning(u"No resolution value entered. Resetting resolution to 100 DPI.")
 
             # If warning flag and the value is potentially too small.
-            elif valuesDict['dpiWarningFlag'] and 0 < int(valuesDict['chartResolution']) < 80:
+            elif values_dict['dpiWarningFlag'] and 0 < int(values_dict['chartResolution']) < 80:
                 error_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
                 error_msg_dict['showAlertText']   = u"Chart Resolution Warning.\n\nIt is recommended that you enter a value of 80 or more for best results."
-                valuesDict['dpiWarningFlag']      = False
-                return False, valuesDict, error_msg_dict
+                values_dict['dpiWarningFlag']      = False
+                return False, values_dict, error_msg_dict
 
             # If no warning flag and the value is good.
-            elif not valuesDict['dpiWarningFlag'] or int(valuesDict['chartResolution']) >= 80:
+            elif not values_dict['dpiWarningFlag'] or int(values_dict['chartResolution']) >= 80:
                 pass
 
             else:
                 error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
                 error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         except ValueError:
             error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
             error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
-            return False, valuesDict, error_msg_dict
+            return False, values_dict, error_msg_dict
 
         # ============================= Chart Dimensions ==============================
         for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize'):
             try:
-                if float(valuesDict[dimension_prop]) < 75:
+                if float(values_dict[dimension_prop]) < 75:
                     error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
                     error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be greater than 75 pixels"
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
             except ValueError:
                 error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
                 error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be a real number."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # ================================ Line Weight ================================
         try:
-            if float(valuesDict['lineWeight']) <= 0:
+            if float(values_dict['lineWeight']) <= 0:
                 error_msg_dict['lineWeight']    = u"The line weight value must be greater than zero."
                 error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be greater than zero"
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
         except ValueError:
             error_msg_dict['lineWeight']    = u"The line weight value must be a real number."
             error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be a real number"
-            return False, valuesDict, error_msg_dict
+            return False, values_dict, error_msg_dict
 
         # TODO: consider adding this feature to DLFramework and including in all plugins.
         # ============================== Log All Changes ==============================
         # Log any changes to the plugin preferences.
-        for key in valuesDict.keys():
-            if valuesDict[key] != self.pluginPrefs[key]:
-                config_changed = True
-                changed_keys += (u"{0}".format(key), u"Old: {0}".format(self.pluginPrefs[key]), u"New: {0}".format(valuesDict[key]),)
+        for key in values_dict.keys():
+            try:
+                if values_dict[key] != self.pluginPrefs[key]:
+                    config_changed = True
+                    changed_keys += (u"{0}".format(key), u"Old: {0}".format(self.pluginPrefs[key]), u"New: {0}".format(values_dict[key]),)
+            # Missing keys will be config dialog format props like labels and separators
+            except KeyError:
+                pass
 
         if config_changed:
-            self.logger.threaddebug(u"valuesDict changed: {0}".format(changed_keys))
+            self.logger.threaddebug(u"values_dict changed: {0}".format(changed_keys))
 
-        valuesDict['dpiWarningFlag'] = True
+        values_dict['dpiWarningFlag'] = True
         self.logger.threaddebug(u"Preferences validated successfully.")
-        return True, valuesDict
+        return True, values_dict
 
     # =============================================================================
-    def validateDeviceConfigUi(self, valuesDict, typeId, devId):
+    def validateDeviceConfigUi(self, values_dict=None, type_id="", dev_id=0):
 
         error_msg_dict = indigo.Dict()
-        dev = indigo.devices[int(devId)]
+        dev = indigo.devices[int(dev_id)]
 
         self.logger.threaddebug(u"Validating device configuration parameters.")
 
         # ================================= Bar Chart =================================
-        # =============================================================================
-        if typeId == 'barChartingDevice':
+        if type_id == 'barChartingDevice':
 
-            bar_1_source = valuesDict['bar1Source']
+            bar_1_source = values_dict['bar1Source']
 
             # Must select at least one source (bar 1)
             if bar_1_source == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
-                bar_width = float(valuesDict['barWidth'])
+                bar_width = float(values_dict['barWidth'])
 
                 if not bar_width >= 0:
                     raise ValueError
@@ -669,16 +673,15 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
                 error_msg_dict['showAlertText'] = u"Bar Width Error.\n\nYou must enter a bar width greater than 0."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # =========================== Battery Health Chart ============================
-        # =============================================================================
-        if typeId == 'batteryHealthDevice':
+        if type_id == 'batteryHealthDevice':
 
             for prop in ('cautionLevel', 'warningLevel'):
                 try:
                     # Bar width must be greater than 0. Will also trap strings.
-                    alert_level = float(valuesDict[prop])
+                    alert_level = float(values_dict[prop])
 
                     if not 0 <= alert_level <= 100:
                         raise ValueError
@@ -686,22 +689,20 @@ class Plugin(indigo.PluginBase):
                 except ValueError:
                     error_msg_dict[prop] = u"Alert levels must between 0 and 100 (integer)."
                     error_msg_dict['showAlertText'] = u"Alert Level Error.\n\nYou must enter an alert level between 0 and 100 (integer)."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
         # ============================== Calendar Chart ===============================
-        # =============================================================================
         # There are currently no unique validation steps needed for calendar devices
-        if typeId == 'calendarChartingDevice':
+        if type_id == 'calendarChartingDevice':
             pass
 
         # ================================ CSV Engine =================================
-        # =============================================================================
-        if typeId == 'csvEngine':
+        if type_id == 'csvEngine':
 
             # ========================== Number of Observations ===========================
             try:
                 # Will catch strings and floats cast as strings
-                obs = int(valuesDict['numLinesToKeep'])
+                obs = int(values_dict['numLinesToKeep'])
 
                 # Must be 1 or greater
                 if obs < 1:
@@ -710,11 +711,11 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['numLinesToKeep'] = u"The observation value must be a whole number integer greater than zero."
                 error_msg_dict['showAlertText'] = u"Observation Value Error.\n\nThe observation value must be a whole number integer greater than zero."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             # ================================= Duration ==================================
             try:
-                duration = float(valuesDict['numLinesToKeepTime'])
+                duration = float(values_dict['numLinesToKeepTime'])
 
                 # Must be zero or greater
                 if duration < 0:
@@ -723,13 +724,13 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['numLinesToKeepTime'] = u"The duration value must be an integer or float greater than zero."
                 error_msg_dict['showAlertText'] = u"Duration Value Error.\n\nThe observation value must be an integer or float greater than zero."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             self.logger.threaddebug(u"[{0}] Settings validated successfully.".format(dev.name))
 
             # ============================= Refresh Interval ==============================
             try:
-                refresh = int(valuesDict['refreshInterval'])
+                refresh = int(values_dict['refreshInterval'])
 
                 # Must be zero or greater
                 if refresh < 0:
@@ -738,50 +739,68 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['refreshInterval'] = u"The refresh interval must be a whole number integer and greater than zero."
                 error_msg_dict['showAlertText'] = u"Refresh interval Value Error.\n\nThe observation value must be a whole number integer and greater than zero."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
+
+            # =============================== Data Sources ================================
+            try:
+                sources = literal_eval(values_dict['columnDict'])
+
+                # columnDict may contain a place-holder dict with one entry, so we test for
+                # that.
+                if len(sources.keys()) < 2:
+                    for key in sources.keys():
+                        if sources[key] == ('None', 'None', 'None'):
+                            raise ValueError
+
+                    # If columnDict has no keys, we know that won't work either.
+                    if len(sources.keys()) == 0:
+                        raise ValueError
+
+            except ValueError:
+                error_msg_dict['addSource'] = u"You must create at least one CSV data source."
+                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source."
+                return False, values_dict, error_msg_dict
 
         # ================================ Line Chart =================================
-        # =============================================================================
-        if typeId == 'lineChartingDevice':
+        if type_id == 'lineChartingDevice':
 
             # There must be at least 1 source selected
-            if valuesDict['line1Source'] == 'None':
+            if values_dict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             # Iterate for each line group (1-6).
             for line in range(1, 7, 1):
 
                 # Line adjustment values
-                for char in valuesDict['line{0}adjuster'.format(line)]:
+                for char in values_dict['line{0}adjuster'.format(line)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['line{0}adjuster'.format(line)] = u"Valid operators are +, -, *, /"
                         error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
-                        return False, valuesDict, error_msg_dict
+                        return False, values_dict, error_msg_dict
 
                 # Fill is illegal for the steps line type
-                if valuesDict['line{0}Style'.format(line)] == 'steps' and valuesDict['line{0}Fill'.format(line)]:
+                if values_dict['line{0}Style'.format(line)] == 'steps' and values_dict['line{0}Fill'.format(line)]:
                     error_msg_dict['line{0}Fill'.format(line)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['line{0}Style'.format(line)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
         # ============================== Multiline Text ===============================
-        # =============================================================================
-        if typeId == 'multiLineText':
+        if type_id == 'multiLineText':
 
             for prop in ('thing', 'thingState'):
 
                 # A data source must be selected
-                if not valuesDict[prop] or valuesDict[prop] == 'None':
+                if not values_dict[prop] or values_dict[prop] == 'None':
                     error_msg_dict[prop] = u"You must select a data source."
                     error_msg_dict['showAlertText'] = u"Source Error.\n\nYou must select a text source for charting."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
             try:
                 # Number of characters. Will catch strings and floats
-                characters = int(valuesDict['numberOfCharacters'])
+                characters = int(values_dict['numberOfCharacters'])
 
                 # Must be zero or greater
                 if characters < 1:
@@ -790,13 +809,13 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number greater than zero (integer)."
                 error_msg_dict['showAlertText'] = u"Number of Characters Error.\n\nThe number of characters must be a positive number greater than zero (integer)."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             # Figure width and height.
             for prop in ('figureWidth', 'figureHeight'):
                 try:
                     # Will catch strings and floats
-                    figure_size = int(valuesDict[prop])
+                    figure_size = int(values_dict[prop])
 
                     # Must be zero or greater
                     if figure_size < 1:
@@ -805,12 +824,12 @@ class Plugin(indigo.PluginBase):
                 except ValueError:
                     error_msg_dict[prop] = u"The figure width and height must be positive whole numbers greater than zero (pixels)."
                     error_msg_dict['showAlertText'] = u"Figure Dimensions Error.\n\nThe figure width and height must be positive whole numbers greater than zero (pixels)."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
             # Font size
             try:
                 # Will catch strings
-                font_size = float(valuesDict['multilineFontSize'])
+                font_size = float(values_dict['multilineFontSize'])
 
                 # Must be zero or greater
                 if font_size < 0:
@@ -819,58 +838,54 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['multilineFontSize'] = u"The font size must be a positive real number greater than zero."
                 error_msg_dict['showAlertText'] = u"Font Size Error.\n\nThe font size must be a positive real number greater than zero."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # ================================ Polar Chart ================================
-        # =============================================================================
-        if typeId == 'polarChartingDevice':
+        if type_id == 'polarChartingDevice':
 
-            if not valuesDict['thetaValue']:
+            if not values_dict['thetaValue']:
                 error_msg_dict['thetaValue'] = u"You must select a direction source."
                 error_msg_dict['showAlertText'] = u"Direction Source Error.\n\nYou must select a direction source for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
-            if not valuesDict['radiiValue']:
+            if not values_dict['radiiValue']:
                 error_msg_dict['radiiValue'] = u"You must select a magnitude source."
                 error_msg_dict['showAlertText'] = u"Magnitude Source Error.\n\nYou must select a magnitude source for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
             # Number of observations
             try:
                 # Will catch strings and floats
-                num_obs = int(valuesDict['numObs'])
+                num_obs = int(values_dict['numObs'])
 
                 # Must be 1 or greater
                 if num_obs < 1:
                     error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number integer)."
                     error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nYou must specify at least 1 observation (must be a whole number integer)."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
             except ValueError:
                 error_msg_dict['numObs'] = u"The number of observations must be a whole number integer)."
                 error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nThe number of observations must be a whole number integer)."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # =============================== Scatter Chart ===============================
-        # =============================================================================
-        if typeId == 'scatterChartingDevice':
+        if type_id == 'scatterChartingDevice':
 
-            if not valuesDict['group1Source']:
+            if not values_dict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # =============================== Weather Chart ===============================
-        # =============================================================================
-        if typeId == 'forecastChartingDevice':
+        if type_id == 'forecastChartingDevice':
 
-            if not valuesDict['forecastSourceDevice']:
+            if not values_dict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
                 error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
-                return False, valuesDict, error_msg_dict
+                return False, values_dict, error_msg_dict
 
         # ============================== All Chart Types ==============================
-        # =============================================================================
         # The following validation blocks are applied to all graphical chart device
         # types.
 
@@ -878,32 +893,33 @@ class Plugin(indigo.PluginBase):
         # Check to see that custom chart dimensions conform to valid types
         for custom_dimension_prop in ('customSizeHeight', 'customSizeWidth', 'customSizePolar'):
             try:
-                if custom_dimension_prop in valuesDict.keys() and valuesDict[custom_dimension_prop] != 'None' and float(valuesDict[custom_dimension_prop]) < 75:
+                if custom_dimension_prop in values_dict.keys() and values_dict[custom_dimension_prop] != 'None' and float(values_dict[custom_dimension_prop]) < 75:
                     error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
                     error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
-                    return False, valuesDict, error_msg_dict
+                    return False, values_dict, error_msg_dict
 
             except ValueError:
                 error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number."
                 error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is not a real number."
-                valuesDict[custom_dimension_prop]     = 'None'
-                return False, valuesDict, error_msg_dict
+                values_dict[custom_dimension_prop]     = 'None'
+                return False, values_dict, error_msg_dict
 
         # ================================ Axis Limits ================================
         # Check to see that each axis limit matches one of the accepted formats
         for limit_prop in ('yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin'):
             try:
-                if limit_prop in valuesDict.keys() and valuesDict[limit_prop] not in ('None', '0'):
-                    float(valuesDict[limit_prop])
+                if limit_prop in values_dict.keys() and values_dict[limit_prop] not in ('None', '0'):
+                    float(values_dict[limit_prop])
 
             except ValueError:
                 error_msg_dict[limit_prop]      = u"The axis limit must be a real number or None."
-                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\nA valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, valuesDict[limit_prop])
-                valuesDict[limit_prop] = 'None'
-                return False, valuesDict, error_msg_dict
+                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\n" \
+                                                  u"A valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, values_dict[limit_prop])
+                values_dict[limit_prop] = 'None'
+                return False, values_dict, error_msg_dict
 
         self.logger.threaddebug(u"Preferences validated successfully.")
-        return True, valuesDict
+        return True, values_dict
 
     # =============================================================================
     def __log_dicts(self, dev=None):
@@ -914,14 +930,13 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
+        :param dev:
         """
 
         self.logger.threaddebug(u"[{0:<19}] Props: {1}".format(dev.name, dict(dev.ownerProps)))
 
     # =============================================================================
-    def dummyCallback(self, valuesDict=None, typeId="", targetId=0):
+    def dummyCallback(self, values_dict=None, type_id="", target_id=0):
         """
         Dummy callback method to force dialog refreshes
 
@@ -931,14 +946,15 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str typeId:
-        :param indigo.Dict valuesDict:
+        :param unicode type_id:
+        :param class 'indigo.Dict' values_dict:
+        :param int target_id:
         """
 
         pass
 
     # =============================================================================
-    def advancedSettingsExecuted(self, valuesDict, menuId):
+    def advancedSettingsExecuted(self, values_dict=None, menu_id=0):
         """
         Save advanced settings menu items to plugin props for storage
 
@@ -949,20 +965,20 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param int menuId:
+        :param class 'indigo.Dict' values_dict:
+        :param int menu_id:
         """
 
-        self.pluginPrefs['enableCustomLineSegments']  = valuesDict['enableCustomLineSegments']
-        self.pluginPrefs['promoteCustomLineSegments'] = valuesDict['promoteCustomLineSegments']
-        self.pluginPrefs['snappyConfigMenus']         = valuesDict['snappyConfigMenus']
-        self.pluginPrefs['forceOriginLines']          = valuesDict['forceOriginLines']
+        self.pluginPrefs['enableCustomLineSegments']  = values_dict['enableCustomLineSegments']
+        self.pluginPrefs['promoteCustomLineSegments'] = values_dict['promoteCustomLineSegments']
+        self.pluginPrefs['snappyConfigMenus']         = values_dict['snappyConfigMenus']
+        self.pluginPrefs['forceOriginLines']          = values_dict['forceOriginLines']
 
-        self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
+        self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(values_dict)))
         return True
 
     # =============================================================================
-    def advancedSettingsMenu(self, valuesDict, typeId="", devId=None):
+    def advancedSettingsMenu(self, values_dict=None, type_id="", dev_id=0):
         """
         Write advanced settings menu selections to the log
 
@@ -971,11 +987,11 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int devId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int dev_id:
         """
-        self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(valuesDict)))
+        self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(values_dict)))
         return
 
     def commsKillAll(self):
@@ -1046,7 +1062,7 @@ class Plugin(indigo.PluginBase):
                             self.pluginPrefs[pref] = 'FF FF FF'
 
     # =============================================================================
-    def csv_item_add(self, valuesDict, typeId="", devId=None):
+    def csv_item_add(self, values_dict=None, type_id="", dev_id=0):
         """
         Add new item to CSV engine
 
@@ -1055,43 +1071,43 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int devId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int dev_id:
         """
 
-        dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] csv item add valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        dev = indigo.devices[int(dev_id)]
+        self.logger.threaddebug(u"[{0}] csv item add values_dict: {1}".format(dev.name, dict(values_dict)))
 
         error_msg_dict = indigo.Dict()
 
         try:
-            column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict
+            column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict
             lister = [0]
             num_lister = []
 
             # ================================ Validation =================================
             # Add data item validation.  Will not allow add until all three conditions are
             # met.
-            if valuesDict['addValue'] == "":
+            if values_dict['addValue'] == "":
                 error_msg_dict['addValue'] = u"Please enter a title value for your CSV data element."
                 error_msg_dict['showAlertText'] = u"Title Error.\n\nA title is required for each CSV data element."
-                return valuesDict, error_msg_dict
+                return values_dict, error_msg_dict
 
-            if valuesDict['addSource'] == "":
+            if values_dict['addSource'] == "":
                 error_msg_dict['addSource'] = u"Please select a device or variable as a source for your CSV data element."
                 error_msg_dict['showAlertText'] = u"ID Error.\n\nA source is required for each CSV data element."
-                return valuesDict, error_msg_dict
+                return values_dict, error_msg_dict
 
-            if valuesDict['addState'] == "":
+            if values_dict['addState'] == "":
                 error_msg_dict['addState'] = u"Please select a value source for your CSV data element."
                 error_msg_dict['showAlertText'] = u"Data Error.\n\nA data value is required for each CSV data element."
-                return valuesDict, error_msg_dict
+                return values_dict, error_msg_dict
 
             [lister.append(key.lstrip('k')) for key in sorted(column_dict.keys())]  # Create a list of existing keys with the 'k' lopped off
             [num_lister.append(int(item)) for item in lister]  # Change each value to an integer for evaluation
             next_key = u'k{0}'.format(int(max(num_lister)) + 1)  # Generate the next key
-            column_dict[next_key] = (valuesDict['addValue'], valuesDict['addSource'], valuesDict['addState'])  # Save the tuple of properties
+            column_dict[next_key] = (values_dict['addValue'], values_dict['addSource'], values_dict['addState'])  # Save the tuple of properties
 
             # Remove any empty entries as they're not going to do any good anyway.
             new_dict = {}
@@ -1102,14 +1118,14 @@ class Plugin(indigo.PluginBase):
                 else:
                     self.logger.info(u"Pruning CSV Engine.")
 
-            valuesDict['columnDict'] = str(new_dict)  # Convert column_dict back to a string and prepare it for storage.
+            values_dict['columnDict'] = str(new_dict)  # Convert column_dict back to a string and prepare it for storage.
 
         except AttributeError, sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.error(u"[{0}] Error adding CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
-        file_name = valuesDict['addValue']
+        file_name = values_dict['addValue']
         full_path = "{0}{1}.csv".format(self.pluginPrefs['dataPath'], file_name.encode("utf-8"))
 
         if not os.path.isfile(full_path):
@@ -1119,15 +1135,15 @@ class Plugin(indigo.PluginBase):
 
         # Wipe the field values clean for the next element to be added.
         for key in ('addSourceFilter', 'editSourceFilter'):
-            valuesDict[key] = "A"
+            values_dict[key] = "A"
 
         for key in ('addValue', 'addSource', 'addState'):
-            valuesDict[key] = u""
+            values_dict[key] = u""
 
-        return valuesDict, error_msg_dict
+        return values_dict, error_msg_dict
 
     # =============================================================================
-    def csv_item_delete(self, valuesDict, typeId="", devId=None):
+    def csv_item_delete(self, values_dict=None, type_id="", dev_id=0):
         """
         Deletes items from the CSV Engine configuration dialog
 
@@ -1136,36 +1152,36 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int devId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int dev_id:
         """
 
-        dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] csv item delete valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        dev = indigo.devices[int(dev_id)]
+        self.logger.threaddebug(u"[{0}] csv item delete values_dict: {1}".format(dev.name, dict(values_dict)))
 
-        column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
+        column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
         try:
-            valuesDict["editKey"] = valuesDict["csv_item_list"]
-            del column_dict[valuesDict['editKey']]
+            values_dict["editKey"] = values_dict["csv_item_list"]
+            del column_dict[values_dict['editKey']]
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.error(u"[{0}] Error deleting CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
-        valuesDict['csv_item_list'] = ""
-        valuesDict['editKey']     = ""
-        valuesDict['editSource']  = ""
-        valuesDict['editState']   = ""
-        valuesDict['editValue']   = ""
-        valuesDict['previousKey'] = ""
-        valuesDict['columnDict']  = str(column_dict)  # Convert column_dict back to a string for storage.
+        values_dict['csv_item_list'] = ""
+        values_dict['editKey']     = ""
+        values_dict['editSource']  = ""
+        values_dict['editState']   = ""
+        values_dict['editValue']   = ""
+        values_dict['previousKey'] = ""
+        values_dict['columnDict']  = str(column_dict)  # Convert column_dict back to a string for storage.
 
-        return valuesDict
+        return values_dict
 
     # =============================================================================
-    def csv_item_list(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def csv_item_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Construct the list of CSV items
 
@@ -1175,17 +1191,17 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
-        dev = indigo.devices[int(targetId)]
+        dev = indigo.devices[int(target_id)]
 
         try:
-            valuesDict['columnDict'] = valuesDict.get('columnDict', '{}')  # Returning an empty dict seems to work and may solve the 'None' issue
-            column_dict = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
+            values_dict['columnDict'] = values_dict.get('columnDict', '{}')  # Returning an empty dict seems to work and may solve the 'None' issue
+            column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
             prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
 
         except Exception as sub_error:
@@ -1197,7 +1213,7 @@ class Plugin(indigo.PluginBase):
         return result
 
     # =============================================================================
-    def csv_item_update(self, valuesDict, typeId="", devId=None):
+    def csv_item_update(self, values_dict=None, type_id="", dev_id=0):
         """
         Updates items from the CSV Engine configuration dialog
 
@@ -1206,36 +1222,36 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int devId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int dev_id:
         """
 
-        dev = indigo.devices[devId]
-        self.logger.threaddebug(u"[{0}] csv item update valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        dev = indigo.devices[dev_id]
+        self.logger.threaddebug(u"[{0}] csv item update values_dict: {1}".format(dev.name, dict(values_dict)))
 
         error_msg_dict = indigo.Dict()
-        column_dict  = literal_eval(valuesDict['columnDict'])  # Convert column_dict from a string to a literal dict.
+        column_dict  = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
         try:
-            key = valuesDict['editKey']
-            previous_key = valuesDict['previousKey']
+            key = values_dict['editKey']
+            previous_key = values_dict['previousKey']
             if key != previous_key:
                 if key in column_dict:
                     error_msg_dict['editKey'] = u"New key ({0}) already exists in the global properties, please use a different key value".format(key)
-                    valuesDict['editKey']   = previous_key
+                    values_dict['editKey']   = previous_key
                 else:
                     del column_dict[previous_key]
             else:
-                column_dict[key]            = (valuesDict['editValue'], valuesDict['editSource'], valuesDict['editState'])
-                valuesDict['csv_item_list'] = ""
-                valuesDict['editKey']       = ""
-                valuesDict['editSource']    = ""
-                valuesDict['editState']     = ""
-                valuesDict['editValue']     = ""
+                column_dict[key]            = (values_dict['editValue'], values_dict['editSource'], values_dict['editState'])
+                values_dict['csv_item_list'] = ""
+                values_dict['editKey']       = ""
+                values_dict['editSource']    = ""
+                values_dict['editState']     = ""
+                values_dict['editValue']     = ""
 
             if not len(error_msg_dict):
-                valuesDict['previousKey'] = key
+                values_dict['previousKey'] = key
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
@@ -1250,12 +1266,12 @@ class Plugin(indigo.PluginBase):
         column_dict = new_dict
 
         # Convert column_dict back to a string for storage.
-        valuesDict['columnDict'] = str(column_dict)
+        values_dict['columnDict'] = str(column_dict)
 
-        return valuesDict, error_msg_dict
+        return values_dict, error_msg_dict
 
     # =============================================================================
-    def csv_item_select(self, valuesDict, typeId="", devId=None):
+    def csv_item_select(self, values_dict=None, type_id="", dev_id=0):
         """
         Populates CSV engine controls for updates and deletions
 
@@ -1266,27 +1282,27 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int devId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int dev_id:
         """
 
-        dev = indigo.devices[int(devId)]
-        self.logger.threaddebug(u"[{0}] csv item select valuesDict: {1}".format(dev.name, dict(valuesDict)))
+        dev = indigo.devices[int(dev_id)]
+        self.logger.threaddebug(u"[{0}] csv item select values_dict: {1}".format(dev.name, dict(values_dict)))
 
         try:
-            column_dict                    = literal_eval(valuesDict['columnDict'])
-            valuesDict['editKey']          = valuesDict['csv_item_list']
-            valuesDict['editSource']       = column_dict[valuesDict['csv_item_list']][1]
-            valuesDict['editState']        = column_dict[valuesDict['csv_item_list']][2]
-            valuesDict['editValue']        = column_dict[valuesDict['csv_item_list']][0]
-            valuesDict['isColumnSelected'] = True
-            valuesDict['previousKey']      = valuesDict['csv_item_list']
+            column_dict                    = literal_eval(values_dict['columnDict'])
+            values_dict['editKey']          = values_dict['csv_item_list']
+            values_dict['editSource']       = column_dict[values_dict['csv_item_list']][1]
+            values_dict['editState']        = column_dict[values_dict['csv_item_list']][2]
+            values_dict['editValue']        = column_dict[values_dict['csv_item_list']][0]
+            values_dict['isColumnSelected'] = True
+            values_dict['previousKey']      = values_dict['csv_item_list']
 
         except Exception as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose: {1}. See plugin log for more information.".format(dev.name, sub_error))
-        return valuesDict
+        return values_dict
 
     # =============================================================================
     def csv_refresh(self):
@@ -1339,8 +1355,8 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param csv_dict:
-        :param dev:
+        :param class 'indigo.Device' dev: indigo device instance
+        :param dict csv_dict:
         :return:
         """
 
@@ -1488,7 +1504,7 @@ class Plugin(indigo.PluginBase):
             self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
     # =============================================================================
-    def csv_refresh_device_action(self, pluginAction, dev, callerWaitingForResult):
+    def csv_refresh_device_action(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Perform a manual refresh of a single CSV Device
 
@@ -1499,13 +1515,13 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param pluginAction:
-        :param dev:
-        :param callerWaitingForResult:
+        :param class 'indigo.PluginAction' plugin_action:
+        :param class 'indigo.Device' dev:
+        :param bool caller_waiting_for_result:
         :return:
         """
 
-        dev = indigo.devices[int(pluginAction.props['targetDevice'])]
+        dev = indigo.devices[int(plugin_action.props['targetDevice'])]
 
         if dev.enabled:
 
@@ -1521,7 +1537,7 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
 
     # =============================================================================
-    def csv_refresh_source_action(self, pluginAction, dev, callerWaitingForResult):
+    def csv_refresh_source_action(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Perform a manual refresh of a single CSV Source
 
@@ -1534,18 +1550,18 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param pluginAction:
-        :param dev:
-        :param callerWaitingForResult:
+        :param class 'indigo.PluginAction' plugin_action:
+        :param class 'indigo.Device' dev:
+        :param bool caller_waiting_for_result:
 
         :return:
         """
 
-        dev_id = int(pluginAction.props['targetDevice'])
+        dev_id = int(plugin_action.props['targetDevice'])
         dev    = indigo.devices[dev_id]
 
         if dev.enabled:
-            target_source = pluginAction.props['targetSource']
+            target_source = plugin_action.props['targetSource']
             temp_dict     = literal_eval(dev.pluginProps['columnDict'])
             foo           = {target_source: temp_dict[target_source]}
 
@@ -1556,7 +1572,7 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
 
     # =============================================================================
-    def csv_source(self, typeId, valuesDict, devId, targetId):
+    def csv_source(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Construct a list of devices and variables for the CSV engine
 
@@ -1568,19 +1584,19 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str typeId:
-        :param indigo.Dict valuesDict:
-        :param int devId:
-        :param int targetId:
+        :param unicode type_id:
+        :param class 'indigo.Dict' values_dict:
+        :param int dev_id:
+        :param int target_id:
         """
 
         list_ = list()
 
-        if valuesDict.get('addSourceFilter', 'A') == "D":
+        if values_dict.get('addSourceFilter', 'A') == "D":
             [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
             [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
 
-        elif valuesDict.get('addSourceFilter', 'A') == "V":
+        elif values_dict.get('addSourceFilter', 'A') == "V":
             [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
             [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
 
@@ -1594,7 +1610,7 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
-    def csv_source_edit(self, typeId, valuesDict, devId, targetId):
+    def csv_source_edit(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Construct a list of devices and variables for the CSV engine
 
@@ -1606,19 +1622,19 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str typeId:
-        :param indigo.Dict valuesDict:
-        :param int devId:
-        :param int targetId:
+        :param unicode type_id:
+        :param class 'indigo.Dict' values_dict:
+        :param int dev_id:
+        :param int target_id:
         """
 
         list_ = list()
 
-        if valuesDict.get('editSourceFilter', 'A') == "D":
+        if values_dict.get('editSourceFilter', 'A') == "D":
             [list_.append(t) for t in [(u"-1", u"%%disabled:Devices%%"), (u"-2", u"%%separator%%")]]
             [list_.append((dev.id, u"{0}".format(dev.name))) for dev in indigo.devices.iter()]
 
-        elif valuesDict.get('editSourceFilter', 'A') == "V":
+        elif values_dict.get('editSourceFilter', 'A') == "V":
             [list_.append(t) for t in [(u"-3", u"%%separator%%"), (u"-4", u"%%disabled:Variables%%"), (u"-5", u"%%separator%%")]]
             [list_.append((var.id, u"{0}".format(var.name))) for var in indigo.variables.iter()]
 
@@ -1632,17 +1648,17 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
-    def get_csv_device_list(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def get_csv_device_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV Engine devices set to manual refresh
 
         The get_csv_device_list() method returns a list of CSV Engine devices with a
         manual refresh interval.
 
-        :param filter:
-        :param valuesDict:
-        :param typeId:
-        :param targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param target_id:
         :return:
         """
 
@@ -1651,34 +1667,34 @@ class Plugin(indigo.PluginBase):
         return [(dev.id, dev.name) for dev in indigo.devices.iter("self") if dev.deviceTypeId == "csvEngine" and dev.pluginProps['refreshInterval'] == "0"]
 
     # =============================================================================
-    def get_csv_source_list(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def get_csv_source_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV sources from CSV Engine devices set to manual refresh
 
         The get_csv_source_list() method returns a list of CSV sources for the target
         CSV Engine device.
 
-        :param filter:
-        :param valuesDict:
-        :param typeId:
-        :param targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param target_id:
         :return:
         """
 
-        if not valuesDict:
+        if not values_dict:
             return []
 
         # Once user selects a device ( see get_csv_device_list() ), populate the dropdown
         # menu.
         else:
-            target_device = int(valuesDict['targetDevice'])
+            target_device = int(values_dict['targetDevice'])
             dev           = indigo.devices[target_device]
             dev_dict      = literal_eval(dev.pluginProps['columnDict'])
 
             return [(k, dev_dict[k][0]) for k in dev_dict]
 
     # =============================================================================
-    def deviceStateValueListAdd(self, typeId, valuesDict, devId, targetId):
+    def deviceStateValueListAdd(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Formulates list of device states for CSV engine
 
@@ -1689,27 +1705,27 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str typeId:
-        :param indigo.Dict valuesDict:
-        :param int devId:
-        :param int targetId:
+        :param unicode type_id:
+        :param class 'indigo.Dict' values_dict:
+        :param int dev_id:
+        :param int target_id:
         """
 
-        if valuesDict['addSource'] != u'':
+        if values_dict['addSource'] != u'':
             try:
                 # User has selected an Indigo device element and then set the filter to Variables only.
-                if int(valuesDict['addSource']) in indigo.devices and valuesDict['addSourceFilter'] == "V":
+                if int(values_dict['addSource']) in indigo.devices and values_dict['addSourceFilter'] == "V":
                     return [('None', u'Please select a data source first')]
 
                 # User has selected an Indigo device element and the filter is set to Devices only or Show All.
-                elif int(valuesDict['addSource']) in indigo.devices and valuesDict['addSourceFilter'] != "V":
-                    dev = indigo.devices[int(valuesDict['addSource'])]
+                elif int(values_dict['addSource']) in indigo.devices and values_dict['addSourceFilter'] != "V":
+                    dev = indigo.devices[int(values_dict['addSource'])]
                     return [x for x in dev.states.keys() if ".ui" not in x]
 
-                elif int(valuesDict['addSource']) in indigo.variables and valuesDict['addSourceFilter'] != "D":
+                elif int(values_dict['addSource']) in indigo.variables and values_dict['addSourceFilter'] != "D":
                     return [('value', 'value')]
 
-                elif int(valuesDict['addSource']) in indigo.variables and valuesDict['addSourceFilter'] == "D":
+                elif int(values_dict['addSource']) in indigo.variables and values_dict['addSourceFilter'] == "D":
                     return [('None', u'Please select a data source first')]
 
             except ValueError:
@@ -1719,7 +1735,7 @@ class Plugin(indigo.PluginBase):
             return [('None', u'Please select a data source first')]
 
     # =============================================================================
-    def deviceStateValueListEdit(self, typeId, valuesDict, devId, targetId):
+    def deviceStateValueListEdit(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Formulates list of device states for CSV engine
 
@@ -1730,27 +1746,27 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str typeId:
-        :param indigo.Dict valuesDict:
-        :param int devId:
-        :param int targetId:
+        :param unicode type_id:
+        :param class 'indigo.Dict' values_dict:
+        :param int dev_id:
+        :param int target_id:
         """
 
-        if valuesDict['editSource'] != u'':
+        if values_dict['editSource'] != u'':
             try:
                 # User has selected an Indigo device element and then set the filter to Variables only.
-                if int(valuesDict['editSource']) in indigo.devices and valuesDict['editSourceFilter'] == "V":
+                if int(values_dict['editSource']) in indigo.devices and values_dict['editSourceFilter'] == "V":
                     return [('None', u'Please select a data source first')]
 
                 # User has selected an Indigo device element and the filter is set to Devices only or Show All.
-                elif int(valuesDict['editSource']) in indigo.devices and valuesDict['editSourceFilter'] != "V":
-                    dev = indigo.devices[int(valuesDict['editSource'])]
+                elif int(values_dict['editSource']) in indigo.devices and values_dict['editSourceFilter'] != "V":
+                    dev = indigo.devices[int(values_dict['editSource'])]
                     return [x for x in dev.states.keys() if ".ui" not in x]
 
-                elif int(valuesDict['editSource']) in indigo.variables and valuesDict['editSourceFilter'] != "D":
+                elif int(values_dict['editSource']) in indigo.variables and values_dict['editSourceFilter'] != "D":
                     return [('value', 'value')]
 
-                elif int(valuesDict['editSource']) in indigo.variables and valuesDict['editSourceFilter'] == "D":
+                elif int(values_dict['editSource']) in indigo.variables and values_dict['editSourceFilter'] == "D":
                     return [('None', u'Please select a data source first')]
 
             except ValueError:
@@ -1789,7 +1805,7 @@ class Plugin(indigo.PluginBase):
         return p_dict
 
     # =============================================================================
-    def generatorDeviceStates(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def generatorDeviceStates(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of device states for the provided device or variable id.
 
@@ -1804,20 +1820,20 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         try:
-            dev_id = valuesDict['thing']
+            dev_id = values_dict['thing']
             return self.Fogbert.generatorStateOrValue(dev_id)
         except KeyError:
             return [("Select a Source Above", "Select a Source Above")]
 
     # =============================================================================
-    def generatorDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
 
@@ -1831,16 +1847,16 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return self.Fogbert.deviceList()
 
     # =============================================================================
-    def generatorDeviceAndVariableList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def generatorDeviceAndVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of devices and variables for config menu controls
 
@@ -1857,16 +1873,16 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return self.Fogbert.deviceAndVariableList()
 
     # =============================================================================
-    def generatorVariableList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def generatorVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
 
@@ -1880,16 +1896,16 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return self.Fogbert.variableList()
 
     # =============================================================================
-    def getAxisList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getAxisList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of axis formats.
 
@@ -1899,9 +1915,9 @@ class Plugin(indigo.PluginBase):
         -----
 
         :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         axis_list_menu = [("None", "None"),
@@ -1923,7 +1939,7 @@ class Plugin(indigo.PluginBase):
         return axis_list_menu
 
     # =============================================================================
-    def getBatteryDeviceList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of battery-powered devices
 
@@ -1933,10 +1949,10 @@ class Plugin(indigo.PluginBase):
         holder.
 
         -----
-        :param Indigo filter filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
@@ -1947,7 +1963,7 @@ class Plugin(indigo.PluginBase):
         return batt_list
 
     # =============================================================================
-    def getBinList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getBinList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of bins for the X axis.
 
@@ -1955,10 +1971,10 @@ class Plugin(indigo.PluginBase):
         are provided. The list is constrained.
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         bin_list_menu = [("quarter-hourly", "Every 15 Minutes"),
@@ -1975,7 +1991,7 @@ class Plugin(indigo.PluginBase):
         return bin_list_menu
 
 # =============================================================================
-    def getFileList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getFileList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Get list of CSV files for various dropdown menus.
 
@@ -1985,10 +2001,10 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         file_name_list_menu = []
@@ -2016,7 +2032,7 @@ class Plugin(indigo.PluginBase):
         return file_name_list_menu
 
     # =============================================================================
-    def getFontList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getFontList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Provide a list of font names for various dropdown menus.
 
@@ -2026,10 +2042,10 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         font_menu = []
@@ -2079,7 +2095,7 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     # =============================================================================
-    def getFontSizeList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getFontSizeList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of font sizes.
 
@@ -2088,16 +2104,16 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return [(str(_), str(_)) for _ in np.arange(6, 21)]
 
     # =============================================================================
-    def getForecastSource(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getForecastSource(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of WUnderground devices for forecast chart devices
 
@@ -2107,10 +2123,10 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         forecast_source_menu = []
@@ -2136,7 +2152,7 @@ class Plugin(indigo.PluginBase):
         return sorted(forecast_source_menu, key=lambda s: s[1].lower())
 
     # =============================================================================
-    def getLineList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getLineList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of line styles.
 
@@ -2147,10 +2163,10 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return [("None", "None"),
@@ -2164,7 +2180,7 @@ class Plugin(indigo.PluginBase):
                 ("steps-post", "Steps Post")]
 
     # =============================================================================
-    def getMarkerList(self, filter="", valuesDict=None, typeId="", targetId=0):
+    def getMarkerList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of marker styles.
 
@@ -2175,10 +2191,10 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter:
-        :param indigo.Dict valuesDict:
-        :param str typeId:
-        :param int targetId:
+        :param unicode filter:
+        :param class 'indigo.Dict' values_dict:
+        :param unicode type_id:
+        :param int target_id:
         """
 
         return [("None", "None"),
@@ -2207,7 +2223,7 @@ class Plugin(indigo.PluginBase):
                 ("x", "X")]
 
     # =============================================================================
-    def plotActionTest(self, pluginAction, dev, callerWaitingForResult):
+    def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Plugin API handler
 
@@ -2228,25 +2244,25 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.pluginAction pluginAction:
-        :param indigo.Device dev:
-        :param bool callerWaitingForResult:
+        :param class 'indigo.PluginAction' plugin_action:
+        :param class 'indigo.Device' dev:
+        :param bool caller_waiting_for_result:
         """
 
-        self.logger.threaddebug(u"Scripting payload: {0}".format(dict(pluginAction.props)))
+        self.logger.threaddebug(u"Scripting payload: {0}".format(dict(plugin_action.props)))
 
         try:
-            plt.plot(pluginAction.props['x_values'], pluginAction.props['y_values'], **pluginAction.props['kwargs'])
-            plt.savefig(u"{0}{1}".format(pluginAction.props['path'], pluginAction.props['filename']))
+            plt.plot(plugin_action.props['x_values'], plugin_action.props['y_values'], **plugin_action.props['kwargs'])
+            plt.savefig(u"{0}{1}".format(plugin_action.props['path'], plugin_action.props['filename']))
             plt.close('all')
 
         except Exception as sub_error:
-            if callerWaitingForResult:
+            if caller_waiting_for_result:
                 self.pluginErrorHandler(traceback.format_exc())
                 self.logger.error(u"[{0}] Error: {0}. See plugin log for more information.".format(dev.name, sub_error))
                 return {'success': False, 'message': u"{0}".format(sub_error)}
 
-        if callerWaitingForResult:
+        if caller_waiting_for_result:
             return {'success': True, 'message': u"Success"}
 
     # =============================================================================
@@ -2320,8 +2336,8 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Device dev:
-        :param multiprocessing.queues.Queue return_queue:
+        :param class 'indigo.Device' dev: indigo device instance
+        :param class 'multiprocessing.queues.Queue' return_queue:
         """
 
         # ======================= Process Output Queue ========================
@@ -2361,7 +2377,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.Device dev:
+        :param class 'indigo.Device' dev: indigo device instance
         """
 
         state_list = []
@@ -2373,7 +2389,7 @@ class Plugin(indigo.PluginBase):
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
 
     # =============================================================================
-    def refreshAChartAction(self, pluginAction):
+    def refreshAChartAction(self, plugin_action):
         """
         Refreshes an individual plugin chart device.
 
@@ -2383,11 +2399,11 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.pluginAction pluginAction:
+        :param class 'indigo.PluginAction' plugin_action:
         """
 
         # Indigo will trap if device is disabled.
-        dev = indigo.devices[pluginAction.deviceId]
+        dev = indigo.devices[plugin_action.deviceId]
         self.refreshTheCharts([dev])
 
     # =============================================================================
@@ -2513,8 +2529,8 @@ class Plugin(indigo.PluginBase):
                 # Note: PyCharm wants attribute values to be strings. This is not always what
                 # Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
                 k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
-                                            'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center', 'textcoords': 'offset points',
-                                            'verticalalignment': 'center'}
+                                            'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
+                                            'textcoords': 'offset points', 'verticalalignment': 'center'}
                 k_dict['k_bar']          = {'alpha': 1.0, 'zorder': 10}
                 k_dict['k_base_font']    = {'size': float(p_dict['mainFontSize']), 'weight': p_dict['font_weight']}
                 k_dict['k_calendar']     = {'verticalalignment': 'top'}
@@ -2545,8 +2561,8 @@ class Plugin(indigo.PluginBase):
                     k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None,
                                             'transparent': p_dict['transparent_charts']}
                 else:
-                    k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'edgecolor': p_dict['backgroundColor'], 'facecolor': p_dict['backgroundColor'], 'format': None,
-                                            'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None, 'transparent': p_dict['transparent_charts']}
+                    k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'edgecolor': p_dict['backgroundColor'], 'facecolor': p_dict['backgroundColor'],
+                                            'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None, 'transparent': p_dict['transparent_charts']}
 
                 # ========================== matplotlib.rc overrides ==========================
                 plt.rc('font', **k_dict['k_base_font'])
@@ -2744,7 +2760,7 @@ class Plugin(indigo.PluginBase):
                     if dev.deviceTypeId == "lineChartingDevice":
 
                         if __name__ == '__main__':
-                            p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, k_dict, kv_list, return_queue,))
+                            p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, kv_list, return_queue,))
                             p_line.start()
                             # p_line.join()
 
@@ -2765,7 +2781,9 @@ class Plugin(indigo.PluginBase):
                             self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
                         if __name__ == '__main__':
-                            p_multiline = multiprocessing.Process(name='p_multiline', target=MakeChart(self).chart_multiline_text, args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                            p_multiline = multiprocessing.Process(name='p_multiline',
+                                                                  target=MakeChart(self).chart_multiline_text,
+                                                                  args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
                             p_multiline.start()
                             # p_multiline.join()
 
@@ -2773,7 +2791,7 @@ class Plugin(indigo.PluginBase):
                     if dev.deviceTypeId == "polarChartingDevice":
 
                         if __name__ == '__main__':
-                            p_polar = multiprocessing.Process(name='p_polar', target=MakeChart(self).chart_polar, args=(dev, p_dict, k_dict, kv_list, return_queue,))
+                            p_polar = multiprocessing.Process(name='p_polar', target=MakeChart(self).chart_polar, args=(dev, p_dict, k_dict, return_queue,))
                             p_polar.start()
                             # p_polar.join()
 
@@ -2781,7 +2799,7 @@ class Plugin(indigo.PluginBase):
                     if dev.deviceTypeId == "scatterChartingDevice":
 
                         if __name__ == '__main__':
-                            p_scatter = multiprocessing.Process(name='p_scatter', target=MakeChart(self).chart_scatter, args=(dev, p_dict, k_dict, kv_list, return_queue,))
+                            p_scatter = multiprocessing.Process(name='p_scatter', target=MakeChart(self).chart_scatter, args=(dev, p_dict, k_dict, return_queue,))
                             p_scatter.start()
                             # p_scatter.join()
 
@@ -2793,7 +2811,9 @@ class Plugin(indigo.PluginBase):
                         sun_rise_set = (str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset()))
 
                         if __name__ == '__main__':
-                            p_weather = multiprocessing.Process(name='p_weather', target=MakeChart(self).chart_weather_forecast, args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
+                            p_weather = multiprocessing.Process(name='p_weather',
+                                                                target=MakeChart(self).chart_weather_forecast,
+                                                                args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
                             p_weather.start()
                             # p_weather.join()
 
@@ -2824,7 +2844,7 @@ class Plugin(indigo.PluginBase):
             self.logger.critical(u"[{0}] Error: {0}. See plugin log for more information.".format(unicode(sub_error)))
 
     # =============================================================================
-    def refreshTheChartsAction(self, action):
+    def refreshTheChartsAction(self, plugin_action):
         """
         Called by an Indigo Action item.
 
@@ -2833,7 +2853,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param indigo.PluginAction action:
+        :param class 'indigo.PluginAction' plugin_action:
         """
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
@@ -2858,10 +2878,10 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -2991,6 +3011,7 @@ class MakeChart(object):
             # ================================ Save Image =================================
             # plt.tight_layout(pad=1)
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
+
             self.save_chart_image(plt, p_dict, k_dict)
 
             # Prepare log for output.
@@ -3016,11 +3037,11 @@ class MakeChart(object):
         types are dynamic and are created "on the fly" rather than through direct
         user input.
 
-        :param dev:
-        :param device_dict:
-        :param p_dict:
-        :param k_dict:
-        :param return_queue:
+        :param class 'indigo.Device' dev: indigo device instance
+        :param dict device_dict: dictionary of battery device names and battery levels
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        :param class 'multiprocessing.queues.Queue' return_queue:
         :return:
         """
 
@@ -3079,9 +3100,11 @@ class MakeChart(object):
             if show_level:
                 for _ in range(len(y_values)):
                     if x_values[_] >= caution_level:
-                        plt.annotate(u"{0:>3}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88), xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
+                        plt.annotate(u"{0:>3}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88),
+                                     xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
                     else:
-                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88), xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
+                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88),
+                                     xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
 
             # ================================ Chart Title ================================
             # plt.title(p_dict['chartTitle'], location='center', **k_dict['k_title_font'])
@@ -3152,10 +3175,10 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.devices() dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param multiprocessing.Queue() return_queue: return queue
+        :param class 'multiprocessing.queues.Queue' return_queue: return queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -3195,7 +3218,7 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
-    def chart_line(self, dev, p_dict, k_dict, kv_list, return_queue):
+    def chart_line(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the line charts
 
@@ -3203,11 +3226,10 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
+        :param class 'indigo.Device'e dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param indigo.List kv_list: device state values for updating
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -3322,10 +3344,6 @@ class MakeChart(object):
 
                 # =============================== Fill Between ================================
                 if p_dict['line{0}Fill'.format(line)]:
-                    # matplotlib.pyplot.fill_between(x, y1, y2=0, where=None, interpolate=False, step=None, *, data=None, **kwargs)
-                    # x = dates_to_plot
-                    # y1 = 0
-                    # y2 = p_dict['y_obs{0}'.format(line)]
                     ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
                 # =============================== Min/Max Lines ===============================
@@ -3380,11 +3398,11 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param str text_to_plot: the text to be plotted
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param unicode text_to_plot: the text to be plotted
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -3453,7 +3471,7 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
-    def chart_polar(self, dev, p_dict, k_dict, kv_list, return_queue):
+    def chart_polar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the polar charts
 
@@ -3467,11 +3485,10 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param list kv_list: device state values for updating
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -3563,7 +3580,7 @@ class MakeChart(object):
                     ax.plot((0, w[0]), (0, w[1]), color=w[2], linewidth=2, zorder=3)
 
                 # Right-size the grid (must be done after the plot), and customize the tick
-                # labels. The defaul covers anything over 50.
+                # labels. The default covers anything over 50.
                 ticks = np.arange(20, 100, 20)
                 grids = range(20, 120, 20)
 
@@ -3669,7 +3686,7 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
-    def chart_scatter(self, dev, p_dict, k_dict, kv_list, return_queue):
+    def chart_scatter(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the scatter charts
 
@@ -3677,11 +3694,10 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param list kv_list: device state values for updating
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -3723,7 +3739,8 @@ class MakeChart(object):
                         p_dict['group{0}Marker'.format(thing)] = '.'
                         p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
-                    data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['group{0}Source'.format(thing)].encode("utf-8")), log)
+                    data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"),
+                                                                     p_dict['group{0}Source'.format(thing)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
 
                     # Pull the headers
@@ -3834,13 +3851,13 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev: indigo device instance
-        :param str dev_type: device type name
+        :param class 'indigo.Device' dev: indigo device instance
+        :param unicode dev_type: device type name
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict state_list: the data to plot
+        :param class 'indigo.Dict' state_list: the data to plot
         :param tuple sun_rise_set: tuple of sunrise/sunset times
-        :param multiprocessing.queues.Queue return_queue: logging queue
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -4181,7 +4198,8 @@ class MakeChart(object):
 
         -----
 
-        :param str val:
+        :param unicode val:
+        :return val:
         """
 
         # List of (elements, replacements)
@@ -4204,7 +4222,7 @@ class MakeChart(object):
         return val
 
     # =============================================================================
-    def convert_the_data(self, final_data, log, data_source=None):
+    def convert_the_data(self, final_data, log, data_source):
         """
         Convert data into form that matplotlib can understand
 
@@ -4217,6 +4235,8 @@ class MakeChart(object):
         -----
 
         :param list final_data: the data to be charted.
+        :param dict log: plugin log dict
+        :param unicode data_source:
         """
 
         converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
@@ -4293,9 +4313,9 @@ class MakeChart(object):
 
         -----
 
-        :param indigo.Device dev:
-        :param dict p_dict:
-        :param dict k_dict:
+        :param class 'indigo.Device' dev: indigo device instance
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         :return unicode result:
         """
 
@@ -4361,9 +4381,9 @@ class MakeChart(object):
 
         -----
 
-        :param ax:
-        :param dict p_dict:
-        :param dict k_dict:
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         ax.tick_params(axis='x', **k_dict['k_major_x'])
@@ -4386,9 +4406,9 @@ class MakeChart(object):
 
         -----
 
-        :param ax:
-        :param dict p_dict:
-        :param dict k_dict:
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         ax.tick_params(axis='y', **k_dict['k_major_y'])
@@ -4420,7 +4440,7 @@ class MakeChart(object):
 
         -----
 
-        :param dict p_dict:
+        :param dict p_dict: plotting parameters
         :param dict log:
         """
 
@@ -4470,8 +4490,8 @@ class MakeChart(object):
 
         -----
 
-        :param dict p_dict:
-        :param dict k_dict:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
@@ -4485,8 +4505,8 @@ class MakeChart(object):
 
         -----
 
-        :param dict p_dict:
-        :param dict k_dict:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
@@ -4499,7 +4519,7 @@ class MakeChart(object):
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
             plt.yticks(marks, labels)
 
-        except Exception:
+        except (KeyError, ValueError):
             pass
 
     # =============================================================================
@@ -4511,8 +4531,8 @@ class MakeChart(object):
 
         -----
 
-        :param dict p_dict:
-        :param dict k_dict:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
@@ -4544,8 +4564,8 @@ class MakeChart(object):
 
         -----
 
-        :param dict p_dict:
-        :param dict k_dict:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
 
         """
 
@@ -4556,7 +4576,7 @@ class MakeChart(object):
             plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
     # =============================================================================
-    def get_data(self, data_source, log=None):
+    def get_data(self, data_source, log):
         """
         Retrieve data from CSV file.
 
@@ -4566,6 +4586,7 @@ class MakeChart(object):
         -----
 
         :param unicode data_source:
+        :param dict log:
         """
 
         final_data = []
@@ -4606,7 +4627,7 @@ class MakeChart(object):
 
         :param float width:
         :param float height:
-        :param dict p_dict:
+        :param dict p_dict: plotting parameters
         """
 
         dpi = plt.rcParams['savefig.dpi']
@@ -4631,7 +4652,14 @@ class MakeChart(object):
 
         -----
 
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param 'numpy.ndarray' dates_to_plot:
+        :param int line:
+        :param dict p_dict: plotting parameters
+        :return ax:
+
         """
+
         try:
             color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
 
@@ -4655,9 +4683,9 @@ class MakeChart(object):
 
         -----
 
-        :param matplotlib.axes.AxesSubplot ax:
-        :param dict p_dict:
-        :param dict k_dict:
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         # Plot the custom lines if needed.  Note that these need to be plotted after
@@ -4693,7 +4721,7 @@ class MakeChart(object):
                 return ax
 
     # =============================================================================
-    def save_chart_image(self, plt, p_dict, k_dict):
+    def save_chart_image(self, plot, p_dict, k_dict):
         """
         Save the chart figure to a file.
 
@@ -4701,17 +4729,17 @@ class MakeChart(object):
 
         -----
 
-        :param matplotlib object plt:
-        :param dict p_dict:
-        :param dict k_dict:
+        :param module plot:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
         """
 
         try:
             if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
-                plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+                plot.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
-                plt.clf()
-                plt.close('all')
+                plot.clf()
+                plot.close('all')
 
         except RuntimeError as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
