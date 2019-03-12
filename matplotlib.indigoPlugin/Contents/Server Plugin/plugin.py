@@ -101,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.39"
+__version__   = "0.7.40"
 
 # =============================================================================
 
@@ -2720,7 +2720,6 @@ class Plugin(indigo.PluginBase):
                         if __name__ == '__main__':
                             p_bar = multiprocessing.Process(name='p_bar', target=MakeChart(self).chart_bar, args=(dev, p_dict, k_dict, return_queue,))
                             p_bar.start()
-                            # p_bar.join()
 
                     # =========================== Battery Health Chart ============================
                     if dev.deviceTypeId == 'batteryHealthDevice':
@@ -2746,7 +2745,6 @@ class Plugin(indigo.PluginBase):
                         if __name__ == '__main__':
                             p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
                             p_battery.start()
-                            # p_battery.join()
 
                     # ============================== Calendar Charts ==============================
                     if dev.deviceTypeId == "calendarChartingDevice":
@@ -2754,15 +2752,13 @@ class Plugin(indigo.PluginBase):
                         if __name__ == '__main__':
                             p_calendar = multiprocessing.Process(name='p_calendar', target=MakeChart(self).chart_calendar, args=(dev, p_dict, k_dict, return_queue,))
                             p_calendar.start()
-                            # p_calendar.join()
 
                     # ================================ Line Charts ================================
                     if dev.deviceTypeId == "lineChartingDevice":
 
                         if __name__ == '__main__':
-                            p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, kv_list, return_queue,))
+                            p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, k_dict, return_queue,))
                             p_line.start()
-                            # p_line.join()
 
                     # ============================== Multiline Text ===============================
                     if dev.deviceTypeId == 'multiLineText':
@@ -2785,7 +2781,6 @@ class Plugin(indigo.PluginBase):
                                                                   target=MakeChart(self).chart_multiline_text,
                                                                   args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
                             p_multiline.start()
-                            # p_multiline.join()
 
                     # =============================== Polar Charts ================================
                     if dev.deviceTypeId == "polarChartingDevice":
@@ -2793,7 +2788,6 @@ class Plugin(indigo.PluginBase):
                         if __name__ == '__main__':
                             p_polar = multiprocessing.Process(name='p_polar', target=MakeChart(self).chart_polar, args=(dev, p_dict, k_dict, return_queue,))
                             p_polar.start()
-                            # p_polar.join()
 
                     # ============================== Scatter Charts ===============================
                     if dev.deviceTypeId == "scatterChartingDevice":
@@ -2801,7 +2795,6 @@ class Plugin(indigo.PluginBase):
                         if __name__ == '__main__':
                             p_scatter = multiprocessing.Process(name='p_scatter', target=MakeChart(self).chart_scatter, args=(dev, p_dict, k_dict, return_queue,))
                             p_scatter.start()
-                            # p_scatter.join()
 
                     # ========================== Weather Forecast Charts ==========================
                     if dev.deviceTypeId == "forecastChartingDevice":
@@ -2815,7 +2808,6 @@ class Plugin(indigo.PluginBase):
                                                                 target=MakeChart(self).chart_weather_forecast,
                                                                 args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
                             p_weather.start()
-                            # p_weather.join()
 
                     # ========================= Process the output queue ==========================
                     self.processLogQueue(dev, return_queue)

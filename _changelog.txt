@@ -1,3 +1,7 @@
+v0.7.40
+- Fixed bug in line charting for TypeError: list indices must be integers, not
+  str'
+
 v0.7.39
 - No longer allows creation of CSV device without establishing at least one
   data source.
