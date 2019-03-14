@@ -9,8 +9,8 @@ The matplotlib plugin is used to produce various types of charts and graphics
 for use on Indigo control pages. The key benefits of the plugin are its ability
 to make global changes to all generated charts (i.e., fonts, colors) and its
 relative simplicity.  It contains direct support for some automated charts (for
-example, it can create WUnderground plugin forecast charts if linked to the
-proper WUnderground devices.
+example, it can create Fantastic Weather plugin forecast charts if linked to
+the proper Fantastic Weather devices.
 """
 
 # =================================== Notes ===================================
@@ -52,6 +52,12 @@ proper WUnderground devices.
 
 # TODO: Consider dropping the backup csv component to reduce I/O.
 # TODO: Stop traceback for CSV engine device where it has no data sources.
+
+# TODO: Improve error logging like format_axis_x_ticks()
+# TODO: Add default legend label text for each observation, i.e., Line 1,
+#       Line 2, etc.
+# TODO: Add 'Display' to Legend tickbox option. So it's 'Display Legend?'
+#       Consider 'Display' for other settings, too.
 
 # ================================== IMPORTS ==================================
 
@@ -2801,7 +2807,7 @@ class Plugin(indigo.PluginBase):
 
                         dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
                         state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
-                        sun_rise_set = (str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset()))
+                        sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
 
                         if __name__ == '__main__':
                             p_weather = multiprocessing.Process(name='p_weather',
@@ -2890,8 +2896,8 @@ class MakeChart(object):
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # ================================ Format Axes ================================
-            self.format_axis_x_ticks(ax, p_dict, k_dict)
-            self.format_axis_y(ax, p_dict, k_dict)
+            self.format_axis_x_ticks(ax, p_dict, k_dict, log)
+            self.format_axis_y(ax, p_dict, k_dict, log)
 
             for thing in range(1, 5, 1):
 
@@ -2920,7 +2926,7 @@ class MakeChart(object):
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)])
+                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # If the user sets the width to 0, this will perform an introspection of the
                     # dates to plot and get the minimum of the difference between the dates.
@@ -2945,10 +2951,10 @@ class MakeChart(object):
             log = self.format_axis_y1_min_max(p_dict, log)
 
             # =============================== X Axis Label ================================
-            self.format_axis_x_label(dev, p_dict, k_dict)
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -2992,13 +2998,13 @@ class MakeChart(object):
             self.plot_custom_line_segments(ax, p_dict, k_dict)
 
             # =============================== Format Grids ================================
-            self.format_grids(p_dict, k_dict)
+            self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
             # ============================== Custom Y Ticks ===============================
-            self.format_axis_y_ticks(p_dict, k_dict)
+            self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
             # plt.tight_layout(pad=1)
@@ -3008,7 +3014,7 @@ class MakeChart(object):
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
+                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors. See plugin log for more information.', 'Name': dev.name})
             else:
                 return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
@@ -3108,7 +3114,7 @@ class MakeChart(object):
                     ax.axvline(x=_, color=p_dict['gridColor'], linestyle=self.host_plugin.pluginPrefs.get('gridStyle', ':'))
 
             # =============================== X Axis Label ================================
-            self.format_axis_x_label(dev, p_dict, k_dict)
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
             ax.xaxis.set_ticks_position('bottom')
 
             # ============================== X Axis Min/Max ===============================
@@ -3239,8 +3245,8 @@ class MakeChart(object):
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # ================================ Format Axes ================================
-            self.format_axis_x_ticks(ax, p_dict, k_dict)
-            self.format_axis_y(ax, p_dict, k_dict)
+            self.format_axis_x_ticks(ax, p_dict, k_dict, log)
+            self.format_axis_y(ax, p_dict, k_dict, log)
 
             for line in range(1, 7, 1):
 
@@ -3277,7 +3283,7 @@ class MakeChart(object):
                         p_dict['y_obs{0}'.format(line)] = temp_list
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
+                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
                     ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
@@ -3326,7 +3332,7 @@ class MakeChart(object):
                 # don't affect the legend.
 
                 # We need to reload the dates to ensure that they match the line being plotted
-                dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
+                dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
                 # =============================== Best Fit Line ===============================
                 if dev.pluginProps.get('line{0}BestFit'.format(line), False):
@@ -3348,19 +3354,19 @@ class MakeChart(object):
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
 
-            self.format_grids(p_dict, k_dict)
+            self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
             # =============================== X Axis Label ================================
-            self.format_axis_x_label(dev, p_dict, k_dict)
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
-            self.format_axis_y_ticks(p_dict, k_dict)
+            self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
             plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
@@ -3708,8 +3714,8 @@ class MakeChart(object):
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # ================================ Format Axes ================================
-            self.format_axis_x_ticks(ax, p_dict, k_dict)
-            self.format_axis_y(ax, p_dict, k_dict)
+            self.format_axis_x_ticks(ax, p_dict, k_dict, log)
+            self.format_axis_y(ax, p_dict, k_dict, log)
 
             for thing in range(1, 5, 1):
 
@@ -3745,7 +3751,7 @@ class MakeChart(object):
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)])
+                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
                     ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
@@ -3798,19 +3804,19 @@ class MakeChart(object):
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
 
-            self.format_grids(p_dict, k_dict)
+            self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
             plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
 
             # =============================== X Axis Label ================================
-            self.format_axis_x_label(dev, p_dict, k_dict)
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
-            self.format_axis_y_ticks(p_dict, k_dict)
+            self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
             # plt.tight_layout(pad=1)
@@ -3848,7 +3854,7 @@ class MakeChart(object):
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'indigo.Dict' state_list: the data to plot
-        :param tuple sun_rise_set: tuple of sunrise/sunset times
+        :param list sun_rise_set: tuple of sunrise/sunset times
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
 
@@ -3886,7 +3892,7 @@ class MakeChart(object):
                     p_dict['y_obs3'].append(state_list['h{0}_precipChance'.format(counter)])
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -3907,7 +3913,7 @@ class MakeChart(object):
                     p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -3929,7 +3935,7 @@ class MakeChart(object):
                     p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -3950,7 +3956,7 @@ class MakeChart(object):
                     p_dict['y_obs3'].append(state_list['d{0}_pop'.format(counter)])
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs1'])
+                    dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
                     # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
@@ -3967,8 +3973,8 @@ class MakeChart(object):
             # ==================================== AX1 ====================================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            self.format_axis_x_ticks(ax1, p_dict, k_dict)
-            self.format_axis_y(ax1, p_dict, k_dict)
+            self.format_axis_x_ticks(ax1, p_dict, k_dict, log)
+            self.format_axis_y(ax1, p_dict, k_dict, log)
 
             # ============================ Precipitation Bars =============================
             # The width of the bars is a percentage of a day, so we need to
@@ -4020,7 +4026,7 @@ class MakeChart(object):
             plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
             # =============================== X1 Axis Label ===============================
-            self.format_axis_x_label(dev, p_dict, k_dict)
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y1 Axis Label ===============================
             # Note we're plotting Y2 label on ax1. We do this because we want the
@@ -4041,7 +4047,7 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)  # Note: frame alpha should be an int and not a string.
 
-            self.format_grids(p_dict, k_dict)
+            self.format_grids(p_dict, k_dict, log)
 
             # ========================== Transparent Charts Fill ==========================
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -4054,7 +4060,7 @@ class MakeChart(object):
 
             if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
-                sun_rise, sun_set = self.format_dates(sun_rise_set)
+                sun_rise, sun_set = self.format_dates(sun_rise_set, log)
 
                 min_dates_to_plot = np.amin(dates_to_plot)
                 max_dates_to_plot = np.amax(dates_to_plot)
@@ -4092,8 +4098,8 @@ class MakeChart(object):
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
                             ax2.annotate('%.0f' % xy[1], xy=xy, xytext=(0, 0), zorder=(11 - line), **k_dict['k_annotation'])
 
-            self.format_axis_x_ticks(ax2, p_dict, k_dict)
-            self.format_axis_y(ax2, p_dict, k_dict)
+            self.format_axis_x_ticks(ax2, p_dict, k_dict, log)
+            self.format_axis_y(ax2, p_dict, k_dict, log)
 
             self.plot_custom_line_segments(ax2, p_dict, k_dict)
 
@@ -4156,7 +4162,7 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            self.format_grids(p_dict, k_dict)
+            self.format_grids(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
             plt.tight_layout(pad=1)
@@ -4296,7 +4302,7 @@ class MakeChart(object):
         return final_data, log
 
     # =============================================================================
-    def format_axis_x_label(self, dev, p_dict, k_dict):
+    def format_axis_x_label(self, dev, p_dict, k_dict, log):
         """
         Format X axis label visibility and properties
 
@@ -4308,20 +4314,28 @@ class MakeChart(object):
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
         :return unicode result:
         """
 
-        if not p_dict['showLegend']:
-            plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-            return u"[{0}] No call for legend. Formatting X label.".format(dev.name)
+        try:
+            if not p_dict['showLegend']:
+                plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
+                return u"[{0}] No call for legend. Formatting X label.".format(dev.name)
 
-        if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
-            return u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name)
+            if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
+                return u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name)
 
-        return ''
+            return ''
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting X labels: showLegend = {0}".format(p_dict['showLegend']))
+            log['Threaddebug'].append(u"Problem formatting X labels: customAxisLabelX = {0}".format(p_dict['customAxisLabelX']))
+            log['Threaddebug'].append(u"Problem formatting X labels: k_x_axis_font = {0}".format(k_dict['k_x_axis_font']))
 
     # =============================================================================
-    def format_axis_x_scale(self, x_axis_bins):
+    def format_axis_x_scale(self, x_axis_bins, log):
         """
         Format X axis scale based on user setting
 
@@ -4331,41 +4345,47 @@ class MakeChart(object):
         -----
 
         :param list x_axis_bins:
+        :param dict log: logging dict
         """
 
-        if x_axis_bins == 'quarter-hourly':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 96)))
-        if x_axis_bins == 'half-hourly':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 48)))
-        elif x_axis_bins == 'hourly':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 24)))
-        elif x_axis_bins == 'hourly_4':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))
-        elif x_axis_bins == 'hourly_8':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 4)))
-        elif x_axis_bins == 'hourly_12':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 2)))
-        elif x_axis_bins == 'daily':
-            plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=1))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 6)))
-        elif x_axis_bins == 'weekly':
-            plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=7))
-            plt.gca().xaxis.set_minor_locator(mdate.DayLocator(interval=1))
-        elif x_axis_bins == 'monthly':
-            plt.gca().xaxis.set_major_locator(mdate.MonthLocator(interval=1))
-            plt.gca().xaxis.set_minor_locator(mdate.DayLocator(interval=1))
-        elif x_axis_bins == 'yearly':
-            plt.gca().xaxis.set_major_locator(mdate.YearLocator())
-            plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
+        try:
+            if x_axis_bins == 'quarter-hourly':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 96)))
+            if x_axis_bins == 'half-hourly':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 48)))
+            elif x_axis_bins == 'hourly':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 24)))
+            elif x_axis_bins == 'hourly_4':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))
+            elif x_axis_bins == 'hourly_8':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 4)))
+            elif x_axis_bins == 'hourly_12':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 2)))
+            elif x_axis_bins == 'daily':
+                plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=1))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 6)))
+            elif x_axis_bins == 'weekly':
+                plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=7))
+                plt.gca().xaxis.set_minor_locator(mdate.DayLocator(interval=1))
+            elif x_axis_bins == 'monthly':
+                plt.gca().xaxis.set_major_locator(mdate.MonthLocator(interval=1))
+                plt.gca().xaxis.set_minor_locator(mdate.DayLocator(interval=1))
+            elif x_axis_bins == 'yearly':
+                plt.gca().xaxis.set_major_locator(mdate.YearLocator())
+                plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting X axis scale: x_axis_bins = {0}".format(x_axis_bins))
 
     # =============================================================================
-    def format_axis_x_ticks(self, ax, p_dict, k_dict):
+    def format_axis_x_ticks(self, ax, p_dict, k_dict, log):
         """
         Format X axis tick properties
 
@@ -4376,21 +4396,30 @@ class MakeChart(object):
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: Logging dict
         """
 
-        ax.tick_params(axis='x', **k_dict['k_major_x'])
-        ax.tick_params(axis='x', **k_dict['k_minor_x'])
-        ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
-        self.format_axis_x_scale(p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
+        try:
+            ax.tick_params(axis='x', **k_dict['k_major_x'])
+            ax.tick_params(axis='x', **k_dict['k_minor_x'])
+            ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
+            self.format_axis_x_scale(p_dict['xAxisBins'], log)  # Set the scale for the X axis. We assume a date.
 
-        # If the x axis format has been set to None, let's hide the labels.
-        if p_dict['xAxisLabelFormat'] == "None":
-            ax.axes.xaxis.set_ticklabels([])
+            # If the x axis format has been set to None, let's hide the labels.
+            if p_dict['xAxisLabelFormat'] == "None":
+                ax.axes.xaxis.set_ticklabels([])
 
-        return ax
+            return ax
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting X ticks: k_major_x = {0}".format(k_dict['k_major_x']))
+            log['Threaddebug'].append(u"Problem formatting X ticks: k_minor_x = {0}".format(k_dict['k_minor_x']))
+            log['Threaddebug'].append(u"Problem formatting X ticks: xAxisLabelFormat = {0}".format(mdate.DateFormatter(p_dict['xAxisLabelFormat'])))
+            log['Threaddebug'].append(u"Problem formatting X ticks: xAxisBins = {0}".format(p_dict['xAxisBins']))
 
     # =============================================================================
-    def format_axis_y(self, ax, p_dict, k_dict):
+    def format_axis_y(self, ax, p_dict, k_dict, log):
         """
         Format Y1 axis display properties
 
@@ -4401,25 +4430,35 @@ class MakeChart(object):
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: Logging dict
         """
 
-        ax.tick_params(axis='y', **k_dict['k_major_y'])
-        ax.tick_params(axis='y', **k_dict['k_minor_y'])
-        ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision']))))
-
-        # Mirror Y axis values on Y2. Not all charts will support this option.
         try:
-            if p_dict['yMirrorValues']:
-                ax.tick_params(labelright=True)
+            ax.tick_params(axis='y', **k_dict['k_major_y'])
+            ax.tick_params(axis='y', **k_dict['k_minor_y'])
+            ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision']))))
 
-                # A user may want tick labels only on Y2.
-                if not p_dict['yMirrorValuesAlsoY1']:
-                    ax.tick_params(labelleft=False)
+            # Mirror Y axis values on Y2. Not all charts will support this option.
+            try:
+                if p_dict['yMirrorValues']:
+                    ax.tick_params(labelright=True)
 
-        except KeyError:
-            pass
+                    # A user may want tick labels only on Y2.
+                    if not p_dict['yMirrorValuesAlsoY1']:
+                        ax.tick_params(labelleft=False)
 
-        return ax
+            except KeyError:
+                pass
+
+            return ax
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting Y ticks: k_major_y = {0}".format(k_dict['k_major_y']))
+            log['Threaddebug'].append(u"Problem formatting Y ticks: k_minor_x = {0}".format(k_dict['k_minor_y']))
+            log['Threaddebug'].append(u"Problem formatting Y ticks: xAxisLabelFormat = {0}".format(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision'])))))
+            log['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValues = {0}".format(p_dict['yMirrorValues']))
+            log['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValuesAlsoY1 = {0}".format(p_dict['yMirrorValuesAlsoY1']))
 
     # =============================================================================
     def format_axis_y1_min_max(self, p_dict, log):
@@ -4433,7 +4472,7 @@ class MakeChart(object):
         -----
 
         :param dict p_dict: plotting parameters
-        :param dict log:
+        :param dict log: Logging dict
         """
 
         try:
@@ -4466,15 +4505,15 @@ class MakeChart(object):
 
             return log
 
-        except ValueError as sub_error:
+        except (ValueError, TypeError):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = {0}".format(p_dict['yAxisMax']))
+            log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMin = {0}".format(p_dict['yAxisMin']))
+            log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: Data Min/Max = {0}/{1}".format(min(p_dict['data_array']), max(p_dict['data_array'])))
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
-            log['Warning'].append(u"Error: {0}. See plugin log for more information.".format(sub_error))
-
-            return log
 
     # =============================================================================
-    def format_axis_y1_label(self, p_dict, k_dict):
+    def format_axis_y1_label(self, p_dict, k_dict, log):
         """
         Format Y1 axis labels
 
@@ -4484,12 +4523,19 @@ class MakeChart(object):
 
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
         """
 
-        plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+        try:
+            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
     # =============================================================================
-    def format_axis_y_ticks(self, p_dict, k_dict):
+    def format_axis_y_ticks(self, p_dict, k_dict, log):
         """
         Format Y axis tick marks
 
@@ -4499,23 +4545,34 @@ class MakeChart(object):
 
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
         """
 
-        plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
         try:
-            marks = [float(_) for _ in p_dict['customTicksY'].split(",")]
+            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+
+            if p_dict['customTicksY'] not in ('None', ''):
+                marks = [float(_) for _ in p_dict['customTicksY'].split(",")]
+            else:
+                marks = []
+
             if p_dict['customTicksLabelY'] == "":
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
 
             else:
                 labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
+
             plt.yticks(marks, labels)
 
         except (KeyError, ValueError):
-            pass
+            log['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: customTicksY = {0}".format(p_dict['customTicksY']))
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
 
     # =============================================================================
-    def format_axis_y2_label(self, p_dict, k_dict):
+    # TODO: this is currently unused.
+    def format_axis_y2_label(self, p_dict, k_dict, log):
         """
         Format Y2 axis properties
 
@@ -4525,12 +4582,19 @@ class MakeChart(object):
 
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
         """
 
-        plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
+        try:
+            plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
+
+        except (KeyError, ValueError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = {0}".format(p_dict['customAxisLabelY2']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
     # =============================================================================
-    def format_dates(self, list_of_dates):
+    def format_dates(self, list_of_dates, log):
         """
         Convert date strings to date objects
 
@@ -4539,16 +4603,27 @@ class MakeChart(object):
 
         -----
 
-        :param list_of_dates:
+        :param list list_of_dates:
+        :param dict log: logging dict
         """
 
-        dates_to_plot = [date_parse(obs) for obs in list_of_dates]
-        dates_to_plot = mdate.date2num(dates_to_plot)
+        dates_to_plot   = []
+        dates_to_plot_m = []
 
-        return dates_to_plot
+        try:
+            dates_to_plot = [date_parse(obs) for obs in list_of_dates]
+            dates_to_plot_m = mdate.date2num(dates_to_plot)
+
+            return dates_to_plot_m
+
+        except (KeyError, ValueError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting dates: list_of_dates = {0}".format(list_of_dates))
+            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = {0}".format(dates_to_plot))
+            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = {0}".format(dates_to_plot_m))
 
     # =============================================================================
-    def format_grids(self, p_dict, k_dict):
+    def format_grids(self, p_dict, k_dict, log):
         """
         Format matplotlib grids
 
@@ -4558,14 +4633,21 @@ class MakeChart(object):
 
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
 
         """
 
-        if p_dict['showxAxisGrid']:
-            plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
+        try:
+            if p_dict['showxAxisGrid']:
+                plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
 
-        if p_dict['showyAxisGrid']:
-            plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
+            if p_dict['showyAxisGrid']:
+                plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
+
+        except (KeyError, ValueError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {0}".format(p_dict['showxAxisGrid']))
+            log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
 
     # =============================================================================
     def get_data(self, data_source, log):

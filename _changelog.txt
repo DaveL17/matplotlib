@@ -1,3 +1,8 @@
+v0.7.41
+- Fixes bug in format_axis_y_ticks where error was thrown under certain
+  conditions (including 'None', '', and ' '.)
+- Improved error logging.
+
 v0.7.40
 - Fixed bug in line charting for TypeError: list indices must be integers, not
   str'
