@@ -1,3 +1,7 @@
+v0.7.42
+- Refines configuration dialog control labels.
+- Deletes unneeded Fill control from Bar Devices (bar 4).
+
 v0.7.41
 - Fixes bug in format_axis_y_ticks where error was thrown under certain
   conditions (including 'None', '', and ' '.)

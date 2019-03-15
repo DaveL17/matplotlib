@@ -80,7 +80,7 @@
             </Field>
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -89,7 +89,7 @@
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="barWidth" type="textfield" defaultValue="0"
@@ -108,7 +108,7 @@
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -135,7 +135,7 @@
             </Field>
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -153,7 +153,7 @@
             </Field>
 
             <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
-                <Label>Mirror</Label>
+                <Label>Mirror Axis?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -199,7 +199,7 @@
             </Field>
 
             <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -214,17 +214,17 @@
             </Field>
 
             <Field id="plotBar1Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotBar1Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="suppressBar1" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
-                <Label>Suppress Bar</Label>
+                <Label>Suppress Bar?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -241,7 +241,7 @@
             </Field>
 
             <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -256,17 +256,17 @@
             </Field>
 
             <Field id="plotBar2Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotBar2Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="suppressBar2" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
-                <Label>Suppress Bar</Label>
+                <Label>Suppress Bar?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -284,7 +284,7 @@
 
             <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true"
                    tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -299,17 +299,17 @@
             </Field>
 
             <Field id="plotBar3Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotBar3Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="suppressBar3" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
-                <Label>Suppress Bar</Label>
+                <Label>Suppress Bar?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -326,7 +326,7 @@
             </Field>
 
             <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -340,23 +340,23 @@
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="bar4Fill" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to fill below this bar.">
-                <Label>Fill</Label>
-                <Description>Yes/No</Description>
-            </Field>
+            <!--<Field id="bar4Fill" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to fill below this bar.">-->
+                <!--<Label>Fill?</Label>-->
+                <!--<Description>Yes/No</Description>-->
+            <!--</Field>-->
 
             <Field id="plotBar4Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotBar4Max" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="suppressBar4" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
-                <Label>Suppress Bar</Label>
+                <Label>Suppress Bar?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -451,7 +451,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="sourceSeparator1" type="separator"/>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
@@ -482,12 +482,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <!-- We need this value to exist in order to display the X axis label. We don't need a legend for the battery health device. -->
             <Field id="showLegend" type="checkbox" defaultValue="false" hidden="true">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false" tooltip="Check to display X axis grid.">
-                <Label>Grid:</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -521,7 +521,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showBatteryLevel" type="checkbox" defaultValue="true" tooltip="Check to display the current battery level for each device within the chart.">
-                <Label>Show Battery Level:</Label>
+                <Label>Show Battery Level?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -703,12 +703,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
@@ -722,7 +722,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -749,7 +749,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -767,7 +767,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
-                <Label>Mirror</Label>
+                <Label>Mirror Axis?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -818,12 +818,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line1Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -855,12 +855,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine1Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine1Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -875,7 +875,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine1" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -896,12 +896,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line2Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -933,12 +933,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine2Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine2Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -953,7 +953,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine2" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -974,12 +974,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line3Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1011,12 +1011,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine3Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine3Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1031,7 +1031,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine3" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1052,12 +1052,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line4Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1088,12 +1088,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine4Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine4Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1108,7 +1108,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine4" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1129,12 +1129,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line5Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line5Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1166,12 +1166,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine5Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine5Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1186,7 +1186,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine5" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1207,12 +1207,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line6Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="line6Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to fill below this line.">
-                <Label>Fill</Label>
+                <Label>Fill?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1244,12 +1244,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotLine6Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotLine6Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1264,7 +1264,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressLine6" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
-                <Label>Suppress Line</Label>
+                <Label>Suppress Line?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1373,7 +1373,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="sourceSeparator2" type="separator"/>
 
             <Field id="textAreaBorder" type="checkbox" defaultValue="false" tooltip="Check this box if you would like a border around your image.">
-                <Label>Border?</Label>
+                <Label>Display Border?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1382,7 +1382,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="cleanTheText" type="checkbox" defaultValue="true" tooltip="If enabled, the plugin will try to remove whitespace from the text.">
-                <Label>Clean Text:</Label>
+                <Label>Clean Text?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1409,7 +1409,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>
@@ -1539,17 +1539,17 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="xHideLabels" defaultValue="false" type="checkbox" tooltip="Select to hide the surrounding labels on the outside of the chart.">
-                <Label>Hide X Labels:</Label>
+                <Label>Hide X Labels?</Label>
                 <Description/>
             </Field>
 
             <Field id="yHideLabels" defaultValue="false" type="checkbox" tooltip="Select to hide the radial labels on the inside of the chart.">
-                <Label>Hide Y Labels:</Label>
+                <Label>Hide Y Labels?</Label>
                 <Description/>
             </Field>
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1558,7 +1558,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="bottomSeparator" type="separator"/>
@@ -1664,12 +1664,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 <!--X Axis-->
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
@@ -1683,7 +1683,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1711,7 +1711,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1729,7 +1729,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
-                <Label>Mirror</Label>
+                <Label>Mirror Axis?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1796,12 +1796,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotGroup1Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotGroup1Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1816,7 +1816,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressGroup1" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
-                <Label>Suppress Group</Label>
+                <Label>Suppress Group?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1854,12 +1854,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotGroup2Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotGroup2Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1874,7 +1874,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressGroup2" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
-                <Label>Suppress Group</Label>
+                <Label>Suppress Group?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1912,12 +1912,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotGroup3Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotGroup3Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1932,7 +1932,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressGroup3" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
-                <Label>Suppress Group</Label>
+                <Label>Suppress Group?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1969,12 +1969,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="plotGroup4Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
-                <Label>Plot Min</Label>
+                <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="plotGroup4Max" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
-                <Label>Plot Max</Label>
+                <Label>Plot Max?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1989,7 +1989,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="suppressGroup4" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to hide this group when plotting.">
-                <Label>Suppress Group</Label>
+                <Label>Suppress Group?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2115,11 +2115,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="daytimeColor" type="colorpicker" defaultValue="33 33 33"
                    tooltip="Select the color to be used to plot daylight hours.">
-                <Label>daytime Color:</Label>
+                <Label>Daytime Color:</Label>
             </Field>
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
-                <Label>Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2136,7 +2136,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
@@ -2155,7 +2155,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2177,7 +2177,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2211,7 +2211,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="showy2AxisGrid" type="checkbox" defaultValue="false" visibleBindingId="y2AxisLabel" visibleBindingValue="true" tooltip="Check to display Y2 axis grid.">
-                <Label>Grid</Label>
+                <Label>Display Grid?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2255,7 +2255,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2293,7 +2293,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2326,7 +2326,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
-                <Label>Annotate</Label>
+                <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2335,7 +2335,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
-                <Label>Enable Custom Line Segments</Label>
+                <Label>Enable Custom Line Segments?</Label>
             </Field>
 
             <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
@@ -2434,7 +2434,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="addValue" type="textfield" tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
-                <Label>Title:</Label>
+                <Label>Chart Title:</Label>
             </Field>
 
             <Field id="addSourceFilter" type="menu" defaultValue="A">
@@ -2486,7 +2486,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
-                <Label>is an item selected?</Label>
+                <Label>Is an item selected?</Label>
             </Field>
 
             <Field id="columnDict" type="textfield" defaultValue="{'k0': ('None', 'None', 'None')}" hidden="true">
