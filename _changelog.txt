@@ -1,3 +1,7 @@
+v0.7.43
+- Adds default entries for legend labels (will only be displayed if Display
+  Legend option is enabled.)
+
 v0.7.42
 - Refines configuration dialog control labels.
 - Deletes unneeded Fill control from Bar Devices (bar 4).

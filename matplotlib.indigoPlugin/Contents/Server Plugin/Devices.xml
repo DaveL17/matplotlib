@@ -208,7 +208,7 @@
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="bar1Legend" type="textfield" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true"
+            <Field id="bar1Legend" type="textfield" defaultValue="Bar 1" visibleBindingId="barLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -250,7 +250,7 @@
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="bar2Legend" type="textfield" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true"
+            <Field id="bar2Legend" type="textfield" defaultValue="Bar 2" visibleBindingId="barLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -293,7 +293,7 @@
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="bar3Legend" type="textfield" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true"
+            <Field id="bar3Legend" type="textfield" defaultValue="Bar 3" visibleBindingId="barLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -335,7 +335,7 @@
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="bar4Legend" type="textfield" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true"
+            <Field id="bar4Legend" type="textfield" defaultValue="Bar 4" visibleBindingId="barLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -827,7 +827,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line1Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Legend" type="textfield" defaultValue="Line 1" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -905,7 +905,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line2Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Legend" type="textfield" defaultValue="Line 2" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -983,7 +983,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line3Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Legend" type="textfield" defaultValue="Line 3" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1061,7 +1061,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line4Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Legend" type="textfield" defaultValue="Line 4" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1138,7 +1138,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line5Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel5" visibleBindingValue="true"
+            <Field id="line5Legend" type="textfield" defaultValue="Line 5" visibleBindingId="lineLabel5" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1216,7 +1216,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line6Legend" type="textfield" defaultValue="" visibleBindingId="lineLabel6" visibleBindingValue="true"
+            <Field id="line6Legend" type="textfield" defaultValue="Line 6" visibleBindingId="lineLabel6" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1779,7 +1779,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="group1Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1Legend" type="textfield" defaultValue="Group 1" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1837,7 +1837,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="group2Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2Legend" type="textfield" defaultValue="Group 2" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1895,7 +1895,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="group3Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3Legend" type="textfield" defaultValue="Group 3" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>
@@ -1953,7 +1953,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="group4Legend" type="textfield" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true"
+            <Field id="group4Legend" type="textfield" defaultValue="Group 4" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
                 <Label>Legend Label:</Label>
             </Field>

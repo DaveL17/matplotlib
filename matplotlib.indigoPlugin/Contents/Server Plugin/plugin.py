@@ -54,10 +54,6 @@ the proper Fantastic Weather devices.
 # TODO: Stop traceback for CSV engine device where it has no data sources.
 
 # TODO: Improve error logging like format_axis_x_ticks()
-# TODO: Add default legend label text for each observation, i.e., Line 1,
-#       Line 2, etc.
-# TODO: Add 'Display' to Legend tickbox option. So it's 'Display Legend?'
-#       Consider 'Display' for other settings, too.
 # TODO: Grid property for battery devices has an ID of 'showLegend'.
 
 # ================================== IMPORTS ==================================
@@ -108,7 +104,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.42"
+__version__   = "0.7.43"
 
 # =============================================================================
 
