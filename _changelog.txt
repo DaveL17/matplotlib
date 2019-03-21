@@ -1,3 +1,11 @@
+v0.7.44
+- Updates config dialog text for Battery Health Chart - excluded devices
+  (language referred to legacy control.)
+- Adds requirement that the custom Y tick labels field and custom Y tick
+  values field be the same length.
+- Fixed bug for Battery Health Chart to remove "No Battery Devices" dummy
+  device when actual devices present.
+
 v0.7.43
 - Adds default entries for legend labels (will only be displayed if Display
   Legend option is enabled.)

@@ -3,6 +3,19 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-02-12  Autolog
+===============================================================================
+It would be useful to able to specify the text colour when selecting Show
+Battery Level. At the moment if you select a light green colour for the Healthy
+colour then the white text gets lost.
+
+===============================================================================
+2019-02-12  Autolog
+===============================================================================
+it would be useful to set the whole bar to red if the battery is zero - so it
+stands out.
+
+===============================================================================
 2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
@@ -45,7 +58,7 @@ closed) to 100% (fully open). I would then be able to easily correlate the
 valve opening against the temperature.
 
 ===============================================================================
-2019-01-21  Autolog  [complete]
+2019-01-21  Autolog  [COMPLETE]
 ===============================================================================
 I had incorrectly assumed that if the checkbox for a line wasn't ticked that
 the line was disabled - it isn't. You have to select None for the data source.

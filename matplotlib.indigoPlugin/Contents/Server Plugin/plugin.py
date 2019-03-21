@@ -37,7 +37,6 @@ the proper Fantastic Weather devices.
 #              automatically?
 # TODO: Support substitutions for certain fields (like save location).
 # TODO: Try to address annotation collisions.
-
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Wrap long names for battery health device?
 # TODO: Add facility to have different Y1 and Y2.  Add a new group of controls
@@ -46,15 +45,12 @@ the proper Fantastic Weather devices.
 # TODO: Remove matplotlib_version.html after deprecation
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
-
-# TODO: Line hiding not properly handled for legacy devices.
 # TODO: Add logging to the CSV engine routines
-
 # TODO: Consider dropping the backup csv component to reduce I/O.
-# TODO: Stop traceback for CSV engine device where it has no data sources.
-
-# TODO: Improve error logging like format_axis_x_ticks()
 # TODO: Grid property for battery devices has an ID of 'showLegend'.
+
+# TODO: Y1 and Y2 tick labels not plotting for line charts.
+# TODO: Validation: chart Y axis max must be greater than min.
 
 # ================================== IMPORTS ==================================
 
@@ -104,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.43"
+__version__   = "0.7.44"
 
 # =============================================================================
 
@@ -678,6 +674,13 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Bar Width Error.\n\nYou must enter a bar width greater than 0."
                 return False, values_dict, error_msg_dict
 
+            # Custom Y axis ticks and labels
+            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
+                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
+                return False, values_dict, error_msg_dict
+
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
 
@@ -761,7 +764,7 @@ class Plugin(indigo.PluginBase):
 
             except ValueError:
                 error_msg_dict['addSource'] = u"You must create at least one CSV data source."
-                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source."
+                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source. If you have filled in the entries, you may have forgotten to click the 'Add Item' button."
                 return False, values_dict, error_msg_dict
 
         # ================================ Line Chart =================================
@@ -789,6 +792,14 @@ class Plugin(indigo.PluginBase):
                     error_msg_dict['line{0}Style'.format(line)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
                     return False, values_dict, error_msg_dict
+
+            # Custom Y axis ticks and labels
+            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
+                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
+                return False, values_dict, error_msg_dict
+
 
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
@@ -878,6 +889,13 @@ class Plugin(indigo.PluginBase):
             if not values_dict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, values_dict, error_msg_dict
+
+            # Custom Y axis ticks and labels
+            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
+                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
+                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
                 return False, values_dict, error_msg_dict
 
         # =============================== Weather Chart ===============================
@@ -1944,7 +1962,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
-        Create a list of battery-powered devices
+        Create a list of ba dttery-powered devices
 
         Creates a list of tuples that contains the device ID and device name of all
         Indigo devices that report a batterLevel device property that is not None.
@@ -2735,15 +2753,15 @@ class Plugin(indigo.PluginBase):
                                 if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                                if device_dict == {}:
-                                    device_dict['No Battery Devices'] = 0
-
                                 # The following line is used for testing the battery health code; it isn't needed in production.
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
 
                             except Exception as sub_error:
                                 self.pluginErrorHandler(traceback.format_exc())
                                 self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
+
+                        if device_dict == {}:
+                            device_dict['No Battery Devices'] = 0
 
                         if __name__ == '__main__':
                             p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
@@ -2951,7 +2969,7 @@ class MakeChart(object):
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict, log)
+            # self.format_axis_y1_label(p_dict, k_dict, log)
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -3102,7 +3120,6 @@ class MakeChart(object):
                                      xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
 
             # ================================ Chart Title ================================
-            # plt.title(p_dict['chartTitle'], location='center', **k_dict['k_title_font'])
             plt.suptitle(p_dict['chartTitle'], **k_dict['k_title_font'])
 
             # =============================== Format Grids ================================
@@ -3360,7 +3377,7 @@ class MakeChart(object):
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict, log)
+            # self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -3810,7 +3827,7 @@ class MakeChart(object):
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            self.format_axis_y1_label(p_dict, k_dict, log)
+            # self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -4510,26 +4527,26 @@ class MakeChart(object):
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
 
     # =============================================================================
-    def format_axis_y1_label(self, p_dict, k_dict, log):
-        """
-        Format Y1 axis labels
-
-        Controls the format and placement of labels for the Y1 axis.
-
-        -----
-
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
-        """
-
-        try:
-            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
-
-        except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
-            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
+    # def format_axis_y1_label(self, p_dict, k_dict, log):
+    #     """
+    #     Format Y1 axis labels
+    #
+    #     Controls the format and placement of labels for the Y1 axis.
+    #
+    #     -----
+    #
+    #     :param dict p_dict: plotting parameters
+    #     :param dict k_dict: plotting kwargs
+    #     :param dict log: logging dict
+    #     """
+    #
+    #     try:
+    #         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+    #
+    #     except (ValueError, TypeError):
+    #         self.host_plugin.pluginErrorHandler(traceback.format_exc())
+    #         log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
+    #         log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
     # =============================================================================
     def format_axis_y_ticks(self, p_dict, k_dict, log):
@@ -4544,20 +4561,29 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
         """
+        # TODO: why are we plotting the Y axis label in a ticks method?
+
+        custom_ticks_marks  = p_dict['customTicksY']
+        custom_ticks_labels = p_dict['customTicksLabelY']
 
         try:
+            # The label for the Y axis.
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
-            if p_dict['customTicksY'] not in ('None', ''):
-                marks = [float(_) for _ in p_dict['customTicksY'].split(",")]
-            else:
-                marks = []
+            # Get the default tick values and labels (which we'll replace as needed.)
+            marks, labels = plt.yticks()
 
-            if p_dict['customTicksLabelY'] == "":
-                labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksY'].split(",")]
+            # If the user has not set custom tick values or labels, we're done.
+            if custom_ticks_marks.lower() in ('none', '') and custom_ticks_labels.lower() in ('none', ''):
+                return
 
-            else:
-                labels = [u"{0}".format(_.strip()) for _ in p_dict['customTicksLabelY'].split(",")]
+            # Replace default Y tick values with the custom ones.
+            if custom_ticks_marks.lower() not in ('none', '') and not custom_ticks_marks.isspace():
+                marks = [float(_) for _ in custom_ticks_marks.split(",")]
+
+            # Replace the default Y tick labels with the custom ones.
+            if custom_ticks_labels.lower() not in ('none', '') and not custom_ticks_labels.isspace():
+                labels = [u"{0}".format(_.strip()) for _ in custom_ticks_labels.split(",")]
 
             plt.yticks(marks, labels)
 

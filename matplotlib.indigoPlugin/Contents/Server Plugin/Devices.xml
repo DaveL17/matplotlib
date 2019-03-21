@@ -531,7 +531,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="excludedDevicesLabel" type="label" alignWithControl="true" tooltip="Indigo ID numbers, separated by a comma.">
-                <Label>Select the Indigo ID numbers of the devices you want to exclude from the chart (separated by a comma). For example, you may want to exclude USB-powered devices. To select multiple devices, hold the command (&#x2318;) key while selecting.</Label>
+                <Label>Select the devices you want to exclude from the chart (for example, you may want to exclude USB-powered devices.) To select multiple devices, hold the Command (&#x2318;) key while selecting.</Label>
             </Field>
         </ConfigUI>
 
