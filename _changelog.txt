@@ -1,3 +1,7 @@
+v0.7.45
+- Improved validation for chart axis limits (Y Min, Y Max, Y2 Min, Y2 Max).
+- Code refinements.
+
 v0.7.44
 - Updates config dialog text for Battery Health Chart - excluded devices
   (language referred to legacy control.)
@@ -400,7 +404,7 @@ v0.4.04
 - Fixes bug in CSV data element validation to eliminate null devices.
 
 v0.4.03
-- Adds steps-mid and steps-post to linestyles.
+- Adds steps-mid and steps-post to line styles.
 - Adds plugin menu items to enable and disable communication for all charting
   devices (includes CSV Engine devices).
 - Refactors CSV Engine configuration dialog to pre-populate dropdown menus so

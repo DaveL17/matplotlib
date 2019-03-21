@@ -144,12 +144,12 @@
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
-                <Label>Max:</Label>
-            </Field>
-
             <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
                 <Label>Min:</Label>
+            </Field>
+
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
+                <Label>Max:</Label>
             </Field>
 
             <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
@@ -418,7 +418,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <ConfigUI>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="datteryDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="batteryDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
                 <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.</Label>
             </Field>
 
@@ -482,7 +482,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <!-- We need this value to exist in order to display the X axis label. We don't need a legend for the battery health device. -->
             <Field id="showLegend" type="checkbox" defaultValue="false" hidden="true">
-                <Label>Display Grid?</Label>
+                <Label>Show Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 

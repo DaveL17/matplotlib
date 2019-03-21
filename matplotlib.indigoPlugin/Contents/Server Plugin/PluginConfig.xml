@@ -18,7 +18,7 @@
     <Field id="separator00" type="separator"/>
 
     <!-- Hidden controls -->
-    <!-- The DPI warning flag is used to alert the user that selecting a DPI value that's too low will produce subpar results. The checkbox is used to
+    <!-- The DPI warning flag is used to alert the user that selecting a DPI value that's too low will produce sub par results. The checkbox is used to
          allow a warning to be displayed but then also allow the user to save the value if they still want to. -->
     <Field id="dpiWarningFlag" type="checkbox" hidden="True">
         <Label>DPI Warning Flag</Label>

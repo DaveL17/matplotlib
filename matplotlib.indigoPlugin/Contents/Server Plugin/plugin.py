@@ -45,12 +45,6 @@ the proper Fantastic Weather devices.
 # TODO: Remove matplotlib_version.html after deprecation
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
-# TODO: Add logging to the CSV engine routines
-# TODO: Consider dropping the backup csv component to reduce I/O.
-# TODO: Grid property for battery devices has an ID of 'showLegend'.
-
-# TODO: Y1 and Y2 tick labels not plotting for line charts.
-# TODO: Validation: chart Y axis max must be greater than min.
 
 # ================================== IMPORTS ==================================
 
@@ -100,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.44"
+__version__   = "0.7.45"
 
 # =============================================================================
 
@@ -517,11 +511,11 @@ class Plugin(indigo.PluginBase):
 
                 # ========================== Clean Up Old Processes ===========================
                 # If all goes according to plan, this will join() all completed processes. Any
-                # processes that are still running (if any) will be listed to the log
-                zombies = multiprocessing.active_children()  # Will join any zombie processes.
+                # processes that are still running (if any) will be listed to the log.
+                zombies = multiprocessing.active_children()
 
                 if len(zombies) > 0:
-                    self.logger.warning(u"Active child processes: {0}".format(zombies))
+                    self.logger.threaddebug(u"Active child processes: {0}".format(zombies))
 
                 # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
@@ -800,7 +794,6 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
                 return False, values_dict, error_msg_dict
 
-
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
 
@@ -928,16 +921,26 @@ class Plugin(indigo.PluginBase):
         # ================================ Axis Limits ================================
         # Check to see that each axis limit matches one of the accepted formats
         for limit_prop in ('yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin'):
-            try:
-                if limit_prop in values_dict.keys() and values_dict[limit_prop] not in ('None', '0'):
-                    float(values_dict[limit_prop])
 
-            except ValueError:
-                error_msg_dict[limit_prop]      = u"The axis limit must be a real number or None."
-                error_msg_dict['showAlertText'] = u"Axis limit Error.\n\n" \
-                                                  u"A valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, values_dict[limit_prop])
-                values_dict[limit_prop] = 'None'
-                return False, values_dict, error_msg_dict
+            # We only do these if the device has these props.
+            if limit_prop in values_dict.keys():
+
+                # Y axis limits can not be empty.
+                if values_dict[limit_prop] == '' or values_dict[limit_prop].isspace():
+                    self.logger.warning(u"Limits can not be empty. Setting empty limits to \"None.\"")
+                    values_dict[limit_prop] = "None"
+
+                # Y axis limits must be a value that can float.
+                try:
+                    if values_dict[limit_prop] not in ('None', '0'):
+                        float(values_dict[limit_prop])
+
+                except ValueError:
+                    error_msg_dict[limit_prop]      = u"The axis limit must be a real number or None."
+                    error_msg_dict['showAlertText'] = u"Axis limit Error.\n\n" \
+                                                      u"A valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, values_dict[limit_prop])
+                    values_dict[limit_prop] = 'None'
+                    return False, values_dict, error_msg_dict
 
         self.logger.threaddebug(u"Preferences validated successfully.")
         return True, values_dict
@@ -1962,7 +1965,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
-        Create a list of ba dttery-powered devices
+        Create a list of battery-powered devices
 
         Creates a list of tuples that contains the device ID and device name of all
         Indigo devices that report a batterLevel device property that is not None.
