@@ -94,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.45"
+__version__   = "0.7.46"
 
 # =============================================================================
 
@@ -3394,7 +3394,7 @@ class MakeChart(object):
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            # self.format_axis_y1_label(p_dict, k_dict, log)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -4543,26 +4543,26 @@ class MakeChart(object):
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
 
     # =============================================================================
-    # def format_axis_y1_label(self, p_dict, k_dict, log):
-    #     """
-    #     Format Y1 axis labels
-    #
-    #     Controls the format and placement of labels for the Y1 axis.
-    #
-    #     -----
-    #
-    #     :param dict p_dict: plotting parameters
-    #     :param dict k_dict: plotting kwargs
-    #     :param dict log: logging dict
-    #     """
-    #
-    #     try:
-    #         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
-    #
-    #     except (ValueError, TypeError):
-    #         self.host_plugin.pluginErrorHandler(traceback.format_exc())
-    #         log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
-    #         log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
+    def format_axis_y1_label(self, p_dict, k_dict, log):
+        """
+        Format Y1 axis labels
+
+        Controls the format and placement of labels for the Y1 axis.
+
+        -----
+
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
+        """
+
+        try:
+            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+
+        except (ValueError, TypeError):
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
     # =============================================================================
     def format_axis_y_ticks(self, p_dict, k_dict, log):

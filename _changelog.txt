@@ -1,3 +1,6 @@
+v0.7.46
+- Attempt to fix empty text instances for Y axis labels.
+
 v0.7.45
 - Adds feature to Battery Health Device to plot a background box for battery
   level values.
