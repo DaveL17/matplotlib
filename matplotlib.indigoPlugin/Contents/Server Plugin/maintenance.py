@@ -254,6 +254,10 @@ class Maintain(object):
 
             props['isChart'] = is_chart_dict[dev.deviceTypeId]
 
+            # ========================== Battery Health Devices ===========================
+            if dev.deviceTypeId in ('batteryHealthDevice',):
+                props['showBatteryLevelBackground'] = False
+
             # =============================== Chart Devices ===============================
             if dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
 

@@ -2552,6 +2552,9 @@ class Plugin(indigo.PluginBase):
                 # ================================== kwargs ===================================
                 # Note: PyCharm wants attribute values to be strings. This is not always what
                 # Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
+                k_dict['k_annotation_battery'] = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
+                                                  'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
+                                                  'textcoords': 'offset points', 'verticalalignment': 'center', 'zorder': 25}
                 k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
                                             'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
                                             'textcoords': 'offset points', 'verticalalignment': 'center'}
@@ -2757,7 +2760,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92', 'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
                             except Exception as sub_error:
                                 self.pluginErrorHandler(traceback.format_exc())
@@ -3070,6 +3073,7 @@ class MakeChart(object):
             font_color    = p_dict['fontColor']
             font_size     = plt.rcParams['ytick.labelsize']
             healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
+            level_box     = p_dict['showBatteryLevelBackground']
             show_level    = p_dict['showBatteryLevel']
             warning_color = r"#{0}".format(p_dict['warningColor'].replace(' ', '').replace('#', ''))
             warning_level = int(p_dict['warningLevel'])
@@ -3113,7 +3117,17 @@ class MakeChart(object):
 
             # ================================ Data Labels ================================
             # Plot data labels inside or outside depending on bar length
-            if show_level:
+
+            # With annotation background
+            if show_level and level_box:
+                for _ in range(len(y_values)):
+                    if x_values[_] >= caution_level:
+                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88), xytext=(11, 2), **k_dict['k_annotation_battery'])
+                    else:
+                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88), xytext=(3, 2), **k_dict['k_annotation_battery'])
+
+            # Without annotation background
+            elif show_level:
                 for _ in range(len(y_values)):
                     if x_values[_] >= caution_level:
                         plt.annotate(u"{0:>3}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88),
@@ -4493,30 +4507,29 @@ class MakeChart(object):
         """
 
         try:
-            # Min and Max are not 'None'
-            if p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] != 'None':
-                y_axis_min = float(p_dict['yAxisMin']) * 0.75
-                y_axis_max = float(p_dict['yAxisMax']) * 1.25
 
-            # Min is not 'None and max is 'None'
-            elif p_dict['yAxisMin'] != 'None' and p_dict['yAxisMax'] == 'None':
-                y_axis_min = float(p_dict['yAxisMin'])
-                y_axis_max = max(p_dict['data_array']) * 1.25
+            y_min = min(p_dict['data_array'])
+            y_max = max(p_dict['data_array'])
 
-            # Min is 'None' and Max is not 'None'
-            elif p_dict['yAxisMin'] == 'None' and p_dict['yAxisMax'] != 'None':
-                y_axis_min = min(p_dict['data_array']) * 0.75
-                y_axis_max = float(p_dict['yAxisMax'])
+            # Since the min / max is used here only for chart boundaries, we "trick"
+            # Matplotlib by using a number that's very nearly zero.
+            if y_min == 0:
+                y_min = 0.000001
 
-            # Both min and max are 'None'
+            if y_max == 0:
+                y_max = 0.000001
+
+            # Y min
+            if isinstance(p_dict['yAxisMin'], unicode) and p_dict['yAxisMin'].lower() == 'none':
+                y_axis_min = y_min * (1 - (1 / y_min ** 1.25))
             else:
-                if max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
-                    y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
-                    y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
+                y_axis_min = float(p_dict['yAxisMin'])
 
-                else:
-                    y_axis_min = min(p_dict['data_array']) * 0.98
-                    y_axis_max = max(p_dict['data_array']) * 1.02
+            # Y max
+            if isinstance(p_dict['yAxisMax'], unicode) and p_dict['yAxisMax'].lower()== 'none':
+                y_axis_max = y_max * (1 + (1 / y_max ** 1.25))
+            else:
+                y_axis_max = float(p_dict['yAxisMax'])
 
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 

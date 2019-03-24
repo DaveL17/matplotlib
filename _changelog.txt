@@ -1,5 +1,8 @@
 v0.7.45
-- Improved validation for chart axis limits (Y Min, Y Max, Y2 Min, Y2 Max).
+- Adds feature to Battery Health Device to plot a background box for battery
+  level values.
+- Improves validation for chart axis limits (Y Min, Y Max, Y2 Min, Y2 Max).
+- Improves code for plotting Y1 and Y2 axis limits (Y Min, Y Max, Y2 Min, Y2 Max).
 - Code refinements.
 
 v0.7.44
