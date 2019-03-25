@@ -46,6 +46,8 @@ the proper Fantastic Weather devices.
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
 
+# TODO: Add validation that will not allow custom tick locations to be outside
+#       the boundaries of the axis min/max.
 # ================================== IMPORTS ==================================
 
 try:
@@ -668,13 +670,6 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Bar Width Error.\n\nYou must enter a bar width greater than 0."
                 return False, values_dict, error_msg_dict
 
-            # Custom Y axis ticks and labels
-            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
-                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
-                return False, values_dict, error_msg_dict
-
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
 
@@ -787,13 +782,6 @@ class Plugin(indigo.PluginBase):
                     error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
                     return False, values_dict, error_msg_dict
 
-            # Custom Y axis ticks and labels
-            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
-                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
-                return False, values_dict, error_msg_dict
-
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
 
@@ -884,13 +872,6 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
                 return False, values_dict, error_msg_dict
 
-            # Custom Y axis ticks and labels
-            if len(values_dict['customTicksY'].split(',')) != len(values_dict['customTicksLabelY'].split(",")):
-                error_msg_dict['customTicksY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['customTicksLabelY'] = u"There must be the same number of custom labels and ticks."
-                error_msg_dict['showAlertText'] = u"Custom Y Axis Error.\n\nThere must be the same number of custom labels and ticks."
-                return False, values_dict, error_msg_dict
-
         # =============================== Weather Chart ===============================
         if type_id == 'forecastChartingDevice':
 
@@ -943,7 +924,7 @@ class Plugin(indigo.PluginBase):
                     return False, values_dict, error_msg_dict
 
         self.logger.threaddebug(u"Preferences validated successfully.")
-        return True, values_dict
+        return True, values_dict, error_msg_dict
 
     # =============================================================================
     def __log_dicts(self, dev=None):
@@ -4579,8 +4560,8 @@ class MakeChart(object):
         """
         # TODO: why are we plotting the Y axis label in a ticks method?
 
-        custom_ticks_marks  = p_dict['customTicksY']
-        custom_ticks_labels = p_dict['customTicksLabelY']
+        custom_ticks_marks  = p_dict['customTicksY'].strip()
+        custom_ticks_labels = p_dict['customTicksLabelY'].strip()
 
         try:
             # The label for the Y axis.
@@ -4592,6 +4573,11 @@ class MakeChart(object):
             # If the user has not set custom tick values or labels, we're done.
             if custom_ticks_marks.lower() in ('none', '') and custom_ticks_labels.lower() in ('none', ''):
                 return
+
+            # If tick locations defined but tick labels are empty, let's use the tick
+            # locations as the tick labels
+            if custom_ticks_marks.lower() not in ('none', '') and custom_ticks_labels.lower() in ('none', ''):
+                custom_ticks_labels = custom_ticks_marks
 
             # Replace default Y tick values with the custom ones.
             if custom_ticks_marks.lower() not in ('none', '') and not custom_ticks_marks.isspace():
