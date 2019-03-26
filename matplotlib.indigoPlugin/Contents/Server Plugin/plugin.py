@@ -39,15 +39,16 @@ the proper Fantastic Weather devices.
 # TODO: Try to address annotation collisions.
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Wrap long names for battery health device?
-# TODO: Add facility to have different Y1 and Y2.  Add a new group of controls
+# TODO: Add facility to have different Y1 and Y2. Add a new group of controls
 #       (like Y1) for Y2 and then have a control to allow user to elect when Y
 #       axis to assign the line to.
 # TODO: Remove matplotlib_version.html after deprecation
 # TODO: if the csv save location is a share, and the share is unreachable, it
 #       blows up.
-
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
+# TODO: Add adjustment factor to scatter charts
+# TODO: Move more plotting stuff to methods
 # ================================== IMPORTS ==================================
 
 try:
