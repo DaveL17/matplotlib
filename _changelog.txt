@@ -1,3 +1,7 @@
+v0.7.47
+- Improves handling of CSV data updates when duration is set to zero (no
+  limit.)
+
 v0.7.46
 - Fixes empty text instances for custom Y tick labels (where locations are
   defined but labels are not.)

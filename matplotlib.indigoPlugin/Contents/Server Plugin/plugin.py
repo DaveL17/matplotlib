@@ -97,7 +97,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.46"
+__version__   = "0.7.47"
 
 # =============================================================================
 
@@ -1428,7 +1428,7 @@ class Plugin(indigo.PluginBase):
 
                 # ============================== Limit for Time ===============================
                 # Limit data by time
-                if delta >= 0:
+                if delta > 0:
                     cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
                     time_data = [row for row in data if date_parse(row[0]) >= cut_off]
 
