@@ -97,7 +97,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.47"
+__version__   = "0.7.48"
 
 # =============================================================================
 
@@ -4251,7 +4251,7 @@ class MakeChart(object):
         """
 
         converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
-                     'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1}
+                     'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1, 'armed':1, 'disarmed':0}
         now       = dt.datetime.now()
         now_text  = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
 

@@ -1,3 +1,6 @@
+v0.7.48
+- Adds support for charting 'Armed' and 'Disarmed' values.
+
 v0.7.47
 - Improves handling of CSV data updates when duration is set to zero (no
   limit.)
