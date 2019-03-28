@@ -2897,17 +2897,13 @@ class MakeChart(object):
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
 
-            for _ in range(1, 5, 1):
-                p_dict['bar{0}Color'.format(_)] = r"#{0}".format(p_dict['bar{0}Color'.format(_)].replace(' ', '').replace('#', ''))
-
-            # ============================== Plot the Figure ==============================
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-
-            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
             for thing in range(1, 5, 1):
+
+                p_dict['bar{0}Color'.format(thing)] = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor']:
@@ -2917,7 +2913,7 @@ class MakeChart(object):
                 if p_dict['suppressBar{0}'.format(thing)]:
                     log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, thing))
 
-                # Plot the bars.  If 'suppressBar{thing} is True, we skip it.
+                # Plot the bars. If 'suppressBar{thing} is True, we skip it.
                 if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not p_dict['suppressBar{0}'.format(thing)]:
 
                     # Get the data and grab the header.
@@ -2955,13 +2951,8 @@ class MakeChart(object):
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(thing)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            # ============================== Y1 Axis Min/Max ==============================
             self.format_axis_y1_min_max(p_dict, log)
-
-            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
-
-            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict, log)
 
             # Add a patch so that we can have transparent charts but a filled plot area.
@@ -3002,22 +2993,11 @@ class MakeChart(object):
                 if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            # =========================== Custom Line Segments ============================
             self.plot_custom_line_segments(ax, p_dict, k_dict)
-
-            # =============================== Format Grids ================================
             self.format_grids(p_dict, k_dict, log)
-
-            # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
-
-            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
-
-            # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3090,7 +3070,6 @@ class MakeChart(object):
             # Create a range of values to plot on the Y axis, since we can't plot on device names.
             y_values = np.arange(len(y_text))
 
-            # ============================== Plot the Figure ==============================
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # Adding 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting it off the axis.
@@ -3125,9 +3104,7 @@ class MakeChart(object):
                 for _ in (20, 40, 60, 80):
                     ax.axvline(x=_, color=p_dict['gridColor'], linestyle=self.host_plugin.pluginPrefs.get('gridStyle', ':'))
 
-            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
-
             ax.xaxis.set_ticks_position('bottom')
 
             # ============================== X Axis Min/Max ===============================
@@ -3157,11 +3134,7 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            # ================================ Save Image =================================
-            # Output the file
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': None, 'right': 0.95})
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3206,10 +3179,7 @@ class MakeChart(object):
             ax.axes.get_yaxis().set_visible(False)
             ax.axis('off')
 
-            # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3249,7 +3219,6 @@ class MakeChart(object):
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
@@ -3358,25 +3327,12 @@ class MakeChart(object):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
-
             self.format_grids(p_dict, k_dict, log)
-
-            # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
-
-            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
-
-            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict, log)
-
-            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
-
-            # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3448,13 +3404,8 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
-
-            # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3655,16 +3606,8 @@ class MakeChart(object):
                     frame = legend.get_frame()
                     frame.set_alpha(0)
 
-                # =============================== Display Grids ===============================
-                # Grids are always on for polar wind charts.
-
-                # ================================ Chart Title ================================
                 self.format_title(p_dict, k_dict, log, loc=(-0.1, 1.05))
-
-                # ================================ Save Image =================================
                 self.save_chart_image(plt, p_dict, k_dict, log, size={'top': 0.85, 'bottom': 0.15, 'left': 0.15, 'right': 0.85})
-
-                # ============================ Process Log Entries ============================
                 self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3704,8 +3647,6 @@ class MakeChart(object):
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-
-            # ================================ Format Axes ================================
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
@@ -3795,25 +3736,12 @@ class MakeChart(object):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
-
             self.format_grids(p_dict, k_dict, log)
-
-            # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
-
-            # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
-
-            # =============================== Y Axis Label ================================
             self.format_axis_y1_label(p_dict, k_dict, log)
-
-            # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
-
-            # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
@@ -3957,9 +3885,7 @@ class MakeChart(object):
 
             log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
 
-            # ==================================== AX1 ====================================
             ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-
             self.format_axis_x_ticks(ax1, p_dict, k_dict, log)
             self.format_axis_y(ax1, p_dict, k_dict, log)
 
@@ -4087,7 +4013,6 @@ class MakeChart(object):
 
             self.format_axis_x_ticks(ax2, p_dict, k_dict, log)
             self.format_axis_y(ax2, p_dict, k_dict, log)
-
             self.plot_custom_line_segments(ax2, p_dict, k_dict)
 
             plt.autoscale(enable=True, axis='x', tight=None)
@@ -4134,9 +4059,6 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])  # Note we're plotting Y1 label on ax2
             ax2.yaxis.set_label_position('left')
 
-            # ================================ Chart Title ================================
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
-
             # ============================= Legend Properties =============================
             # (note that we need a separate instance of this code for each subplot. This
             # one controls the temperatures subplot.) Legend should be plotted before any
@@ -4149,13 +4071,10 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
             self.format_grids(p_dict, k_dict, log)
-
-            # ================================ Save Image =================================
             plt.tight_layout(pad=1)
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': 0.05, 'right': 0.95})
-
-            # ============================ Process Log Entries ============================
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
@@ -4307,7 +4226,7 @@ class MakeChart(object):
                 log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev.name))
 
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
-                log['Threaddebug'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
+                log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
         except (ValueError, TypeError):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -4812,6 +4731,7 @@ class MakeChart(object):
     # =============================================================================
     def process_log(self, dev, log, return_queue):
         """
+        Iterate the chart log and add it to the output queue
 
         -----
 

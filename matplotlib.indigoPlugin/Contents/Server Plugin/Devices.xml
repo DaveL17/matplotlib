@@ -81,7 +81,7 @@
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -486,7 +486,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <!-- We need this value to exist in order to display the X axis label. We don't need a legend for the battery health device. -->
             <Field id="showLegend" type="checkbox" defaultValue="false" hidden="true">
-                <Label>Show Legend?</Label>
+                <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -716,7 +716,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -1566,7 +1566,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -1683,7 +1683,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -2140,7 +2140,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Daytime Color:</Label>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend.">
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
