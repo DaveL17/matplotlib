@@ -101,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.49"
+__version__   = "0.7.50"
 
 # =============================================================================
 
@@ -3017,11 +3017,8 @@ class MakeChart(object):
             # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors. See plugin log for more information.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3164,11 +3161,8 @@ class MakeChart(object):
             # Output the file
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': None, 'right': 0.95})
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3215,11 +3209,8 @@ class MakeChart(object):
             # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3385,11 +3376,8 @@ class MakeChart(object):
             # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3466,11 +3454,8 @@ class MakeChart(object):
             # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3679,11 +3664,8 @@ class MakeChart(object):
                 # ================================ Save Image =================================
                 self.save_chart_image(plt, p_dict, k_dict, log, size={'top': 0.85, 'bottom': 0.15, 'left': 0.15, 'right': 0.85})
 
-                # Prepare log for output.
-                if log['Warning'] or log['Critical']:
-                    return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-                else:
-                    return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+                # ============================ Process Log Entries ============================
+                self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -3831,11 +3813,8 @@ class MakeChart(object):
             # ================================ Save Image =================================
             self.save_chart_image(plt, p_dict, k_dict, log)
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -4176,11 +4155,8 @@ class MakeChart(object):
             plt.tight_layout(pad=1)
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': 0.05, 'right': 0.95})
 
-            # Prepare log for output.
-            if log['Warning'] or log['Critical']:
-                return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors.', 'Name': dev.name})
-            else:
-                return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            # ============================ Process Log Entries ============================
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -4832,6 +4808,22 @@ class MakeChart(object):
                 self.host_plugin.logger.warning(u"There is a problem with the custom line segments settings. {0}. See plugin log for more information.".format(sub_error))
 
                 return ax
+
+    # =============================================================================
+    def process_log(self, dev, log, return_queue):
+        """
+
+        -----
+
+        :param dev:
+        :param log:
+        :param return_queue:
+        :return:
+        """
+        if log['Warning'] or log['Critical']:
+            return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors. See plugin log for more information.', 'Name': dev.name})
+        else:
+            return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
 
     # =============================================================================
     def save_chart_image(self, plot, p_dict, k_dict, log, size=None):
