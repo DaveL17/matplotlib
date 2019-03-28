@@ -49,6 +49,10 @@ the proper Fantastic Weather devices.
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
 # TODO: Move more plotting stuff to methods
+
+# TODO: Check and see if we need to return the log from the formatting routines
+#       since they're being called from within the charting method. I'm
+#       guessing not.  Search for 'log ='
 # ================================== IMPORTS ==================================
 
 try:
@@ -97,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.48"
+__version__   = "0.7.49"
 
 # =============================================================================
 
@@ -2742,7 +2746,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92', 'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
+                                device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92', 'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
                             except Exception as sub_error:
                                 self.pluginErrorHandler(traceback.format_exc())
@@ -2896,6 +2900,7 @@ class MakeChart(object):
             for _ in range(1, 5, 1):
                 p_dict['bar{0}Color'.format(_)] = r"#{0}".format(p_dict['bar{0}Color'.format(_)].replace(' ', '').replace('#', ''))
 
+            # ============================== Plot the Figure ==============================
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # ================================ Format Axes ================================
@@ -2951,13 +2956,13 @@ class MakeChart(object):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             # ============================== Y1 Axis Min/Max ==============================
-            log = self.format_axis_y1_min_max(p_dict, log)
+            self.format_axis_y1_min_max(p_dict, log)
 
             # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            # self.format_axis_y1_label(p_dict, k_dict, log)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -3004,16 +3009,13 @@ class MakeChart(object):
             self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
-            # plt.tight_layout(pad=1)
-            plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
-
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log)
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -3119,7 +3121,7 @@ class MakeChart(object):
                                      xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
 
             # ================================ Chart Title ================================
-            plt.suptitle(p_dict['chartTitle'], **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # =============================== Format Grids ================================
             if dev.ownerProps.get('showxAxisGrid', False):
@@ -3128,6 +3130,7 @@ class MakeChart(object):
 
             # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
+
             ax.xaxis.set_ticks_position('bottom')
 
             # ============================== X Axis Min/Max ===============================
@@ -3159,8 +3162,7 @@ class MakeChart(object):
 
             # ================================ Save Image =================================
             # Output the file
-            plt.tight_layout()
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log, size={'left': None, 'right': 0.95})
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -3211,8 +3213,7 @@ class MakeChart(object):
             ax.axis('off')
 
             # ================================ Save Image =================================
-            plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.9, hspace=None, wspace=None)
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log)
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -3314,7 +3315,7 @@ class MakeChart(object):
 
             # ============================== Y1 Axis Min/Max ==============================
             # Min and Max are not 'None'.
-            log = self.format_axis_y1_min_max(p_dict, log)
+            self.format_axis_y1_min_max(p_dict, log)
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -3370,7 +3371,7 @@ class MakeChart(object):
             self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3382,8 +3383,7 @@ class MakeChart(object):
             self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
-            plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log)
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -3461,11 +3461,10 @@ class MakeChart(object):
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
             # ================================ Chart Title ================================
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # ================================ Save Image =================================
-            plt.subplots_adjust(top=0.9, bottom=0.05, left=0.02, right=0.98, hspace=None, wspace=None)
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -3675,12 +3674,10 @@ class MakeChart(object):
                 # Grids are always on for polar wind charts.
 
                 # ================================ Chart Title ================================
-                plt.title(p_dict['chartTitle'], position=(0, 1.0), **k_dict['k_title_font'])
+                self.format_title(p_dict, k_dict, log, loc=(-0.1, 1.05))
 
                 # ================================ Save Image =================================
-                # plt.tight_layout(pad=1)
-                plt.subplots_adjust(top=0.95, bottom=0.15, left=0.15, right=0.85, hspace=None, wspace=None)
-                self.save_chart_image(plt, p_dict, k_dict)
+                self.save_chart_image(plt, p_dict, k_dict, log, size={'top': 0.85, 'bottom': 0.15, 'left': 0.15, 'right': 0.85})
 
                 # Prepare log for output.
                 if log['Warning'] or log['Critical']:
@@ -3778,7 +3775,7 @@ class MakeChart(object):
 
             # ============================== Y1 Axis Min/Max ==============================
             # Min and Max are not 'None'.
-            log = self.format_axis_y1_min_max(p_dict, log)
+            self.format_axis_y1_min_max(p_dict, log)
 
             # ================================== Legend ===================================
             if p_dict['showLegend']:
@@ -3820,21 +3817,19 @@ class MakeChart(object):
             self.format_grids(p_dict, k_dict, log)
 
             # ================================ Chart Title ================================
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # =============================== X Axis Label ================================
             self.format_axis_x_label(dev, p_dict, k_dict, log)
 
             # =============================== Y Axis Label ================================
-            # self.format_axis_y1_label(p_dict, k_dict, log)
+            self.format_axis_y1_label(p_dict, k_dict, log)
 
             # ============================== Custom Y Ticks ===============================
             self.format_axis_y_ticks(p_dict, k_dict, log)
 
             # ================================ Save Image =================================
-            # plt.tight_layout(pad=1)
-            plt.subplots_adjust(top=0.9, bottom=0.2, left=0.1, right=0.92, hspace=None, wspace=None)
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log)
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -4161,7 +4156,7 @@ class MakeChart(object):
             ax2.yaxis.set_label_position('left')
 
             # ================================ Chart Title ================================
-            plt.title(p_dict['chartTitle'], position=(0.5, 1.0), **k_dict['k_title_font'])
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
 
             # ============================= Legend Properties =============================
             # (note that we need a separate instance of this code for each subplot. This
@@ -4179,8 +4174,7 @@ class MakeChart(object):
 
             # ================================ Save Image =================================
             plt.tight_layout(pad=1)
-            plt.subplots_adjust(bottom=0.2)
-            self.save_chart_image(plt, p_dict, k_dict)
+            self.save_chart_image(plt, p_dict, k_dict, log, size={'left': 0.05, 'right': 0.95})
 
             # Prepare log for output.
             if log['Warning'] or log['Critical']:
@@ -4334,12 +4328,10 @@ class MakeChart(object):
         try:
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-                return u"[{0}] No call for legend. Formatting X label.".format(dev.name)
+                log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev.name))
 
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
-                return u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name)
-
-            return ''
+                log['Threaddebug'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
         except (ValueError, TypeError):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -4445,6 +4437,18 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         :param dict log: Logging dict
         """
+        # TODO: Balance the axis methods.  We should have:
+        #       x_label
+        #       x_scale
+        #       x_ticks
+        #       y1_label
+        #       y1_scale
+        #       y1_ticks
+        #       y1_min_max
+        #       y2_label
+        #       y2_scale
+        #       y2_ticks
+        #       y2_min_max
 
         try:
             ax.tick_params(axis='y', **k_dict['k_major_y'])
@@ -4515,8 +4519,6 @@ class MakeChart(object):
 
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
-            return log
-
         except (ValueError, TypeError):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = {0}".format(p_dict['yAxisMax']))
@@ -4559,15 +4561,11 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
         """
-        # TODO: why are we plotting the Y axis label in a ticks method?
 
         custom_ticks_marks  = p_dict['customTicksY'].strip()
         custom_ticks_labels = p_dict['customTicksLabelY'].strip()
 
         try:
-            # The label for the Y axis.
-            plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
-
             # Get the default tick values and labels (which we'll replace as needed.)
             marks, labels = plt.yticks()
 
@@ -4674,6 +4672,21 @@ class MakeChart(object):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {0}".format(p_dict['showxAxisGrid']))
             log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
+
+    # =============================================================================
+    def format_title(self, p_dict, k_dict, log, loc):
+        """
+        Plot the figure's title
+
+        -----
+
+        :param p_dict:
+        :param k_dict:
+        :param log:
+        :param loc:
+        :return:
+        """
+        plt.title(p_dict['chartTitle'], position=loc, **k_dict['k_title_font'])
 
     # =============================================================================
     def get_data(self, data_source, log):
@@ -4821,12 +4834,11 @@ class MakeChart(object):
                 return ax
 
     # =============================================================================
-    def save_chart_image(self, plot, p_dict, k_dict):
+    def save_chart_image(self, plot, p_dict, k_dict, log, size=None):
         """
         Save the chart figure to a file.
 
         Uses the matplotlib savefig module to write the chart to a file.
-
         -----
 
         :param module plot:
@@ -4834,7 +4846,28 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         """
 
+        # All charts will use these dimenstions unless they're overridden by the payload.
+        parms = {'top': 0.90,
+                 'bottom': 0.20,
+                 'left': 0.10,
+                 'right': 0.90,
+                 'hspace': None,
+                 'wspace': None}
+
         try:
+
+            # if a parm is sent here, replace the default with the payload
+            if size:
+                for key in size.keys():
+                    parms[key] = size[key]
+
+            plt.subplots_adjust(top=parms['top'],
+                                bottom=parms['bottom'],
+                                left=parms['left'],
+                                right=parms['right'],
+                                hspace=parms['hspace'],
+                                wspace=parms['wspace'])
+
             if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
                 plot.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 

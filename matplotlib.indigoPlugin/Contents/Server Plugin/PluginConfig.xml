@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <PluginConfig>
 
+    <SupportURL>https://github.com/DaveL17/matplotlib/wiki/configuration</SupportURL>
+
     <Field id="infoLabel0" type="label">
         <Label>Matplotlib Charting Plugin</Label>
     </Field>

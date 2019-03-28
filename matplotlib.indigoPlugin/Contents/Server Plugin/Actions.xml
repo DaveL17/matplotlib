@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <Actions>
 
-    <SupportURL>https://github.com/DaveL17/matplotlib/wiki</SupportURL>
-
     <!-- ========================= Refresh CSV Device ========================= -->
 
     <Action id="refresh_csv_device" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Device</Name>
 
       <ConfigUI>
+        <SupportURL>https://github.com/DaveL17/matplotlib/wiki/actions</SupportURL>
+
         <Field id="Instructions" type="label">
           <Label>Use this action to refresh all data sources associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
         </Field>
@@ -30,6 +30,7 @@
     <Action id="refresh_csv_source" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Source</Name>
       <ConfigUI>
+        <SupportURL>https://github.com/DaveL17/matplotlib/wiki/actions</SupportURL>
 
         <Field id="Instructions" type="label">
           <Label>Use this action to refresh the selected data source associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>

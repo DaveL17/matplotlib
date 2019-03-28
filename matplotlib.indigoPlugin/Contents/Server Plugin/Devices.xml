@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <Devices>
 
+
 <!-- Bar Charting Device -->
     <Device id="barChartingDevice" type="custom">
         <Name>Bar Chart</Name>
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
@@ -416,6 +418,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Battery Health Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="batteryDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -562,6 +566,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Calendar Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="CalendarDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -635,6 +641,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Line Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="lineChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -1323,6 +1331,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Multiline Text Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="multilineTextDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -1447,6 +1457,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Polar Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="polarChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -1595,6 +1607,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Scatter Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="scatterChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -2048,6 +2062,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <Name>Weather Forecast Chart</Name>
 
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
@@ -2388,6 +2404,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
     <Device id="csvEngine" type="custom">
         <Name>CSV Engine Device</Name>
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/csv_engine</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
 
@@ -2577,6 +2594,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
     <Device id="rcParamsDevice" type="custom">
         <Name>Matplotlib Parameters Device</Name>
         <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
             <Field id="rcParamsLabel" type="label">

@@ -24,6 +24,7 @@
         <CallbackMethod>advancedSettingsExecuted</CallbackMethod>
         <ButtonTitle>Save</ButtonTitle>
 		<ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/advanced_settings</SupportURL>
 
 			<Field id="instructionsLabel" type="label" fontColor="black" fontSize="regular">
 				<Label>Advanced Plugin Settings</Label>
