@@ -1,3 +1,8 @@
+v0.7.52
+- Better handles long device names in Battery Health chart.
+- Plots title relative to figure instead of to plot.
+- Fixes KeyError bug in pluginEnvironmentLogger 'isChart'.
+
 v0.7.51
 - Adds control to hide device names on battery health charts.
 - Improves plotting of battery level values on battery health charts.

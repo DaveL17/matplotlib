@@ -2468,7 +2468,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="addSourceFilter" type="menu" defaultValue="A">
                 <Label>Filter:</Label>
                 <List>
-                    <Option value="A">Show All</Option>
+                    <Option value="A">Display All</Option>
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>
@@ -2536,7 +2536,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="editSourceFilter" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
                 <Label>Filter:</Label>
                 <List>
-                    <Option value="A">Show All</Option>
+                    <Option value="A">Display All</Option>
                     <Option value="D">Devices Only</Option>
                     <Option value="V">Variables Only</Option>
                 </List>

@@ -47,6 +47,9 @@ the proper Fantastic Weather devices.
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
+# TODO: Note that the Title and X Axis label do not center to the figure but
+#       to the plot.  This may be normal.
+# TODO: Check to ensure that the Indigo version is compatible.
 
 # ================================== IMPORTS ==================================
 
@@ -96,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.51"
+__version__   = "0.7.52"
 
 # =============================================================================
 
@@ -2290,7 +2293,7 @@ class Plugin(indigo.PluginBase):
 
         # ========================== Get Plugin Device Load ===========================
         for dev in indigo.devices.iter('self'):
-            if dev.ownerProps['isChart']:
+            if dev.ownerProps.get('isChart', False):
                 chart_devices += 1
             elif dev.deviceTypeId == 'csvEngine':
                 csv_engines += 1
@@ -2754,7 +2757,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                # device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                                device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
@@ -3004,7 +3007,7 @@ class MakeChart(object):
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
             self.format_grids(p_dict, k_dict, log)
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_y_ticks(p_dict, k_dict, log)
             self.save_chart_image(plt, p_dict, k_dict, log)
             self.process_log(dev, log, return_queue)
@@ -3106,7 +3109,7 @@ class MakeChart(object):
                         plt.annotate(u"{0:.0f}".format(width), xy=(width + 1, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
 
             # ================================ Chart Title ================================
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
 
             # =============================== Format Grids ================================
             if dev.ownerProps.get('showxAxisGrid', False):
@@ -3145,7 +3148,11 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            self.save_chart_image(plt, p_dict, k_dict, log, size={'left': None, 'right': 0.95})
+            plt.tight_layout()
+            plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+            plt.clf()
+            plt.close('all')
+
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
@@ -3171,7 +3178,7 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: return queue
         """
-
+        # TODO: See if this can be extended using plt.table; then we can use TT fonts.
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
@@ -3338,7 +3345,7 @@ class MakeChart(object):
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
             self.format_grids(p_dict, k_dict, log)
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
             self.format_axis_y1_label(p_dict, k_dict, log)
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -3414,7 +3421,7 @@ class MakeChart(object):
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                 ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
 
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
             self.process_log(dev, log, return_queue)
 
@@ -3616,7 +3623,7 @@ class MakeChart(object):
                     frame = legend.get_frame()
                     frame.set_alpha(0)
 
-                self.format_title(p_dict, k_dict, log, loc=(-0.1, 1.05))
+                self.format_title(p_dict, k_dict, log, loc=(0.025, 0.98), align='left')
                 self.save_chart_image(plt, p_dict, k_dict, log, size={'top': 0.85, 'bottom': 0.15, 'left': 0.15, 'right': 0.85})
                 self.process_log(dev, log, return_queue)
 
@@ -3744,7 +3751,7 @@ class MakeChart(object):
 
             self.plot_custom_line_segments(ax, p_dict, k_dict)
             self.format_grids(p_dict, k_dict, log)
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
             self.format_axis_y1_label(p_dict, k_dict, log)
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -4079,7 +4086,7 @@ class MakeChart(object):
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_grids(p_dict, k_dict, log)
             plt.tight_layout(pad=1)
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': 0.05, 'right': 0.95})
@@ -4577,7 +4584,7 @@ class MakeChart(object):
             log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
 
     # =============================================================================
-    def format_title(self, p_dict, k_dict, log, loc):
+    def format_title(self, p_dict, k_dict, log, loc, align='center'):
         """
         Plot the figure's title
 
@@ -4587,10 +4594,11 @@ class MakeChart(object):
         :param k_dict:
         :param log:
         :param loc:
+        :param str align:
         :return:
         """
         try:
-            plt.title(p_dict['chartTitle'], position=loc, **k_dict['k_title_font'])
+            plt.suptitle(p_dict['chartTitle'], position=loc, ha=align, **k_dict['k_title_font'])
 
         except KeyError as sub_error:
             log['Warning'].append(u"Title Error: {0}".format(sub_error))

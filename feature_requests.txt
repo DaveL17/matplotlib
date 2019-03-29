@@ -5,13 +5,6 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 2019-02-12  Autolog
 ===============================================================================
-It would be useful to able to specify the text colour when selecting Show
-Battery Level. At the moment if you select a light green colour for the Healthy
-colour then the white text gets lost.
-
-===============================================================================
-2019-02-12  Autolog
-===============================================================================
 it would be useful to set the whole bar to red if the battery is zero - so it
 stands out.
 
@@ -56,6 +49,19 @@ Setpoints. I use the range -5 deg C to 35 deg C for the Y1 axis. I would like
 to map the thermostat valve opening value on the Y2 scale from 0% (fully
 closed) to 100% (fully open). I would then be able to easily correlate the
 valve opening against the temperature.
+
+===============================================================================
+COMPLETED =====================================================================
+===============================================================================
+
+===============================================================================
+2019-02-12  Autolog  [COMPLETE]
+===============================================================================
+It would be useful to able to specify the text colour when selecting Show
+Battery Level. At the moment if you select a light green colour for the Healthy
+colour then the white text gets lost.
+
+DaveL17 - annotations feature added to Battery Health devices in v0.7.45.
 
 ===============================================================================
 2019-01-21  Autolog  [COMPLETE]

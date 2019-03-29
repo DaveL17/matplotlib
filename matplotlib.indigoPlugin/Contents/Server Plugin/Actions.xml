@@ -19,7 +19,7 @@
         </Field>
 
         <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
-          <Label>(Only devices set to manual update will be shown. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
+          <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
         </Field>
       </ConfigUI>
       <CallbackMethod>csv_refresh_device_action</CallbackMethod>
@@ -48,7 +48,7 @@
         </Field>
 
         <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
-          <Label>(Only devices set to manual update will be shown. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
+          <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
         </Field>
 
       </ConfigUI>
