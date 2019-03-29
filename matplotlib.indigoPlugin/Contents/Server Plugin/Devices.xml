@@ -524,14 +524,19 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Warning Level:</Label>
             </Field>
 
+            <Field id="showDeviceName" type="checkbox" defaultValue="true" tooltip="Check to display device names along the Y axis. If the names are too long, it is recommended that you hide them and add names using control page text elements.">
+                <Label>Display Device Names?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="showBatteryLevel" type="checkbox" defaultValue="true" tooltip="Check to display the current battery level for each device within the chart.">
-                <Label>Display Battery Level?</Label>
+                <Label>Display Battery Levels?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
             <Field id="showBatteryLevelBackground" type="checkbox" defaultValue="false" visibleBindingId="showBatteryLevel" visibleBindingValue="true"
                    tooltip="Check to display a background box to the battery level indicator.">
-                <Label>Display Battery Level Box?</Label>
+                <Label>Highlight Battery Levels?</Label>
                 <Description>Yes/No</Description>
             </Field>
 

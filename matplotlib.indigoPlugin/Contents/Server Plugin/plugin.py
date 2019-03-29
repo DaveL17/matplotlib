@@ -38,7 +38,6 @@ the proper Fantastic Weather devices.
 # TODO: Support substitutions for certain fields (like save location).
 # TODO: Try to address annotation collisions.
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
-# TODO: Wrap long names for battery health device?
 # TODO: Add facility to have different Y1 and Y2. Add a new group of controls
 #       (like Y1) for Y2 and then have a control to allow user to elect when Y
 #       axis to assign the line to.
@@ -48,11 +47,7 @@ the proper Fantastic Weather devices.
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
-# TODO: Move more plotting stuff to methods
 
-# TODO: Check and see if we need to return the log from the formatting routines
-#       since they're being called from within the charting method. I'm
-#       guessing not.  Search for 'log ='
 # ================================== IMPORTS ==================================
 
 try:
@@ -101,7 +96,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.50"
+__version__   = "0.7.51"
 
 # =============================================================================
 
@@ -335,12 +330,13 @@ class Plugin(indigo.PluginBase):
 
                 # =========================== Battery Health Device ===========================
                 if type_id == "batteryHealthDevice":
-                    values_dict['healthyColor']     = '00 00 CC'
-                    values_dict['cautionLevel']     = '10'
-                    values_dict['cautionColor']     = 'FF FF 00'
-                    values_dict['warningLevel']     = '5'
-                    values_dict['warningColor']     = 'FF 00 00'
-                    values_dict['showBatteryLevel'] = 'true'
+                    values_dict['healthyColor']               = '00 00 CC'
+                    values_dict['cautionLevel']               = '10'
+                    values_dict['cautionColor']               = 'FF FF 00'
+                    values_dict['warningLevel']               = '5'
+                    values_dict['warningColor']               = 'FF 00 00'
+                    values_dict['showBatteryLevel']           = 'true'
+                    values_dict['showBatteryLevelBackground'] = 'false'
 
                 # ========================== Calendar Charting Device =========================
                 if type_id == "calendarChartingDevice":
@@ -442,7 +438,8 @@ class Plugin(indigo.PluginBase):
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
-        return True
+
+        return True, values_dict
 
     # =============================================================================
     def getDeviceStateList(self, dev):
@@ -758,7 +755,7 @@ class Plugin(indigo.PluginBase):
 
             except ValueError:
                 error_msg_dict['addSource'] = u"You must create at least one CSV data source."
-                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source. If you have filled in the entries, you may have forgotten to click the 'Add Item' button."
+                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source. If you have filled in the entries, you may need to click the 'Add Item' button."
                 return False, values_dict, error_msg_dict
 
         # ================================ Line Chart =================================
@@ -1418,7 +1415,7 @@ class Plugin(indigo.PluginBase):
                     self.logger.error(u"[{0}] Unable to backup CSV file: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                 # ================================= Load Data =================================
-                # Read CSV data into dataframe
+                # Read CSV data into data frame
                 with open(full_path) as in_file:
                     raw_data = [row for row in csv.reader(in_file, delimiter=',')]
 
@@ -1477,7 +1474,7 @@ class Plugin(indigo.PluginBase):
                     self.logger.error(u"[{0}] Invalid CSV definition: {1}".format(dev.name, sub_error))
 
                 # ============================= Limit for Length ==============================
-                # The dataframe (with the newest observation included) may now be too long.
+                # The data frame (with the newest observation included) may now be too long.
                 # If it is, we trim it for length.
                 if 0 <= target_lines < len(data):
                     data = data[len(data) - target_lines:]
@@ -1576,7 +1573,6 @@ class Plugin(indigo.PluginBase):
             foo           = {target_source: temp_dict[target_source]}
 
             self.csv_refresh_process(dev, foo)
-            self.logger.info(u"CSV refresh source action complete.")
 
         else:
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
@@ -2538,9 +2534,21 @@ class Plugin(indigo.PluginBase):
                 # ================================== kwargs ===================================
                 # Note: PyCharm wants attribute values to be strings. This is not always what
                 # Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
+                k_dict['k_battery']            = {'color': p_dict['fontColorAnnotation'],
+                                                  'horizontalalignment': 'center',
+                                                  'size': plt.rcParams['xtick.labelsize'],
+                                                  'textcoords': 'data',
+                                                  'verticalalignment': 'center',
+                                                  'xycoords': 'data',
+                                                  'zorder': 25}
                 k_dict['k_annotation_battery'] = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
-                                                  'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
-                                                  'textcoords': 'offset points', 'verticalalignment': 'center', 'zorder': 25}
+                                                  'color': p_dict['fontColorAnnotation'],
+                                                  'horizontalalignment': 'center',
+                                                  'size': plt.rcParams['xtick.labelsize'],
+                                                  'textcoords': 'data',
+                                                  'verticalalignment': 'center',
+                                                  'xycoords': 'data',
+                                                  'zorder': 25}
                 k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
                                             'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
                                             'textcoords': 'offset points', 'verticalalignment': 'center'}
@@ -2746,7 +2754,9 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92', 'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
+                                device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92'}
+                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
+                                #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
                             except Exception as sub_error:
                                 self.pluginErrorHandler(traceback.format_exc())
@@ -2939,8 +2949,7 @@ class MakeChart(object):
                     else:
                         width = float(p_dict['barWidth'])
 
-                    # Plot the bar.
-                    # Note: hatching is not supported in the PNG backend.
+                    # Plot the bar. Note: hatching is not supported in the PNG backend.
                     ax.bar(dates_to_plot[num_obs * -1:], p_dict['y_obs{0}'.format(thing)][num_obs * -1:], align='center', width=width,
                            color=p_dict['bar{0}Color'.format(thing)], edgecolor=p_dict['bar{0}Color'.format(thing)], **k_dict['k_bar'])
 
@@ -2982,9 +2991,9 @@ class MakeChart(object):
                 frame.set_alpha(0)
 
             # =============================== Min/Max Lines ===============================
-            # Note that these need to be plotted after the legend is
-            # established, otherwise some of the characteristics of the min/max
-            # lines will take over the legend props.
+            # Note that these need to be plotted after the legend is established, otherwise
+            # some of the characteristics of the min/max lines will take over the legend
+            # props.
             for thing in range(1, 5, 1):
                 if p_dict['plotBar{0}Min'.format(thing)]:
                     ax.axhline(y=min(p_dict['y_obs{0}'.format(thing)][num_obs * -1:]), color=p_dict['bar{0}Color'.format(thing)], **k_dict['k_min'])
@@ -3031,7 +3040,6 @@ class MakeChart(object):
             bar_colors    = []
             caution_color = r"#{0}".format(p_dict['cautionColor'].replace(' ', '').replace('#', ''))
             caution_level = int(p_dict['cautionLevel'])
-            font_color    = p_dict['fontColor']
             font_size     = plt.rcParams['ytick.labelsize']
             healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
             level_box     = p_dict['showBatteryLevelBackground']
@@ -3073,28 +3081,29 @@ class MakeChart(object):
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # Adding 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting it off the axis.
-            ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
+            rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
 
             # ================================ Data Labels ================================
             # Plot data labels inside or outside depending on bar length
 
-            # With annotation background
-            if show_level and level_box:
-                for _ in range(len(y_values)):
-                    if x_values[_] >= caution_level:
-                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88), xytext=(11, 2), **k_dict['k_annotation_battery'])
-                    else:
-                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88), xytext=(3, 2), **k_dict['k_annotation_battery'])
+            for rect in rects:
+                width  = rect.get_width()    # horizontal width of bars
+                height = rect.get_height()  # vertical height of bars
+                y      = rect.get_y()            # Y axis position
 
-            # Without annotation background
-            elif show_level:
-                for _ in range(len(y_values)):
-                    if x_values[_] >= caution_level:
-                        plt.annotate(u"{0:>3}".format(int(x_values[_])), xy=((x_values[_] - 6), (y_values[_]) + 0.88),
-                                     xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
+                # With bbox.  We give a little extra room horizontally for the bbox.
+                if show_level and level_box:
+                    if width >= caution_level:
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width - 3, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
                     else:
-                        plt.annotate(u"{0}".format(int(x_values[_])), xy=((x_values[_] + 1), (y_values[_]) + 0.88),
-                                     xycoords='data', textcoords='data', fontsize=font_size, color=font_color, zorder=25)
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 2, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
+
+                # Without bbox.
+                elif show_level:
+                    if width >= caution_level:
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width - 2, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
+                    else:
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 1, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
 
             # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 1.0))
@@ -3116,10 +3125,12 @@ class MakeChart(object):
             ax.set_yticklabels('')
             ax.yaxis.set_ticks_position('left')
 
-            # Customize minor tick label position and assign device names to the
-            # minor ticks
+            # Customize minor tick label position
             ax.set_yticks([n for n in range(1, len(y_values) + 1)], minor=True)
-            ax.set_yticklabels(y_text, minor=True)
+
+            # Assign device names to the minor ticks if wanted
+            if p_dict.get('showDeviceName', True):
+                ax.set_yticklabels(y_text, minor=True)
 
             # ============================== Y Axis Min/Max ===============================
             # We never want the Y axis to go lower than 0.
@@ -3209,11 +3220,6 @@ class MakeChart(object):
 
         try:
 
-            for _ in range(1, 7, 1):
-                p_dict['line{0}Color'.format(_)]        = r"#{0}".format(p_dict['line{0}Color'.format(_)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}MarkerColor'.format(_)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(_)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}BestFitColor'.format(_)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(_)].replace(' ', '').replace('#', ''))
-
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
 
@@ -3223,6 +3229,10 @@ class MakeChart(object):
             self.format_axis_y(ax, p_dict, k_dict, log)
 
             for line in range(1, 7, 1):
+
+                p_dict['line{0}Color'.format(line)]        = r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
+                p_dict['line{0}MarkerColor'.format(line)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(line)].replace(' ', '').replace('#', ''))
+                p_dict['line{0}BestFitColor'.format(line)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
 
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
@@ -3302,8 +3312,8 @@ class MakeChart(object):
                 frame.set_alpha(0)
 
             for line in range(1, 7, 1):
-                # Note that we do these after the legend is drawn so that these lines
-                # don't affect the legend.
+                # Note that we do these after the legend is drawn so that these lines don't
+                # affect the legend.
 
                 # We need to reload the dates to ensure that they match the line being plotted
                 dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
@@ -3637,12 +3647,6 @@ class MakeChart(object):
 
         try:
 
-            # ============================= p_dict Overrides ==============================
-            for _ in range(1, 5, 1):
-                p_dict['group{0}Color'.format(_)]       = r"#{0}".format(p_dict['group{0}Color'.format(_)].replace(' ', '').replace('#', ''))
-                p_dict['group{0}MarkerColor'.format(_)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(_)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}BestFitColor'.format(_)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(_)].replace(' ', '').replace('#', 'FF 00 00'))
-
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
 
@@ -3651,6 +3655,9 @@ class MakeChart(object):
             self.format_axis_y(ax, p_dict, k_dict, log)
 
             for thing in range(1, 5, 1):
+                p_dict['group{0}Color'.format(thing)]       = r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
+                p_dict['group{0}MarkerColor'.format(thing)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
+                p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
 
                 # If dot color is the same as the background color, alert the user.
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor']:
@@ -3890,9 +3897,8 @@ class MakeChart(object):
             self.format_axis_y(ax1, p_dict, k_dict, log)
 
             # ============================ Precipitation Bars =============================
-            # The width of the bars is a percentage of a day, so we need to
-            # account for instances where the unit of time could be hours to
-            # months or years.
+            # The width of the bars is a percentage of a day, so we need to account for
+            # instances where the unit of time could be hours to months or years.
 
             # Plot precipitation bars
             if p_dict['y_obs3']:
@@ -4017,7 +4023,9 @@ class MakeChart(object):
 
             plt.autoscale(enable=True, axis='x', tight=None)
 
-            # Note that we plot the bar plot so that it will be under the line plot, but we still want the temperature scale on the left and the percentages on the right.
+            # Note that we plot the bar plot so that it will be under the line plot, but we
+            # still want the temperature scale on the left and the percentages on the
+            # right.
             ax1.yaxis.tick_right()
             ax2.yaxis.tick_left()
 
@@ -4165,8 +4173,8 @@ class MakeChart(object):
             if value[1].lower() in converter.keys():
                 value[1] = converter[value[1].lower()]
 
-        # We have converted all nonsense numbers to '-99.0'. Let's replace
-        # those with 'NaN' for charting.
+        # We have converted all nonsense numbers to '-99.0'. Let's replace those with
+        # 'NaN' for charting.
         final_data = [[n[0], 'NaN'] if n[1] == '-99.0' else n for n in final_data]
 
         # ================================ Process CSV ================================
@@ -4407,7 +4415,7 @@ class MakeChart(object):
                 y_axis_min = float(p_dict['yAxisMin'])
 
             # Y max
-            if isinstance(p_dict['yAxisMax'], unicode) and p_dict['yAxisMax'].lower()== 'none':
+            if isinstance(p_dict['yAxisMax'], unicode) and p_dict['yAxisMax'].lower() == 'none':
                 y_axis_max = y_max * (1 + (1 / y_max ** 1.25))
             else:
                 y_axis_max = float(p_dict['yAxisMax'])
@@ -4581,7 +4589,11 @@ class MakeChart(object):
         :param loc:
         :return:
         """
-        plt.title(p_dict['chartTitle'], position=loc, **k_dict['k_title_font'])
+        try:
+            plt.title(p_dict['chartTitle'], position=loc, **k_dict['k_title_font'])
+
+        except KeyError as sub_error:
+            log['Warning'].append(u"Title Error: {0}".format(sub_error))
 
     # =============================================================================
     def get_data(self, data_source, log):
@@ -4756,9 +4768,11 @@ class MakeChart(object):
         :param module plot:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: chart refresh log
+        :param dict size: chart boundaries
         """
 
-        # All charts will use these dimenstions unless they're overridden by the payload.
+        # All charts will use these dimensions unless they're overridden by the payload.
         parms = {'top': 0.90,
                  'bottom': 0.20,
                  'left': 0.10,
@@ -4788,6 +4802,6 @@ class MakeChart(object):
 
         except RuntimeError as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            self.host_plugin.logger.warning(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See plugin log for more information.".format(sub_error))
+            log['Warning'].append(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See plugin log for more information.".format(sub_error))
 
     # =============================================================================

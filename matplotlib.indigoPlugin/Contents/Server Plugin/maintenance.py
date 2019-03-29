@@ -256,7 +256,7 @@ class Maintain(object):
 
             # ========================== Battery Health Devices ===========================
             if dev.deviceTypeId in ('batteryHealthDevice',):
-                props['showBatteryLevelBackground'] = False
+                pass
 
             # =============================== Chart Devices ===============================
             if dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):

@@ -1,7 +1,12 @@
-v0.7.50
-- Consolidates chart logging into single method.
+v0.7.51
+- Adds control to hide device names on battery health charts.
+- Improves plotting of battery level values on battery health charts.
 - Code refinements.
+
+v0.7.50
+- Consolidates chart plot logging into single method.
 - Help bubble refinements.
+- Code refinements.
 
 v0.7.49
 - Standardizes plotting of X axis label across all devices.
