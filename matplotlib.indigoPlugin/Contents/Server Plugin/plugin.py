@@ -2535,21 +2535,19 @@ class Plugin(indigo.PluginBase):
                     pass
 
                 # ================================== kwargs ===================================
-                # Note: PyCharm wants attribute values to be strings. This is not always what
-                # Matplotlib wants (i.e., bbox alpha and linewidth should be floats.)
                 k_dict['k_battery']            = {'color': p_dict['fontColorAnnotation'],
-                                                  'horizontalalignment': 'center',
+                                                  'ha': 'center',
                                                   'size': plt.rcParams['xtick.labelsize'],
                                                   'textcoords': 'data',
-                                                  'verticalalignment': 'center',
+                                                  'va': 'center',
                                                   'xycoords': 'data',
                                                   'zorder': 25}
                 k_dict['k_annotation_battery'] = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
                                                   'color': p_dict['fontColorAnnotation'],
-                                                  'horizontalalignment': 'center',
+                                                  'ha': 'center',
                                                   'size': plt.rcParams['xtick.labelsize'],
                                                   'textcoords': 'data',
-                                                  'verticalalignment': 'center',
+                                                  'va': 'center',
                                                   'xycoords': 'data',
                                                   'zorder': 25}
                 k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
@@ -2757,7 +2755,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
+                                # device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
@@ -3099,14 +3097,14 @@ class MakeChart(object):
                     if width >= caution_level:
                         plt.annotate(u"{0:.0f}".format(width), xy=(width - 3, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
                     else:
-                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 2, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 3, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
 
                 # Without bbox.
                 elif show_level:
                     if width >= caution_level:
                         plt.annotate(u"{0:.0f}".format(width), xy=(width - 2, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
                     else:
-                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 1, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
+                        plt.annotate(u"{0:.0f}".format(width), xy=(width + 2, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
 
             # ================================ Chart Title ================================
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
