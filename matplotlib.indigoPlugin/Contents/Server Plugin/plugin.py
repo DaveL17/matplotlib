@@ -50,6 +50,7 @@ the proper Fantastic Weather devices.
 # TODO: Note that the Title and X Axis label do not center to the figure but
 #       to the plot.  This may be normal.
 # TODO: Check to ensure that the Indigo version is compatible.
+# TODO: Check battery health level of 100 -- alignment not optimal.
 
 # ================================== IMPORTS ==================================
 
@@ -186,6 +187,14 @@ class Plugin(indigo.PluginBase):
         # Remove legacy cruft from plugin prefs. We do devices later.
         # self.pluginPrefs = self.__clean_prefs(self.pluginPrefs)
         # indigo.server.savePluginPrefs()
+
+        # ================ Compare Save Path to Current Indigo Version ================
+        new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/static/"
+        current_save_path = self.pluginPrefs['chartPath']
+
+        if new_save_path != current_save_path:
+            self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
+            self.logger.critical(u"You should change the save path to: {0}".format(new_save_path))
 
         # ============================= Remote Debug Hook =============================
         # try:
@@ -338,8 +347,8 @@ class Plugin(indigo.PluginBase):
                     values_dict['cautionColor']               = 'FF FF 00'
                     values_dict['warningLevel']               = '5'
                     values_dict['warningColor']               = 'FF 00 00'
-                    values_dict['showBatteryLevel']           = 'true'
-                    values_dict['showBatteryLevelBackground'] = 'false'
+                    values_dict['showBatteryLevel']           = True
+                    values_dict['showBatteryLevelBackground'] = False
 
                 # ========================== Calendar Charting Device =========================
                 if type_id == "calendarChartingDevice":
@@ -2530,6 +2539,7 @@ class Plugin(indigo.PluginBase):
                         p_dict['mainFontSize'] = int(dev.pluginProps['customTitleFontSize'])
                         plt.rcParams['xtick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
                         plt.rcParams['ytick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
+
                 except KeyError:
                     # Not all devices may support this feature.
                     pass
@@ -2755,7 +2765,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                # device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
+                                device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
@@ -3093,14 +3103,14 @@ class MakeChart(object):
                 y      = rect.get_y()            # Y axis position
 
                 # With bbox.  We give a little extra room horizontally for the bbox.
-                if show_level and level_box:
+                if show_level in ('true', 'True', True) and level_box:
                     if width >= caution_level:
                         plt.annotate(u"{0:.0f}".format(width), xy=(width - 3, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
                     else:
                         plt.annotate(u"{0:.0f}".format(width), xy=(width + 3, y + height / 2), fontsize=font_size, **k_dict['k_annotation_battery'])
 
                 # Without bbox.
-                elif show_level:
+                elif show_level in ('true', 'True', True):
                     if width >= caution_level:
                         plt.annotate(u"{0:.0f}".format(width), xy=(width - 2, y + height / 2), fontsize=font_size, **k_dict['k_battery'])
                     else:

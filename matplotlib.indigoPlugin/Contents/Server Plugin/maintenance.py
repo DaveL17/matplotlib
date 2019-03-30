@@ -256,7 +256,18 @@ class Maintain(object):
 
             # ========================== Battery Health Devices ===========================
             if dev.deviceTypeId in ('batteryHealthDevice',):
-                pass
+
+                # Some legacy devices had the battery level prop established as a string.
+                if props['showBatteryLevel'] in ('true', 'True'):
+                    props['showBatteryLevel'] = True
+                else:
+                    props['showBatteryLevel'] = False
+
+                # Some legacy devices had the battery level box prop established as a string.
+                if props['showBatteryLevelBackground'] in ('true', 'True'):
+                    props['showBatteryLevelBackground'] = True
+                else:
+                    props['showBatteryLevelBackground'] = False
 
             # =============================== Chart Devices ===============================
             if dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):

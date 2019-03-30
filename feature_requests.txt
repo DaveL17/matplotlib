@@ -3,6 +3,17 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-02-12  Mat
+===============================================================================
+Consider automatically updating the chart save path to the latest version of
+Indigo.
+
+DaveL17 - this will require "tricking" the plugin to think that I've updated
+Indigo.  See what happens to a control page when this is done. If a user has
+saved an image as a static image, it would likely be fine; but if they've
+saved the image as a refreshing image URL, those would likely break, right?
+
+===============================================================================
 2019-02-12  Autolog
 ===============================================================================
 it would be useful to set the whole bar to red if the battery is zero - so it

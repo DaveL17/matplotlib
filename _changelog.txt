@@ -1,3 +1,8 @@
+v0.7.53
+- Adds tests to alert the user that they're saving charts to the wrong location
+  (when the Indigo version is updated.)
+- Fixes bug where battery level being displayed regardless of setting.
+
 v0.7.52
 - Better handles long device names in Battery Health chart.
 - Plots title relative to figure instead of to plot.
