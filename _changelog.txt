@@ -1,5 +1,5 @@
 v0.7.55
-- Refixes float error in the duration value for CSV refreshes.
+- Re-fixes float error in the duration value for CSV refreshes.
 
 v0.7.54
 - Fixes float error in the duration value for CSV refreshes.
