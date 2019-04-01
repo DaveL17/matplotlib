@@ -100,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.52"
+__version__   = "0.7.54"
 
 # =============================================================================
 
@@ -193,8 +193,9 @@ class Plugin(indigo.PluginBase):
         current_save_path = self.pluginPrefs['chartPath']
 
         if new_save_path != current_save_path:
-            self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
-            self.logger.critical(u"You should change the save path to: {0}".format(new_save_path))
+            if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
+                self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
+                self.logger.critical(u"You should change the save path to: {0}".format(new_save_path))
 
         # ============================= Remote Debug Hook =============================
         # try:
@@ -247,6 +248,8 @@ class Plugin(indigo.PluginBase):
         # If we're coming here from a sleep state, we need to ensure that the plugin
         # shutdown global is in its proper state.
         self.pluginIsShuttingDown = False
+
+        self.maintain.clean_props(dev)
 
         # If chartLastUpdated is empty, set it to the epoch
         if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
@@ -548,7 +551,8 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        self.maintain.clean_props()
+        pass
+        # self.maintain.clean_props()
 
     # =============================================================================
     def shutdown(self):
@@ -1384,8 +1388,13 @@ class Plugin(indigo.PluginBase):
             import shutil
 
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
-            delta        = float(dev.pluginProps.get('numLinesToKeepTime', '72'))
+            delta        = dev.pluginProps.get('numLinesToKeepTime', '72')
             cycle_time   = dt.datetime.now()
+
+            try:
+                float(dev.pluginProps.get('numLinesToKeepTime', '72'))
+            except ValueError:
+                delta = 0.0
 
             # Read through the dict and construct headers and data
             for k, v in sorted(csv_dict.items()):

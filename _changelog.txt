@@ -1,3 +1,7 @@
+v0.7.54
+- Fixes float error in the duration value for CSV refreshes.
+- Moves dev prop maintenance routine to deviceStartComm.
+
 v0.7.53
 - Adds tests to alert the user that they're saving charts to the wrong location
   (when the Indigo version is updated.)

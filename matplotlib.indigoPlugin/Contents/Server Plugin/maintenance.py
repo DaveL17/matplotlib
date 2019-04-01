@@ -30,7 +30,7 @@ class Maintain(object):
 
     def clean_prefs(self, dev_name, prefs):
         """
-        Remove legacy keys from plugin and device prefs
+        Remove legacy keys from non-chart device prefs
 
         -----
 
@@ -226,265 +226,229 @@ class Maintain(object):
 
         return prefs
 
-    def clean_props(self):
+    def clean_props(self, dev):
         """
-        Remove legacy keys from plugin prefs
+        Remove legacy keys from device prefs
 
         -----
 
         :return:
         """
 
-        for dev in indigo.devices.itervalues("self"):
+        props = dev.pluginProps
 
-            props = dev.pluginProps
+        # ================================ All Devices ================================
+        # Set whether it's a chart device or not
+        is_chart_dict = {'barChartingDevice': True,
+                         'batteryHealthDevice': True,
+                         'calendarChartingDevice': True,
+                         'csvEngine': False,
+                         'forecastChartingDevice': True,
+                         'lineChartingDevice': True,
+                         'multiLineText': True,
+                         'polarChartingDevice': True,
+                         'rcParamsDevice': False,
+                         'scatterChartingDevice': True}
 
-            # ================================ All Devices ================================
-            # Set whether it's a chart device or not
-            is_chart_dict = {'barChartingDevice': True,
-                             'batteryHealthDevice': True,
-                             'calendarChartingDevice': True,
-                             'csvEngine': False,
-                             'forecastChartingDevice': True,
-                             'lineChartingDevice': True,
-                             'multiLineText': True,
-                             'polarChartingDevice': True,
-                             'rcParamsDevice': False,
-                             'scatterChartingDevice': True}
+        props['isChart'] = is_chart_dict[dev.deviceTypeId]
 
-            props['isChart'] = is_chart_dict[dev.deviceTypeId]
+        # ============================= Non-chart Devices =============================
+        if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
 
-            # ========================== Battery Health Devices ===========================
-            if dev.deviceTypeId in ('batteryHealthDevice',):
+            # Remove legacy cruft from csv engine and rcParams device props
+            props = self.clean_prefs(dev.name, props)
 
-                # Some legacy devices had the battery level prop established as a string.
-                if props['showBatteryLevel'] in ('true', 'True'):
-                    props['showBatteryLevel'] = True
-                else:
-                    props['showBatteryLevel'] = False
+        # =============================== Chart Devices ===============================
+        elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
 
-                # Some legacy devices had the battery level box prop established as a string.
-                if props['showBatteryLevelBackground'] in ('true', 'True'):
-                    props['showBatteryLevelBackground'] = True
-                else:
-                    props['showBatteryLevelBackground'] = False
+            # ============================= Fix Custom Colors =============================
+            # For all chart device types
+            # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+            for prop in props:
+                if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(props[prop])):
+                    self.plugin.logger.debug(u"[{0}] Refactoring color property: ({1})".format(dev.name, prop))
+                    props[prop] = u'{0} {1} {2}'.format(prop[0:3], prop[3:5], prop[5:7]).replace('#', '')
 
-            # =============================== Chart Devices ===============================
-            if dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
-
-                # ============================= Fix Custom Colors =============================
-                # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+            # ======================== Reset Legacy Color Settings ========================
+            # Initially, the plugin was constructed with a standard set of colors that
+            # could be overwritten by electing to set a custom color value. With the
+            # inclusion of the color picker control, this was no longer needed. So we try
+            # to set the color field to the custom value. This block is for device color
+            # preferences. They should be updated whether or not the device is enabled in
+            # the Indigo UI.
+            if '#custom' in props.values() or 'custom' in props.values():
                 for prop in props:
-                    if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(props[prop])):
-                        self.plugin.logger.debug(u"[{0}] Refactoring color property: ({1})".format(dev.name, prop))
-                        props[prop] = u'{0} {1} {2}'.format(prop[0:3], prop[3:5], prop[5:7]).replace('#', '')
+                    if 'color' in prop.lower():
+                        if props[prop] in ('#custom', 'custom'):
 
-                # ======================== Reset Legacy Color Settings ========================
-                # Initially, the plugin was constructed with a standard set of colors that
-                # could be overwritten by electing to set a custom color value. With the
-                # inclusion of the color picker control, this was no longer needed. So we try
-                # to set the color field to the custom value. This block is for device color
-                # preferences. They should be updated whether or not the device is enabled in
-                # the Indigo UI.
-                if '#custom' in props.values() or 'custom' in props.values():
-                    for prop in props:
-                        if 'color' in prop.lower():
-                            if props[prop] in ('#custom', 'custom'):
+                            self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to new color picker.")
 
-                                self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to new color picker.")
+                            if props[u'{0}Other'.format(prop)]:
+                                props[prop] = props[u'{0}Other'.format(prop)]
 
-                                if props[u'{0}Other'.format(prop)]:
-                                    props[prop] = props[u'{0}Other'.format(prop)]
+                            else:
+                                props[prop] = 'FF FF FF'
 
-                                else:
-                                    props[prop] = 'FF FF FF'
+            # =============================== Fix Bar Props ===============================
+            if dev.deviceTypeId == 'barChartingDevice':
 
-                # ================================= Fix Props =================================
-                # Some early devices were created with the device prop as the wrong type. Let's
-                # go ahead and fix those.
+                for _ in range(1, 5, 1):
 
-                # =============================== Fix Bar Props ===============================
-                if dev.deviceTypeId == 'barChartingDevice':
-
-                    for _ in range(1, 5, 1):
-
-                        for item in ('bar{0}Annotate'.format(_),
-                                     'barLabel{0}'.format(_),
-                                     'plotBar{0}Max'.format(_),
-                                     'plotBar{0}Min'.format(_),
-                                     'suppressBar{0}'.format(_),
-                                     ):
-
-                            if item in dev.ownerProps.keys():
-                                if not isinstance(props[item], bool):
-                                    if props[item] in ('False', 'false', ''):
-                                        props[item] = False
-                                    elif props[item] in ('True', 'true'):
-                                        props[item] = True
-
-                    for prop in props.keys():
-                        if prop.startswith(('line', 'group', 'suppressLine', 'suppressGroup', 'plotLine')):
-                            del props[prop]
-
-                # ============================ Fix Calendar Props =============================
-                elif dev.deviceTypeId == 'calendarChartingDevice':
-
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
-                            del props[prop]
-
-                # ============================== Fix Line Props ===============================
-                elif dev.deviceTypeId == 'lineChartingDevice':
-
-                    for _ in range(1, 7, 1):
-
-                        for item in ('line{0}Annotate'.format(_),
-                                     'line{0}BestFit'.format(_),
-                                     'line{0}Fill'.format(_),
-                                     'lineLabel{0}'.format(_),
-                                     'plotLine{0}Max'.format(_),
-                                     'plotLine{0}Min'.format(_),
-                                     'suppressLine{0}'.format(_),
-                                     ):
-
-                            if item in dev.ownerProps.keys():
-                                if not isinstance(props[item], bool):
-                                    if props[item] in ('False', 'false', ''):
-                                        props[item] = False
-                                    elif props[item] in ('True', 'true'):
-                                        props[item] = True
-
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'group', 'suppressBar', 'suppressGroup')):
-                            del props[prop]
-
-                # ========================= Fix Multiline Text Props ==========================
-                elif dev.deviceTypeId == 'multiLineText':
-
-                    for item in ('textAreaBorder',
-                                 'cleanTheText',
+                    for item in ('bar{0}Annotate'.format(_),
+                                 'barLabel{0}'.format(_),
+                                 'plotBar{0}Max'.format(_),
+                                 'plotBar{0}Min'.format(_),
+                                 'suppressBar{0}'.format(_),
                                  ):
 
                         if item in dev.ownerProps.keys():
                             if not isinstance(props[item], bool):
-                                if props[item] in ('False', 'false', ''):
+                                if props[item].strip() in ('False', 'false', ''):
+                                    props[item] = False
+                                else:
+                                    props[item] = True
+
+                for prop in props.keys():
+                    if prop.startswith(('line', 'group', 'suppressLine', 'suppressGroup', 'plotLine')):
+                        del props[prop]
+
+            # ========================= Fix Battery Health Props ==========================
+            if dev.deviceTypeId == 'batteryHealthDevice':
+
+                for item in ('showBatteryLevel', 'showBatteryLevelBackground'):
+                    if not isinstance(props[item], bool):
+                        if props[item].strip() in ('False', 'false', ''):
+                            props[item] = False
+                        else:
+                            props[item] = True
+
+                for prop in props.keys():
+                    if prop.startswith(('barLabel', 'line', 'group', 'suppressBar', 'suppressLine', 'suppressGroup', 'plotLine')):
+                        del props[prop]
+
+            # ============================ Fix Calendar Props =============================
+            if dev.deviceTypeId == 'calendarChartingDevice':
+
+                for prop in props.keys():
+                    if prop.startswith(('barLabel', 'line', 'group', 'suppressBar', 'suppressLine', 'suppressGroup', 'plotLine')):
+                        del props[prop]
+
+            # ============================== Fix Line Props ===============================
+            if dev.deviceTypeId == 'lineChartingDevice':
+
+                for _ in range(1, 7, 1):
+
+                    for item in ('line{0}Annotate'.format(_),
+                                 'line{0}BestFit'.format(_),
+                                 'line{0}Fill'.format(_),
+                                 'lineLabel{0}'.format(_),
+                                 'plotLine{0}Max'.format(_),
+                                 'plotLine{0}Min'.format(_),
+                                 'suppressLine{0}'.format(_),
+                                 ):
+
+                        if item in dev.ownerProps.keys():
+                            if not isinstance(props[item], bool):
+                                if props[item].strip() in ('False', 'false', ''):
                                     props[item] = False
                                 elif props[item] in ('True', 'true'):
                                     props[item] = True
 
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
-                            del props[prop]
+                for prop in props.keys():
+                    if prop.startswith(('bar', 'group', 'suppressBar', 'suppressGroup')):
+                        del props[prop]
 
-                # ============================== Fix Polar Props ==============================
-                elif dev.deviceTypeId == 'polarChartingDevice':
+            # ========================= Fix Multiline Text Props ==========================
+            if dev.deviceTypeId == 'multiLineText':
 
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
-                            del props[prop]
+                for item in ('textAreaBorder',
+                             'cleanTheText',
+                             ):
 
-                # ============================= Fix Scatter Props =============================
-                elif dev.deviceTypeId == 'scatterChartingDevice':
-
-                    for _ in range(1, 4, 1):
-
-                        for item in ('line{0}BestFit'.format(_),
-                                     'groupLabel{0}'.format(_),
-                                     'line{0}Fill'.format(_),
-                                     'line{0}BestFit'.format(_),
-                                     'plotGroup{0}Min'.format(_),
-                                     'plotGroup{0}Max'.format(_),
-                                     'suppressGroup{0}'.format(_),
-                                     ):
-
-                            if item in dev.ownerProps.keys():
-                                if not isinstance(props[item], bool):
-                                    if props[item] in ('False', 'false', ''):
-                                        props[item] = False
-                                    elif props[item] in ('True', 'true'):
-                                        props[item] = True
-                            else:
+                    if item in dev.ownerProps.keys():
+                        if not isinstance(props[item], bool):
+                            if props[item].strip() in ('False', 'false', ''):
                                 props[item] = False
+                            elif props[item] in ('True', 'true'):
+                                props[item] = True
 
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'plotLine', 'suppressBar', 'suppressLine')):
-                            del props[prop]
+                for prop in props.keys():
+                    if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
+                        del props[prop]
 
-                # ============================ Fix Forecast Props =============================
-                elif dev.deviceTypeId == 'forecastChartingDevice':
+            # ============================== Fix Polar Props ==============================
+            if dev.deviceTypeId == 'polarChartingDevice':
 
-                    for _ in range(1, 4, 1):
+                for prop in props.keys():
+                    if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
+                        del props[prop]
 
-                        for item in (
-                                     'lineLabel{0}'.format(_),
-                                     'line{0}Annotate'.format(_),
-                                     ):
+            # ============================= Fix Scatter Props =============================
+            if dev.deviceTypeId == 'scatterChartingDevice':
 
-                            if 'item' in dev.ownerProps.keys():
-                                if not isinstance(props[item], bool):
-                                    if props[item] in ('False', 'false', ''):
-                                        props[item] = False
-                                    elif props[item] in ('True', 'true'):
-                                        props[item] = True
+                for _ in range(1, 4, 1):
 
-                    for prop in props.keys():
-                        if prop.startswith(('bar', 'group',
-                                            'line4', 'line5', 'line6',
-                                            'line1adjuster', 'line2adjuster', 'line3adjuster',
-                                            'lineLabel4', 'lineLabel5', 'lineLabel6',
-                                            'line1BestFit', 'line2BestFit', 'line3BestFit',
-                                            'line1BestFitColor', 'line2BestFitColor', 'line3BestFitColor',
-                                            'plotLine4', 'plotLine5', 'plotLine6',
-                                            'plotLine1Max', 'plotLine2Max', 'plotLine3Max',
-                                            'plotLine1Min', 'plotLine2Min', 'plotLine3Min',
-                                            'suppressBar', 'suppressGroup',
-                                            'suppressLine4', 'suppressLine5', 'suppressLine6')):
-                            del props[prop]
+                    for item in ('line{0}BestFit'.format(_),
+                                 'groupLabel{0}'.format(_),
+                                 'line{0}Fill'.format(_),
+                                 'line{0}BestFit'.format(_),
+                                 'plotGroup{0}Min'.format(_),
+                                 'plotGroup{0}Max'.format(_),
+                                 'suppressGroup{0}'.format(_),
+                                 ):
 
-                # =============== Establish Refresh Interval for Legacy Devices ===============
-                # Establish refresh interval for legacy devices. If the prop isn't present, we
-                # set it equal to the user's current global refresh rate.
-                if 'refreshInterval' not in props.keys():
-                    self.plugin.logger.debug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
-                    props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
+                        if item in dev.ownerProps.keys():
+                            if not isinstance(props[item], bool):
+                                if props[item].strip() in ('False', 'false', ''):
+                                    props[item] = False
+                                elif props[item] in ('True', 'true'):
+                                    props[item] = True
+                        else:
+                            props[item] = False
 
-            # ============================= Non-chart Devices =============================
-            elif dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
+                for prop in props.keys():
+                    if prop.startswith(('bar', 'plotLine', 'suppressBar', 'suppressLine')):
+                        del props[prop]
 
-                # Remove legacy cruft from csv engine and rcParams device props
-                props = self.clean_prefs(dev.name, props)
+            # ============================ Fix Forecast Props =============================
+            if dev.deviceTypeId == 'forecastChartingDevice':
 
-            # ============================= Update the Server =============================
-            dev.replacePluginPropsOnServer(props)
+                for _ in range(1, 4, 1):
 
-            self.plugin.logger.debug(u"[{0}] prefs cleaned.".format(dev.name))
+                    for item in (
+                                 'lineLabel{0}'.format(_),
+                                 'line{0}Annotate'.format(_),
+                                 ):
 
-    # def clean_dev_props(self, dev):
-    #
-    #     import xml.etree.ElementTree as ET
-    #
-    #     current_prefs = []
-    #     dead_prefs = []
-    #
-    #     # Get the device's current Devices.xml config
-    #     config_prefs = self.plugin.devicesTypeDict[dev.deviceTypeId]["ConfigUIRawXml"]
-    #     config_prefs = ET.ElementTree(ET.fromstring(config_prefs))
-    #
-    #     # Iterate the XML to get the field IDs
-    #     for pref in config_prefs.findall('Field'):
-    #         dev_id = unicode(pref.get('id'))
-    #         current_prefs.append(dev_id)
-    #
-    #     self.plugin.logger.info(u"Current config prefs: {0}".format(sorted(current_prefs)))
-    #
-    #     # Get the device's current config. There may be prefs here that are not
-    #     # in Devices.xml but are still valid (they may have been added dynamically).
-    #     dev_prefs = dev.pluginProps
-    #     self.plugin.logger.info(u"Current device prefs: {0}".format(sorted(dict(dev_prefs).keys())))
-    #
-    #     # prefs in the device that aren't in the config
-    #     for pref in dev_prefs:
-    #         if pref not in current_prefs:
-    #             dead_prefs.append(pref)
-    #
-    #     self.plugin.logger.info(u"Device prefs not in current config: {0}".format(sorted(dead_prefs)))
+                        if 'item' in dev.ownerProps.keys():
+                            if not isinstance(props[item], bool):
+                                if props[item].strip() in ('False', 'false', ''):
+                                    props[item] = False
+                                elif props[item] in ('True', 'true'):
+                                    props[item] = True
+
+                for prop in props.keys():
+                    if prop.startswith(('bar', 'group',
+                                        'line4', 'line5', 'line6',
+                                        'line1adjuster', 'line2adjuster', 'line3adjuster',
+                                        'lineLabel4', 'lineLabel5', 'lineLabel6',
+                                        'line1BestFit', 'line2BestFit', 'line3BestFit',
+                                        'line1BestFitColor', 'line2BestFitColor', 'line3BestFitColor',
+                                        'plotLine4', 'plotLine5', 'plotLine6',
+                                        'plotLine1Max', 'plotLine2Max', 'plotLine3Max',
+                                        'plotLine1Min', 'plotLine2Min', 'plotLine3Min',
+                                        'suppressBar', 'suppressGroup',
+                                        'suppressLine4', 'suppressLine5', 'suppressLine6')):
+                        del props[prop]
+
+            # =============== Establish Refresh Interval for Legacy Devices ===============
+            # Establish refresh interval for legacy devices. If the prop isn't present, we
+            # set it equal to the user's current global refresh rate.
+            if 'refreshInterval' not in props.keys():
+                self.plugin.logger.debug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
+                props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
+
+        # ============================= Update the Server =============================
+        dev.replacePluginPropsOnServer(props)
+
+        self.plugin.logger.debug(u"[{0}] prefs cleaned.".format(dev.name))
