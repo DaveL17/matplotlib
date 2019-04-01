@@ -100,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.54"
+__version__   = "0.7.55"
 
 # =============================================================================
 
@@ -1392,7 +1392,7 @@ class Plugin(indigo.PluginBase):
             cycle_time   = dt.datetime.now()
 
             try:
-                float(dev.pluginProps.get('numLinesToKeepTime', '72'))
+                delta = float(delta)
             except ValueError:
                 delta = 0.0
 
