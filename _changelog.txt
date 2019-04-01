@@ -1,3 +1,6 @@
+v0.7.56
+- Adds check to ensure that the plugin is compatible with Indigo version.
+
 v0.7.55
 - Re-fixes float error in the duration value for CSV refreshes.
 

@@ -47,10 +47,6 @@ the proper Fantastic Weather devices.
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
-# TODO: Note that the Title and X Axis label do not center to the figure but
-#       to the plot.  This may be normal.
-# TODO: Check to ensure that the Indigo version is compatible.
-# TODO: Check battery health level of 100 -- alignment not optimal.
 
 # ================================== IMPORTS ==================================
 
@@ -100,7 +96,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.55"
+__version__   = "0.7.56"
 
 # =============================================================================
 
@@ -195,7 +191,7 @@ class Plugin(indigo.PluginBase):
         if new_save_path != current_save_path:
             if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
                 self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
-                self.logger.critical(u"You should change the save path to: {0}".format(new_save_path))
+                self.logger.critical(u"You may want to change the save path to: {0}".format(new_save_path))
 
         # ============================= Remote Debug Hook =============================
         # try:
@@ -551,8 +547,11 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        pass
-        # self.maintain.clean_props()
+        # =========================== Audit Indigo Version ============================
+        min_ver = 7
+        ver     = self.versStrToTuple(indigo.server.version)
+        if ver[0] == min_ver:
+            self.stopPlugin(u"The Matplotlib plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
 
     # =============================================================================
     def shutdown(self):
@@ -1391,6 +1390,7 @@ class Plugin(indigo.PluginBase):
             delta        = dev.pluginProps.get('numLinesToKeepTime', '72')
             cycle_time   = dt.datetime.now()
 
+            # If delta isn't a valid float, set it to zero.
             try:
                 delta = float(delta)
             except ValueError:
@@ -2555,7 +2555,7 @@ class Plugin(indigo.PluginBase):
 
                 # ================================== kwargs ===================================
                 k_dict['k_battery']            = {'color': p_dict['fontColorAnnotation'],
-                                                  'ha': 'center',
+                                                  'ha': 'right',
                                                   'size': plt.rcParams['xtick.labelsize'],
                                                   'textcoords': 'data',
                                                   'va': 'center',
@@ -2774,7 +2774,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                device_dict = {'Device 1 Has A Very Long Name': '50', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
+                                device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
@@ -2933,6 +2933,8 @@ class MakeChart(object):
 
             for thing in range(1, 5, 1):
 
+                suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
+
                 p_dict['bar{0}Color'.format(thing)] = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
 
                 # If the bar color is the same as the background color, alert the user.
@@ -2940,11 +2942,11 @@ class MakeChart(object):
                     log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
                 # If the bar is suppressed, remind the user they suppressed it.
-                if p_dict['suppressBar{0}'.format(thing)]:
+                if suppress_bar:
                     log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, thing))
 
                 # Plot the bars. If 'suppressBar{thing} is True, we skip it.
-                if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not p_dict['suppressBar{0}'.format(thing)]:
+                if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
 
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
@@ -3254,6 +3256,8 @@ class MakeChart(object):
 
             for line in range(1, 7, 1):
 
+                suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
+
                 p_dict['line{0}Color'.format(line)]        = r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}MarkerColor'.format(line)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(line)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(line)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
@@ -3263,12 +3267,12 @@ class MakeChart(object):
                     log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
                 # If the line is suppressed, remind the user they suppressed it.
-                if p_dict['suppressLine{0}'.format(line)]:
+                if suppress_line:
                     log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, line))
 
                 # ============================== Plot the Lines ===============================
-                # Plot the lines. If p_dict['suppressLine{0}'] is True, we skip it.
-                if p_dict['line{0}Source'.format(line)] not in ("", "None") and not p_dict['suppressLine{0}'.format(line)]:
+                # Plot the lines. If suppress_line is True, we skip it.
+                if p_dict['line{0}Source'.format(line)] not in ("", "None") and not suppress_line:
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
@@ -3679,6 +3683,9 @@ class MakeChart(object):
             self.format_axis_y(ax, p_dict, k_dict, log)
 
             for thing in range(1, 5, 1):
+
+                suppress_group = p_dict.get('suppressGroup{0}'.format(thing), False)
+
                 p_dict['group{0}Color'.format(thing)]       = r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
                 p_dict['group{0}MarkerColor'.format(thing)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
@@ -3688,12 +3695,12 @@ class MakeChart(object):
                     log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
                 # If the group is suppressed, remind the user they suppressed it.
-                if p_dict['suppressGroup{0}'.format(thing)]:
+                if suppress_group:
                     log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, thing))
 
                 # ============================== Plot the Points ==============================
-                # Plot the groups. If p_dict['suppressGroup{0}'] is True, we skip it.
-                if p_dict['group{0}Source'.format(thing)] not in ("", "None") and not p_dict['suppressGroup{0}'.format(thing)]:
+                # Plot the groups. If suppress_group is True, we skip it.
+                if p_dict['group{0}Source'.format(thing)] not in ("", "None") and not suppress_group:
 
                     # There is a bug in matplotlib (fixed in newer versions) where points would not
                     # plot if marker set to 'none'. This overrides the behavior.
