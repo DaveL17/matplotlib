@@ -1,3 +1,7 @@
+v0.7.57
+- Moves 'None' options in drop-down lists to bottom of list (per Indigo
+  standard.)
+
 v0.7.56
 - Adds check to ensure that the plugin is compatible with Indigo version.
 

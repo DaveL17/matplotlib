@@ -96,7 +96,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.56"
+__version__   = "0.7.57"
 
 # =============================================================================
 
@@ -547,11 +547,8 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        # =========================== Audit Indigo Version ============================
-        min_ver = 7
-        ver     = self.versStrToTuple(indigo.server.version)
-        if ver[0] < min_ver:
-            self.stopPlugin(u"The Matplotlib plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
+        # Ensure the plugin is compatible with the current version of Indigo.
+        self.Fogbert.audit_server_version(min_ver=7)
 
     # =============================================================================
     def shutdown(self):
@@ -2196,15 +2193,15 @@ class Plugin(indigo.PluginBase):
         :param int target_id:
         """
 
-        return [("None", "None"),
-                ("-1", "%%separator%%"),
-                ("--", "Dashed"),
+        return [("--", "Dashed"),
                 (":", "Dotted"),
                 ("-.", "Dot Dash"),
                 ("-", "Solid"),
                 ("steps", "Steps"),
                 ("steps-mid", "Steps Mid"),
-                ("steps-post", "Steps Post")]
+                ("steps-post", "Steps Post"),
+                ("-1", "%%separator%%"),
+                ("None", "None")]
 
     # =============================================================================
     def getMarkerList(self, filter="", values_dict=None, type_id="", target_id=0):
@@ -2247,7 +2244,9 @@ class Plugin(indigo.PluginBase):
                 ("3", "Tri Left"),
                 ("4", "Tri Right"),
                 ("|", "Vertical Line"),
-                ("x", "X")]
+                ("x", "X"),
+                ("None", "None"),
+                ("-1", "%%separator%%")]
 
     # =============================================================================
     def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
@@ -2775,7 +2774,7 @@ class Plugin(indigo.PluginBase):
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
                                 # device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
-                                # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
+                                # device_dict = {'Device 1': '50', 'Device 2': '100', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
                             except Exception as sub_error:

@@ -167,6 +167,13 @@ class Fogbert(object):
         except (KeyError, ValueError):
             return [(0, 'Pick a Device or Variable')]
 
+    def audit_server_version(self, min_ver):
+
+        # =========================== Audit Indigo Version ============================
+        ver     = self.plugin.versStrToTuple(indigo.server.version)
+        if ver[0] < min_ver:
+            self.plugin.stopPlugin(u"This plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
+
 
 class Formatter(object):
     """
