@@ -2774,7 +2774,7 @@ class Plugin(indigo.PluginBase):
                                     device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                 # The following line is used for testing the battery health code; it isn't needed in production.
-                                device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
+                                # device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
                                 # device_dict = {'Device 1': '50', 'Device 2': '77', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
                                 #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
