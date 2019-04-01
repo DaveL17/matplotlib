@@ -550,7 +550,7 @@ class Plugin(indigo.PluginBase):
         # =========================== Audit Indigo Version ============================
         min_ver = 7
         ver     = self.versStrToTuple(indigo.server.version)
-        if ver[0] == min_ver:
+        if ver[0] < min_ver:
             self.stopPlugin(u"The Matplotlib plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
 
     # =============================================================================
