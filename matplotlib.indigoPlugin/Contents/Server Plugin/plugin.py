@@ -35,7 +35,6 @@ the proper Fantastic Weather devices.
 #              of Indigo devices.
 # TODO: NEW -- Add config dialog to rcparams device that's generated
 #              automatically?
-# TODO: Support substitutions for certain fields (like save location).
 # TODO: Try to address annotation collisions.
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Add facility to have different Y1 and Y2. Add a new group of controls
@@ -47,7 +46,13 @@ the proper Fantastic Weather devices.
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
-
+# TODO: Add props to adjust the figure to API.
+# TODO: Enable substitutions for custom line segments. For example, on a
+#       temperature chart, you might want to plot the day's forecast high
+#       temperature (%%d:733695023:d01_temperatureHigh%%, 'blue')
+# TODO: Allow scripting control or a tool to repopulate color controls so that
+#       you can change all bars/lines/scatter etc in one go.
+# TODO: Add device/variable filter to mutliline text device (like CSV Engine).
 # ================================== IMPORTS ==================================
 
 try:
@@ -2221,9 +2226,7 @@ class Plugin(indigo.PluginBase):
         :param int target_id:
         """
 
-        return [("None", "None"),
-                ("-1", "%%separator%%"),
-                ("o", "Circle"),
+        return [("o", "Circle"),
                 ("D", "Diamond"),
                 ("d", "Diamond (Thin)"),
                 ("h", "Hexagon 1"),
@@ -2245,8 +2248,8 @@ class Plugin(indigo.PluginBase):
                 ("4", "Tri Right"),
                 ("|", "Vertical Line"),
                 ("x", "X"),
-                ("None", "None"),
-                ("-1", "%%separator%%")]
+                ("-1", "%%separator%%"),
+                ("None", "None")]
 
     # =============================================================================
     def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
@@ -2277,8 +2280,16 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Scripting payload: {0}".format(dict(plugin_action.props)))
 
+        dpi        = int(self.pluginPrefs.get('chartResolution', 100))
+        height     = float(self.pluginPrefs.get('rectChartHeight', 250))
+        width      = float(self.pluginPrefs.get('rectChartWidth', 600))
+        face_color = '#' + self.pluginPrefs.get('faceColor', '00 00 00').replace(' ', '')
+        canvas_color = '#' + self.pluginPrefs.get('backgroundColor', '00 00 00').replace(' ', '')
+
         try:
-            plt.plot(plugin_action.props['x_values'], plugin_action.props['y_values'], **plugin_action.props['kwargs'])
+            fig = plt.figure(1, figsize=(width / dpi, height / dpi))
+            ax = fig.add_subplot(111, axisbg=face_color)
+            ax.plot(plugin_action.props['x_values'], plugin_action.props['y_values'], **plugin_action.props['kwargs'])
             plt.savefig(u"{0}{1}".format(plugin_action.props['path'], plugin_action.props['filename']))
             plt.close('all')
 
