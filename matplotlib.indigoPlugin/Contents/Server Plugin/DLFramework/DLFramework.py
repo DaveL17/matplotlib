@@ -4,6 +4,7 @@
 """
 DLFramework is a framework to consolidate methods used throughout all
 Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
+.
 """
 
 import ast
@@ -137,7 +138,7 @@ class Fogbert(object):
         devices_and_variables_list = []
         [devices_and_variables_list.append((dev.id, u"(D) {0}".format(dev.name))) for dev in indigo.devices]
         [devices_and_variables_list.append((var.id, u"(V) {0}".format(var.name))) for var in indigo.variables]
-        devices_and_variables_list.append(('-1','%%separator%%'),)
+        devices_and_variables_list.append(('-1', '%%separator%%'),)
         devices_and_variables_list.append(('None', 'None'),)
         return devices_and_variables_list
 

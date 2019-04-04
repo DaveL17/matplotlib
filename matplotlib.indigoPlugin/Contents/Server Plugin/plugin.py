@@ -53,6 +53,7 @@ the proper Fantastic Weather devices.
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
 # TODO: Add device/variable filter to mutliline text device (like CSV Engine).
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -101,7 +102,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.7.57"
+__version__   = "0.8.01"
 
 # =============================================================================
 
@@ -453,7 +454,6 @@ class Plugin(indigo.PluginBase):
         except KeyError as sub_error:
             self.pluginErrorHandler(traceback.format_exc())
             self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
-
 
         return True, values_dict
 
@@ -1338,36 +1338,36 @@ class Plugin(indigo.PluginBase):
         -----
 
         """
+        if not self.pluginIsShuttingDown:
+            for dev in indigo.devices.itervalues("self"):
 
-        for dev in indigo.devices.itervalues("self"):
+                refresh_interval = int(dev.pluginProps['refreshInterval'])
 
-            refresh_interval = int(dev.pluginProps['refreshInterval'])
+                if dev.deviceTypeId == 'csvEngine' and dev.enabled:
 
-            if dev.deviceTypeId == 'csvEngine' and dev.enabled:
+                    try:
+                        last_updated = date_parse(dev.states['csvLastUpdated'])
 
-                try:
-                    last_updated = date_parse(dev.states['csvLastUpdated'])
+                    except ValueError:
+                        last_updated = date_parse('1970-01-01 00:00')
 
-                except ValueError:
-                    last_updated = date_parse('1970-01-01 00:00')
+                    diff = dt.datetime.now() - last_updated
+                    refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
 
-                diff = dt.datetime.now() - last_updated
-                refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
+                    if refresh_needed and refresh_interval != 0:
 
-                if refresh_needed and refresh_interval != 0:
+                        self.__log_dicts(dev)
 
-                    self.__log_dicts(dev)
+                        dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
-                    dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
+                        # {key: (Item Name, Source ID, Source State)}
+                        csv_dict_str = dev.pluginProps['columnDict']
 
-                    # {key: (Item Name, Source ID, Source State)}
-                    csv_dict_str = dev.pluginProps['columnDict']
+                        # Convert column_dict from a string to a literal dict.
+                        csv_dict = literal_eval(csv_dict_str)
 
-                    # Convert column_dict from a string to a literal dict.
-                    csv_dict = literal_eval(csv_dict_str)
-
-                    self.logger.threaddebug(u"[{0}] Refreshing CSV Device: {1}".format(dev.name, dict(csv_dict)))
-                    self.csv_refresh_process(dev, csv_dict)
+                        self.logger.threaddebug(u"[{0}] Refreshing CSV Device: {1}".format(dev.name, dict(csv_dict)))
+                        self.csv_refresh_process(dev, csv_dict)
 
     # =============================================================================
     def csv_refresh_process(self, dev, csv_dict):
@@ -2473,420 +2473,424 @@ class Plugin(indigo.PluginBase):
         :param list dev_list: list of devices to be refreshed.
         """
 
-        return_queue = multiprocessing.Queue()
+        if not self.pluginIsShuttingDown:
 
-        k_dict  = {}  # A dict of kwarg dicts
-        p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
+            return_queue = multiprocessing.Queue()
 
-        try:
-            p_dict['font_style']  = 'normal'
-            p_dict['font_weight'] = 'normal'
-            p_dict['tick_bottom'] = 'on'
-            p_dict['tick_left']   = 'on'
-            p_dict['tick_right']  = 'off'
-            p_dict['tick_top']    = 'off'
+            k_dict  = {}  # A dict of kwarg dicts
+            p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
 
-            # ============================ rcParams overrides =============================
-            plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
-            plt.rcParams['lines.linewidth']  = float(self.pluginPrefs.get('lineWeight', '1'))
-            plt.rcParams['savefig.dpi']      = int(self.pluginPrefs.get('chartResolution', '100'))
-            plt.rcParams['xtick.major.size'] = int(self.pluginPrefs.get('tickSize', '8'))
-            plt.rcParams['ytick.major.size'] = int(self.pluginPrefs.get('tickSize', '8'))
-            plt.rcParams['xtick.minor.size'] = plt.rcParams['xtick.major.size'] / 2
-            plt.rcParams['ytick.minor.size'] = plt.rcParams['ytick.major.size'] / 2
-            plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
-            plt.rcParams['ytick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
+            try:
+                p_dict['font_style']  = 'normal'
+                p_dict['font_weight'] = 'normal'
+                p_dict['tick_bottom'] = 'on'
+                p_dict['tick_left']   = 'on'
+                p_dict['tick_right']  = 'off'
+                p_dict['tick_top']    = 'off'
 
-            plt.rcParams['grid.color']  = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
-            plt.rcParams['xtick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
-            plt.rcParams['ytick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
+                # ============================ rcParams overrides =============================
+                plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
+                plt.rcParams['lines.linewidth']  = float(self.pluginPrefs.get('lineWeight', '1'))
+                plt.rcParams['savefig.dpi']      = int(self.pluginPrefs.get('chartResolution', '100'))
+                plt.rcParams['xtick.major.size'] = int(self.pluginPrefs.get('tickSize', '8'))
+                plt.rcParams['ytick.major.size'] = int(self.pluginPrefs.get('tickSize', '8'))
+                plt.rcParams['xtick.minor.size'] = plt.rcParams['xtick.major.size'] / 2
+                plt.rcParams['ytick.minor.size'] = plt.rcParams['ytick.major.size'] / 2
+                plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
+                plt.rcParams['ytick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
 
-            p_dict['faceColor']           = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-            p_dict['fontColor']           = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-            p_dict['fontColorAnnotation'] = r"#{0}".format(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF').replace(' ', '').replace('#', ''))
-            p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
-            p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
+                plt.rcParams['grid.color']  = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+                plt.rcParams['xtick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
+                plt.rcParams['ytick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
 
-            # ============================= Background color ==============================
-            if not self.pluginPrefs.get('backgroundColorOther', 'false'):
-                p_dict['transparent_charts'] = False
-                p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-            elif self.pluginPrefs.get('backgroundColorOther', 'false') == 'false':
-                p_dict['transparent_charts'] = False
-                p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-            else:
-                p_dict['transparent_charts'] = True
-                p_dict['backgroundColor'] = '#000000'
+                p_dict['faceColor']           = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+                p_dict['fontColor']           = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+                p_dict['fontColorAnnotation'] = r"#{0}".format(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF').replace(' ', '').replace('#', ''))
+                p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
+                p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
 
-            # ============================== Plot Area color ==============================
-            if not self.pluginPrefs.get('faceColorOther', 'false'):
-                p_dict['transparent_filled'] = True
-                p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
-            elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
-                p_dict['transparent_filled'] = True
-                p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
-            else:
-                p_dict['transparent_filled'] = False
-                p_dict['faceColor'] = '#000000'
-
-            # A list of chart ids may be passed to the method. In that case, refresh only
-            # those charts. Otherwise, chart_id is None and we evaluate all of the charts
-            # to see if they need to be updated.
-            if not dev_list:
-
-                dev_list = []
-
-                for dev in indigo.devices.itervalues('self'):
-                    refresh_interval = int(dev.pluginProps['refreshInterval'])
-
-                    if dev.deviceTypeId != 'csvEngine' and refresh_interval > 0 and dev.enabled:
-
-                        diff = dt.datetime.now() - date_parse(dev.states['chartLastUpdated'])
-                        refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
-
-                        if refresh_needed:
-                            dev_list.append(dev)
-
-            for dev in dev_list:
-
-                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
-
-                # ============================= Custom Font Sizes =============================
-                # Custom font sizes for retina/non-retina adjustments.
-                try:
-                    if dev.pluginProps['customSizeFont']:
-                        p_dict['mainFontSize'] = int(dev.pluginProps['customTitleFontSize'])
-                        plt.rcParams['xtick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
-                        plt.rcParams['ytick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
-
-                except KeyError:
-                    # Not all devices may support this feature.
-                    pass
-
-                # ================================== kwargs ===================================
-                k_dict['k_battery']            = {'color': p_dict['fontColorAnnotation'],
-                                                  'ha': 'right',
-                                                  'size': plt.rcParams['xtick.labelsize'],
-                                                  'textcoords': 'data',
-                                                  'va': 'center',
-                                                  'xycoords': 'data',
-                                                  'zorder': 25}
-                k_dict['k_annotation_battery'] = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
-                                                  'color': p_dict['fontColorAnnotation'],
-                                                  'ha': 'center',
-                                                  'size': plt.rcParams['xtick.labelsize'],
-                                                  'textcoords': 'data',
-                                                  'va': 'center',
-                                                  'xycoords': 'data',
-                                                  'zorder': 25}
-                k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
-                                            'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
-                                            'textcoords': 'offset points', 'verticalalignment': 'center'}
-                k_dict['k_bar']          = {'alpha': 1.0, 'zorder': 10}
-                k_dict['k_base_font']    = {'size': float(p_dict['mainFontSize']), 'weight': p_dict['font_weight']}
-                k_dict['k_calendar']     = {'verticalalignment': 'top'}
-                k_dict['k_custom']       = {'alpha': 1.0, 'zorder': 3}
-                k_dict['k_fill']         = {'alpha': 0.7, 'zorder': 10}
-                k_dict['k_grid_fig']     = {'which': 'major', 'zorder': 1}
-                k_dict['k_line']         = {'alpha': 1.0}
-                k_dict['k_major_x']      = {'bottom': p_dict['tick_bottom'], 'reset': False, 'top': p_dict['tick_top'], 'which': 'major'}
-                k_dict['k_major_y']      = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'major'}
-                k_dict['k_major_y2']     = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'major'}
-                k_dict['k_max']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
-                k_dict['k_min']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
-                k_dict['k_minor_x']      = {'bottom': p_dict['tick_bottom'], 'reset': False, 'top': p_dict['tick_top'], 'which': 'minor'}
-                k_dict['k_minor_y']      = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'minor'}
-                k_dict['k_minor_y2']     = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'minor'}
-                k_dict['k_rgrids']       = {'angle': 67, 'color': p_dict['fontColor'], 'horizontalalignment': 'left', 'verticalalignment': 'center'}
-                k_dict['k_title_font']   = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                            'weight': p_dict['font_weight'], 'visible': True}
-                k_dict['k_x_axis_font']  = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                            'weight': p_dict['font_weight'], 'visible': True}
-                k_dict['k_y_axis_font']  = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                            'weight': p_dict['font_weight'], 'visible': True}
-                k_dict['k_y2_axis_font'] = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                            'weight': p_dict['font_weight'], 'visible': True}
-
-                # If the user has selected transparent in the plugin menu, we account for that here when setting up the kwargs for savefig().
-                if p_dict['transparent_charts']:
-                    k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None,
-                                            'transparent': p_dict['transparent_charts']}
+                # ============================= Background color ==============================
+                if not self.pluginPrefs.get('backgroundColorOther', 'false'):
+                    p_dict['transparent_charts'] = False
+                    p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
+                elif self.pluginPrefs.get('backgroundColorOther', 'false') == 'false':
+                    p_dict['transparent_charts'] = False
+                    p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
                 else:
-                    k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'edgecolor': p_dict['backgroundColor'], 'facecolor': p_dict['backgroundColor'],
-                                            'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None, 'transparent': p_dict['transparent_charts']}
+                    p_dict['transparent_charts'] = True
+                    p_dict['backgroundColor'] = '#000000'
 
-                # ========================== matplotlib.rc overrides ==========================
-                plt.rc('font', **k_dict['k_base_font'])
+                # ============================== Plot Area color ==============================
+                if not self.pluginPrefs.get('faceColorOther', 'false'):
+                    p_dict['transparent_filled'] = True
+                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+                elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
+                    p_dict['transparent_filled'] = True
+                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+                else:
+                    p_dict['transparent_filled'] = False
+                    p_dict['faceColor'] = '#000000'
 
-                p_dict.update(dev.pluginProps)
+                # A list of chart ids may be passed to the method. In that case, refresh only
+                # those charts. Otherwise, chart_id is None and we evaluate all of the charts
+                # to see if they need to be updated.
+                if not dev_list:
 
-                for _ in ('bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
-                          'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
-                          'y_obs1', 'y_obs1_max', 'y_obs1_min',
-                          'y_obs2', 'y_obs2_max', 'y_obs2_min',
-                          'y_obs3', 'y_obs3_max', 'y_obs3_min',
-                          'y_obs4', 'y_obs4_max', 'y_obs4_min',
-                          'y_obs5', 'y_obs5_max', 'y_obs5_min',
-                          'y_obs6', 'y_obs6_max', 'y_obs6_min'):
-                    p_dict[_] = []
+                    dev_list = []
 
-                p_dict['fileName']  = ''
-                p_dict['headers_1'] = ()  # Tuple
-                p_dict['headers_2'] = ()  # Tuple
+                    for dev in indigo.devices.itervalues('self'):
+                        refresh_interval = int(dev.pluginProps['refreshInterval'])
 
-                try:
-                    kv_list = list()  # A list of state/value pairs used to feed updateStatesOnServer()
-                    kv_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+                        if dev.deviceTypeId != 'csvEngine' and refresh_interval > 0 and dev.enabled:
+
+                            diff = dt.datetime.now() - date_parse(dev.states['chartLastUpdated'])
+                            refresh_needed = diff > dt.timedelta(seconds=refresh_interval)
+
+                            if refresh_needed:
+                                dev_list.append(dev)
+
+                for dev in dev_list:
+
+                    dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
+
+                    # ============================= Custom Font Sizes =============================
+                    # Custom font sizes for retina/non-retina adjustments.
+                    try:
+                        if dev.pluginProps['customSizeFont']:
+                            p_dict['mainFontSize'] = int(dev.pluginProps['customTitleFontSize'])
+                            plt.rcParams['xtick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
+                            plt.rcParams['ytick.labelsize'] = int(dev.pluginProps['customTickFontSize'])
+
+                    except KeyError:
+                        # Not all devices may support this feature.
+                        pass
+
+                    # ================================== kwargs ===================================
+                    k_dict['k_battery']            = {'color': p_dict['fontColorAnnotation'],
+                                                      'ha': 'right',
+                                                      'size': plt.rcParams['xtick.labelsize'],
+                                                      'textcoords': 'data',
+                                                      'va': 'center',
+                                                      'xycoords': 'data',
+                                                      'zorder': 25}
+                    k_dict['k_annotation_battery'] = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
+                                                      'color': p_dict['fontColorAnnotation'],
+                                                      'ha': 'center',
+                                                      'size': plt.rcParams['xtick.labelsize'],
+                                                      'textcoords': 'data',
+                                                      'va': 'center',
+                                                      'xycoords': 'data',
+                                                      'zorder': 25}
+                    k_dict['k_annotation']   = {'bbox': dict(boxstyle='round,pad=0.3', facecolor=p_dict['faceColor'], edgecolor=p_dict['spineColor'], alpha=0.75, linewidth=0.5),
+                                                'color': p_dict['fontColorAnnotation'], 'size': plt.rcParams['xtick.labelsize'], 'horizontalalignment': 'center',
+                                                'textcoords': 'offset points', 'verticalalignment': 'center'}
+                    k_dict['k_bar']          = {'alpha': 1.0, 'zorder': 10}
+                    k_dict['k_base_font']    = {'size': float(p_dict['mainFontSize']), 'weight': p_dict['font_weight']}
+                    k_dict['k_calendar']     = {'verticalalignment': 'top'}
+                    k_dict['k_custom']       = {'alpha': 1.0, 'zorder': 3}
+                    k_dict['k_fill']         = {'alpha': 0.7, 'zorder': 10}
+                    k_dict['k_grid_fig']     = {'which': 'major', 'zorder': 1}
+                    k_dict['k_line']         = {'alpha': 1.0}
+                    k_dict['k_major_x']      = {'bottom': p_dict['tick_bottom'], 'reset': False, 'top': p_dict['tick_top'], 'which': 'major'}
+                    k_dict['k_major_y']      = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'major'}
+                    k_dict['k_major_y2']     = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'major'}
+                    k_dict['k_max']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
+                    k_dict['k_min']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
+                    k_dict['k_minor_x']      = {'bottom': p_dict['tick_bottom'], 'reset': False, 'top': p_dict['tick_top'], 'which': 'minor'}
+                    k_dict['k_minor_y']      = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'minor'}
+                    k_dict['k_minor_y2']     = {'left': p_dict['tick_left'], 'reset': False, 'right': p_dict['tick_right'], 'which': 'minor'}
+                    k_dict['k_rgrids']       = {'angle': 67, 'color': p_dict['fontColor'], 'horizontalalignment': 'left', 'verticalalignment': 'center'}
+                    k_dict['k_title_font']   = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+                    k_dict['k_x_axis_font']  = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+                    k_dict['k_y_axis_font']  = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+                    k_dict['k_y2_axis_font'] = {'color': p_dict['fontColor'], 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+
+                    # If the user has selected transparent in the plugin menu, we account for that here when setting up the kwargs for savefig().
+                    if p_dict['transparent_charts']:
+                        k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None,
+                                                'papertype': None, 'transparent': p_dict['transparent_charts']}
+                    else:
+                        k_dict['k_plot_fig'] = {'bbox_extra_artists': None, 'bbox_inches': None, 'edgecolor': p_dict['backgroundColor'], 'facecolor': p_dict['backgroundColor'],
+                                                'format': None, 'frameon': None, 'orientation': None, 'pad_inches': None, 'papertype': None, 'transparent': p_dict['transparent_charts']}
+
+                    # ========================== matplotlib.rc overrides ==========================
+                    plt.rc('font', **k_dict['k_base_font'])
+
                     p_dict.update(dev.pluginProps)
 
-                    # ======================= Limit number of observations ========================
+                    for _ in ('bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
+                              'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
+                              'y_obs1', 'y_obs1_max', 'y_obs1_min',
+                              'y_obs2', 'y_obs2_max', 'y_obs2_min',
+                              'y_obs3', 'y_obs3_max', 'y_obs3_min',
+                              'y_obs4', 'y_obs4_max', 'y_obs4_min',
+                              'y_obs5', 'y_obs5_max', 'y_obs5_min',
+                              'y_obs6', 'y_obs6_max', 'y_obs6_min'):
+                        p_dict[_] = []
+
+                    p_dict['fileName']  = ''
+                    p_dict['headers_1'] = ()  # Tuple
+                    p_dict['headers_2'] = ()  # Tuple
+
                     try:
-                        p_dict['numObs'] = int(p_dict['numObs'])
+                        kv_list = list()  # A list of state/value pairs used to feed updateStatesOnServer()
+                        kv_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+                        p_dict.update(dev.pluginProps)
 
-                    except KeyError:
-                        # Only some devices will have their own numObs.
-                        pass
+                        # ======================= Limit number of observations ========================
+                        try:
+                            p_dict['numObs'] = int(p_dict['numObs'])
 
-                    except ValueError as sub_error:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. See plugin log for more information.".format(dev.name, sub_error))
-
-                    # ============================ Custom Square Size =============================
-                    try:
-                        if p_dict['customSizePolar'] == 'None':
+                        except KeyError:
+                            # Only some devices will have their own numObs.
                             pass
 
-                        else:
-                            p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
+                        except ValueError as sub_error:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
-                    except ValueError as sub_error:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.warning(u"[{0}] Custom size must be a positive number or None: {1}".format(dev.name, sub_error))
-
-                    except KeyError:
-                        pass
-
-                    # ============================= Extra Wide Chart ==============================
-                    try:
-                        if p_dict.get('rectWide', False):
-                            p_dict['chart_height'] = float(p_dict['rectChartWideHeight'])
-                            p_dict['chart_width']  = float(p_dict['rectChartWideWidth'])
-
-                        else:
-                            p_dict['chart_height'] = float(p_dict['rectChartHeight'])
-                            p_dict['chart_width']  = float(p_dict['rectChartWidth'])
-
-                    except KeyError:
-                        # Not all devices will have these keys
-                        pass
-
-                    # ================================ Custom Size ================================
-                    # If the user has specified a custom size, let's override
-                    # with their custom setting.
-                    if p_dict.get('customSizeChart', False):
+                        # ============================ Custom Square Size =============================
                         try:
-                            if p_dict['customSizeHeight'] != 'None':
-                                p_dict['chart_height'] = float(p_dict['customSizeHeight'])
+                            if p_dict['customSizePolar'] == 'None':
+                                pass
 
-                            if p_dict['customSizeWidth'] != 'None':
-                                p_dict['chart_width'] = float(p_dict['customSizeWidth'])
+                            else:
+                                p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
+
+                        except ValueError as sub_error:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] Custom size must be a positive number or None: {1}".format(dev.name, sub_error))
+
+                        except KeyError:
+                            pass
+
+                        # ============================= Extra Wide Chart ==============================
+                        try:
+                            if p_dict.get('rectWide', False):
+                                p_dict['chart_height'] = float(p_dict['rectChartWideHeight'])
+                                p_dict['chart_width']  = float(p_dict['rectChartWideWidth'])
+
+                            else:
+                                p_dict['chart_height'] = float(p_dict['rectChartHeight'])
+                                p_dict['chart_width']  = float(p_dict['rectChartWidth'])
 
                         except KeyError:
                             # Not all devices will have these keys
                             pass
 
-                    # ============================== Best Fit Lines ===============================
-                    # Set the defaults for best fit lines in p_dict.
-                    for _ in range(1, 7, 1):
-                        p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00')
+                        # ================================ Custom Size ================================
+                        # If the user has specified a custom size, let's override
+                        # with their custom setting.
+                        if p_dict.get('customSizeChart', False):
+                            try:
+                                if p_dict['customSizeHeight'] != 'None':
+                                    p_dict['chart_height'] = float(p_dict['customSizeHeight'])
 
-                    # ============================== Phantom Labels ===============================
-                    # Since users may or may not include axis labels and
-                    # because we want to ensure that all plot areas present
-                    # in the same way, we need to create 'phantom' labels that
-                    # are plotted but not visible.  Setting the font color to
-                    # 'None' will effectively hide them.
-                    try:
-                        if p_dict['customAxisLabelX'].isspace() or p_dict['customAxisLabelX'] == '':
-                            p_dict['customAxisLabelX'] = 'null'
-                            k_dict['k_x_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                                          'weight': p_dict['font_weight'], 'visible': True}
-                    except KeyError:
-                        # Not all devices will contain these keys
-                        pass
+                                if p_dict['customSizeWidth'] != 'None':
+                                    p_dict['chart_width'] = float(p_dict['customSizeWidth'])
 
-                    try:
-                        if p_dict['customAxisLabelY'].isspace() or p_dict['customAxisLabelY'] == '':
-                            p_dict['customAxisLabelY'] = 'null'
-                            k_dict['k_y_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']), 'fontstyle': p_dict['font_style'],
-                                                          'weight': p_dict['font_weight'], 'visible': True}
-                    except KeyError:
-                        # Not all devices will contain these keys
-                        pass
+                            except KeyError:
+                                # Not all devices will have these keys
+                                pass
 
-                    try:
-                        if 'customAxisLabelY2' in p_dict.keys():  # Not all devices that get to this point will support Y2.
-                            if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
-                                p_dict['customAxisLabelY2'] = 'null'
-                                k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
-                                                               'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
-                    except KeyError:
-                        # Not all devices will contain these keys
-                        pass
+                        # ============================== Best Fit Lines ===============================
+                        # Set the defaults for best fit lines in p_dict.
+                        for _ in range(1, 7, 1):
+                            p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00')
 
-                    # ================================ Annotations ================================
-                    # If the user wants annotations, we need to hide the line
-                    # markers as we don't want to plot one on top of the other.
-                    for line in range(1, 7, 1):
+                        # ============================== Phantom Labels ===============================
+                        # Since users may or may not include axis labels and
+                        # because we want to ensure that all plot areas present
+                        # in the same way, we need to create 'phantom' labels that
+                        # are plotted but not visible.  Setting the font color to
+                        # 'None' will effectively hide them.
                         try:
-                            if p_dict['line{0}Annotate'.format(line)] and p_dict['line{0}Marker'.format(line)] != 'None':
-                                p_dict['line{0}Marker'.format(line)] = 'None'
-                                self.logger.warning(u"[{0}] Line {1} marker is suppressed to display annotations. "
-                                                    u"To see the marker, disable annotations for this line.".format(dev.name, line))
+                            if p_dict['customAxisLabelX'].isspace() or p_dict['customAxisLabelX'] == '':
+                                p_dict['customAxisLabelX'] = 'null'
+                                k_dict['k_x_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                              'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
                         except KeyError:
                             # Not all devices will contain these keys
                             pass
 
-                    # =============================== Line Markers ================================
-                    # Some line markers need to be adjusted due to their inherent value. For
-                    # example, matplotlib uses '<', '>' and '.' as markers but storing these values
-                    # will blow up the XML.  So we need to convert them. (See self.formatMarkers()
-                    # method.)
-                    p_dict = self.formatMarkers(p_dict)
+                        try:
+                            if p_dict['customAxisLabelY'].isspace() or p_dict['customAxisLabelY'] == '':
+                                p_dict['customAxisLabelY'] = 'null'
+                                k_dict['k_y_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                              'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+                        except KeyError:
+                            # Not all devices will contain these keys
+                            pass
 
-                    # Note that the logging of p_dict and k_dict are handled within the thread.
-                    self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
-                    self.__log_dicts(dev)
+                        try:
+                            if 'customAxisLabelY2' in p_dict.keys():  # Not all devices that get to this point will support Y2.
+                                if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
+                                    p_dict['customAxisLabelY2'] = 'null'
+                                    k_dict['k_y2_axis_font']    = {'color': 'None', 'fontname': p_dict['fontMain'], 'fontsize': float(p_dict['mainFontSize']),
+                                                                   'fontstyle': p_dict['font_style'], 'weight': p_dict['font_weight'], 'visible': True}
+                        except KeyError:
+                            # Not all devices will contain these keys
+                            pass
 
-                    # ============================== rcParams Device ==============================
-                    if dev.deviceTypeId == 'rcParamsDevice':
-                        self.rcParamsDeviceUpdate(dev)
-
-                    # For the time being, we're running each device through its
-                    # own process synchronously; parallel processing may come later.
-
-                    # ================================ Bar Charts =================================
-                    if dev.deviceTypeId == 'barChartingDevice':
-
-                        if __name__ == '__main__':
-                            p_bar = multiprocessing.Process(name='p_bar', target=MakeChart(self).chart_bar, args=(dev, p_dict, k_dict, return_queue,))
-                            p_bar.start()
-
-                    # =========================== Battery Health Chart ============================
-                    if dev.deviceTypeId == 'batteryHealthDevice':
-
-                        device_dict  = {}
-                        exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
-
-                        for batt_dev in indigo.devices.itervalues():
+                        # ================================ Annotations ================================
+                        # If the user wants annotations, we need to hide the line
+                        # markers as we don't want to plot one on top of the other.
+                        for line in range(1, 7, 1):
                             try:
-                                if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
-                                    device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
+                                if p_dict['line{0}Annotate'.format(line)] and p_dict['line{0}Marker'.format(line)] != 'None':
+                                    p_dict['line{0}Marker'.format(line)] = 'None'
+                                    self.logger.warning(u"[{0}] Line {1} marker is suppressed to display annotations. "
+                                                        u"To see the marker, disable annotations for this line.".format(dev.name, line))
+                            except KeyError:
+                                # Not all devices will contain these keys
+                                pass
 
-                                # The following line is used for testing the battery health code; it isn't needed in production.
-                                # device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77', 'Device 3 Has A Name Longer Than The Other Two, But': '9', 'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
-                                # device_dict = {'Device 1': '50', 'Device 2': '100', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
-                                #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
+                        # =============================== Line Markers ================================
+                        # Some line markers need to be adjusted due to their inherent value. For
+                        # example, matplotlib uses '<', '>' and '.' as markers but storing these values
+                        # will blow up the XML.  So we need to convert them. (See self.formatMarkers()
+                        # method.)
+                        p_dict = self.formatMarkers(p_dict)
 
-                            except Exception as sub_error:
-                                self.pluginErrorHandler(traceback.format_exc())
-                                self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
+                        # Note that the logging of p_dict and k_dict are handled within the thread.
+                        self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
+                        self.__log_dicts(dev)
 
-                        if device_dict == {}:
-                            device_dict['No Battery Devices'] = 0
+                        # ============================== rcParams Device ==============================
+                        if dev.deviceTypeId == 'rcParamsDevice':
+                            self.rcParamsDeviceUpdate(dev)
 
-                        if __name__ == '__main__':
-                            p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
-                            p_battery.start()
+                        # For the time being, we're running each device through its
+                        # own process synchronously; parallel processing may come later.
 
-                    # ============================== Calendar Charts ==============================
-                    if dev.deviceTypeId == "calendarChartingDevice":
+                        # ================================ Bar Charts =================================
+                        if dev.deviceTypeId == 'barChartingDevice':
 
-                        if __name__ == '__main__':
-                            p_calendar = multiprocessing.Process(name='p_calendar', target=MakeChart(self).chart_calendar, args=(dev, p_dict, k_dict, return_queue,))
-                            p_calendar.start()
+                            if __name__ == '__main__':
+                                p_bar = multiprocessing.Process(name='p_bar', target=MakeChart(self).chart_bar, args=(dev, p_dict, k_dict, return_queue,))
+                                p_bar.start()
 
-                    # ================================ Line Charts ================================
-                    if dev.deviceTypeId == "lineChartingDevice":
+                        # =========================== Battery Health Chart ============================
+                        if dev.deviceTypeId == 'batteryHealthDevice':
 
-                        if __name__ == '__main__':
-                            p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, k_dict, return_queue,))
-                            p_line.start()
+                            device_dict  = {}
+                            exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
 
-                    # ============================== Multiline Text ===============================
-                    if dev.deviceTypeId == 'multiLineText':
+                            for batt_dev in indigo.devices.itervalues():
+                                try:
+                                    if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
+                                        device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                        # Get the text to plot. We do this here so we don't need to send all the
-                        # devices and variables to the method (the process does not have access to the
-                        # Indigo server).
-                        if int(p_dict['thing']) in indigo.devices:
-                            text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
+                                    # The following line is used for testing the battery health code; it isn't needed in production.
+                                    # device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77',
+                                    #                'Device 3 Has A Name Longer Than The Other Two, But': '9',
+                                    #                'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
+                                    # device_dict = {'Device 1': '50', 'Device 2': '100', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
+                                    #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
 
-                        elif int(p_dict['thing']) in indigo.variables:
-                            text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
+                                except Exception as sub_error:
+                                    self.pluginErrorHandler(traceback.format_exc())
+                                    self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
 
-                        else:
-                            text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
-                            self.logger.info(u"Presently, the plugin only supports device state and variable values.")
+                            if device_dict == {}:
+                                device_dict['No Battery Devices'] = 0
 
-                        if __name__ == '__main__':
-                            p_multiline = multiprocessing.Process(name='p_multiline',
-                                                                  target=MakeChart(self).chart_multiline_text,
-                                                                  args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
-                            p_multiline.start()
+                            if __name__ == '__main__':
+                                p_battery = multiprocessing.Process(name='p_battery', target=MakeChart(self).chart_battery_health, args=(dev, device_dict, p_dict, k_dict, return_queue,))
+                                p_battery.start()
 
-                    # =============================== Polar Charts ================================
-                    if dev.deviceTypeId == "polarChartingDevice":
+                        # ============================== Calendar Charts ==============================
+                        if dev.deviceTypeId == "calendarChartingDevice":
 
-                        if __name__ == '__main__':
-                            p_polar = multiprocessing.Process(name='p_polar', target=MakeChart(self).chart_polar, args=(dev, p_dict, k_dict, return_queue,))
-                            p_polar.start()
+                            if __name__ == '__main__':
+                                p_calendar = multiprocessing.Process(name='p_calendar', target=MakeChart(self).chart_calendar, args=(dev, p_dict, k_dict, return_queue,))
+                                p_calendar.start()
 
-                    # ============================== Scatter Charts ===============================
-                    if dev.deviceTypeId == "scatterChartingDevice":
+                        # ================================ Line Charts ================================
+                        if dev.deviceTypeId == "lineChartingDevice":
 
-                        if __name__ == '__main__':
-                            p_scatter = multiprocessing.Process(name='p_scatter', target=MakeChart(self).chart_scatter, args=(dev, p_dict, k_dict, return_queue,))
-                            p_scatter.start()
+                            if __name__ == '__main__':
+                                p_line = multiprocessing.Process(name='p_line', target=MakeChart(self).chart_line, args=(dev, p_dict, k_dict, return_queue,))
+                                p_line.start()
 
-                    # ========================== Weather Forecast Charts ==========================
-                    if dev.deviceTypeId == "forecastChartingDevice":
+                        # ============================== Multiline Text ===============================
+                        if dev.deviceTypeId == 'multiLineText':
 
-                        dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
-                        state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
-                        sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
+                            # Get the text to plot. We do this here so we don't need to send all the
+                            # devices and variables to the method (the process does not have access to the
+                            # Indigo server).
+                            if int(p_dict['thing']) in indigo.devices:
+                                text_to_plot = unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
 
-                        if __name__ == '__main__':
-                            p_weather = multiprocessing.Process(name='p_weather',
-                                                                target=MakeChart(self).chart_weather_forecast,
-                                                                args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
-                            p_weather.start()
+                            elif int(p_dict['thing']) in indigo.variables:
+                                text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
 
-                    # ========================= Process the output queue ==========================
-                    self.processLogQueue(dev, return_queue)
+                            else:
+                                text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
+                                self.logger.info(u"Presently, the plugin only supports device state and variable values.")
 
-                    dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                            if __name__ == '__main__':
+                                p_multiline = multiprocessing.Process(name='p_multiline',
+                                                                      target=MakeChart(self).chart_multiline_text,
+                                                                      args=(dev, p_dict, k_dict, text_to_plot, return_queue,))
+                                p_multiline.start()
 
-                    # If we have manually asked for all charts to update, don't refresh the last
-                    # update time so that the charts will update on their own at the next refresh
-                    # cycle.
-                    if not self.skipRefreshDateUpdate:
-                        kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+                        # =============================== Polar Charts ================================
+                        if dev.deviceTypeId == "polarChartingDevice":
 
-                    dev.updateStatesOnServer(kv_list)
+                            if __name__ == '__main__':
+                                p_polar = multiprocessing.Process(name='p_polar', target=MakeChart(self).chart_polar, args=(dev, p_dict, k_dict, return_queue,))
+                                p_polar.start()
 
-                except RuntimeError as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
-                    self.logger.critical(u"Skipping device.")
-                    dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                        # ============================== Scatter Charts ===============================
+                        if dev.deviceTypeId == "scatterChartingDevice":
 
-            # Ensure the flag is in the proper state for the next automatic refresh.
-            self.skipRefreshDateUpdate = False
+                            if __name__ == '__main__':
+                                p_scatter = multiprocessing.Process(name='p_scatter', target=MakeChart(self).chart_scatter, args=(dev, p_dict, k_dict, return_queue,))
+                                p_scatter.start()
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"[{0}] Error: {0}. See plugin log for more information.".format(unicode(sub_error)))
+                        # ========================== Weather Forecast Charts ==========================
+                        if dev.deviceTypeId == "forecastChartingDevice":
+
+                            dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
+                            state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
+                            sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
+
+                            if __name__ == '__main__':
+                                p_weather = multiprocessing.Process(name='p_weather',
+                                                                    target=MakeChart(self).chart_weather_forecast,
+                                                                    args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
+                                p_weather.start()
+
+                        # ========================= Process the output queue ==========================
+                        self.processLogQueue(dev, return_queue)
+
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+
+                        # If we have manually asked for all charts to update, don't refresh the last
+                        # update time so that the charts will update on their own at the next refresh
+                        # cycle.
+                        if not self.skipRefreshDateUpdate:
+                            kv_list.append({'key': 'chartLastUpdated', 'value': u"{0}".format(dt.datetime.now())})
+
+                        dev.updateStatesOnServer(kv_list)
+
+                    except RuntimeError as sub_error:
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
+                        self.logger.critical(u"Skipping device.")
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+
+                # Ensure the flag is in the proper state for the next automatic refresh.
+                self.skipRefreshDateUpdate = False
+
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.critical(u"[{0}] Error: {0}. See plugin log for more information.".format(unicode(sub_error)))
 
     # =============================================================================
     def refreshTheChartsAction(self, plugin_action):
