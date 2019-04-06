@@ -3,6 +3,14 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-04-05  Sam
+===============================================================================
+In the Line Chart 'device', would it be possible to have 8 lines?
+
+DaveL17 - Consider perhaps grouping line controls to reduce the number that
+show at any one time.  I.e., Lines 1-4 and 5-8.
+
+===============================================================================
 2019-02-12  Mat
 ===============================================================================
 Consider automatically updating the chart save path to the latest version of
@@ -29,14 +37,6 @@ import/export -- it just exports/imports all plugin props it finds on the
 device and/or XML file during import.
 
 ===============================================================================
-2019-02-10  Busta999
-===============================================================================
-Legend extended so it can run all the way across the bottom of the graph - at
-the moment it wraps to a second line even though it is only using the middle
-half of the graph - if all 6 lines are used and text is too long it wraps
-rather than - see below.
-
-===============================================================================
 2019-01-21  Autolog
 ===============================================================================
 Another useful feature to add to the mix, especially if you are going to
@@ -48,6 +48,9 @@ CSV file. If you could specify a period in the chart then that would save
 having to do this. My processing adds an entry to the CSV file for the start
 of the period (based on the last one dropped off) so that graph lines are
 always generated from the graph origin.
+
+DaveL17 - note that this is a limit on a chart by chart basis and not on the
+data file.
 
 ===============================================================================
 2019-01-04  Autolog
@@ -64,6 +67,17 @@ valve opening against the temperature.
 ===============================================================================
 COMPLETED =====================================================================
 ===============================================================================
+
+===============================================================================
+2019-02-10  Busta999  [COMPLETE]
+===============================================================================
+Legend extended so it can run all the way across the bottom of the graph - at
+the moment it wraps to a second line even though it is only using the middle
+half of the graph - if all 6 lines are used and text is too long it wraps
+rather than - see below.
+
+DaveL17 - added in v0.8.02. Includes a refactoring of the legend labels so
+that they wrap by row instead of by column.
 
 ===============================================================================
 2019-02-12  Autolog  [COMPLETE]

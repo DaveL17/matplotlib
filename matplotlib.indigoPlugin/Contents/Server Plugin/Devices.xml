@@ -86,6 +86,21 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="legendColumns" type="menu" defaultValue="5" visibleBindingId="showLegend" visibleBindingValue="true"
+                   tooltip="The number of columns for the legend entries.">
+                <Label>Legend Columns:</Label>
+                <List>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                    <Option value="4">4</Option>
+                    <Option value="5">5</Option>
+                    <Option value="6">6</Option>
+                    <Option value="7">7</Option>
+                    <Option value="8">8</Option>
+                </List>
+            </Field>
+
             <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of bars for the chart (integer). Enter zero to plot all observations.">
                 <Label>Number of Bars:</Label>
             </Field>
@@ -726,6 +741,21 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="legendColumns" type="menu" defaultValue="5" visibleBindingId="showLegend" visibleBindingValue="true"
+                   tooltip="The number of columns for the legend entries.">
+                <Label>Legend Columns:</Label>
+                <List>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                    <Option value="4">4</Option>
+                    <Option value="5">5</Option>
+                    <Option value="6">6</Option>
+                    <Option value="7">7</Option>
+                    <Option value="8">8</Option>
+                </List>
+            </Field>
+
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
             </Field>
@@ -884,7 +914,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line1BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -962,7 +992,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line2BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1040,7 +1070,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line3BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1117,7 +1147,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line4BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1195,7 +1225,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line5BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1273,7 +1303,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line6BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1688,9 +1718,25 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+            <Field id="showLegend" type="checkbox" defaultValue="false"  visibleBindingId="showLegend" visibleBindingValue="true"
+                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="legendColumns" type="menu" defaultValue="5"  visibleBindingId="showLegend" visibleBindingValue="true"
+                   tooltip="The number of columns for the legend entries.">
+                <Label>Legend Columns:</Label>
+                <List>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                    <Option value="4">4</Option>
+                    <Option value="5">5</Option>
+                    <Option value="6">6</Option>
+                    <Option value="7">7</Option>
+                    <Option value="8">8</Option>
+                </List>
             </Field>
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
@@ -1831,7 +1877,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line1BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1889,7 +1935,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line2BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -1947,7 +1993,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line3BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
@@ -2004,7 +2050,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line4BestFit" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot best fit line.">
-                <Label>Plot Best Fit</Label>
+                <Label>Plot Best Fit?</Label>
                 <Description>Yes/No</Description>
             </Field>
 

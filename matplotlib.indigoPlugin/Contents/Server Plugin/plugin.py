@@ -66,6 +66,7 @@ from ast import literal_eval
 import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
+import itertools
 import logging
 import multiprocessing
 import numpy as np
@@ -102,7 +103,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.01"
+__version__   = "0.8.02"
 
 # =============================================================================
 
@@ -2509,6 +2510,8 @@ class Plugin(indigo.PluginBase):
                 p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
                 p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
 
+                p_dict['legendColumns']       = self.pluginPrefs.get('legendColumns', 5)
+
                 # ============================= Background color ==============================
                 if not self.pluginPrefs.get('backgroundColorOther', 'false'):
                     p_dict['transparent_charts'] = False
@@ -3021,7 +3024,13 @@ class MakeChart(object):
                         final_headers.append(p_dict['bar{0}Legend'.format(counter)])
                     counter += 1
 
-                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, prop={'size': float(p_dict['legendFontSize'])})
+                # Set the legend
+                # Reorder the headers so that they fill by row instead of by column
+                num_col = int(p_dict['legendColumns'])
+                iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                final_headers = [_ for _ in iter_headers]
+
+                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=int(p_dict['legendColumns']), prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -3348,7 +3357,12 @@ class MakeChart(object):
                     counter += 1
 
                 # Set the legend
-                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, prop={'size': float(p_dict['legendFontSize'])})
+                # Reorder the headers so that they fill by row instead of by column
+                num_col = int(p_dict['legendColumns'])
+                iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                final_headers = [_ for _ in iter_headers]
+
+                legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=num_col, prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -3772,7 +3786,13 @@ class MakeChart(object):
                                          markerfacecolor=p_dict['group{0}Color'.format(counter)], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
                     counter += 1
 
-                legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4, numpoints=1, markerscale=0.6,
+                # Set the legend
+                # Reorder the headers so that they fill by row instead of by column
+                num_col = int(p_dict['legendColumns'])
+                iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                final_headers = [_ for _ in iter_headers]
+
+                legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=int(p_dict['legendColumns']), numpoints=1, markerscale=0.6,
                                    prop={'size': float(p_dict['legendFontSize'])})
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()

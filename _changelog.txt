@@ -1,3 +1,8 @@
+v0.8.02
+- Adds control to vary the number of legend columns for bar, line and scatter
+  charts.
+- UI Refinements
+
 v0.8.01
 - Plugin should shut down more gracefully.
 - Code refinements.
