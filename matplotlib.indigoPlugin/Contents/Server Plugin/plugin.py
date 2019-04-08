@@ -41,8 +41,6 @@ the proper Fantastic Weather devices.
 #       (like Y1) for Y2 and then have a control to allow user to elect when Y
 #       axis to assign the line to.
 # TODO: Remove matplotlib_version.html after deprecation
-# TODO: if the csv save location is a share, and the share is unreachable, it
-#       blows up.
 # TODO: Add validation that will not allow custom tick locations to be outside
 #       the boundaries of the axis min/max.
 # TODO: Add adjustment factor to scatter charts
@@ -103,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.02"
+__version__   = "0.8.03"
 
 # =============================================================================
 
@@ -355,6 +353,7 @@ class Plugin(indigo.PluginBase):
                     values_dict['warningColor']               = 'FF 00 00'
                     values_dict['showBatteryLevel']           = True
                     values_dict['showBatteryLevelBackground'] = False
+                    values_dict['showDeadBattery']            = False
 
                 # ========================== Calendar Charting Device =========================
                 if type_id == "calendarChartingDevice":
@@ -1417,6 +1416,10 @@ class Plugin(indigo.PluginBase):
                     except IOError:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
+
+                    except OSError:
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
 
                 if not os.path.isfile(full_path):
                     self.logger.debug(u"CSV does not exist. Creating: {0}".format(full_path))
@@ -2789,11 +2792,8 @@ class Plugin(indigo.PluginBase):
                                         device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                     # The following line is used for testing the battery health code; it isn't needed in production.
-                                    # device_dict = {'Device 1 Has A Very Long Name': '100', 'Device 2 Has A Really Very Long Name': '77',
-                                    #                'Device 3 Has A Name Longer Than The Other Two, But': '9',
-                                    #                'Device 4 Has The Longest Name Of All The Other Devices We\'re Plotting': '4', 'Device 5': '92'}
-                                    # device_dict = {'Device 1': '50', 'Device 2': '100', 'Device 3': '9', 'Device 4': '4', 'Device 5': '92',
-                                    #                'Device 6': '72', 'Device 7': '47', 'Device 8': '92', 'Device 9': '72', 'Device 10': '47'}
+                                    device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8', 'Device 4': '4', 'Device 5': '92',
+                                                   'Device 6': '72', 'Device 7': '47', 'Device 8': '68', 'Device 9': '0', 'Device 10': '47'}
 
                                 except Exception as sub_error:
                                     self.pluginErrorHandler(traceback.format_exc())
@@ -3089,6 +3089,7 @@ class MakeChart(object):
             healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
             level_box     = p_dict['showBatteryLevelBackground']
             show_level    = p_dict['showBatteryLevel']
+            dead_ones     = p_dict['showDeadBattery']
             warning_color = r"#{0}".format(p_dict['warningColor'].replace(' ', '').replace('#', ''))
             warning_level = int(p_dict['warningLevel'])
             x_values      = []
@@ -3133,8 +3134,8 @@ class MakeChart(object):
 
             for rect in rects:
                 width  = rect.get_width()    # horizontal width of bars
-                height = rect.get_height()  # vertical height of bars
-                y      = rect.get_y()            # Y axis position
+                height = rect.get_height()   # vertical height of bars
+                y      = rect.get_y()        # Y axis position
 
                 # With bbox.  We give a little extra room horizontally for the bbox.
                 if show_level in ('true', 'True', True) and level_box:
@@ -3176,6 +3177,15 @@ class MakeChart(object):
             # Assign device names to the minor ticks if wanted
             if p_dict.get('showDeviceName', True):
                 ax.set_yticklabels(y_text, minor=True)
+
+            # Mark devices that have a battery level of zero by coloring their y axis label
+            # using the same warning color that is used for the bar.
+            if dead_ones:
+                counter = 0
+                for key, value in sorted(device_dict.iteritems(), reverse=True):
+                    if int(value) == 0:
+                        ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
+                    counter += 1
 
             # ============================== Y Axis Min/Max ===============================
             # We never want the Y axis to go lower than 0.

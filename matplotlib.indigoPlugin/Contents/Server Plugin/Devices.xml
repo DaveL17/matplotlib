@@ -555,6 +555,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="showDeadBattery" type="checkbox" defaultValue="false"
+                   tooltip="Highlight device when battery level becomes zero.">
+                <Label>Highlight Dead Batteries?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="excludedDevices" type="list" rows="7" tooltip="Please select the devices to exclude.">
                 <Label>Excluded Devices:</Label>
                 <List class="self" filter="" method="getBatteryDeviceList"/>

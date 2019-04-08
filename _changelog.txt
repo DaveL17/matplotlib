@@ -1,3 +1,8 @@
+v0.8.03
+- Highlights battery devices with dead batteries (level of 0) by coloring the
+  label using the warning color setting.
+- Traps OSError when plugin cannot connect to the CSV storage location.
+
 v0.8.02
 - Adds control to vary the number of legend columns for bar, line and scatter
   charts.

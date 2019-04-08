@@ -11,23 +11,6 @@ DaveL17 - Consider perhaps grouping line controls to reduce the number that
 show at any one time.  I.e., Lines 1-4 and 5-8.
 
 ===============================================================================
-2019-02-12  Mat
-===============================================================================
-Consider automatically updating the chart save path to the latest version of
-Indigo.
-
-DaveL17 - this will require "tricking" the plugin to think that I've updated
-Indigo.  See what happens to a control page when this is done. If a user has
-saved an image as a static image, it would likely be fine; but if they've
-saved the image as a refreshing image URL, those would likely break, right?
-
-===============================================================================
-2019-02-12  Autolog
-===============================================================================
-it would be useful to set the whole bar to red if the battery is zero - so it
-stands out.
-
-===============================================================================
 2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
@@ -69,6 +52,16 @@ COMPLETED =====================================================================
 ===============================================================================
 
 ===============================================================================
+2019-02-12  Autolog
+===============================================================================
+it would be useful to set the whole bar to red if the battery is zero - so it
+stands out.
+
+DaveL17 - setting the full bar for zero level devices was a bit of a Pandora's
+box, so instead the device label will be colored with the warning color if
+highlight dead batteries setting is ticked. v0.8.03
+
+===============================================================================
 2019-02-10  Busta999  [COMPLETE]
 ===============================================================================
 Legend extended so it can run all the way across the bottom of the graph - at
@@ -78,6 +71,19 @@ rather than - see below.
 
 DaveL17 - added in v0.8.02. Includes a refactoring of the legend labels so
 that they wrap by row instead of by column.
+
+===============================================================================
+2019-02-12  Mat  [PARTIALLY COMPLETE]
+===============================================================================
+Consider automatically updating the chart save path to the latest version of
+Indigo.
+
+DaveL17 - If a user has saved an image as a static image, it would likely be
+fine; but if they've saved the image as a refreshing image URL, those would
+likely break. Solution is to send a message to the log that the save location
+looks like it doesn't match the Indigo version (there is some introspection
+of the save path, so that this only happens if the original path is in the
+Indigo folder tree.  v0.7.53
 
 ===============================================================================
 2019-02-12  Autolog  [COMPLETE]
