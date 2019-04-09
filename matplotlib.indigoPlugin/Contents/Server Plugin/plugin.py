@@ -52,6 +52,12 @@ the proper Fantastic Weather devices.
 #       you can change all bars/lines/scatter etc in one go.
 # TODO: Add device/variable filter to mutliline text device (like CSV Engine).
 
+# TODO: Add facility to test that all CSV files exist each time the plugin is
+#       restarted. Don't let a chart device update until they've all been
+#       created.
+# TODO: Add a trap to somehow deal with timestamps that are out of order.
+#       This is an actual thing that's happened.
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -101,7 +107,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.03"
+__version__   = "0.8.04"
 
 # =============================================================================
 
@@ -3063,7 +3069,7 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
-    def chart_battery_health(self, dev, device_dict, p_dict, k_dict, return_queue):
+    def chart_battery_health(self, dev, device_list, p_dict, k_dict, return_queue):
         """
         Creates the battery health charts
 
@@ -3072,7 +3078,7 @@ class MakeChart(object):
         user input.
 
         :param class 'indigo.Device' dev: indigo device instance
-        :param dict device_dict: dictionary of battery device names and battery levels
+        :param dict device_list: dictionary of battery device names and battery levels
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue:
@@ -3085,6 +3091,7 @@ class MakeChart(object):
             bar_colors    = []
             caution_color = r"#{0}".format(p_dict['cautionColor'].replace(' ', '').replace('#', ''))
             caution_level = int(p_dict['cautionLevel'])
+            chart_data    = {}
             font_size     = plt.rcParams['ytick.labelsize']
             healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
             level_box     = p_dict['showBatteryLevelBackground']
@@ -3095,38 +3102,39 @@ class MakeChart(object):
             x_values      = []
             y_text        = []
 
-            for key, value in sorted(device_dict.iteritems(), reverse=True):
+            # ============================ Create Device Dict =============================
+            # 'thing' here is a tuple ('name', 'battery level')
+            for thing in sorted(device_list.iteritems(), reverse=True):
+                chart_data[thing[0]] = {}
+
+                # Add the battery level for each device
                 try:
-                    x_values.append(float(value))
-
+                    chart_data[thing[0]]['batteryLevel'] = float(thing[1])
                 except ValueError:
-                    x_values.append(0)
+                    chart_data[thing[0]]['batteryLevel'] = 0.0
 
-                y_text.append(key)
-
-                # =========================== Calculate Bar Colors ============================
-                # Create a list of colors for the bars based on battery health
-                try:
-                    battery_level = float(value)
-
-                except ValueError:
-                    battery_level = 0
-
-                if battery_level <= warning_level:
-                    bar_colors.append(warning_color)
-
-                elif warning_level < battery_level <= caution_level:
-                    bar_colors.append(caution_color)
-
+                # Determine the appropriate bar color
+                if chart_data[thing[0]]['batteryLevel'] > caution_level:
+                    chart_data[thing[0]]['color'] = healthy_color
+                elif caution_level >= chart_data[thing[0]]['batteryLevel'] > warning_level:
+                    chart_data[thing[0]]['color'] = caution_color
                 else:
-                    bar_colors.append(healthy_color)
+                    chart_data[thing[0]]['color'] = warning_color
+
+                # =========================== Create Chart Elements ===========================
+                bar_colors.append(chart_data[thing[0]]['color'])
+                x_values.append(chart_data[thing[0]]['batteryLevel'])
+                y_text.append(unicode(thing[0]))
 
             # Create a range of values to plot on the Y axis, since we can't plot on device names.
             y_values = np.arange(len(y_text))
 
+            # Create the chart figure
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
-            # Adding 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting it off the axis.
+            # =============================== Plot the Bars ===============================
+            # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
+            # it off the origin.
             rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
 
             # ================================ Data Labels ================================
@@ -3182,7 +3190,7 @@ class MakeChart(object):
             # using the same warning color that is used for the bar.
             if dead_ones:
                 counter = 0
-                for key, value in sorted(device_dict.iteritems(), reverse=True):
+                for key, value in sorted(device_list.iteritems(), reverse=True):
                     if int(value) == 0:
                         ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
                     counter += 1
