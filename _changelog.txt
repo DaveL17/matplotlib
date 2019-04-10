@@ -1,3 +1,7 @@
+v0.8.05
+- At plugin startup, iterate through all CSV Engine devices, audit CSV files,
+  and create any missing ones.
+
 v0.8.04
 - Traps OSError when plugin cannot connect to the CSV storage location.
 - Refactors battery charting code.

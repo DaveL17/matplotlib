@@ -107,7 +107,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.04"
+__version__   = "0.8.05"
 
 # =============================================================================
 
@@ -560,6 +560,9 @@ class Plugin(indigo.PluginBase):
 
         # Ensure the plugin is compatible with the current version of Indigo.
         self.Fogbert.audit_server_version(min_ver=7)
+
+        # Ensure that all CSV devices have existing CSV files.
+        self.csv_check_health()
 
     # =============================================================================
     def shutdown(self):
@@ -1090,6 +1093,47 @@ class Plugin(indigo.PluginBase):
                             self.pluginPrefs[pref] = self.pluginPrefs['{0}Other'.format(pref)]
                         else:
                             self.pluginPrefs[pref] = 'FF FF FF'
+
+    # =============================================================================
+    def csv_check_health(self):
+
+        # Iterate through all existing CSV Engine devices. It doesn't matter if the
+        # device is enabled or not, since we're only creating the file if it
+        # doesn't exist, and we're only going to add the header to the file.
+
+        data_path = self.pluginPrefs['dataPath']
+
+        for dev in indigo.devices.iter(filter='self'):
+            if dev.deviceTypeId == 'csvEngine':
+                column_dict = literal_eval(dev.pluginProps['columnDict'])
+
+                for thing in column_dict.items():
+                    full_path = data_path + thing[1][0] + ".csv"
+
+                    # TODO: does it make sense to combine this with the check that happens at CSV device refresh?
+                    #       could do passed device or if no passed device do all devices.
+
+                    # ============================= Create (if needed) ============================
+                    # If the appropriate CSV file doesn't exist, create it and write the header
+                    # line.
+                    if not os.path.isdir(data_path):
+                        try:
+                            os.makedirs(data_path)
+                            self.logger.warning(u"Target data folder does not exist. Creating it.")
+
+                        except IOError:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
+
+                        except OSError:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
+
+                    if not os.path.isfile(full_path):
+                        self.logger.warning(u"CSV file does not exist. Creating a new one: {0}".format(full_path))
+                        csv_file = open(full_path, 'w')
+                        csv_file.write('{0},{1}\n'.format('Timestamp', thing[1][2].encode("utf-8")))
+                        csv_file.close()
 
     # =============================================================================
     def csv_item_add(self, values_dict=None, type_id="", dev_id=0):
