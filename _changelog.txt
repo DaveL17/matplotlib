@@ -1,3 +1,7 @@
+v0.8.06
+- Adds section text and tooltips to show/hide controls for bar, line, scatter,
+  and weather devices (other device types don't have show/hide controls.)
+
 v0.8.05
 - At plugin startup, iterate through all CSV Engine devices, audit CSV files,
   and create any missing ones.

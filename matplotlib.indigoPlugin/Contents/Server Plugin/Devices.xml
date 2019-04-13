@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <Devices>
 
-
 <!-- Bar Charting Device -->
     <Device id="barChartingDevice" type="custom">
         <Name>Bar Chart</Name>
@@ -120,6 +119,10 @@
 
             <Field id="xAxisSeparator" type="separator"/>
 
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected chart axis.</Label>
+            </Field>
+
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
             </Field>
@@ -206,7 +209,11 @@
 <!-- Bar 1 -->
             <Field id="bar1Top" type="separator"/>
 
-            <Field id="barLabel1" type="checkbox" defaultValue="false">
+            <Field id="barText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available bar. Check the box to display the controls for the selected bar.</Label>
+            </Field>
+
+            <Field id="barLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 1.">
                 <Label>Bar 1</Label>
             </Field>
 
@@ -248,7 +255,7 @@
 <!-- Bar 2 -->
             <Field id="bar2Top" type="separator" visibleBindingId="barLabel1" visibleBindingValue="true"/>
 
-            <Field id="barLabel2" type="checkbox" defaultValue="false">
+            <Field id="barLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 2.">
                 <Label>Bar 2</Label>
             </Field>
 
@@ -290,7 +297,7 @@
 <!-- Bar 3 -->
             <Field id="bar3Top" type="separator" visibleBindingId="barLabel2" visibleBindingValue="true"/>
 
-            <Field id="barLabel3" type="checkbox" defaultValue="false">
+            <Field id="barLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 3.">
                 <Label>Bar 3</Label>
             </Field>
 
@@ -333,7 +340,7 @@
 <!-- Bar 4 -->
             <Field id="bar4Top" type="separator" visibleBindingId="barLabel3" visibleBindingValue="true"/>
 
-            <Field id="barLabel4" type="checkbox" defaultValue="false">
+            <Field id="barLabel4" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 4.">
                 <Label>Bar 4</Label>
             </Field>
 
@@ -379,8 +386,6 @@
 
             <Field id="barSeparator" type="separator" visibleBindingId="barLabel4" visibleBindingValue="true"/>
 
-            <Field id="additionalBarSpace" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
-
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
             </Field>
@@ -394,7 +399,7 @@
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid
-number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF").'>
+number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF").'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -566,7 +571,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getBatteryDeviceList"/>
             </Field>
 
-            <Field id="excludedDevicesLabel" type="label" alignWithControl="true" tooltip="Indigo ID numbers, separated by a comma.">
+            <Field id="excludedDevicesLabel" type="label" alignWithControl="true" fontSize="small" tooltip="Indigo ID numbers, separated by a comma.">
                 <Label>Select the devices you want to exclude from the chart (for example, you may want to exclude USB-powered devices.) To select multiple devices, hold the Command (&#x2318;) key while selecting.</Label>
             </Field>
         </ConfigUI>
@@ -772,6 +777,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="xAxisSeparator" type="separator"/>
 
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected chart axis.</Label>
+            </Field>
+
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
             </Field>
@@ -858,8 +867,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="linesSeparator" type="separator"/>
 
+            <Field id="linesText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available line. Check the box to display the controls for the selected line.</Label>
+            </Field>
+
 <!-- Line 1 -->
-            <Field id="lineLabel1" type="checkbox" defaultValue="false">
+            <Field id="lineLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 1.">
                 <Label>Line 1</Label>
             </Field>
 
@@ -937,7 +950,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 
 <!-- Line 2 -->
-            <Field id="lineLabel2" type="checkbox" defaultValue="false">
+            <Field id="lineLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 2.">
                 <Label>Line 2</Label>
             </Field>
 
@@ -1015,7 +1028,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
 
 <!-- Line 3 -->
-            <Field id="lineLabel3" type="checkbox" defaultValue="false">
+            <Field id="lineLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 3.">
                 <Label>Line 3</Label>
             </Field>
 
@@ -1093,7 +1106,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line3Bottom" type="separator" visibleBindingId="lineLabel3" visibleBindingValue="true"/>
 
 <!-- Line 4 -->
-            <Field id="lineLabel4" type="checkbox" defaultValue="false">
+            <Field id="lineLabel4" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 4.">
                 <Label>Line 4</Label>
             </Field>
 
@@ -1170,7 +1183,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line4Bottom" type="separator" visibleBindingId="lineLabel4" visibleBindingValue="true"/>
 
 <!-- Line 5 -->
-            <Field id="lineLabel5" type="checkbox" defaultValue="false">
+            <Field id="lineLabel5" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 5.">
                 <Label>Line 5</Label>
             </Field>
 
@@ -1248,7 +1261,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="line5Bottom" type="separator" visibleBindingId="lineLabel5" visibleBindingValue="true"/>
 
 <!-- Line 6 -->
-            <Field id="lineLabel6" type="checkbox" defaultValue="false">
+            <Field id="lineLabel6" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 6.">
                 <Label>Line 6</Label>
             </Field>
 
@@ -1334,7 +1347,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
                 <Label>Constants:</Label>l
             </Field>
 
@@ -1755,6 +1768,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="xAxisSeparator" type="separator"/>
 
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected chart axis.</Label>
+            </Field>
+
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
             </Field>
@@ -1841,8 +1858,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="groupSeparator" type="separator"/>
+
+            <Field id="groupText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available group. Check the box to display the controls for the selected group.</Label>
+            </Field>
+
 <!-- Group 1 -->
-            <Field id="groupLabel1" type="checkbox" defaultValue="false">
+            <Field id="groupLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for group 1.">
                 <Label>Group 1</Label>
             </Field>
 
@@ -1900,7 +1922,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="group1Bottom" type="separator" visibleBindingId="groupLabel1" visibleBindingValue="true"/>
 
 <!-- Group 2 -->
-            <Field id="groupLabel2" type="checkbox" defaultValue="false">
+            <Field id="groupLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for group 2.">
                 <Label>Group 2</Label>
             </Field>
 
@@ -1958,7 +1980,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="group2Bottom" type="separator" visibleBindingId="groupLabel2" visibleBindingValue="true"/>
 
 <!-- Group 3 -->
-            <Field id="groupLabel3" type="checkbox" defaultValue="false">
+            <Field id="groupLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for group 3.">
                 <Label>Group 3</Label>
             </Field>
 
@@ -2016,7 +2038,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="group3Bottom" type="separator" visibleBindingId="groupLabel3" visibleBindingValue="true"/>
 
 <!-- Group 4 -->
-            <Field id="groupLabel4" type="checkbox" defaultValue="false">
+            <Field id="groupLabel4" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for group 4.">
                 <Label>Group 4</Label>
             </Field>
 
@@ -2081,7 +2103,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
                 <Label>Constants:</Label>l
             </Field>
 
@@ -2224,6 +2246,10 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="xAxisSeparator" type="separator"/>
 
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected axis.</Label>
+            </Field>
+
             <Field id="xAxisLabel" type="checkbox" defaultValue="false">
                 <Label>X Axis</Label>
             </Field>
@@ -2324,8 +2350,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="linesSeparator" type="separator"/>
 
+            <Field id="featureText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available forecast element. Check the box to display the controls for the selected forecast element.</Label>
+            </Field>
+
 <!-- High Temperature -->
-            <Field id="lineLabel1" type="checkbox" defaultValue="false">
+            <Field id="lineLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for the high temperature line.">
                 <Label>High Temperature</Label>
             </Field>
 
@@ -2362,7 +2392,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
 <!-- Low Temperature -->
-            <Field id="lineLabel2" type="checkbox" defaultValue="false">
+            <Field id="lineLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for the low temperature line.">
                 <Label>Low Temperature</Label>
             </Field>
 
@@ -2400,7 +2430,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
 <!-- Precipitation -->
-            <Field id="lineLabel3" type="checkbox" defaultValue="false">
+            <Field id="lineLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for the precipitation bars.">
                 <Label>Precipitation</Label>
             </Field>
 
@@ -2424,7 +2454,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#FFFFFF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
                 <Label>Constants:</Label>l
             </Field>
 

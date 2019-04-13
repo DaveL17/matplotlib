@@ -52,12 +52,6 @@ the proper Fantastic Weather devices.
 #       you can change all bars/lines/scatter etc in one go.
 # TODO: Add device/variable filter to mutliline text device (like CSV Engine).
 
-# TODO: Add facility to test that all CSV files exist each time the plugin is
-#       restarted. Don't let a chart device update until they've all been
-#       created.
-# TODO: Add a trap to somehow deal with timestamps that are out of order.
-#       This is an actual thing that's happened.
-
 # ================================== IMPORTS ==================================
 
 try:
@@ -107,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.05"
+__version__   = "0.8.06"
 
 # =============================================================================
 
@@ -1096,10 +1090,17 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_check_health(self):
+        """
+        Creates any missing CSV files before beginning
 
-        # Iterate through all existing CSV Engine devices. It doesn't matter if the
-        # device is enabled or not, since we're only creating the file if it
-        # doesn't exist, and we're only going to add the header to the file.
+        Iterate through all existing CSV Engine devices. It doesn't matter if the
+        device is enabled or not, since we're only creating the file if it doesn't
+        exist, and we're only going to add the header to the file.
+
+        -----
+
+        :return:
+        """
 
         data_path = self.pluginPrefs['dataPath']
 
@@ -1111,7 +1112,8 @@ class Plugin(indigo.PluginBase):
                     full_path = data_path + thing[1][0] + ".csv"
 
                     # TODO: does it make sense to combine this with the check that happens at CSV device refresh?
-                    #       could do passed device or if no passed device do all devices.
+                    #       could do passed device or if no passed device do all devices. Note that they are
+                    #       constructed slightly differently now.
 
                     # ============================= Create (if needed) ============================
                     # If the appropriate CSV file doesn't exist, create it and write the header
@@ -2842,8 +2844,8 @@ class Plugin(indigo.PluginBase):
                                         device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
                                     # The following line is used for testing the battery health code; it isn't needed in production.
-                                    device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8', 'Device 4': '4', 'Device 5': '92',
-                                                   'Device 6': '72', 'Device 7': '47', 'Device 8': '68', 'Device 9': '0', 'Device 10': '47'}
+                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8', 'Device 4': '4', 'Device 5': '92',
+                                    #                'Device 6': '72', 'Device 7': '47', 'Device 8': '68', 'Device 9': '0', 'Device 10': '47'}
 
                                 except Exception as sub_error:
                                     self.pluginErrorHandler(traceback.format_exc())
@@ -2963,6 +2965,10 @@ class Plugin(indigo.PluginBase):
         self.refreshTheCharts(devices_to_refresh)
 
         self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
+
+    def log_me(self, message="", level='info'):
+
+        indigo.server.log(message)
 
 
 class MakeChart(object):
@@ -3097,7 +3103,7 @@ class MakeChart(object):
                 if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.plot_custom_line_segments(ax, p_dict, k_dict)
+            self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -3438,7 +3444,7 @@ class MakeChart(object):
 
                 # =============================== Best Fit Line ===============================
                 if dev.pluginProps.get('line{0}BestFit'.format(line), False):
-                    self.plot_best_fit_line_segments(ax, dates_to_plot, line, p_dict)
+                    self.format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, log)
 
                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
@@ -3454,7 +3460,7 @@ class MakeChart(object):
                 if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.plot_custom_line_segments(ax, p_dict, k_dict)
+            self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3820,7 +3826,7 @@ class MakeChart(object):
 
                     # =============================== Best Fit Line ===============================
                     if dev.pluginProps.get('line{0}BestFit'.format(thing), False):
-                        self.plot_best_fit_line_segments(ax, dates_to_plot, thing, p_dict)
+                        self.format_best_fit_line_segments(ax, dates_to_plot, thing, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)]]
 
@@ -3869,7 +3875,7 @@ class MakeChart(object):
                 if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.plot_custom_line_segments(ax, p_dict, k_dict)
+            self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -4146,7 +4152,7 @@ class MakeChart(object):
 
             self.format_axis_x_ticks(ax2, p_dict, k_dict, log)
             self.format_axis_y(ax2, p_dict, k_dict, log)
-            self.plot_custom_line_segments(ax2, p_dict, k_dict)
+            self.format_custom_line_segments(ax2, p_dict, k_dict, log)
 
             plt.autoscale(enable=True, axis='x', tight=None)
 
@@ -4648,6 +4654,85 @@ class MakeChart(object):
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
     # =============================================================================
+    def format_best_fit_line_segments(self, ax, dates_to_plot, line, p_dict, log):
+        """
+        Adds best fit line segments to plots
+
+        The format_best_fit_line_segments method provides a utility to add "best fit lines"
+        to select types of charts (best fit lines are not appropriate for all chart
+        types.
+
+        -----
+
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param 'numpy.ndarray' dates_to_plot:
+        :param int line:
+        :param dict p_dict: plotting parameters
+        :return ax:
+
+        """
+
+        try:
+            color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
+
+            ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color, zorder=1)
+
+            return ax
+
+        except TypeError as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"p_dict: {0}.".format(p_dict))
+            log['Threaddebug'].append(u"dates_to_plot: {0}.".format(dates_to_plot))
+            log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. See plugin log for more information.".format(sub_error))
+
+    # =============================================================================
+    def format_custom_line_segments(self, ax, p_dict, k_dict, log):
+        """
+        Chart custom line segments handler
+
+        Process any custom line segments and add them to the
+        matplotlib axes object.
+
+        -----
+
+        :param class 'matplotlib.axes.AxesSubplot' ax:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        """
+
+        # Plot the custom lines if needed.  Note that these need to be plotted after
+        # the legend is established, otherwise some of the characteristics of the
+        # min/max lines will take over the legend props.
+
+        if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
+
+            try:
+                constants_to_plot = literal_eval(p_dict['customLineSegments'])
+
+                cls = ax
+
+                for element in constants_to_plot:
+                    if type(element) == tuple:
+                        cls = ax.axhline(y=element[0], color=element[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
+
+                        # If we want to promote custom line segments, we need to add them to the list that's used to calculate the Y axis limits.
+                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
+                            p_dict['data_array'].append(element[0])
+                    else:
+                        cls = ax.axhline(y=constants_to_plot[0], color=constants_to_plot[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
+
+                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
+                            p_dict['data_array'].append(constants_to_plot[0])
+
+                return cls
+
+            except Exception as sub_error:
+                self.host_plugin.pluginErrorHandler(traceback.format_exc())
+                log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin log for more information.".format(sub_error))
+
+                return ax
+
+    # =============================================================================
     def format_dates(self, list_of_dates, log):
         """
         Convert date strings to date objects
@@ -4788,85 +4873,6 @@ class MakeChart(object):
         [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
         return ax
-
-    # =============================================================================
-    def plot_best_fit_line_segments(self, ax, dates_to_plot, line, p_dict):
-        """
-        Adds best fit line segments to plots
-
-        The plot_best_fit_line_segments method provides a utility to add "best fit lines"
-        to select types of charts (best fit lines are not appropriate for all chart
-        types.
-
-        -----
-
-        :param class 'matplotlib.axes.AxesSubplot' ax:
-        :param 'numpy.ndarray' dates_to_plot:
-        :param int line:
-        :param dict p_dict: plotting parameters
-        :return ax:
-
-        """
-
-        try:
-            color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
-
-            ax.plot(np.unique(dates_to_plot), np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)), color=color, zorder=1)
-
-            return ax
-
-        except TypeError as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            self.host_plugin.logger.threaddebug(u"p_dict: {0}.".format(p_dict))
-            self.host_plugin.logger.threaddebug(u"dates_to_plot: {0}.".format(dates_to_plot))
-            self.host_plugin.logger.warning(u"There is a problem with the best fit line segments settings. Error: {0}. See plugin log for more information.".format(sub_error))
-
-    # =============================================================================
-    def plot_custom_line_segments(self, ax, p_dict, k_dict):
-        """
-        Chart custom line segments handler
-
-        Process any custom line segments and add them to the
-        matplotlib axes object.
-
-        -----
-
-        :param class 'matplotlib.axes.AxesSubplot' ax:
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        """
-
-        # Plot the custom lines if needed.  Note that these need to be plotted after
-        # the legend is established, otherwise some of the characteristics of the
-        # min/max lines will take over the legend props.
-
-        if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
-
-            try:
-                constants_to_plot = literal_eval(p_dict['customLineSegments'])
-
-                cls = ax
-
-                for element in constants_to_plot:
-                    if type(element) == tuple:
-                        cls = ax.axhline(y=element[0], color=element[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
-
-                        # If we want to promote custom line segments, we need to add them to the list that's used to calculate the Y axis limits.
-                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
-                            p_dict['data_array'].append(element[0])
-                    else:
-                        cls = ax.axhline(y=constants_to_plot[0], color=constants_to_plot[1], linestyle=p_dict['customLineStyle'], marker='', **k_dict['k_custom'])
-
-                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
-                            p_dict['data_array'].append(constants_to_plot[0])
-
-                return cls
-
-            except Exception as sub_error:
-                self.host_plugin.pluginErrorHandler(traceback.format_exc())
-                self.host_plugin.logger.warning(u"There is a problem with the custom line segments settings. {0}. See plugin log for more information.".format(sub_error))
-
-                return ax
 
     # =============================================================================
     def process_log(self, dev, log, return_queue):
