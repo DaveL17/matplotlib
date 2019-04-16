@@ -1423,11 +1423,27 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="thing" type="menu">
-                <Label>Source:</Label>
-                <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>
+            <Field id="addSourceFilter" type="menu" defaultValue="A">
+                <Label>Filter:</Label>
+                <List>
+                    <Option value="A">Display All</Option>
+                    <Option value="D">Devices Only</Option>
+                    <Option value="V">Variables Only</Option>
+                </List>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
+
+            <Field id="thing" type="menu">
+                <Label>Source:</Label>
+                <List class="self" filter="" method="csv_source" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+<!--            <Field id="thing" type="menu">-->
+<!--                <Label>Source:</Label>-->
+<!--                <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>-->
+<!--                <CallbackMethod>dummyCallback</CallbackMethod>-->
+<!--            </Field>-->
 
             <Field id="thingState" type="menu">
                 <Label>Text to chart:</Label>

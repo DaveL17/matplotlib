@@ -51,7 +51,7 @@ the proper Fantastic Weather devices.
 #       temperature (%%d:733695023:d01_temperatureHigh%%, 'blue')
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
-# TODO: Add device/variable filter to mutliline text device (like CSV Engine).
+# TODO: Add device/variable filter to multiline text device (like CSV Engine).
 
 # ================================== IMPORTS ==================================
 
@@ -102,7 +102,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.07"
+__version__   = "0.8.08"
 
 # =============================================================================
 
