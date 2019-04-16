@@ -1737,7 +1737,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFontSizeList"/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false"  visibleBindingId="showLegend" visibleBindingValue="true"
+            <Field id="showLegend" type="checkbox" defaultValue="false"
                    tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>

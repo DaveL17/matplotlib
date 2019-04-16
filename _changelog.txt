@@ -1,3 +1,12 @@
+v0.8.07
+- Fixes bug where the legend colors didn't match plot for select column
+  number settings for Scatter Charts.
+- Fixes bug where the Display Lengend? control did not appear for scatter
+  charts.
+
+v0.8.06
+- Improves and expands options for X axis bins.
+
 v0.8.06
 - Adds section text and tooltips to show/hide controls for bar, line, scatter,
   and weather devices (other device types don't have show/hide controls.)

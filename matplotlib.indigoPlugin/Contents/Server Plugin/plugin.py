@@ -35,6 +35,7 @@ the proper Fantastic Weather devices.
 #              of Indigo devices.
 # TODO: NEW -- Add config dialog to rcparams device that's generated
 #              automatically?
+
 # TODO: Try to address annotation collisions.
 # TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Add facility to have different Y1 and Y2. Add a new group of controls
@@ -101,7 +102,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.06"
+__version__   = "0.8.07"
 
 # =============================================================================
 
@@ -2005,21 +2006,25 @@ class Plugin(indigo.PluginBase):
         :param int target_id:
         """
 
+        now = dt.datetime.now()
+
         axis_list_menu = [("None", "None"),
                           ("-1", "%%separator%%"),
-                          ("%I:%M", "01:00"),
-                          ("%l:%M %p", "1:00 pm"),
-                          ("%H:%M", "13:00"),
-                          ("%a", "Sun"),
-                          ("%A", "Sunday"),
-                          ("%b", "Jan"),
-                          ("%B", "January"),
-                          ("%d", "16"),
-                          ("%Y", "2016"),
-                          ("%b %d", "Jan 16"),
-                          ("%b %d %Y", "Jan 16 2019"),
-                          ("%y %b", "16 Jan"),
-                          ("%Y %b %d", "2019 Jan 16")]
+                          ("%I:%M", dt.datetime.strftime(now, "%I:%M") + ' (12 hour clock)'),
+                          ("%H:%M", dt.datetime.strftime(now, "%H:%M") + ' (24 hour clock)'),
+                          ("%l:%M %p", dt.datetime.strftime(now, "%l:%M %p").strip() + ' (full time)'),
+                          ("%a", dt.datetime.strftime(now, "%a") + ' (short day)'),
+                          ("%A", dt.datetime.strftime(now, "%A") + ' (long day)'),
+                          ("%b", dt.datetime.strftime(now, "%b") + ' (short month)'),
+                          ("%B", dt.datetime.strftime(now, "%B") + ' (long month)'),
+                          ("%d", dt.datetime.strftime(now, "%d") + ' (date)'),
+                          ("%Y", dt.datetime.strftime(now, "%Y") + ' (year)'),
+                          ("%b %d", dt.datetime.strftime(now, "%b %d") + ' (month date)'),
+                          ("%b %d", dt.datetime.strftime(now, "%d %b") + ' (date month)'),
+                          ("%y %b", dt.datetime.strftime(now, "%b %y") + ' (month year)'),
+                          ("%y %b", dt.datetime.strftime(now, "%y %b") + ' (year month)'),
+                          ("%b %d %Y", dt.datetime.strftime(now, "%b %d %Y") + ' (full date)'),
+                          ("%Y %b %d", dt.datetime.strftime(now, "%Y %b %d") + ' (full date)')]
 
         return axis_list_menu
 
@@ -2999,6 +3004,7 @@ class MakeChart(object):
             num_obs                   = p_dict['numObs']
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            bar_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
@@ -3009,6 +3015,7 @@ class MakeChart(object):
                 suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
 
                 p_dict['bar{0}Color'.format(thing)] = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
+                bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor']:
@@ -3086,8 +3093,17 @@ class MakeChart(object):
                 iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
+                iter_colors  = itertools.chain(*[bar_colors[i::num_col] for i in range(num_col)])
+                final_colors = [_ for _ in iter_colors]
+
                 legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=int(p_dict['legendColumns']), prop={'size': float(p_dict['legendFontSize'])})
+
+                # Set legend font color
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+
+                # Set legend bar colors
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, 4)]
+
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
@@ -3339,6 +3355,7 @@ class MakeChart(object):
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            line_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -3350,6 +3367,7 @@ class MakeChart(object):
                 suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
                 p_dict['line{0}Color'.format(line)]        = r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
+                line_colors.append(p_dict['line{0}Color'.format(line)])
                 p_dict['line{0}MarkerColor'.format(line)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(line)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(line)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
 
@@ -3425,13 +3443,22 @@ class MakeChart(object):
                     counter += 1
 
                 # Set the legend
-                # Reorder the headers so that they fill by row instead of by column
+                # Reorder the headers and colors so that they fill by row instead of by column
                 num_col = int(p_dict['legendColumns'])
-                iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
+                iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
+                final_colors = [_ for _ in iter_colors]
+
                 legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=num_col, prop={'size': float(p_dict['legendFontSize'])})
+
+                # Set legend font color
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+
+                # Set legend line color
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, 6)]
+
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
@@ -3773,6 +3800,7 @@ class MakeChart(object):
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            group_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
@@ -3783,6 +3811,7 @@ class MakeChart(object):
                 suppress_group = p_dict.get('suppressGroup{0}'.format(thing), False)
 
                 p_dict['group{0}Color'.format(thing)]       = r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
+                group_colors.append(p_dict['group{0}Color'.format(thing)])
                 p_dict['group{0}MarkerColor'.format(thing)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
 
@@ -3840,29 +3869,40 @@ class MakeChart(object):
                 # Amend the headers if there are any custom legend entries defined.
                 counter = 1
                 legend_styles = []
-                final_headers = []
+                labels = []
+
+                # Set legend group colors
+                # Note that we do this in a slightly different order than other chart types
+                # because we use legend styles for scatter charts differently than other
+                # chart types.
+                num_col = int(p_dict['legendColumns'])
+                iter_colors  = itertools.chain(*[group_colors[i::num_col] for i in range(num_col)])
+                final_colors = [_ for _ in iter_colors]
 
                 headers = [_.decode('utf-8') for _ in p_dict['headers']]
                 for header in headers:
 
                     if p_dict['group{0}Legend'.format(counter)] == "":
-                        final_headers.append(header)
+                        labels.append(header)
                     else:
-                        final_headers.append(p_dict['group{0}Legend'.format(counter)])
+                        labels.append(p_dict['group{0}Legend'.format(counter)])
 
                     legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
-                                         markerfacecolor=p_dict['group{0}Color'.format(counter)], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
+                                         markerfacecolor=final_colors[counter-1], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
+                    # legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
+                    #                      markerfacecolor=p_dict['group{0}Color'.format(counter)], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
                     counter += 1
 
-                # Set the legend
                 # Reorder the headers so that they fill by row instead of by column
-                num_col = int(p_dict['legendColumns'])
-                iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                iter_headers   = itertools.chain(*[labels[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
                 legend = ax.legend(legend_styles, final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=int(p_dict['legendColumns']), numpoints=1, markerscale=0.6,
                                    prop={'size': float(p_dict['legendFontSize'])})
+
+                # Set legend font colors
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
