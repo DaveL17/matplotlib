@@ -1,3 +1,8 @@
+v0.8.09
+- Adds test at plugin startup which will review CSV Engine device sources and
+  issue a warning when more than one CSV device is writing to the same CSV
+  file.
+
 v0.8.08
 - Adds device/variable filter to Multiline Text devices.
 

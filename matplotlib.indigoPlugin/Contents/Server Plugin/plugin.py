@@ -51,7 +51,6 @@ the proper Fantastic Weather devices.
 #       temperature (%%d:733695023:d01_temperatureHigh%%, 'blue')
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
-# TODO: Add device/variable filter to multiline text device (like CSV Engine).
 
 # ================================== IMPORTS ==================================
 
@@ -102,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.08"
+__version__   = "0.8.09"
 
 # =============================================================================
 
@@ -558,6 +557,9 @@ class Plugin(indigo.PluginBase):
 
         # Ensure that all CSV devices have existing CSV files.
         self.csv_check_health()
+
+        # Ensure that multiple CSV Engine devices aren't writing to the same file.
+        self.csv_check_unique()
 
     # =============================================================================
     def shutdown(self):
@@ -1137,6 +1139,38 @@ class Plugin(indigo.PluginBase):
                         csv_file = open(full_path, 'w')
                         csv_file.write('{0},{1}\n'.format('Timestamp', thing[1][2].encode("utf-8")))
                         csv_file.close()
+
+    # =============================================================================
+    def csv_check_unique(self):
+        """
+
+        :return:
+        """
+        titles = {}
+
+        # Iterate through CSV Engine devices
+        for dev in indigo.devices.iter(filter='self'):
+            if dev.deviceTypeId == 'csvEngine':
+
+                # Get the list of CSV file titles
+                column_dict = literal_eval(dev.pluginProps['columnDict'])
+
+                # Build a dictionary where the file title is the key and the value is a list of
+                # devices that point to that title for a source.
+                for key in column_dict.keys():
+
+                    title = column_dict[key][0]
+
+                    if title not in titles.keys():
+                        titles[title] = [dev.name]
+
+                    else:
+                        titles[title].append(dev.name)
+
+        # Iterate through the dict of titles
+        for title_name in titles.keys():
+            if len(titles[title_name]) > 1:
+                self.logger.warning(u"CSV filename [{0}] referenced by more than one CSV Engine device: {1}".format(title_name, titles[title_name]))
 
     # =============================================================================
     def csv_item_add(self, values_dict=None, type_id="", dev_id=0):
