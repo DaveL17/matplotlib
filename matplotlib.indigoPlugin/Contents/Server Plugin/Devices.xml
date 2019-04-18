@@ -1336,6 +1336,158 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+<!-- Line 7 -->
+            <Field id="lineLabel7" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 7.">
+                <Label>Line 7</Label>
+            </Field>
+
+            <Field id="line7Source" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Select data source for line 7.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="line7adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 7.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+            <Field id="line7Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line7Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line7Legend" type="textfield" defaultValue="Line 7" visibleBindingId="lineLabel7" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="line7Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's sixth line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line7Style" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's sixth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="line7MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
+
+            <Field id="line7Marker" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's sixth line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="plotLine7Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="plotLine7Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line7BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line7BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line7BestFit" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 7.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressLine7" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Line 8 -->
+            <Field id="lineLabel8" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for line 8.">
+                <Label>Line 8</Label>
+            </Field>
+
+            <Field id="line8Source" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Select data source for line 8.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="line8adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 8.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+            <Field id="line8Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line8Fill" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to fill below this line.">
+                <Label>Fill?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line8Legend" type="textfield" defaultValue="Line 8" visibleBindingId="lineLabel8" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="line8Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's sixth line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line8Style" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's sixth line.">
+                <Label>Line Style:</Label>
+                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="line8MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
+
+            <Field id="line8Marker" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's sixth line.">
+                <Label>Marker Style:</Label>
+                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="plotLine8Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="plotLine8Max" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line8BestFit" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot best fit line.">
+                <Label>Plot Best Fit?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line8BestFitColor" type="colorpicker" defaultValue="FF 00 00" visibleBindingId="line8BestFit" visibleBindingValue="true"
+                   tooltip="Select preference for the color of the best fit line for line 8.">
+                <Label>Best Fit Color:</Label>
+            </Field>
+
+            <Field id="suppressLine8" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to hide this line when plotting.">
+                <Label>Suppress Line?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
             <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
                 <Label>Enable Custom Line Segments</Label>
             </Field>
@@ -1438,12 +1590,6 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
-
-<!--            <Field id="thing" type="menu">-->
-<!--                <Label>Source:</Label>-->
-<!--                <List class="self" filter="" method="generatorDeviceAndVariableList" dynamicReload="true"/>-->
-<!--                <CallbackMethod>dummyCallback</CallbackMethod>-->
-<!--            </Field>-->
 
             <Field id="thingState" type="menu">
                 <Label>Text to chart:</Label>
@@ -2705,6 +2851,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
 There are presently no configurations available for this device.
                 </Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="900" hidden="true">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                </List>
             </Field>
 
         </ConfigUI>

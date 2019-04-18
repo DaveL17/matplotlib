@@ -149,6 +149,24 @@ class Maintain(object):
             'line6Marker',
             'line6MarkerColor',
             'line6Source',
+            'line7adjuster',
+            'line7Annotate',
+            'line7BestFit',
+            'line7BestFitColor',
+            'line7Color',
+            'line7Fill',
+            'line7Marker',
+            'line7MarkerColor',
+            'line7Source',
+            'line8adjuster',
+            'line8Annotate',
+            'line8BestFit',
+            'line8BestFitColor',
+            'line8Color',
+            'line8Fill',
+            'line8Marker',
+            'line8MarkerColor',
+            'line8Source',
             'lineLabel1',
             'lineLabel2',
             'lineLabel3',
@@ -308,10 +326,6 @@ class Maintain(object):
                                 else:
                                     props[item] = True
 
-                for prop in props.keys():
-                    if prop.startswith(('line', 'group', 'suppressLine', 'suppressGroup', 'plotLine')):
-                        del props[prop]
-
             # ========================= Fix Battery Health Props ==========================
             if dev.deviceTypeId == 'batteryHealthDevice':
 
@@ -322,16 +336,10 @@ class Maintain(object):
                         else:
                             props[item] = True
 
-                for prop in props.keys():
-                    if prop.startswith(('barLabel', 'line', 'group', 'suppressBar', 'suppressLine', 'suppressGroup', 'plotLine')):
-                        del props[prop]
-
             # ============================ Fix Calendar Props =============================
             if dev.deviceTypeId == 'calendarChartingDevice':
 
-                for prop in props.keys():
-                    if prop.startswith(('barLabel', 'line', 'group', 'suppressBar', 'suppressLine', 'suppressGroup', 'plotLine')):
-                        del props[prop]
+                pass
 
             # ============================== Fix Line Props ===============================
             if dev.deviceTypeId == 'lineChartingDevice':
@@ -354,10 +362,6 @@ class Maintain(object):
                                 elif props[item] in ('True', 'true'):
                                     props[item] = True
 
-                for prop in props.keys():
-                    if prop.startswith(('bar', 'group', 'suppressBar', 'suppressGroup')):
-                        del props[prop]
-
             # ========================= Fix Multiline Text Props ==========================
             if dev.deviceTypeId == 'multiLineText':
 
@@ -372,16 +376,10 @@ class Maintain(object):
                             elif props[item] in ('True', 'true'):
                                 props[item] = True
 
-                for prop in props.keys():
-                    if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
-                        del props[prop]
-
             # ============================== Fix Polar Props ==============================
             if dev.deviceTypeId == 'polarChartingDevice':
 
-                for prop in props.keys():
-                    if prop.startswith(('bar', 'enableCustomLineSegmentsSetting', 'group', 'line', 'plotLine', 'suppressBar', 'suppressGroup', 'suppressLine')):
-                        del props[prop]
+                pass
 
             # ============================= Fix Scatter Props =============================
             if dev.deviceTypeId == 'scatterChartingDevice':
@@ -390,7 +388,6 @@ class Maintain(object):
 
                     for item in ('line{0}BestFit'.format(_),
                                  'groupLabel{0}'.format(_),
-                                 'line{0}Fill'.format(_),
                                  'line{0}BestFit'.format(_),
                                  'plotGroup{0}Min'.format(_),
                                  'plotGroup{0}Max'.format(_),
@@ -405,10 +402,6 @@ class Maintain(object):
                                     props[item] = True
                         else:
                             props[item] = False
-
-                for prop in props.keys():
-                    if prop.startswith(('bar', 'plotLine', 'suppressBar', 'suppressLine')):
-                        del props[prop]
 
             # ============================ Fix Forecast Props =============================
             if dev.deviceTypeId == 'forecastChartingDevice':
@@ -426,20 +419,6 @@ class Maintain(object):
                                     props[item] = False
                                 elif props[item] in ('True', 'true'):
                                     props[item] = True
-
-                for prop in props.keys():
-                    if prop.startswith(('bar', 'group',
-                                        'line4', 'line5', 'line6',
-                                        'line1adjuster', 'line2adjuster', 'line3adjuster',
-                                        'lineLabel4', 'lineLabel5', 'lineLabel6',
-                                        'line1BestFit', 'line2BestFit', 'line3BestFit',
-                                        'line1BestFitColor', 'line2BestFitColor', 'line3BestFitColor',
-                                        'plotLine4', 'plotLine5', 'plotLine6',
-                                        'plotLine1Max', 'plotLine2Max', 'plotLine3Max',
-                                        'plotLine1Min', 'plotLine2Min', 'plotLine3Min',
-                                        'suppressBar', 'suppressGroup',
-                                        'suppressLine4', 'suppressLine5', 'suppressLine6')):
-                        del props[prop]
 
             # =============== Establish Refresh Interval for Legacy Devices ===============
             # Establish refresh interval for legacy devices. If the prop isn't present, we

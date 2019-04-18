@@ -37,7 +37,6 @@ the proper Fantastic Weather devices.
 #              automatically?
 
 # TODO: Try to address annotation collisions.
-# TODO: Iterate CSV engine devices and warn if any are writing to same file.
 # TODO: Add facility to have different Y1 and Y2. Add a new group of controls
 #       (like Y1) for Y2 and then have a control to allow user to elect when Y
 #       axis to assign the line to.
@@ -101,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.09"
+__version__   = "0.8.10"
 
 # =============================================================================
 
@@ -560,6 +559,9 @@ class Plugin(indigo.PluginBase):
 
         # Ensure that multiple CSV Engine devices aren't writing to the same file.
         self.csv_check_unique()
+
+        # Ensure that all devices are up to date with the latest
+        self.audit_device_props()
 
     # =============================================================================
     def shutdown(self):
@@ -1024,6 +1026,95 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"Advanced settings menu final prefs: {0}".format(dict(values_dict)))
         return
 
+    # =============================================================================
+    def audit_device_props(self):
+        """
+        Audit device properties to ensure they match the current config.
+
+        The audit_device_props method performs two functions. It compares the current
+        device config XML layout to the current dev.pluginProps, and (1) where the
+        current config has fields that are missing from the device, they will be
+        _added_ to the device (checkboxes will be coerced to boolean based on the
+        defaultValue attribute if specified; if unspecified, the value will be set to
+        False.) and (2) where the current pluginProps contains keys that are not in
+        the config, they will be _removed_ from the device.
+
+        The method will return True if it has run error free; False on exception.
+
+        Note that this method should _not_ be called from deviceStartComm() as it will
+        cause an infinite loop--the call to dev.replacePluginPropsOnServer() from this
+        method automatically calls deviceStartComm(). It is recommended that the method
+        be called from plugin's startup() method.
+        -----
+
+        :return:
+        """
+        # TODO: migrate this to DLFramework
+
+        import xml.etree.ElementTree as eTree
+
+        self.logger.info(u"Updating device properties to match current plugin version.")
+
+        try:
+            # Iterate through the plugin's devices
+            for dev in indigo.devices.iter(filter="self"):
+
+                # =========================== Match Props to Config ===========================
+                # For config props that are not in the device's current definition.
+
+                device_xml = self.getDeviceConfigUiXml(dev.deviceTypeId, dev.id)
+                fields     = []
+                props      = dev.pluginProps
+                tree       = eTree.fromstring(device_xml.encode('utf-8'))
+
+                # Iterate through the Config UI fields
+                for field in tree.iter('Field'):
+
+                    attributes = field.attrib
+
+                    # Ignore UI controls that the device doesn't need to function.
+                    if attributes['type'].lower() not in ('button', 'label', 'separator'):
+
+                        field_id      = attributes['id']    # attribute 'id' is required
+                        field_type    = attributes['type']  # attribute 'type' is required
+                        default_value = attributes.get('defaultValue', "")  # attribute 'defaultValue is not required
+
+                        # Save a list of field IDs for later use.
+                        fields.append(field_id)
+
+                        # If the XML field is not in the device's current props dict
+                        if field_id not in props.keys():
+
+                            # Coerce checkbox default values to bool. Everything else will be sent as a string.
+                            if field_type.lower() == 'checkbox':
+                                if default_value.lower() == u'true':
+                                    default_value = True
+                                else:
+                                    default_value = False  # will be False if no defaultValue specified.
+
+                            props[field_id] = default_value
+                            self.logger.debug(u"[{0}] missing prop [{1}] will be added. Value set to [{2}]".format(dev.name, field_id, default_value))
+
+                # =========================== Match Config to Props ===========================
+                # For props that have been removed but are still in the device definition.
+
+                for key in props.keys():
+                    if key not in fields:
+
+                        self.logger.debug(u"[{0}] prop obsolete prop [{1}] will be removed".format(dev.name, key))
+                        del props[key]
+
+                # Now that we're done, let's save the updated dict back to the device.
+                dev.replacePluginPropsOnServer(props)
+
+            return True
+
+        except Exception as sub_error:
+            self.logger.warning(u"Audit device props error: {0}".format(sub_error))
+
+            return False
+
+    # =============================================================================
     def commsKillAll(self):
         """
         Deactivate communication with all plugin devices
@@ -1428,9 +1519,9 @@ class Plugin(indigo.PluginBase):
         if not self.pluginIsShuttingDown:
             for dev in indigo.devices.itervalues("self"):
 
-                refresh_interval = int(dev.pluginProps['refreshInterval'])
-
                 if dev.deviceTypeId == 'csvEngine' and dev.enabled:
+
+                    refresh_interval = int(dev.pluginProps['refreshInterval'])
 
                     try:
                         last_updated = date_parse(dev.states['csvLastUpdated'])
@@ -2636,6 +2727,7 @@ class Plugin(indigo.PluginBase):
                     dev_list = []
 
                     for dev in indigo.devices.itervalues('self'):
+
                         refresh_interval = int(dev.pluginProps['refreshInterval'])
 
                         if dev.deviceTypeId != 'csvEngine' and refresh_interval > 0 and dev.enabled:
