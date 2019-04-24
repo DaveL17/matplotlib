@@ -1,3 +1,6 @@
+v0.8.11
+- Adds lines 7 and 8 to Line Charting device.
+
 v0.8.10
 - Adds test at plugin startup which will review each device's properties
   and bring it up to date with the latest base configuration. Any changes

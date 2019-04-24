@@ -51,6 +51,8 @@ the proper Fantastic Weather devices.
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
 
+# TODO: Run new version against production server to see if lines 7 and 8 are
+#       implemented properly. This is important for updating existing devices.
 # ================================== IMPORTS ==================================
 
 try:
@@ -100,7 +102,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.10"
+__version__   = "0.8.11"
 
 # =============================================================================
 
@@ -323,7 +325,7 @@ class Plugin(indigo.PluginBase):
             #             values_dict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
 
             # ========================== Set Config UI Defaults ===========================
-            # For new devices, force certain defaults that don't carry from devices.xml.
+            # For new devices, force certain defaults that don't carry from Devices.xml.
             # This seems to be especially important for menu items built with callbacks and
             # colorpicker controls that don't appear to accept defaultValue.
             if not dev.configured:
@@ -361,7 +363,7 @@ class Plugin(indigo.PluginBase):
                 # ============================ Line Charting Device ===========================
                 if type_id == "lineChartingDevice":
 
-                    for _ in range(1, 7, 1):
+                    for _ in range(1, 9, 1):
                         values_dict['line{0}BestFit'.format(_)]      = False
                         values_dict['line{0}BestFitColor'.format(_)] = 'FF 00 00'
                         values_dict['line{0}Color'.format(_)]        = 'FF FF FF'
@@ -442,7 +444,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
 
                 for key in ('barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
-                            'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
+                            'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6', 'lineLabel7', 'lineLabel8',
                             'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
                             'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
                     if key in values_dict.keys():
@@ -793,7 +795,7 @@ class Plugin(indigo.PluginBase):
                 return False, values_dict, error_msg_dict
 
             # Iterate for each line group (1-6).
-            for line in range(1, 7, 1):
+            for line in range(1, 9, 1):
 
                 # Line adjustment values
                 for char in values_dict['line{0}adjuster'.format(line)]:
@@ -1050,6 +1052,8 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         # TODO: migrate this to DLFramework
+        # TODO: add facility to compare current value to available values (i.e., a
+        #       control value is no longer an available option.)
 
         import xml.etree.ElementTree as eTree
 
@@ -1085,7 +1089,8 @@ class Plugin(indigo.PluginBase):
                         # If the XML field is not in the device's current props dict
                         if field_id not in props.keys():
 
-                            # Coerce checkbox default values to bool. Everything else will be sent as a string.
+                            # Coerce checkbox default values to bool. Everything that comes in from the XML is a
+                            # string; everything that's not converted will be sent as a string.
                             if field_type.lower() == 'checkbox':
                                 if default_value.lower() == u'true':
                                     default_value = True
@@ -2812,13 +2817,15 @@ class Plugin(indigo.PluginBase):
                     p_dict.update(dev.pluginProps)
 
                     for _ in ('bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers', 'wind_direction', 'wind_speed',
-                              'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
+                              'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6', 'x_obs7', 'x_obs8',
                               'y_obs1', 'y_obs1_max', 'y_obs1_min',
                               'y_obs2', 'y_obs2_max', 'y_obs2_min',
                               'y_obs3', 'y_obs3_max', 'y_obs3_min',
                               'y_obs4', 'y_obs4_max', 'y_obs4_min',
                               'y_obs5', 'y_obs5_max', 'y_obs5_min',
-                              'y_obs6', 'y_obs6_max', 'y_obs6_min'):
+                              'y_obs6', 'y_obs6_max', 'y_obs6_min',
+                              'y_obs7', 'y_obs7_max', 'y_obs7_min',
+                              'y_obs8', 'y_obs8_max', 'y_obs8_min'):
                         p_dict[_] = []
 
                     p_dict['fileName']  = ''
@@ -2888,8 +2895,8 @@ class Plugin(indigo.PluginBase):
 
                         # ============================== Best Fit Lines ===============================
                         # Set the defaults for best fit lines in p_dict.
-                        for _ in range(1, 7, 1):
-                            p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00')
+                        for _ in range(1, 9, 1):
+                            p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00').replace('#', '')
 
                         # ============================== Phantom Labels ===============================
                         # Since users may or may not include axis labels and
@@ -2928,7 +2935,7 @@ class Plugin(indigo.PluginBase):
                         # ================================ Annotations ================================
                         # If the user wants annotations, we need to hide the line
                         # markers as we don't want to plot one on top of the other.
-                        for line in range(1, 7, 1):
+                        for line in range(1, 9, 1):
                             try:
                                 if p_dict['line{0}Annotate'.format(line)] and p_dict['line{0}Marker'.format(line)] != 'None':
                                     p_dict['line{0}Marker'.format(line)] = 'None'
@@ -3488,7 +3495,7 @@ class MakeChart(object):
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
-            for line in range(1, 7, 1):
+            for line in range(1, 9, 1):
 
                 suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
@@ -3507,7 +3514,7 @@ class MakeChart(object):
 
                 # ============================== Plot the Lines ===============================
                 # Plot the lines. If suppress_line is True, we skip it.
-                if p_dict['line{0}Source'.format(line)] not in ("", "None") and not suppress_line:
+                if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
@@ -3583,35 +3590,40 @@ class MakeChart(object):
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
 
                 # Set legend line color
-                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, 6)]
+                num_handles = len(legend.legendHandles)
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
                 frame = legend.get_frame()
                 frame.set_alpha(0)
 
-            for line in range(1, 7, 1):
-                # Note that we do these after the legend is drawn so that these lines don't
-                # affect the legend.
+            for line in range(1, 9, 1):
 
-                # We need to reload the dates to ensure that they match the line being plotted
-                dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+                suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
-                # =============================== Best Fit Line ===============================
-                if dev.pluginProps.get('line{0}BestFit'.format(line), False):
-                    self.format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, log)
+                if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+                    # Note that we do these after the legend is drawn so that these lines don't
+                    # affect the legend.
 
-                [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+                    # We need to reload the dates to ensure that they match the line being plotted
+                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
-                # =============================== Fill Between ================================
-                if p_dict['line{0}Fill'.format(line)]:
-                    ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
+                    # =============================== Best Fit Line ===============================
+                    if dev.pluginProps.get('line{0}BestFit'.format(line), False):
+                        self.format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, log)
 
-                # =============================== Min/Max Lines ===============================
-                if p_dict['plotLine{0}Min'.format(line)]:
-                    ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_min'])
-                if p_dict['plotLine{0}Max'.format(line)]:
-                    ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_max'])
-                if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
-                    ax.axhline(y=0, color=p_dict['spineColor'])
+                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+
+                    # =============================== Fill Between ================================
+                    if p_dict['line{0}Fill'.format(line)]:
+                        ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
+
+                    # =============================== Min/Max Lines ===============================
+                    if p_dict['plotLine{0}Min'.format(line)]:
+                        ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_min'])
+                    if p_dict['plotLine{0}Max'.format(line)]:
+                        ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]), color=p_dict['line{0}Color'.format(line)], **k_dict['k_max'])
+                    if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                        ax.axhline(y=0, color=p_dict['spineColor'])
 
             self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)

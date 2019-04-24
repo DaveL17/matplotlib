@@ -15,7 +15,7 @@ __build__ = "Unused"
 __copyright__ = "Copyright 2017-2019 DaveL17"
 __license__ = "MIT"
 __title__ = "maintenance"
-__version__ = "0.1.01"
+__version__ = "0.1.02"
 
 
 class Maintain(object):
@@ -248,6 +248,7 @@ class Maintain(object):
         """
         Remove legacy keys from device prefs
 
+        # TODO: Note that at some point most, if not all, of this method can go away.
         -----
 
         :return:
@@ -312,6 +313,7 @@ class Maintain(object):
 
                 for _ in range(1, 5, 1):
 
+                    # Coerce these props to bool if needed.
                     for item in ('bar{0}Annotate'.format(_),
                                  'barLabel{0}'.format(_),
                                  'plotBar{0}Max'.format(_),
@@ -329,6 +331,7 @@ class Maintain(object):
             # ========================= Fix Battery Health Props ==========================
             if dev.deviceTypeId == 'batteryHealthDevice':
 
+                # Coerce these props to bool if needed.
                 for item in ('showBatteryLevel', 'showBatteryLevelBackground'):
                     if not isinstance(props[item], bool):
                         if props[item].strip() in ('False', 'false', ''):
@@ -344,8 +347,9 @@ class Maintain(object):
             # ============================== Fix Line Props ===============================
             if dev.deviceTypeId == 'lineChartingDevice':
 
-                for _ in range(1, 7, 1):
+                for _ in range(1, 9, 1):
 
+                    # Coerce these props to bool if needed.
                     for item in ('line{0}Annotate'.format(_),
                                  'line{0}BestFit'.format(_),
                                  'line{0}Fill'.format(_),
@@ -365,6 +369,7 @@ class Maintain(object):
             # ========================= Fix Multiline Text Props ==========================
             if dev.deviceTypeId == 'multiLineText':
 
+                # Coerce these props to bool if needed.
                 for item in ('textAreaBorder',
                              'cleanTheText',
                              ):
@@ -384,6 +389,7 @@ class Maintain(object):
             # ============================= Fix Scatter Props =============================
             if dev.deviceTypeId == 'scatterChartingDevice':
 
+                # Coerce these props to bool if needed.
                 for _ in range(1, 4, 1):
 
                     for item in ('line{0}BestFit'.format(_),
@@ -408,6 +414,7 @@ class Maintain(object):
 
                 for _ in range(1, 4, 1):
 
+                    # Coerce these props to bool if needed.
                     for item in (
                                  'lineLabel{0}'.format(_),
                                  'line{0}Annotate'.format(_),

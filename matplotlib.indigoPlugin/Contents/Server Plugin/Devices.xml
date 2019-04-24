@@ -806,6 +806,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getBinList" dynamicReload="true"/>
             </Field>
 
+            <Field id="limitDataRange" type="menu" defaultValue="L" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Limit data display to the first (X) hours or last (X) hours.">
+                <Label>Limit X Axis Range:</Label>
+                <List>
+                    <Option value="N">Newest</Option>
+                    <Option value="O">Oldest</Option>
+                </List>
+            </Field>
+
+            <Field id="limitDataRangeLength" type="textfield" defaultValue="0" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Will limit the display to the number of hours specified (hours).">
+                <Label>Limit X Axis Length:</Label>
+            </Field>
+
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
 
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
@@ -1366,12 +1380,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line7Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel7" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's sixth line.">
+                   tooltip="Select preference for the color of your chart's seventh line.">
                 <Label>Line Color:</Label>
             </Field>
 
             <Field id="line7Style" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's sixth line.">
+                   tooltip="Select preference for the style of your chart's seventh line.">
                 <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
@@ -1382,7 +1396,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line7Marker" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's sixth line.">
+                   tooltip="Select preference for the marker style for your chart's seventh line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>
@@ -1442,12 +1456,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line8Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel8" visibleBindingValue="true"
-                   tooltip="Select preference for the color of your chart's sixth line.">
+                   tooltip="Select preference for the color of your chart's eighth line.">
                 <Label>Line Color:</Label>
             </Field>
 
             <Field id="line8Style" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's sixth line.">
+                   tooltip="Select preference for the style of your chart's eighth line.">
                 <Label>Line Style:</Label>
                 <List class="self" filter="" method="getLineList" dynamicReload="true"/>
             </Field>
@@ -1458,7 +1472,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="line8Marker" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
-                   tooltip="Select preference for the marker style for your chart's sixth line.">
+                   tooltip="Select preference for the marker style for your chart's eighth line.">
                 <Label>Marker Style:</Label>
                 <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
             </Field>

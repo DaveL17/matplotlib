@@ -3,14 +3,6 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
-2019-04-05  Sam
-===============================================================================
-In the Line Chart 'device', would it be possible to have 8 lines?
-
-DaveL17 - Consider perhaps grouping line controls to reduce the number that
-show at any one time.  I.e., Lines 1-4 and 5-8.
-
-===============================================================================
 2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
@@ -18,6 +10,9 @@ option to dump the Properties to JSON or XML.  Then create a generic import
 that can read those in... that way you don't have to maintain any particular
 import/export -- it just exports/imports all plugin props it finds on the
 device and/or XML file during import.
+
+DaveL17 - this will be easier to do once the device definitions are locked
+          down.
 
 ===============================================================================
 2019-01-21  Autolog
@@ -33,7 +28,7 @@ of the period (based on the last one dropped off) so that graph lines are
 always generated from the graph origin.
 
 DaveL17 - note that this is a limit on a chart by chart basis and not on the
-data file.
+          data file.
 
 ===============================================================================
 2019-01-04  Autolog
@@ -52,14 +47,21 @@ COMPLETED =====================================================================
 ===============================================================================
 
 ===============================================================================
-2019-02-12  Autolog
+2019-04-05  Sam  [COMPLETE]
+===============================================================================
+In the Line Chart 'device', would it be possible to have 8 lines?
+
+DaveL17 - This was implemented with version 0.8.11.
+
+===============================================================================
+2019-02-12  Autolog  [COMPLETE]
 ===============================================================================
 it would be useful to set the whole bar to red if the battery is zero - so it
 stands out.
 
 DaveL17 - setting the full bar for zero level devices was a bit of a Pandora's
-box, so instead the device label will be colored with the warning color if
-highlight dead batteries setting is ticked. v0.8.03
+          box, so instead the device label will be colored with the warning
+          color if highlight dead batteries setting is ticked. v0.8.03
 
 ===============================================================================
 2019-02-10  Busta999  [COMPLETE]
@@ -70,7 +72,7 @@ half of the graph - if all 6 lines are used and text is too long it wraps
 rather than - see below.
 
 DaveL17 - added in v0.8.02. Includes a refactoring of the legend labels so
-that they wrap by row instead of by column.
+          that they wrap by row instead of by column.
 
 ===============================================================================
 2019-02-12  Mat  [PARTIALLY COMPLETE]
@@ -79,11 +81,11 @@ Consider automatically updating the chart save path to the latest version of
 Indigo.
 
 DaveL17 - If a user has saved an image as a static image, it would likely be
-fine; but if they've saved the image as a refreshing image URL, those would
-likely break. Solution is to send a message to the log that the save location
-looks like it doesn't match the Indigo version (there is some introspection
-of the save path, so that this only happens if the original path is in the
-Indigo folder tree.  v0.7.53
+          fine; but if they've saved the image as a refreshing image URL, those
+          would likely break. Solution is to send a message to the log that the
+          save location looks like it doesn't match the Indigo version (there
+          is some introspection of the save path, so that this only happens if
+          the original path is in the Indigo folder tree.  v0.7.53
 
 ===============================================================================
 2019-02-12  Autolog  [COMPLETE]
