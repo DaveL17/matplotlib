@@ -53,6 +53,8 @@ the proper Fantastic Weather devices.
 
 # TODO: Run new version against production server to see if lines 7 and 8 are
 #       implemented properly. This is important for updating existing devices.
+# TODO: Legend line colors on production server broken.
+# TODO: Indoor temperature chart on production server showing 3 of 4 lines.
 # ================================== IMPORTS ==================================
 
 try:
@@ -2144,7 +2146,7 @@ class Plugin(indigo.PluginBase):
                           ("%H:%M", dt.datetime.strftime(now, "%H:%M") + ' (24 hour clock)'),
                           ("%l:%M %p", dt.datetime.strftime(now, "%l:%M %p").strip() + ' (full time)'),
                           ("%a", dt.datetime.strftime(now, "%a") + ' (short day)'),
-                          ("%A", dt.datetime.strftime(now, "%A") + ' (long day)'),
+                          ("%A", dt.datetime.strftime(now, "%A") + ' (long day)*'),
                           ("%b", dt.datetime.strftime(now, "%b") + ' (short month)'),
                           ("%B", dt.datetime.strftime(now, "%B") + ' (long month)'),
                           ("%d", dt.datetime.strftime(now, "%d") + ' (date)'),
@@ -2181,34 +2183,6 @@ class Plugin(indigo.PluginBase):
             batt_list = [(-1, 'No battery devices detected.'), ]
 
         return batt_list
-
-    # =============================================================================
-    def getBinList(self, filter="", values_dict=None, type_id="", target_id=0):
-        """
-        Returns a list of bins for the X axis.
-
-        Returns a list of bins for the X axis. We assume time, so only time-based bins
-        are provided. The list is constrained.
-        -----
-
-        :param unicode filter:
-        :param class 'indigo.Dict' values_dict:
-        :param unicode type_id:
-        :param int target_id:
-        """
-
-        bin_list_menu = [("quarter-hourly", "Every 15 Minutes"),
-                         ("half-hourly", "Every 30 Minutes"),
-                         ("hourly", "Every Hour"),
-                         ("hourly_4", "Every 4 Hours"),
-                         ("hourly_8", "Every 8 Hours"),
-                         ("hourly_12", "Every 12 Hours"),
-                         ("daily", "Every Day"),
-                         ("weekly", "Every Week"),
-                         ("monthly", "Every Month"),
-                         ("yearly", "Every Year")]
-
-        return bin_list_menu
 
 # =============================================================================
     def getFileList(self, filter="", values_dict=None, type_id="", target_id=0):
@@ -2315,24 +2289,6 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     # =============================================================================
-    def getFontSizeList(self, filter="", values_dict=None, type_id="", target_id=0):
-        """
-        Returns a list of font sizes.
-
-        Provides a list of font size values for various dropdown menus. The list is
-        constrained to values that are reasonably attractive (6pt - 20pt).
-
-        -----
-
-        :param unicode filter:
-        :param class 'indigo.Dict' values_dict:
-        :param unicode type_id:
-        :param int target_id:
-        """
-
-        return [(str(_), str(_)) for _ in np.arange(6, 21)]
-
-    # =============================================================================
     def getForecastSource(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of WUnderground devices for forecast chart devices
@@ -2370,77 +2326,6 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
 
         return sorted(forecast_source_menu, key=lambda s: s[1].lower())
-
-    # =============================================================================
-    def getLineList(self, filter="", values_dict=None, type_id="", target_id=0):
-        """
-        Returns a list of line styles.
-
-        Provide a list of matplotlib line styles for various dropdown menus. This is
-        not an exhaustive list of styles that the current version of matplotlib
-        supports; rather, a subset that are known to work with earlier versions that
-        ship with OS X.
-
-        -----
-
-        :param unicode filter:
-        :param class 'indigo.Dict' values_dict:
-        :param unicode type_id:
-        :param int target_id:
-        """
-
-        return [("--", "Dashed"),
-                (":", "Dotted"),
-                ("-.", "Dot Dash"),
-                ("-", "Solid"),
-                ("steps", "Steps"),
-                ("steps-mid", "Steps Mid"),
-                ("steps-post", "Steps Post"),
-                ("-1", "%%separator%%"),
-                ("None", "None")]
-
-    # =============================================================================
-    def getMarkerList(self, filter="", values_dict=None, type_id="", target_id=0):
-        """
-        Returns a list of marker styles.
-
-        Provide a list of matplotlib marker styles for various dropdown menus. This is
-        not an exhaustive list of styles that the current version of matplotlib
-        supports; rather, a subset that are known to work with earlier versions that
-        ship with OS X.
-
-        -----
-
-        :param unicode filter:
-        :param class 'indigo.Dict' values_dict:
-        :param unicode type_id:
-        :param int target_id:
-        """
-
-        return [("o", "Circle"),
-                ("D", "Diamond"),
-                ("d", "Diamond (Thin)"),
-                ("h", "Hexagon 1"),
-                ("H", "Hexagon 2"),
-                ("-", "Horizontal Line"),
-                ("8", "Octagon"),
-                ("p", "Pentagon"),
-                ("PIX", "Pixel"),
-                ("+", "Plus"),
-                (".", "Point"),
-                ("*", "Star"),
-                ("s", "Square"),
-                ("v", "Triangle Down"),
-                ("TL", "Triangle Left"),
-                ("TR", "Triangle Right"),
-                ("1", "Tri Down"),
-                ("2", "Tri Up"),
-                ("3", "Tri Left"),
-                ("4", "Tri Right"),
-                ("|", "Vertical Line"),
-                ("x", "X"),
-                ("-1", "%%separator%%"),
-                ("None", "None")]
 
     # =============================================================================
     def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
@@ -3295,7 +3180,7 @@ class MakeChart(object):
             healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
             level_box     = p_dict['showBatteryLevelBackground']
             show_level    = p_dict['showBatteryLevel']
-            dead_ones     = p_dict['showDeadBattery']
+            dead_ones     = p_dict.get('showDeadBattery', False)
             warning_color = r"#{0}".format(p_dict['warningColor'].replace(' ', '').replace('#', ''))
             warning_level = int(p_dict['warningLevel'])
             x_values      = []

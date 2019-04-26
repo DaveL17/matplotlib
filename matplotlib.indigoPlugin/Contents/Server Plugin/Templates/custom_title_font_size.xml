@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="customTitleFontSize" type="menu" defaultValue="12" visibleBindingId="customSizeFont" visibleBindingValue="true"
+           tooltip="Select your preference for the title font size of your chart (this chart only).">
+        <Label>Title Font Size:</Label>
+        <List>
+            <Option value="6">6</Option>
+            <Option value="7">7</Option>
+            <Option value="8">8</Option>
+            <Option value="9">9</Option>
+            <Option value="10">10</Option>
+            <Option value="11">11</Option>
+            <Option value="12">12*</Option>
+            <Option value="13">13</Option>
+            <Option value="14">14</Option>
+            <Option value="15">15</Option>
+            <Option value="16">16</Option>
+            <Option value="17">17</Option>
+            <Option value="18">18</Option>
+            <Option value="19">19</Option>
+            <Option value="20">20</Option>
+            <Option value="21">21</Option>
+        </List>
+    </Field>
+
+</Template>

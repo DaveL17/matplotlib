@@ -19,21 +19,7 @@
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="outputFileSpace" type="label"/>
 
@@ -68,37 +54,16 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the title font size of your chart (this chart only).">
-                <Label>Title Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_title_font_size.xml" />
 
-            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
-                <Label>Tick Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="legendColumns" type="menu" defaultValue="5" visibleBindingId="showLegend" visibleBindingValue="true"
-                   tooltip="The number of columns for the legend entries.">
-                <Label>Legend Columns:</Label>
-                <List>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                    <Option value="4">4</Option>
-                    <Option value="5">5</Option>
-                    <Option value="6">6</Option>
-                    <Option value="7">7</Option>
-                    <Option value="8">8</Option>
-                </List>
-            </Field>
+            <Template file="Templates/legend_columns.xml" />
 
             <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of bars for the chart (integer). Enter zero to plot all observations.">
                 <Label>Number of Bars:</Label>
@@ -143,10 +108,7 @@
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <Field id="yAxisSeparator" visibleBindingId="xAxisLabel" visibleBindingValue="true" type="separator"/>
 
@@ -182,16 +144,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
                    tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -364,11 +317,6 @@
                 <Label>Legend Label:</Label>
             </Field>
 
-            <!--<Field id="bar4Fill" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to fill below this bar.">-->
-                <!--<Label>Fill?</Label>-->
-                <!--<Description>Yes/No</Description>-->
-            <!--</Field>-->
-
             <Field id="plotBar4Min" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
                 <Description>Yes/No</Description>
@@ -403,11 +351,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>
             </Field>
 
-            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's custom line segments.">
-                <Label>Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/custom_line_style.xml" />
 
             <Field id="bottomSeparator" type="separator"/>
 
@@ -452,21 +396,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="chartControlsLabel" type="label" alignText="right">
                 <Label>Chart Controls</Label>
@@ -611,21 +541,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="customSizeHeight" type="textfield" defaultValue="None"
                    tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None.">
@@ -636,10 +552,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Width:</Label>
             </Field>
 
-            <Field id="fontSize" type="menu" default="12" tooltip="Select the size of the font to use for the calendar plot.">
-                <Label>Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_font_size.xml" />
 
             <Field id="firstDayOfWeek" type="menu" defaultValue="6" tooltip="Select the first day of the week.">
                 <Label>Week Starts on:</Label>
@@ -686,21 +599,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="outputFileSpace" type="label"/>
 
@@ -735,37 +634,16 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the title font size of your chart (this chart only).">
-                <Label>Title Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_title_font_size.xml" />
 
-            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
-                <Label>Tick Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="legendColumns" type="menu" defaultValue="5" visibleBindingId="showLegend" visibleBindingValue="true"
-                   tooltip="The number of columns for the legend entries.">
-                <Label>Legend Columns:</Label>
-                <List>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                    <Option value="4">4</Option>
-                    <Option value="5">5</Option>
-                    <Option value="6">6</Option>
-                    <Option value="7">7</Option>
-                    <Option value="8">8</Option>
-                </List>
-            </Field>
+            <Template file="Templates/legend_columns.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
@@ -801,16 +679,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
-            <Field id="limitDataRange" type="menu" defaultValue="L" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="Limit data display to the first (X) hours or last (X) hours.">
                 <Label>Limit X Axis Range:</Label>
                 <List>
-                    <Option value="N">Newest</Option>
+                    <Option value="N">Newest*</Option>
                     <Option value="O">Oldest</Option>
                 </List>
             </Field>
@@ -854,16 +729,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
                    tooltip="Enter the labels to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -919,10 +785,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
@@ -930,10 +806,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line1Marker" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine1Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -997,10 +898,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
@@ -1008,10 +919,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line2Marker" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine2Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1075,10 +1011,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line3Style" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Style" type="menu" defaultValue="-" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's third line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel3" visibleBindingValue="true"
@@ -1086,10 +1032,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line3Marker" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true"
+            <Field id="line3Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine3Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1153,20 +1124,55 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line4Style" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Style" type="menu" defaultValue="-" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line4Marker" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true"
+            <Field id="line4Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine4Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1230,10 +1236,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line5Style" type="menu" visibleBindingId="lineLabel5" visibleBindingValue="true"
+            <Field id="line5Style" type="menu" defaultValue="-" visibleBindingId="lineLabel5" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fifth line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line5MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel5" visibleBindingValue="true"
@@ -1241,10 +1257,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line5Marker" type="menu" visibleBindingId="lineLabel5" visibleBindingValue="true"
+            <Field id="line5Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel5" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fifth line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine5Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1308,10 +1349,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line6Style" type="menu" visibleBindingId="lineLabel6" visibleBindingValue="true"
+            <Field id="line6Style" type="menu" defaultValue="-" visibleBindingId="lineLabel6" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's sixth line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line6MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel6" visibleBindingValue="true"
@@ -1319,10 +1370,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line6Marker" type="menu" visibleBindingId="lineLabel6" visibleBindingValue="true"
+            <Field id="line6Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel6" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's sixth line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine6Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1384,10 +1460,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line7Style" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
+            <Field id="line7Style" type="menu" defaultValue="-" visibleBindingId="lineLabel7" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's seventh line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line7MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel7" visibleBindingValue="true"
@@ -1395,10 +1481,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line7Marker" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true"
+            <Field id="line7Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel7" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's seventh line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine7Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1460,10 +1571,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="line8Style" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
+            <Field id="line8Style" type="menu" defaultValue="-" visibleBindingId="lineLabel8" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's eighth line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line8MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel8" visibleBindingValue="true"
@@ -1471,10 +1592,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line8Marker" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true"
+            <Field id="line8Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel8" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's eighth line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotLine8Min" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -1517,11 +1663,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's custom line segments.">
-                <Label>Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/custom_line_style.xml" />
 
             <Field id="bottomSeparator" type="separator"/>
 
@@ -1565,21 +1707,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="sourceSpace1" type="label"/>
 
@@ -1701,21 +1829,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="sourceSpace1" type="label"/>
 
@@ -1774,17 +1888,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the title font size of your chart (this chart only).">
-                <Label>Title Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_title_font_size.xml" />
 
-            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
-                <Label>Tick Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="xHideLabels" defaultValue="false" type="checkbox" tooltip="Select to hide the surrounding labels on the outside of the chart.">
                 <Label>Hide X Labels?</Label>
@@ -1851,21 +1957,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="outputFileSpace" type="label"/>
 
@@ -1901,17 +1993,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the title font size of your chart (this chart only).">
-                <Label>Title Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_title_font_size.xml" />
 
-            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
-                <Label>Tick Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
@@ -1919,20 +2003,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="legendColumns" type="menu" defaultValue="5"  visibleBindingId="showLegend" visibleBindingValue="true"
-                   tooltip="The number of columns for the legend entries.">
-                <Label>Legend Columns:</Label>
-                <List>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                    <Option value="4">4</Option>
-                    <Option value="5">5</Option>
-                    <Option value="6">6</Option>
-                    <Option value="7">7</Option>
-                    <Option value="8">8</Option>
-                </List>
-            </Field>
+            <Template file="Templates/legend_columns.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
@@ -1968,10 +2039,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
 <!--Y Axis-->
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
@@ -2008,16 +2076,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
                    tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -2064,10 +2123,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group1Marker" type="menu" visibleBindingId="groupLabel1" visibleBindingValue="true"
+            <Field id="group1Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first group.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotGroup1Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -2122,10 +2206,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group2Marker" type="menu" visibleBindingId="groupLabel2" visibleBindingValue="true"
+            <Field id="group2Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second group.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotGroup2Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -2180,10 +2289,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group3Marker" type="menu" visibleBindingId="groupLabel3" visibleBindingValue="true"
+            <Field id="group3Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's third group.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotGroup3Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -2237,10 +2371,35 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="group4Marker" type="menu" visibleBindingId="groupLabel4" visibleBindingValue="true"
+            <Field id="group4Marker" type="menu" defaultValue="None" visibleBindingId="groupLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's fourth group.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="plotGroup4Min" type="checkbox" defaultValue="false" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
@@ -2283,11 +2442,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's custom line segments.">
-                <Label>Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/custom_line_style.xml" />
 
             <Field id="bottomSeparator" type="separator"/>
 
@@ -2331,21 +2486,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Output File Name:</Label>
             </Field>
 
-            <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
-                <Label>Refresh Interval:</Label>
-                <List>
-                    <Option value="60">Every Minute</Option>
-                    <Option value="300">Every 5 Minutes</Option>
-                    <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
-                    <Option value="1800">Every 30 Minutes</Option>
-                    <Option value="3600">Every Hour</Option>
-                    <Option value="86400">Every Day</Option>
-                    <Option value="604800">Every Week</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="0">None - Manual Refresh Only</Option>
-                </List>
-            </Field>
+            <Template file="Templates/refresh_interval.xml" />
 
             <Field id="outputFileSpace" type="label"/>
 
@@ -2400,17 +2541,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="customTitleFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the title font size of your chart (this chart only).">
-                <Label>Title Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_title_font_size.xml" />
 
-            <Field id="customTickFontSize" type="menu" visibleBindingId="customSizeFont" visibleBindingValue="true"
-                   tooltip="Select your preference for the tick font size of your chart (this chart only).">
-                <Label>Tick Font Size:</Label>
-                <List class="self" filter="" method="getFontSizeList"/>
-            </Field>
+            <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
@@ -2445,11 +2578,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Label</Label>
             </Field>
 
-            <Field id="xAxisBins" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List class="self" filter="" method="getBinList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
 
@@ -2475,15 +2604,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Max:</Label>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="y2AxisSeparator" type="separator" visibleBindingId="yAxisLabel" visibleBindingValue="true"/>
 
@@ -2549,10 +2670,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="line1Style" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Style" type="menu" defaultValue="-" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel1" visibleBindingValue="true"
@@ -2560,13 +2691,39 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line1Marker" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true"
+            <Field id="line1Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="line1Bottom" type="separator" visibleBindingId="lineLabel1" visibleBindingValue="true"/>
+
 <!-- Low Temperature -->
             <Field id="lineLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for the low temperature line.">
                 <Label>Low Temperature</Label>
@@ -2587,10 +2744,20 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Color:</Label>
             </Field>
 
-            <Field id="line2Style" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Style" type="menu" defaultValue="-" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
             </Field>
 
             <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel2" visibleBindingValue="true"
@@ -2598,13 +2765,39 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Marker Color:</Label>
             </Field>
 
-            <Field id="line2Marker" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true"
+            <Field id="line2Marker" type="menu" defaultValue="None" visibleBindingId="lineLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
-                <List class="self" filter="" method="getMarkerList" dynamicReload="true"/>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
             </Field>
 
             <Field id="line2Bottom" type="separator" visibleBindingId="lineLabel2" visibleBindingValue="true"/>
+
 <!-- Precipitation -->
             <Field id="lineLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for the precipitation bars.">
                 <Label>Precipitation</Label>
@@ -2634,11 +2827,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Constants:</Label>l
             </Field>
 
-            <Field id="customLineStyle" type="menu" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip="Select preference for the style of your chart's custom line segments.">
-                <Label>Line Style:</Label>
-                <List class="self" filter="" method="getLineList" dynamicReload="true"/>
-            </Field>
+            <Template file="Templates/custom_line_style.xml" />
 
             <Field id="bottomSeparator" type="separator"/>
 
@@ -2873,7 +3062,7 @@ There are presently no configurations available for this device.
                     <Option value="60">Every Minute</Option>
                     <Option value="300">Every 5 Minutes</Option>
                     <Option value="600">Every 10 Minutes</Option>
-                    <Option value="900">Every 15 Minutes</Option>
+                    <Option value="900">Every 15 Minutes*</Option>
                     <Option value="1800">Every 30 Minutes</Option>
                     <Option value="3600">Every Hour</Option>
                     <Option value="86400">Every Day</Option>

@@ -51,7 +51,7 @@ COMPLETED =====================================================================
 ===============================================================================
 In the Line Chart 'device', would it be possible to have 8 lines?
 
-DaveL17 - This was implemented with version 0.8.11.
+DaveL17 - Implemented with version 0.8.11.
 
 ===============================================================================
 2019-02-12  Autolog  [COMPLETE]

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+        <Label>Refresh Interval:</Label>
+        <List>
+            <Option value="60">Every Minute</Option>
+            <Option value="300">Every 5 Minutes</Option>
+            <Option value="600">Every 10 Minutes</Option>
+            <Option value="900">Every 15 Minutes*</Option>
+            <Option value="1800">Every 30 Minutes</Option>
+            <Option value="3600">Every Hour</Option>
+            <Option value="86400">Every Day</Option>
+            <Option value="604800">Every Week</Option>
+            <Option value="-1">%%separator%%</Option>
+            <Option value="0">None - Manual Refresh Only</Option>
+        </List>
+    </Field>
+
+</Template>

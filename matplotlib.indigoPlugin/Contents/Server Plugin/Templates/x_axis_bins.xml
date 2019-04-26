@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+        <Label>Scale:</Label>
+        <List>
+            <Option value="quarter-hourly">Every 15 Minutes</Option>
+            <Option value="half-hourly">Every 30 Minutes</Option>
+            <Option value="hourly">Every Hour</Option>
+            <Option value="hourly_4">Every 4 Hours</Option>
+            <Option value="hourly_8">Every 8 Hours</Option>
+            <Option value="hourly_12">Every 12 Hours</Option>
+            <Option value="daily">Every Day*</Option>
+            <Option value="weekly">Every Week</Option>
+            <Option value="monthly">Every Month</Option>
+            <Option value="yearly">Every Year</Option>
+        </List>
+    </Field>
+
+</Template>

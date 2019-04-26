@@ -1,3 +1,10 @@
+v0.8.12
+- Converts all static menu callbacks to hard-coded XML list items to
+  make selection of default option more seamless and converts them to
+  XML templates for consistency.
+- Indicates default menu item options with a star (*); only applies to
+  static menu lists (not dynamic lists).
+
 v0.8.11
 - Adds lines 7 and 8 to Line Charting device.
 

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+           tooltip="Select preference for the style of your chart's custom line segments.">
+        <Label>Style:</Label>
+        <List>
+            <Option value="--">Dashed</Option>
+            <Option value=":">Dotted</Option>
+            <Option value="-.">Dot Dash</Option>
+            <Option value="-">Solid*</Option>
+            <Option value="steps">Steps</Option>
+            <Option value="steps-mid">Steps Mid</Option>
+            <Option value="steps-post">Steps Post</Option>
+            <Option value="-1">%%separator%%</Option>
+            <Option value="None">None</Option>
+        </List>
+    </Field>
+
+</Template>
