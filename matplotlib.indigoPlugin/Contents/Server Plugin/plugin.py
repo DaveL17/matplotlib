@@ -104,7 +104,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.11"
+__version__   = "0.8.13"
 
 # =============================================================================
 
@@ -3033,7 +3033,6 @@ class MakeChart(object):
                 suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
 
                 p_dict['bar{0}Color'.format(thing)] = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
-                bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor']:
@@ -3045,6 +3044,8 @@ class MakeChart(object):
 
                 # Plot the bars. If 'suppressBar{thing} is True, we skip it.
                 if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
+
+                    bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                     # Get the data and grab the header.
                     data_column, log = self.get_data(u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['bar{0}Source'.format(thing)]), log)
@@ -3384,8 +3385,8 @@ class MakeChart(object):
 
                 suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
-                p_dict['line{0}Color'.format(line)]        = r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
-                line_colors.append(p_dict['line{0}Color'.format(line)])
+                p_dict['line{0}Color'.format(line)] = r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
+
                 p_dict['line{0}MarkerColor'.format(line)]  = r"#{0}".format(p_dict['line{0}MarkerColor'.format(line)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(line)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
 
@@ -3400,6 +3401,8 @@ class MakeChart(object):
                 # ============================== Plot the Lines ===============================
                 # Plot the lines. If suppress_line is True, we skip it.
                 if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+
+                    line_colors.append(p_dict['line{0}Color'.format(line)])
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
                     log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
@@ -3452,7 +3455,9 @@ class MakeChart(object):
                 # Amend the headers if there are any custom legend entries defined.
                 counter = 1
                 final_headers = []
+
                 headers = [_.decode('utf-8') for _ in p_dict['headers']]
+
                 for header in headers:
                     if p_dict['line{0}Legend'.format(counter)] == "":
                         final_headers.append(header)
@@ -3463,11 +3468,16 @@ class MakeChart(object):
                 # Set the legend
                 # Reorder the headers and colors so that they fill by row instead of by column
                 num_col = int(p_dict['legendColumns'])
+                log['Info'].append(u"  {0}".format(num_col))
                 iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
                 iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
                 final_colors = [_ for _ in iter_colors]
+
+                log['Info'].append(u"Legend Values:")
+                log['Info'].append(u"  {0}".format(final_headers))
+                log['Info'].append(u"  {0}".format(final_colors))
 
                 legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=num_col, prop={'size': float(p_dict['legendFontSize'])})
 
@@ -3834,7 +3844,6 @@ class MakeChart(object):
                 suppress_group = p_dict.get('suppressGroup{0}'.format(thing), False)
 
                 p_dict['group{0}Color'.format(thing)]       = r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
-                group_colors.append(p_dict['group{0}Color'.format(thing)])
                 p_dict['group{0}MarkerColor'.format(thing)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
                 p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
 
@@ -3849,6 +3858,8 @@ class MakeChart(object):
                 # ============================== Plot the Points ==============================
                 # Plot the groups. If suppress_group is True, we skip it.
                 if p_dict['group{0}Source'.format(thing)] not in ("", "None") and not suppress_group:
+
+                    group_colors.append(p_dict['group{0}Color'.format(thing)])
 
                     # There is a bug in matplotlib (fixed in newer versions) where points would not
                     # plot if marker set to 'none'. This overrides the behavior.

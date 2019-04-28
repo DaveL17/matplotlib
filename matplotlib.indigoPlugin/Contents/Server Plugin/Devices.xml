@@ -474,7 +474,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Warning Level:</Label>
             </Field>
 
-            <Field id="showDeviceName" type="checkbox" defaultValue="true" tooltip="Check to display device names along the Y axis. If the names are too long, it is recommended that you hide them and add names using control page text elements.">
+            <Field id="showDeviceName" type="checkbox" defaultValue="true"
+                   tooltip="Check to display device names along the Y axis. If the names are too long, it is recommended that you hide them and add names using control page text elements.">
                 <Label>Display Device Names?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -638,7 +639,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Template file="Templates/custom_tick_font_size.xml" />
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -1140,7 +1142,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 </List>
             </Field>
 
-            <Field id="line4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="line4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="lineLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
@@ -1652,7 +1655,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom Line Segments</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+                   alignText="right">
                 <Label>Custom Line Segments</Label>
             </Field>
 
@@ -1902,7 +1906,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description/>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -2367,7 +2372,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Legend Label:</Label>
             </Field>
 
-            <Field id="group4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select preference for the color of your chart's markers.">
+            <Field id="group4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
                 <Label>Marker Color:</Label>
             </Field>
 
@@ -2431,7 +2437,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom group Segments</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+                   alignText="right">
                 <Label>Custom Group Segments</Label>
             </Field>
 
@@ -2536,7 +2543,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Daytime Color:</Label>
             </Field>
 
-            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -2808,7 +2816,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="line3Color" type="colorpicker" defaultValue="99 CC FF" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select preference for the color of your chart's second line.">
+            <Field id="line3Color" type="colorpicker" defaultValue="99 CC FF" visibleBindingId="lineLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second line.">
                 <Label>Color:</Label>
             </Field>
 
@@ -2816,7 +2825,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom Line Segments?</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular" alignText="right">
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+                   alignText="right">
                     <Label>Custom Line Segments</Label>
             </Field>
 
@@ -2867,7 +2877,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="topSeparator" type="separator"/>
 
             <!-- Number of lines to keep -->
-            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false"  tooltip="Please enter the maximum number of observations you would like to retain in your CSV files.">
+            <Field id="numLinesToKeep" type="textfield" defaultValue="300" hidden="false"
+                   tooltip="Please enter the maximum number of observations you would like to retain in your CSV files.">
                 <Label>Observations:</Label>
             </Field>
 
