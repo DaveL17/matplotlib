@@ -51,10 +51,6 @@ the proper Fantastic Weather devices.
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
 
-# TODO: Run new version against production server to see if lines 7 and 8 are
-#       implemented properly. This is important for updating existing devices.
-# TODO: Legend line colors on production server broken.
-# TODO: Indoor temperature chart on production server showing 3 of 4 lines.
 # ================================== IMPORTS ==================================
 
 try:
@@ -104,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.13"
+__version__   = "0.8.14"
 
 # =============================================================================
 
@@ -3468,16 +3464,11 @@ class MakeChart(object):
                 # Set the legend
                 # Reorder the headers and colors so that they fill by row instead of by column
                 num_col = int(p_dict['legendColumns'])
-                log['Info'].append(u"  {0}".format(num_col))
                 iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
                 iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
                 final_colors = [_ for _ in iter_colors]
-
-                log['Info'].append(u"Legend Values:")
-                log['Info'].append(u"  {0}".format(final_headers))
-                log['Info'].append(u"  {0}".format(final_colors))
 
                 legend = ax.legend(final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=num_col, prop={'size': float(p_dict['legendFontSize'])})
 
