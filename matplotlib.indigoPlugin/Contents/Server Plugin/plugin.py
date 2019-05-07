@@ -51,6 +51,12 @@ the proper Fantastic Weather devices.
 # TODO: Allow scripting control or a tool to repopulate color controls so that
 #       you can change all bars/lines/scatter etc in one go.
 
+# TODO: Consider adding a leading zero obs when date range limited data is less
+#       than the specified date range (so the chart always shows the specified
+#       date range.)
+# TODO: When the number of bars to be plotted is less than the number of bars
+#       requested (because there isn't enough data), the bars plot funny.
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -100,7 +106,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.14"
+__version__   = "0.8.15"
 
 # =============================================================================
 
@@ -183,11 +189,6 @@ class Plugin(indigo.PluginBase):
         # See method for more info.
         self.convert_custom_colors()
 
-        # ============================ Clean Plugin Prefs =============================
-        # Remove legacy cruft from plugin prefs. We do devices later.
-        # self.pluginPrefs = self.__clean_prefs(self.pluginPrefs)
-        # indigo.server.savePluginPrefs()
-
         # ================ Compare Save Path to Current Indigo Version ================
         new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/static/"
         current_save_path = self.pluginPrefs['chartPath']
@@ -256,11 +257,9 @@ class Plugin(indigo.PluginBase):
             dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
             self.logger.threaddebug(u"CSV last update unknown. Coercing update.")
 
-        # If the refresh interval is greater than zero
         # Note that we check for the existence of the device state before trying to
         # update it due to how Indigo processes devices when their source plugin has
         # been changed (i.e., assigning an existing device to a new plugin instance.)
-
         if 'onOffState' in dev.states:
 
             if dev.deviceTypeId != 'rcParamsDevice' and int(dev.pluginProps['refreshInterval']) > 0:
@@ -311,16 +310,6 @@ class Plugin(indigo.PluginBase):
                 values_dict['previousKey']            = ""
 
                 return values_dict
-
-            # # ============================= Fix Custom Colors =============================
-            # # For existing devices
-            # if dev.configured:
-            #
-            #     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
-            #     for prop in values_dict:
-            #         if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(values_dict[prop])):
-            #             s = values_dict[prop]
-            #             values_dict[prop] = u'{0} {1} {2}'.format(s[0:3], s[3:5], s[5:7]).replace('#', '')
 
             # ========================== Set Config UI Defaults ===========================
             # For new devices, force certain defaults that don't carry from Devices.xml.
@@ -538,14 +527,13 @@ class Plugin(indigo.PluginBase):
 
                 # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
-                self.refreshTheCharts()
+                self.charts_refresh()
                 self.sleep(15)
 
     # =============================================================================
     def sendDevicePing(self, dev_id=0, suppress_logging=False):
 
         indigo.server.log(u"Matplotlib Plugin devices do not support the ping function.")
-
         return {'result': 'Failure'}
 
     # =============================================================================
@@ -2513,7 +2501,7 @@ class Plugin(indigo.PluginBase):
 
         # Indigo will trap if device is disabled.
         dev = indigo.devices[plugin_action.deviceId]
-        self.refreshTheCharts([dev])
+        self.charts_refresh([dev])
 
     # =============================================================================
     def refresh_the_charts_now(self):
@@ -2529,11 +2517,11 @@ class Plugin(indigo.PluginBase):
         """
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
-        self.refreshTheCharts(devices_to_refresh)
+        self.charts_refresh(devices_to_refresh)
         self.logger.info(u"{0:{1}^80}".format(' Redraw Charts Now Menu Action Complete ', '='))
 
     # =============================================================================
-    def refreshTheCharts(self, dev_list=None):
+    def charts_refresh(self, dev_list=None):
         """
         Refreshes all the plugin chart devices.
 
@@ -2971,7 +2959,7 @@ class Plugin(indigo.PluginBase):
         """
         Called by an Indigo Action item.
 
-        Allows the plugin to call the refreshTheCharts() method from an Indigo Action
+        Allows the plugin to call the charts_refresh() method from an Indigo Action
         item. This action will refresh all charts.
 
         -----
@@ -2981,7 +2969,7 @@ class Plugin(indigo.PluginBase):
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and dev.deviceTypeId != 'csvEngine']
 
-        self.refreshTheCharts(devices_to_refresh)
+        self.charts_refresh(devices_to_refresh)
 
         self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
 
@@ -3041,6 +3029,7 @@ class MakeChart(object):
                 # Plot the bars. If 'suppressBar{thing} is True, we skip it.
                 if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
 
+                    # Add bar color to list for later use
                     bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                     # Get the data and grab the header.
@@ -3056,8 +3045,22 @@ class MakeChart(object):
                         p_dict['x_obs{0}'.format(thing)].append(element[0])
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
+                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
+
+                    # ================================ Prune Data =================================
+                    # Prune the data if warranted
+                    try:
+                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                    except ValueError:
+                        limit = 0
+
+                    if limit > 0:
+                        y_obs   = p_dict['y_obs{0}'.format(thing)]
+                        new_old = dev.pluginProps['limitDataRange']
+                        dates_to_plot, p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
+                    dates_to_plot = self.format_dates(dates_to_plot, log)
 
                     # If the user sets the width to 0, this will perform an introspection of the
                     # dates to plot and get the minimum of the difference between the dates.
@@ -3117,7 +3120,8 @@ class MakeChart(object):
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
 
                 # Set legend bar colors
-                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, 4)]
+                num_handles = len(legend.legendHandles)
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -3398,6 +3402,7 @@ class MakeChart(object):
                 # Plot the lines. If suppress_line is True, we skip it.
                 if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
 
+                    # Add line color to list for later use
                     line_colors.append(p_dict['line{0}Color'.format(line)])
 
                     data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['line{0}Source'.format(line)].encode("utf-8")), log)
@@ -3413,6 +3418,8 @@ class MakeChart(object):
                         p_dict['y_obs{0}'.format(line)].append(float(element[1]))
 
                     # ============================= Adjustment Factor =============================
+                    # Allows user to shift data on the Y axis (for example, to display multiple
+                    # binary sources on the same chart.)
                     if dev.pluginProps['line{0}adjuster'.format(line)] != "":
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(line)]:
@@ -3420,8 +3427,22 @@ class MakeChart(object):
                             temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
                         p_dict['y_obs{0}'.format(line)] = temp_list
 
-                    # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+                    dates_to_plot = p_dict['x_obs{0}'.format(line)]
+
+                    # ================================ Prune Data =================================
+                    # Prune the data if warranted
+                    try:
+                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                    except ValueError:
+                        limit = 0
+
+                    if limit > 0:
+                        y_obs   = p_dict['y_obs{0}'.format(line)]
+                        new_old = dev.pluginProps['limitDataRange']
+                        dates_to_plot, p_dict['y_obs{0}'.format(line)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+
+                    # ======================== Convert Dates for Charting =========================
+                    dates_to_plot = self.format_dates(dates_to_plot, log)
 
                     ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
@@ -3850,6 +3871,7 @@ class MakeChart(object):
                 # Plot the groups. If suppress_group is True, we skip it.
                 if p_dict['group{0}Source'.format(thing)] not in ("", "None") and not suppress_group:
 
+                    # Add group color to list for later use
                     group_colors.append(p_dict['group{0}Color'.format(thing)])
 
                     # There is a bug in matplotlib (fixed in newer versions) where points would not
@@ -3871,8 +3893,22 @@ class MakeChart(object):
                         p_dict['x_obs{0}'.format(thing)].append(element[0])
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
+                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
+
+                    # ================================ Prune Data =================================
+                    # Prune the data if warranted
+                    try:
+                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                    except ValueError:
+                        limit = 0
+
+                    if limit > 0:
+                        y_obs   = p_dict['y_obs{0}'.format(thing)]
+                        new_old = dev.pluginProps['limitDataRange']
+                        dates_to_plot, p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
+                    dates_to_plot = self.format_dates(dates_to_plot, log)
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
                     ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
@@ -3927,6 +3963,9 @@ class MakeChart(object):
 
                 # Set legend font colors
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+
+                num_handles = len(legend.legendHandles)
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
                 frame = legend.get_frame()
                 frame.set_alpha(0)
@@ -4245,8 +4284,8 @@ class MakeChart(object):
                     y_axis_min = 0
                     y_axis_max = 1
                 elif max(p_dict['data_array']) != 0 and min(p_dict['data_array']) != 0 and 0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
-                    y_axis_min = min(p_dict['data_array']) * (1 - (1 / min(p_dict['data_array']) ** 1.25))
-                    y_axis_max = max(p_dict['data_array']) * (1 + (1 / max(p_dict['data_array']) ** 1.25))
+                    y_axis_min = min(p_dict['data_array']) * (1 - (1 / abs(min(p_dict['data_array'])) ** 1.25))
+                    y_axis_max = max(p_dict['data_array']) * (1 + (1 / abs(max(p_dict['data_array'])) ** 1.25))
                 else:
                     if min(p_dict['data_array']) < 0:
                         y_axis_min = min(p_dict['data_array']) * 1.5
@@ -4595,8 +4634,10 @@ class MakeChart(object):
 
         try:
 
-            y_min = min(p_dict['data_array'])
-            y_max = max(p_dict['data_array'])
+            y_min        = min(p_dict['data_array'])
+            y_max        = max(p_dict['data_array'])
+            y_min_wanted = p_dict['yAxisMin']
+            y_max_wanted = p_dict['yAxisMax']
 
             # Since the min / max is used here only for chart boundaries, we "trick"
             # Matplotlib by using a number that's very nearly zero.
@@ -4607,16 +4648,16 @@ class MakeChart(object):
                 y_max = 0.000001
 
             # Y min
-            if isinstance(p_dict['yAxisMin'], unicode) and p_dict['yAxisMin'].lower() == 'none':
-                y_axis_min = y_min * (1 - (1 / y_min ** 1.25))
+            if isinstance(y_min_wanted, unicode) and y_min_wanted.lower() == 'none':
+                y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
             else:
-                y_axis_min = float(p_dict['yAxisMin'])
+                y_axis_min = float(y_min_wanted)
 
             # Y max
-            if isinstance(p_dict['yAxisMax'], unicode) and p_dict['yAxisMax'].lower() == 'none':
-                y_axis_max = y_max * (1 + (1 / y_max ** 1.25))
+            if isinstance(y_max_wanted, unicode) and y_max_wanted.lower() == 'none':
+                y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
             else:
-                y_axis_max = float(p_dict['yAxisMax'])
+                y_axis_max = float(y_max_wanted)
 
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
@@ -4733,6 +4774,7 @@ class MakeChart(object):
         :param 'numpy.ndarray' dates_to_plot:
         :param int line:
         :param dict p_dict: plotting parameters
+        :param dict log: logging dict
         :return ax:
 
         """
@@ -4763,6 +4805,7 @@ class MakeChart(object):
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
         """
 
         # Plot the custom lines if needed.  Note that these need to be plotted after
@@ -4955,6 +4998,56 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors. See plugin log for more information.', 'Name': dev.name})
         else:
             return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+
+    # =============================================================================
+    def prune_data(self, x_data, y_data, limit, new_old, log):
+        """
+        Prune data to display subset of available data
+
+        The prune_data() method is used to show a subset of available data. Users
+        enter a number of days into a device config dialog, the method then drops
+        any observations that are outside that window.
+        -----
+
+        :param list x_data:
+        :param list y_data:
+        :param int limit:
+        :param dict log:
+        :param unicode new_old:
+        :return:
+        """
+
+        now   = dt.datetime.now()
+        delta = now - dt.timedelta(days=limit)
+        log['Debug'].append(u"Pruning chart data: {0} through {1}.".format(delta, now))
+
+        # Convert dates from string to datetime for filters
+        for i, x in enumerate(x_data):
+            x_data[i] = dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f')
+
+        # Create numpy arrays from the data
+        x_obs_d = np.array(x_data)
+        y_obs_d = np.array(y_data)
+
+        # Get the indexes of the date data that fits the time window
+        idx = np.where((x_obs_d >= delta) & (x_obs_d <= now))
+
+        # Keep only the indexed observations, and put them back into lists
+        final_x = x_obs_d[idx].tolist()
+        final_y = y_obs_d[idx].tolist()
+
+        # If final_x is of length zero, no observations fit the requested time
+        # parameter. We return empty lists.
+        if len(final_x) == 0:
+            log['Warning'].append(u"All data outside time series limits. Resulting chart is empty.")
+            final_x = [dt.datetime.now()]
+            final_y = [0]
+
+        # Convert dates back to strings
+        for i, x in enumerate(final_x):
+            final_x[i] = dt.datetime.strftime(x, '%Y-%m-%d %H:%M:%S.%f')
+
+        return final_x, final_y
 
     # =============================================================================
     def save_chart_image(self, plot, p_dict, k_dict, log, size=None):

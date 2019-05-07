@@ -110,6 +110,21 @@
 
             <Template file="Templates/x_axis_bins.xml" />
 
+            <!-- Not currently used. -->
+            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true" hidden="true"
+                   tooltip="Limit data display to the first (X) hours or last (X) hours.">
+                <Label>Limit X Axis Range:</Label>
+                <List>
+                    <Option value="N">Newest*</Option>
+                    <Option value="O">Oldest</Option>
+                </List>
+            </Field>
+
+            <Field id="limitDataRangeLength" type="textfield" defaultValue="" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Will limit the display to the number of days specified (days). Leave empty to show all available data.">
+                <Label>Days to Show:</Label>
+            </Field>
+
             <Field id="yAxisSeparator" visibleBindingId="xAxisLabel" visibleBindingValue="true" type="separator"/>
 
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">
@@ -159,6 +174,7 @@
             <Field id="barLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
                 <Label>Bar Controls:</Label>
             </Field>
+
 <!-- Bar 1 -->
             <Field id="bar1Top" type="separator"/>
 
@@ -683,7 +699,8 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Template file="Templates/x_axis_bins.xml" />
 
-            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <!-- Not currently used. -->
+            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true" hidden="true"
                    tooltip="Limit data display to the first (X) hours or last (X) hours.">
                 <Label>Limit X Axis Range:</Label>
                 <List>
@@ -692,9 +709,9 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 </List>
             </Field>
 
-            <Field id="limitDataRangeLength" type="textfield" defaultValue="0" visibleBindingId="xAxisLabel" visibleBindingValue="true"
-                   tooltip="Will limit the display to the number of hours specified (hours).">
-                <Label>Limit X Axis Length:</Label>
+            <Field id="limitDataRangeLength" type="textfield" defaultValue="" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Will limit the display to the number of days specified (days). Leave empty to show all available data.">
+                <Label>Days to Show:</Label>
             </Field>
 
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
@@ -2045,6 +2062,22 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Template file="Templates/x_axis_bins.xml" />
+
+            <!-- Not currently used. -->
+            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true" hidden="true"
+                   tooltip="Limit data display to the first (X) hours or last (X) hours.">
+                <Label>Limit X Axis Range:</Label>
+                <List>
+                    <Option value="N">Newest*</Option>
+                    <Option value="O">Oldest</Option>
+                </List>
+            </Field>
+
+            <Field id="limitDataRangeLength" type="textfield" defaultValue="" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Will limit the display to the number of days specified (days). Leave empty to show all available data.">
+                <Label>Days to Show:</Label>
+            </Field>
+
 
 <!--Y Axis-->
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>

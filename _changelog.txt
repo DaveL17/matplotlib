@@ -1,3 +1,8 @@
+v0.8.15
+- Adds feature to limit the number of days of data to display to bar, line,
+  and scatter charts.
+- Fixes bug in setting of Y1 axis limits where max or min of data are negative.
+
 v0.8.14
 - Removes development logging.
 
@@ -8,7 +13,7 @@ v0.8.13
 v0.8.12
 - Converts all static menu callbacks to hard-coded XML list items to
   make selection of default option more seamless and converts them to
-  XML templates for consistency.
+  XML templates for consistency and lightness.
 - Indicates default menu item options with a star (*); only applies to
   static menu lists (not dynamic lists).
 
