@@ -3045,10 +3045,10 @@ class MakeChart(object):
                         p_dict['x_obs{0}'.format(thing)].append(element[0])
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
-                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
-
                     # ================================ Prune Data =================================
                     # Prune the data if warranted
+                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
+
                     try:
                         limit = float(dev.pluginProps['limitDataRangeLength'])
                     except ValueError:
@@ -3057,27 +3057,27 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
                         new_old = dev.pluginProps['limitDataRange']
-                        dates_to_plot, p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(dates_to_plot, log)
+                    p_dict['x_obs{0}'.format(thing)] = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # If the user sets the width to 0, this will perform an introspection of the
                     # dates to plot and get the minimum of the difference between the dates.
                     if float(p_dict['barWidth']) == 0.0:
-                        width = np.min(np.diff(dates_to_plot)) * 0.8
+                        width = np.min(np.diff(p_dict['x_obs{0}'.format(thing)])) * 0.8
                     else:
                         width = float(p_dict['barWidth'])
 
                     # Plot the bar. Note: hatching is not supported in the PNG backend.
-                    ax.bar(dates_to_plot[num_obs * -1:], p_dict['y_obs{0}'.format(thing)][num_obs * -1:], align='center', width=width,
+                    ax.bar(p_dict['x_obs{0}'.format(thing)][num_obs * -1:], p_dict['y_obs{0}'.format(thing)][num_obs * -1:], align='center', width=width,
                            color=p_dict['bar{0}Color'.format(thing)], edgecolor=p_dict['bar{0}Color'.format(thing)], **k_dict['k_bar'])
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
 
                     # If annotations desired, plot those too.
                     if p_dict['bar{0}Annotate'.format(thing)]:
-                        for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(thing)]):
+                        for xy in zip(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             self.format_axis_y1_min_max(p_dict, log)
@@ -3427,10 +3427,10 @@ class MakeChart(object):
                             temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
                         p_dict['y_obs{0}'.format(line)] = temp_list
 
-                    dates_to_plot = p_dict['x_obs{0}'.format(line)]
-
                     # ================================ Prune Data =================================
                     # Prune the data if warranted
+                    dates_to_plot = p_dict['x_obs{0}'.format(line)]
+
                     try:
                         limit = float(dev.pluginProps['limitDataRangeLength'])
                     except ValueError:
@@ -3439,23 +3439,23 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(line)]
                         new_old = dev.pluginProps['limitDataRange']
-                        dates_to_plot, p_dict['y_obs{0}'.format(line)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
 
                     # ======================== Convert Dates for Charting =========================
-                    dates_to_plot = self.format_dates(dates_to_plot, log)
+                    p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
-                    ax.plot_date(dates_to_plot, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
+                    ax.plot_date(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
                                  markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
                     if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
+                        ax.fill_between(p_dict['x_obs{0}'.format(line)], 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
                     # ================================ Annotations ================================
                     if p_dict['line{0}Annotate'.format(line)]:
-                        for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
+                        for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             # ============================== Y1 Axis Min/Max ==============================
@@ -3512,17 +3512,17 @@ class MakeChart(object):
                     # affect the legend.
 
                     # We need to reload the dates to ensure that they match the line being plotted
-                    dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+                    # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
                     # =============================== Best Fit Line ===============================
                     if dev.pluginProps.get('line{0}BestFit'.format(line), False):
-                        self.format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, log)
+                        self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(line)], line, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
                     # =============================== Fill Between ================================
                     if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(dates_to_plot, 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
+                        ax.fill_between(p_dict['x_obs{0}'.format(line)], 0, p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], **k_dict['k_fill'])
 
                     # =============================== Min/Max Lines ===============================
                     if p_dict['plotLine{0}Min'.format(line)]:
@@ -3893,10 +3893,10 @@ class MakeChart(object):
                         p_dict['x_obs{0}'.format(thing)].append(element[0])
                         p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
 
-                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
-
                     # ================================ Prune Data =================================
                     # Prune the data if warranted
+                    dates_to_plot = p_dict['x_obs{0}'.format(thing)]
+
                     try:
                         limit = float(dev.pluginProps['limitDataRangeLength'])
                     except ValueError:
@@ -3905,18 +3905,18 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
                         new_old = dev.pluginProps['limitDataRange']
-                        dates_to_plot, p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
 
                     # Convert the date strings for charting.
-                    dates_to_plot = self.format_dates(dates_to_plot, log)
+                    p_dict['x_obs{0}'.format(thing)] = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
-                    ax.scatter(dates_to_plot, p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
+                    ax.scatter(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)], c=p_dict['group{0}Color'.format(thing)], marker=p_dict['group{0}Marker'.format(thing)],
                                edgecolor=p_dict['group{0}MarkerColor'.format(thing)], linewidths=0.75, zorder=10, **k_dict['k_line'])
 
                     # =============================== Best Fit Line ===============================
                     if dev.pluginProps.get('line{0}BestFit'.format(thing), False):
-                        self.format_best_fit_line_segments(ax, dates_to_plot, thing, p_dict, log)
+                        self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(thing)], thing, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)]]
 
@@ -3950,8 +3950,6 @@ class MakeChart(object):
 
                     legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
                                          markerfacecolor=final_colors[counter-1], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
-                    # legend_styles.append(tuple(plt.plot([], color=p_dict['group{0}MarkerColor'.format(counter)], linestyle='', marker=p_dict['group{0}Marker'.format(counter)],
-                    #                      markerfacecolor=p_dict['group{0}Color'.format(counter)], markeredgewidth=.8, markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])))
                     counter += 1
 
                 # Reorder the headers so that they fill by row instead of by column
@@ -4994,10 +4992,20 @@ class MakeChart(object):
         :param return_queue:
         :return:
         """
+        errors = {'Threaddebug': 0, 'Debug': 0, 'Info': 0, 'Warning': 0, 'Critical': 0}
+
         if log['Warning'] or log['Critical']:
-            return_queue.put({'Error': True, 'Log': log, 'Message': 'chart updated with errors. See plugin log for more information.', 'Name': dev.name})
+            errors['Warning']  = len(log['Warning'])
+            errors['Critical'] = len(log['Critical'])
+
+        if log['Warning'] or log['Critical']:
+            return_queue.put({'Error': True,
+                              'Log': log,
+                              'Message': u'Chart updated with messages (Warnings: {0}, Errors: {1}). See logs for more information.'.format(errors['Warning'], errors['Critical']),
+                              'Name': dev.name})
+
         else:
-            return_queue.put({'Error': False, 'Log': log, 'Message': 'chart updated successfully.', 'Name': dev.name})
+            return_queue.put({'Error': False, 'Log': log, 'Message': u'Chart updated successfully.', 'Name': dev.name})
 
     # =============================================================================
     def prune_data(self, x_data, y_data, limit, new_old, log):
@@ -5039,7 +5047,7 @@ class MakeChart(object):
         # If final_x is of length zero, no observations fit the requested time
         # parameter. We return empty lists.
         if len(final_x) == 0:
-            log['Warning'].append(u"All data outside time series limits. Resulting chart is empty.")
+            log['Warning'].append(u"All data outside time series limits. No observations to return.")
             final_x = [dt.datetime.now()]
             final_y = [0]
 
