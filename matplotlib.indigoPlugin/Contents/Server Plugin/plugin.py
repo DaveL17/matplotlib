@@ -106,7 +106,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.15"
+__version__   = "0.8.16"
 
 # =============================================================================
 
@@ -184,19 +184,6 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u"Verbose logging is on. It is best to leave this turned off unless directed.")
         else:
             self.plugin_file_handler.setLevel(10)
-
-        # =================== Conform Custom Colors to Color Picker ===================
-        # See method for more info.
-        self.convert_custom_colors()
-
-        # ================ Compare Save Path to Current Indigo Version ================
-        new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/static/"
-        current_save_path = self.pluginPrefs['chartPath']
-
-        if new_save_path != current_save_path:
-            if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
-                self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
-                self.logger.critical(u"You may want to change the save path to: {0}".format(new_save_path))
 
         # ============================= Remote Debug Hook =============================
         # try:
@@ -539,17 +526,23 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        # Ensure the plugin is compatible with the current version of Indigo.
+        # =========================== Check Indigo Version ============================
         self.Fogbert.audit_server_version(min_ver=7)
 
-        # Ensure that all CSV devices have existing CSV files.
-        self.csv_check_health()
-
-        # Ensure that multiple CSV Engine devices aren't writing to the same file.
+        # =========================== Check CSV Uniqueness ============================
         self.csv_check_unique()
 
-        # Ensure that all devices are up to date with the latest
+        # ============================== Audit CSV Files ==============================
+        self.audit_csv_health()
+
+        # ============================ Audit Device Props =============================
         self.audit_device_props()
+
+        # ============================= Audit Save Paths ==============================
+        self.audit_save_paths()
+
+        # =================== Conform Custom Colors to Color Picker ===================
+        self.convert_custom_colors()
 
     # =============================================================================
     def shutdown(self):
@@ -1015,6 +1008,55 @@ class Plugin(indigo.PluginBase):
         return
 
     # =============================================================================
+    def audit_csv_health(self):
+        """
+        Creates any missing CSV files before beginning
+
+        Iterate through all existing CSV Engine devices. It doesn't matter if the
+        device is enabled or not, since we're only creating the file if it doesn't
+        exist, and we're only going to add the header to the file.
+
+        -----
+
+        :return:
+        """
+
+        data_path = self.pluginPrefs['dataPath']
+
+        for dev in indigo.devices.iter(filter='self'):
+            if dev.deviceTypeId == 'csvEngine':
+                column_dict = literal_eval(dev.pluginProps['columnDict'])
+
+                for thing in column_dict.items():
+                    full_path = data_path + thing[1][0] + ".csv"
+
+                    # TODO: does it make sense to combine this with the check that happens at CSV device refresh?
+                    #       could do passed device or if no passed device do all devices. Note that they are
+                    #       constructed slightly differently now.
+
+                    # ============================= Create (if needed) ============================
+                    # If the appropriate CSV file doesn't exist, create it and write the header
+                    # line.
+                    if not os.path.isdir(data_path):
+                        try:
+                            os.makedirs(data_path)
+                            self.logger.warning(u"Target data folder does not exist. Creating it.")
+
+                        except IOError:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
+
+                        except OSError:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
+
+                    if not os.path.isfile(full_path):
+                        self.logger.warning(u"CSV file does not exist. Creating a new one: {0}".format(full_path))
+                        csv_file = open(full_path, 'w')
+                        csv_file.write('{0},{1}\n'.format('Timestamp', thing[1][2].encode("utf-8")))
+                        csv_file.close()
+
+    # =============================================================================
     def audit_device_props(self):
         """
         Audit device properties to ensure they match the current config.
@@ -1106,6 +1148,52 @@ class Plugin(indigo.PluginBase):
             return False
 
     # =============================================================================
+    def audit_save_paths(self):
+        """
+        Audit plugin save locations to ensure validity
+
+        The audit_save_paths() method will attempt to access the configured paths
+        (CSV save location, chart save location) to ensure that they are accessible
+        to the plugin. It will attempt to write to the paths and warn the user if
+        unsuccessful.
+
+        -----
+
+        :return:
+        """
+        # ============================= Audit Save Paths ==============================
+        # Test the current path settings to ensure that they are valid.
+        path_list = (self.pluginPrefs['dataPath'], self.pluginPrefs['chartPath'])
+
+        # If the target folders do not exist, create them.
+        for path_name in path_list:
+
+            if not os.path.isdir(path_name):
+                try:
+                    os.makedirs(path_name)
+                    self.logger.warning(u"Target folder does not exist. Creating path:{0}".format(path_name))
+
+                except (IOError, OSError):
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See plugin log for more information.")
+
+        # Test to ensure that each path is writeable.
+        for path_name in path_list:
+            if os.access(path_name, os.W_OK):
+                self.logger.debug(u"Auditing path IO. Path OK: {0}".format(path_name))
+            else:
+                self.logger.critical(u"Plugin does not have the proper rights to write to the path: {0}".format(path_name))
+
+        # ================ Compare Save Path to Current Indigo Version ================
+        new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/static/"
+        current_save_path = self.pluginPrefs['chartPath']
+
+        if new_save_path != current_save_path:
+            if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
+                self.logger.critical(u"Charts are being saved to: {0})".format(current_save_path))
+                self.logger.critical(u"You may want to change the save path to: {0}".format(new_save_path))
+
+    # =============================================================================
     def commsKillAll(self):
         """
         Deactivate communication with all plugin devices
@@ -1174,55 +1262,6 @@ class Plugin(indigo.PluginBase):
                             self.pluginPrefs[pref] = 'FF FF FF'
 
     # =============================================================================
-    def csv_check_health(self):
-        """
-        Creates any missing CSV files before beginning
-
-        Iterate through all existing CSV Engine devices. It doesn't matter if the
-        device is enabled or not, since we're only creating the file if it doesn't
-        exist, and we're only going to add the header to the file.
-
-        -----
-
-        :return:
-        """
-
-        data_path = self.pluginPrefs['dataPath']
-
-        for dev in indigo.devices.iter(filter='self'):
-            if dev.deviceTypeId == 'csvEngine':
-                column_dict = literal_eval(dev.pluginProps['columnDict'])
-
-                for thing in column_dict.items():
-                    full_path = data_path + thing[1][0] + ".csv"
-
-                    # TODO: does it make sense to combine this with the check that happens at CSV device refresh?
-                    #       could do passed device or if no passed device do all devices. Note that they are
-                    #       constructed slightly differently now.
-
-                    # ============================= Create (if needed) ============================
-                    # If the appropriate CSV file doesn't exist, create it and write the header
-                    # line.
-                    if not os.path.isdir(data_path):
-                        try:
-                            os.makedirs(data_path)
-                            self.logger.warning(u"Target data folder does not exist. Creating it.")
-
-                        except IOError:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
-
-                        except OSError:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
-
-                    if not os.path.isfile(full_path):
-                        self.logger.warning(u"CSV file does not exist. Creating a new one: {0}".format(full_path))
-                        csv_file = open(full_path, 'w')
-                        csv_file.write('{0},{1}\n'.format('Timestamp', thing[1][2].encode("utf-8")))
-                        csv_file.close()
-
-    # =============================================================================
     def csv_check_unique(self):
         """
 
@@ -1252,7 +1291,7 @@ class Plugin(indigo.PluginBase):
         # Iterate through the dict of titles
         for title_name in titles.keys():
             if len(titles[title_name]) > 1:
-                self.logger.warning(u"CSV filename [{0}] referenced by more than one CSV Engine device: {1}".format(title_name, titles[title_name]))
+                self.logger.warning(u"Audit CSV data files: CSV filename [{0}] referenced by more than one CSV Engine device: {1}".format(title_name, titles[title_name]))
 
     # =============================================================================
     def csv_item_add(self, values_dict=None, type_id="", dev_id=0):
@@ -5045,13 +5084,14 @@ class MakeChart(object):
         final_y = y_obs_d[idx].tolist()
 
         # If final_x is of length zero, no observations fit the requested time
-        # parameter. We return empty lists.
+        # mask. We return empty lists so that there's something to chart.
         if len(final_x) == 0:
             log['Warning'].append(u"All data outside time series limits. No observations to return.")
             final_x = [dt.datetime.now()]
             final_y = [0]
 
-        # Convert dates back to strings
+        # Convert dates back to strings (they get processed later by matplotlib
+        # mdate.
         for i, x in enumerate(final_x):
             final_x[i] = dt.datetime.strftime(x, '%Y-%m-%d %H:%M:%S.%f')
 

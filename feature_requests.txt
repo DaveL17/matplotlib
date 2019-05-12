@@ -16,14 +16,6 @@ DaveL17 - look at other fields too. Requests for:
     temperature
 
 ===============================================================================
-2019-05-01  norcoscia
-===============================================================================
-Add a check for bad paths.
-
-DaveL17 - Check to ensure that the path is valid and reachable (writeable) by
-the plugin.
-
-===============================================================================
 2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
@@ -34,22 +26,6 @@ device and/or XML file during import.
 
 DaveL17 - this will be easier to do once the device definitions are locked
           down.
-
-===============================================================================
-2019-01-21  Autolog
-===============================================================================
-Another useful feature to add to the mix, especially if you are going to
-roll-your-own rather than using pandas, would be to be able to specify a period
-on the CSV file. My TRV plugin is creating CSV files for the measurements over
-the last say 24 hours. At times I would like to view the last 3 hours in more
-detail. The only reasonable way to do this at the moment is to create 2 sets of
-CSV file. If you could specify a period in the chart then that would save
-having to do this. My processing adds an entry to the CSV file for the start
-of the period (based on the last one dropped off) so that graph lines are
-always generated from the graph origin.
-
-DaveL17 - note that this is a limit on a chart by chart basis and not on the
-          data file.
 
 ===============================================================================
 2019-01-04  Autolog
@@ -66,6 +42,30 @@ valve opening against the temperature.
 ===============================================================================
 COMPLETED =====================================================================
 ===============================================================================
+
+===============================================================================
+2019-05-01  norcoscia  [COMPLETE]
+===============================================================================
+Add a check for bad paths.
+
+DaveL17 - Check to ensure that the path is valid and reachable (writeable) by
+the plugin.  Added in 0.8.16.
+
+===============================================================================
+2019-01-21  Autolog  [COMPLETE]
+===============================================================================
+Another useful feature to add to the mix, especially if you are going to
+roll-your-own rather than using pandas, would be to be able to specify a period
+on the CSV file. My TRV plugin is creating CSV files for the measurements over
+the last say 24 hours. At times I would like to view the last 3 hours in more
+detail. The only reasonable way to do this at the moment is to create 2 sets of
+CSV file. If you could specify a period in the chart then that would save
+having to do this. My processing adds an entry to the CSV file for the start
+of the period (based on the last one dropped off) so that graph lines are
+always generated from the graph origin.
+
+DaveL17 - note that this is a limit on a chart by chart basis and not on the
+          data file. This feature became available in v0.8.15.
 
 ===============================================================================
 2019-04-05  Sam  [COMPLETE]
