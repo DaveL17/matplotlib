@@ -1,3 +1,7 @@
+v0.8.17
+- Fixes bug in setting of hourly bins for charts that support the option.
+- Adds a 2 hour option to the X Axis bins setting.
+
 v0.8.16
 - Audits save paths to ensure they exist and are writeable at startup.
 
@@ -44,8 +48,6 @@ v0.8.07
 
 v0.8.06
 - Improves and expands options for X axis bins.
-
-v0.8.06
 - Adds section text and tooltips to show/hide controls for bar, line, scatter,
   and weather devices (other device types don't have show/hide controls.)
 

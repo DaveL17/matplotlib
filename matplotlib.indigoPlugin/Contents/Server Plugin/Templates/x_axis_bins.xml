@@ -7,6 +7,7 @@
             <Option value="quarter-hourly">Every 15 Minutes</Option>
             <Option value="half-hourly">Every 30 Minutes</Option>
             <Option value="hourly">Every Hour</Option>
+            <Option value="hourly_2">Every 2 Hours</Option>
             <Option value="hourly_4">Every 4 Hours</Option>
             <Option value="hourly_8">Every 8 Hours</Option>
             <Option value="hourly_12">Every 12 Hours</Option>

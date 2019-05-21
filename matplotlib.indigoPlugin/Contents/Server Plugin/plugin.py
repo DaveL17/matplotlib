@@ -106,7 +106,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.16"
+__version__   = "0.8.17"
 
 # =============================================================================
 
@@ -4538,8 +4538,11 @@ class MakeChart(object):
                 plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
                 plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 48)))
             elif x_axis_bins == 'hourly':
-                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=1))
                 plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 24)))
+            elif x_axis_bins == 'hourly_2':
+                plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=2))
+                plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))
             elif x_axis_bins == 'hourly_4':
                 plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
                 plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))

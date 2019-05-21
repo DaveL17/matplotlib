@@ -2953,7 +2953,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="addValue" type="textfield" tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
-                <Label>Chart Title:</Label>
+                <Label>Name:</Label>
             </Field>
 
             <Field id="addSourceFilter" type="menu" defaultValue="A">
@@ -2967,7 +2967,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="addSource" type="menu">
-                <Label>Data Source:</Label>
+                <Label>Source:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
@@ -3021,7 +3021,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="editValue" type="textfield" enabledBindingId="isColumnSelected">
-                <Label>Title:</Label>
+                <Label>Name:</Label>
             </Field>
 
             <Field id="editSourceFilter" type="menu" defaultValue="A" enabledBindingId="isColumnSelected">
@@ -3035,7 +3035,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             </Field>
 
             <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
-                <Label>Data Source:</Label>
+                <Label>Source:</Label>
                 <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
