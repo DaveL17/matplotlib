@@ -42,6 +42,84 @@ class Maintain(object):
         list_of_removed_keys = []
         list_of_keys_to_remove = (
             'annotationColorOther',
+            'area1adjuster',
+            'area1Annotate',
+            'area1Color',
+            'area1ColorOther',
+            'area1Fill',
+            'area1Marker',
+            'area1MarkerColor',
+            'area1Max',
+            'area1Min',
+            'area1Source',
+            'area1Style',
+            'area2adjuster',
+            'area2Annotate',
+            'area2Color',
+            'area2ColorOther',
+            'area2Fill',
+            'area2Marker',
+            'area2MarkerColor',
+            'area2Max',
+            'area2Min',
+            'area2Source',
+            'area2Style',
+            'area3adjuster',
+            'area3Annotate',
+            'area3Color',
+            'area3ColorOther',
+            'area3Fill',
+            'area3Marker',
+            'area3MarkerColor',
+            'area3Max',
+            'area3Min',
+            'area3Source',
+            'area3Style',
+            'area4adjuster',
+            'area4Annotate',
+            'area4Color',
+            'area4ColorOther',
+            'area4Fill',
+            'area4Marker',
+            'area4MarkerColor',
+            'area4Max',
+            'area4Min',
+            'area4Source',
+            'area4Style',
+            'area5adjuster',
+            'area5Annotate',
+            'area5Color',
+            'area5Fill',
+            'area5Marker',
+            'area5MarkerColor',
+            'area5Max',
+            'area5Min',
+            'area5Source',
+            'area6adjuster',
+            'area6Annotate',
+            'area6Color',
+            'area6Fill',
+            'area6Marker',
+            'area6MarkerColor',
+            'area6Source',
+            'area7adjuster',
+            'area7Annotate',
+            'area7Color',
+            'area7Fill',
+            'area7Marker',
+            'area7MarkerColor',
+            'area7Source',
+            'area8adjuster',
+            'area8Annotate',
+            'area8Color',
+            'area8Fill',
+            'area8Marker',
+            'area8MarkerColor',
+            'area8Source',
+            'areaLabel1',
+            'areaLabel2',
+            'areaLabel3',
+            'areaLabel4',
             'bar_colors',
             'barLabel1',
             'barLabel2',
@@ -175,6 +253,22 @@ class Maintain(object):
             'notificationsLabel',
             'offColor',
             'onColor',
+            'plotArea1Max',
+            'plotArea1Min',
+            'plotArea2Max',
+            'plotArea2Min',
+            'plotArea3Max',
+            'plotArea3Min',
+            'plotArea4Max',
+            'plotArea4Min',
+            'plotArea5Max',
+            'plotArea5Min',
+            'plotArea6Max',
+            'plotArea6Min',
+            'plotArea7Max',
+            'plotArea7Min',
+            'plotArea8Max',
+            'plotArea8Min',
             'plotLine1Max',
             'plotLine1Min',
             'plotLine2Max',
@@ -187,6 +281,10 @@ class Maintain(object):
             'plotLine5Min',
             'plotLine6Max',
             'plotLine6Min',
+            'plotLine7Max',
+            'plotLine7Min',
+            'plotLine8Max',
+            'plotLine8Min',
             'saveSettingsLabel',
             'saveSettingsSeparator',
             'showLegend',
@@ -258,7 +356,8 @@ class Maintain(object):
 
         # ================================ All Devices ================================
         # Set whether it's a chart device or not
-        is_chart_dict = {'barChartingDevice': True,
+        is_chart_dict = {'areaChartingDevice': True,
+                         'barChartingDevice': True,
                          'batteryHealthDevice': True,
                          'calendarChartingDevice': True,
                          'csvEngine': False,
@@ -307,6 +406,28 @@ class Maintain(object):
 
                             else:
                                 props[prop] = 'FF FF FF'
+
+            # ============================== Fix Area Props ===============================
+            if dev.deviceTypeId == 'areaChartingDevice':
+
+                for _ in range(1, 9, 1):
+
+                    # Coerce these props to bool if needed.
+                    for item in ('area{0}Annotate'.format(_),
+                                 'line{0}BestFit'.format(_),
+                                 'area{0}Fill'.format(_),
+                                 'areaLabel{0}'.format(_),
+                                 'plotArea{0}Max'.format(_),
+                                 'plotArea{0}Min'.format(_),
+                                 'suppressArea{0}'.format(_),
+                                 ):
+
+                        if item in dev.ownerProps.keys():
+                            if not isinstance(props[item], bool):
+                                if props[item].strip() in ('False', 'false', ''):
+                                    props[item] = False
+                                elif props[item] in ('True', 'true'):
+                                    props[item] = True
 
             # =============================== Fix Bar Props ===============================
             if dev.deviceTypeId == 'barChartingDevice':

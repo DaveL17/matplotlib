@@ -1,6 +1,998 @@
 <?xml version="1.0"?>
 <Devices>
 
+<!-- Area Charting Device -->
+    <Device id="areaChartingDevice" type="custom">
+        <Name>Area Chart</Name>
+
+        <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="areaChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Area Chart Devices are probably the most useful in instances where there are a relatively large number of time series data. They are like Line Chart Devices, where the plots are cumulative. That is, the data for area 2 will be plotted above area 1 (and so on.)</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <Field id="fileName" type="textfield" defaultValue="chart_area.png" tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Template file="Templates/refresh_interval.xml" />
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Template file="Templates/custom_title_font_size.xml" />
+
+            <Template file="Templates/custom_tick_font_size.xml" />
+
+            <Field id="showLegend" type="checkbox" defaultValue="false"
+                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                <Label>Display Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Template file="Templates/legend_columns.xml" />
+
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected chart axis.</Label>
+            </Field>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <Template file="Templates/x_axis_bins.xml" />
+
+            <!-- Not currently used. -->
+            <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="xAxisLabel" visibleBindingValue="true" hidden="true"
+                   tooltip="Limit data display to the first (X) hours or last (X) hours.">
+                <Label>Limit X Axis Range:</Label>
+                <List>
+                    <Option value="N">Newest*</Option>
+                    <Option value="O">Oldest</Option>
+                </List>
+            </Field>
+
+            <Field id="limitDataRangeLength" type="textfield" defaultValue="" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Will limit the display to the number of days specified (days). Leave empty to show all available data.">
+                <Label>Days to Show:</Label>
+            </Field>
+
+            <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
+                <Label>Min:</Label>
+            </Field>
+
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
+                <Label>Max:</Label>
+            </Field>
+
+            <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
+                <Label>Mirror Axis?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="yMirrorValuesAlsoY1" type="checkbox" defaultValue="true" visibleBindingId="yMirrorValues" visibleBindingValue="true" tooltip="Uncheck to hide Y1 axis values.">
+                <Label/>
+                <Description>Keep Y1?</Description>
+            </Field>
+
+            <Template file="Templates/y_axis_precision.xml" />
+
+            <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the labels to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
+                <Label>Tick Labels:</Label>
+            </Field>
+
+            <Field id="customTicksY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the numbers to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
+                <Label>Tick Locations:</Label>
+            </Field>
+
+            <Field id="areasLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Area Controls</Label>
+            </Field>
+
+            <Field id="areasSeparator" type="separator"/>
+
+            <Field id="areasText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available area. Check the box to display the controls for the selected area.</Label>
+            </Field>
+
+<!-- Area 1 -->
+            <Field id="areaLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 1.">
+                <Label>Area 1</Label>
+            </Field>
+
+            <Field id="area1Source" type="menu" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Select data source for area 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area1adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 1.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area1Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area1Legend" type="textfield" defaultValue="Area 1" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area1Style" type="menu" defaultValue="-" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's first area.">
+                <Label>Area Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel1" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area1Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel1" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's first area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea1Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea1Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea1" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area1Bottom" type="separator" visibleBindingId="areaLabel1" visibleBindingValue="true"/>
+
+<!-- Area 2 -->
+            <Field id="areaLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 2.">
+                <Label>Area 2</Label>
+            </Field>
+
+            <Field id="area2Source" type="menu" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Select data source for area 2.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area2adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 2.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area2Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area2Legend" type="textfield" defaultValue="Area 2" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area2Style" type="menu" defaultValue="-" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's second area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel2" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area2Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel2" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's second area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea2Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea2Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea2" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area2Bottom" type="separator" visibleBindingId="areaLabel2" visibleBindingValue="true"/>
+
+<!-- Area 3 -->
+            <Field id="areaLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 3.">
+                <Label>Area 3</Label>
+            </Field>
+
+            <Field id="area3Source" type="menu" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Select data source for area 3.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area3adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 3.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area3Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area3Legend" type="textfield" defaultValue="Area 3" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area3Style" type="menu" defaultValue="-" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's third area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel3" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area3Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel3" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's third area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea3Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea3Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea3" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area3Bottom" type="separator" visibleBindingId="areaLabel3" visibleBindingValue="true"/>
+
+<!-- Area 4 -->
+            <Field id="areaLabel4" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 4.">
+                <Label>Area 4</Label>
+            </Field>
+
+            <Field id="area4Source" type="menu" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Select data source for area 4.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area4adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 4.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area4Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area4Legend" type="textfield" defaultValue="Area 4" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area4Style" type="menu" defaultValue="-" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fourth area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel4" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area4Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel4" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's fourth area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea4Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea4Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea4" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area4Bottom" type="separator" visibleBindingId="areaLabel4" visibleBindingValue="true"/>
+
+<!-- Area 5 -->
+            <Field id="areaLabel5" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 5.">
+                <Label>Area 5</Label>
+            </Field>
+
+            <Field id="area5Source" type="menu" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Select data source for area 5.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area5adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 5.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area5Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area5Legend" type="textfield" defaultValue="Area 5" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area5Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fifth area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area5Style" type="menu" defaultValue="-" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's fifth area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area5MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel5" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area5Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel5" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's fifth area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea5Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea5Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea5" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area5Bottom" type="separator" visibleBindingId="areaLabel5" visibleBindingValue="true"/>
+
+<!-- Area 6 -->
+            <Field id="areaLabel6" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 6.">
+                <Label>Area 6</Label>
+            </Field>
+
+            <Field id="area6Source" type="menu" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Select data source for area 6.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area6adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 6.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area6Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area6Legend" type="textfield" defaultValue="Area 6" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area6Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's sixth area.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="area6Style" type="menu" defaultValue="-" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's sixth area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area6MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel6" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area6Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel6" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's sixth area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea6Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea6Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea6" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Area 7 -->
+            <Field id="areaLabel7" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 7.">
+                <Label>Area 7</Label>
+            </Field>
+
+            <Field id="area7Source" type="menu" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Select data source for area 7.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area7adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 7.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area7Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area7Legend" type="textfield" defaultValue="Area 7" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area7Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's seventh area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area7Style" type="menu" defaultValue="-" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's seventh area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area7MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel7" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area7Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel7" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's seventh area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea7Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea7Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea7" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Area 8 -->
+            <Field id="areaLabel8" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for area 8.">
+                <Label>Area 8</Label>
+            </Field>
+
+            <Field id="area8Source" type="menu" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Select data source for area 8.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="area8adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 8.">
+                <Label>Adjustment Factor</Label>
+            </Field>
+
+<!--            <Field id="area8Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
+<!--                <Label>Annotate?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="area8Legend" type="textfield" defaultValue="Area 8" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:</Label>
+            </Field>
+
+            <Field id="area8Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's eighth area.">
+                <Label>Area Color:</Label>
+            </Field>
+
+            <Field id="area8Style" type="menu" defaultValue="-" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the style of your chart's eighth area.">
+                <Label>Line Style:</Label>
+                <List>
+                    <Option value="--">Dashed</Option>
+                    <Option value=":">Dotted</Option>
+                    <Option value="-.">Dot Dash</Option>
+                    <Option value="-">Solid*</Option>
+                    <Option value="steps">Steps</Option>
+                    <Option value="steps-mid">Steps Mid</Option>
+                    <Option value="steps-post">Steps Post</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None</Option>
+                </List>
+            </Field>
+
+<!--            <Field id="area8MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel8" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the color of your chart's markers.">-->
+<!--                <Label>Marker Color:</Label>-->
+<!--            </Field>-->
+
+<!--            <Field id="area8Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel8" visibleBindingValue="true"-->
+<!--                   tooltip="Select preference for the marker style for your chart's eighth area.">-->
+<!--                <Label>Marker Style:</Label>-->
+<!--                <List>-->
+<!--                    <Option value="o">Circle</Option>-->
+<!--                    <Option value="D">Diamond</Option>-->
+<!--                    <Option value="d">Diamond (Thin)</Option>-->
+<!--                    <Option value="h">Hexagon 1</Option>-->
+<!--                    <Option value="H">Hexagon 2</Option>-->
+<!--                    <Option value="-">Horizontal Line</Option>-->
+<!--                    <Option value="8">Octagon</Option>-->
+<!--                    <Option value="p">Pentagon</Option>-->
+<!--                    <Option value="PIX">Pixel</Option>-->
+<!--                    <Option value="+">Plus</Option>-->
+<!--                    <Option value=".">Point</Option>-->
+<!--                    <Option value="*">Star</Option>-->
+<!--                    <Option value="s">Square</Option>-->
+<!--                    <Option value="v">Triangle Down</Option>-->
+<!--                    <Option value="TL">Triangle Left</Option>-->
+<!--                    <Option value="TR">Triangle Right</Option>-->
+<!--                    <Option value="1">Tri Down</Option>-->
+<!--                    <Option value="2">Tri Up</Option>-->
+<!--                    <Option value="3">Tri Left</Option>-->
+<!--                    <Option value="4">Tri Right</Option>-->
+<!--                    <Option value="|">Vertical Line</Option>-->
+<!--                    <Option value="x">X</Option>-->
+<!--                    <Option value="-1">%%separator%%</Option>-->
+<!--                    <Option value="None">None*</Option>-->
+<!--                </List>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea8Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
+<!--                <Label>Plot Min?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+<!--            <Field id="plotArea8Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
+<!--                <Label>Plot Max?</Label>-->
+<!--                <Description>Yes/No</Description>-->
+<!--            </Field>-->
+
+            <Field id="suppressArea8" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
+                <Label>Suppress Area?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+                   alignText="right">
+                <Label>Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
+                <Label>Constants:</Label>l
+            </Field>
+
+            <Template file="Templates/custom_line_style.xml" />
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+    </Device>
+
 <!-- Bar Charting Device -->
     <Device id="barChartingDevice" type="custom">
         <Name>Bar Chart</Name>
@@ -2078,8 +3070,6 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Days to Show:</Label>
             </Field>
 
-
-<!--Y Axis-->
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
 
             <Field id="yAxisLabel" type="checkbox" defaultValue="false">

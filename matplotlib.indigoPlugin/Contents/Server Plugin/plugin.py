@@ -56,6 +56,10 @@ the proper Fantastic Weather devices.
 #       date range.)
 # TODO: When the number of bars to be plotted is less than the number of bars
 #       requested (because there isn't enough data), the bars plot funny.
+# TODO: add each devices.xml section to its own template file.
+# TODO: do stack plots support markers? Not inherently (apparently) but you
+#       can fool it by laying a line on top of the stack. May want to just not
+#       support it for now...
 
 # ================================== IMPORTS ==================================
 
@@ -106,7 +110,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.17"
+__version__   = "0.8.18"
 
 # =============================================================================
 
@@ -306,6 +310,22 @@ class Plugin(indigo.PluginBase):
 
                 values_dict['refreshInterval'] = '900'
 
+                # ============================ Line Charting Device ===========================
+                if type_id == "areaChartingDevice":
+
+                    for _ in range(1, 9, 1):
+                        values_dict['area{0}Color'.format(_)]        = 'FF FF FF'
+                        values_dict['area{0}Marker'.format(_)]       = 'None'
+                        values_dict['area{0}MarkerColor'.format(_)]  = 'FF FF FF'
+                        values_dict['area{0}Source'.format(_)]       = 'None'
+                        values_dict['area{0}Style'.format(_)]        = '-'
+
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisBins']           = 'daily'
+                    values_dict['xAxisLabelFormat']    = '%A'
+
                 # ============================ Bar Charting Device ============================
                 if type_id == "barChartingDevice":
 
@@ -417,7 +437,8 @@ class Plugin(indigo.PluginBase):
             if self.pluginPrefs.get('snappyConfigMenus', False):
                 self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
 
-                for key in ('barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
+                for key in ('areaLabel1', 'areaLabel2', 'areaLabel3', 'areaLabel4', 'areaLabel5', 'areaLabel6', 'areaLabel7', 'areaLabel8',
+                            'barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
                             'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6', 'lineLabel7', 'lineLabel8',
                             'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3', 'groupLabel4',
                             'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
@@ -655,6 +676,25 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Validating device configuration parameters.")
 
+        # ================================ Area Chart =================================
+        if type_id == 'areaChartingDevice':
+
+            # There must be at least 1 source selected
+            if values_dict['area1Source'] == 'None':
+                error_msg_dict['area1Source'] = u"You must select at least one data source."
+                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
+                return False, values_dict, error_msg_dict
+
+            # Iterate for each area group (1-6).
+            for area in range(1, 9, 1):
+
+                # Line adjustment values
+                for char in values_dict['area{0}adjuster'.format(area)]:
+                    if char not in ' +-/*.0123456789':  # allowable numeric specifiers
+                        error_msg_dict['area{0}adjuster'.format(area)] = u"Valid operators are +, -, *, /"
+                        error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
+                        return False, values_dict, error_msg_dict
+
         # ================================= Bar Chart =================================
         if type_id == 'barChartingDevice':
 
@@ -774,19 +814,19 @@ class Plugin(indigo.PluginBase):
                 return False, values_dict, error_msg_dict
 
             # Iterate for each line group (1-6).
-            for line in range(1, 9, 1):
+            for area in range(1, 9, 1):
 
                 # Line adjustment values
-                for char in values_dict['line{0}adjuster'.format(line)]:
+                for char in values_dict['line{0}adjuster'.format(area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
-                        error_msg_dict['line{0}adjuster'.format(line)] = u"Valid operators are +, -, *, /"
+                        error_msg_dict['line{0}adjuster'.format(area)] = u"Valid operators are +, -, *, /"
                         error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
                         return False, values_dict, error_msg_dict
 
                 # Fill is illegal for the steps line type
-                if values_dict['line{0}Style'.format(line)] == 'steps' and values_dict['line{0}Fill'.format(line)]:
-                    error_msg_dict['line{0}Fill'.format(line)] = u"Fill is not supported for the Steps line type."
-                    error_msg_dict['line{0}Style'.format(line)] = u"Fill is not supported for the Steps line type."
+                if values_dict['line{0}Style'.format(area)] == 'steps' and values_dict['line{0}Fill'.format(area)]:
+                    error_msg_dict['line{0}Fill'.format(area)] = u"Fill is not supported for the Steps line type."
+                    error_msg_dict['line{0}Style'.format(area)] = u"Fill is not supported for the Steps line type."
                     error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
                     return False, values_dict, error_msg_dict
 
@@ -2031,8 +2071,9 @@ class Plugin(indigo.PluginBase):
         :param p_dict:
         """
 
-        markers     = ('line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker',
-                       'line6Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker')
+        markers     = ('area1Marker', 'area2Marker', 'area3Marker', 'area4Marker', 'area5Marker','area6Marker', 'area7Marker', 'area8Marker',
+                       'line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker','line6Marker', 'line7Marker', 'line8Marker',
+                       'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker')
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
 
         for marker in markers:
@@ -2871,6 +2912,13 @@ class Plugin(indigo.PluginBase):
                         # For the time being, we're running each device through its
                         # own process synchronously; parallel processing may come later.
 
+                        # ================================ Area Charts ================================
+                        if dev.deviceTypeId == "areaChartingDevice":
+
+                            if __name__ == '__main__':
+                                p_area = multiprocessing.Process(name='p_area', target=MakeChart(self).chart_area, args=(dev, p_dict, k_dict, return_queue,))
+                                p_area.start()
+
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
 
@@ -3022,6 +3070,211 @@ class MakeChart(object):
     def __init__(self, plugin):
         self.final_data = []
         self.host_plugin = plugin
+
+    # TODO: Markers will need to be added through a secondary plot which uses a
+    #       line plot (stackplots don't support markers).
+    # TODO: Min, Max and annotations plot on their absolute value and not the spot
+    #       where they are.
+    # =============================================================================
+    def chart_area(self, dev, p_dict, k_dict, return_queue):
+        """
+        Creates the Area charts
+
+        All steps required to generate area charts.
+
+        -----
+
+        :param class 'indigo.Device'e dev: indigo device instance
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
+        """
+
+        log         = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
+
+        try:
+
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            x_obs          = ''
+            y_obs_tuple    = ()  # Y values
+            y_colors_tuple = ()  # Y area colors
+
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+
+            self.format_axis_x_ticks(ax, p_dict, k_dict, log)
+            self.format_axis_y(ax, p_dict, k_dict, log)
+
+            for area in range(1, 9, 1):
+
+                suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
+
+                p_dict['area{0}Color'.format(area)] = r"#{0}".format(p_dict['area{0}Color'.format(area)].replace(' ', '').replace('#', ''))
+
+                # p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', ''))
+
+                # If area color is the same as the background color, alert the user.
+                if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor']:
+                    log['Warning'].append(u"[{0}] Area {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, area))
+
+                # If the area is suppressed, remind the user they suppressed it.
+                if suppress_area:
+                    log['Info'].append(u"[{0}] Area {1} is suppressed by user setting. You can re-enable it in the device configuration menu.".format(dev.name, area))
+
+                # ============================== Plot the Areas ===============================
+                # Plot the areas. If suppress_area is True, we skip it.
+                if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
+
+                    data_column, log = self.get_data('{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"), p_dict['area{0}Source'.format(area)].encode("utf-8")), log)
+                    log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
+
+                    # Pull the headers
+                    p_dict['headers'].append(data_column[0][1])
+                    del data_column[0]
+
+                    # Pull the observations into distinct lists for charting.
+                    for element in data_column:
+                        p_dict['x_obs{0}'.format(area)].append(element[0])
+                        p_dict['y_obs{0}'.format(area)].append(float(element[1]))
+
+                    # ============================= Adjustment Factor =============================
+                    # Allows user to shift data on the Y axis (for example, to display multiple
+                    # binary sources on the same chart.)
+                    if dev.pluginProps['area{0}adjuster'.format(area)] != "":
+                        temp_list = []
+                        for obs in p_dict['y_obs{0}'.format(area)]:
+                            expr = u'{0}{1}'.format(obs, dev.pluginProps['area{0}adjuster'.format(area)])
+                            temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
+                        p_dict['y_obs{0}'.format(area)] = temp_list
+
+                    # ================================ Prune Data =================================
+                    # Prune the data if warranted
+                    dates_to_plot = p_dict['x_obs{0}'.format(area)]
+
+                    try:
+                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                    except ValueError:
+                        limit = 0
+
+                    if limit > 0:
+                        y_obs = p_dict['y_obs{0}'.format(area)]
+                        new_old = dev.pluginProps['limitDataRange']
+                        p_dict['x_obs{0}'.format(area)], p_dict['y_obs{0}'.format(area)] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+
+                    # ======================== Convert Dates for Charting =========================
+                    p_dict['x_obs{0}'.format(area)] = self.format_dates(p_dict['x_obs{0}'.format(area)], log)
+
+                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
+
+                    # We need to plot all the stacks at once, so we create some tuples to hold the data we need later.
+                    y_obs_tuple += (p_dict['y_obs{0}'.format(area)],)
+                    y_colors_tuple += (p_dict['area{0}Color'.format(area)],)
+                    x_obs = p_dict['x_obs{0}'.format(area)]
+
+                    # ================================ Annotations ================================
+                    # if p_dict['area{0}Annotate'.format(area)]:
+                    #     for xy in zip(p_dict['x_obs{0}'.format(area)], p_dict['y_obs{0}'.format(area)]):
+                    #         ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
+
+            ax.stackplot(x_obs, y_obs_tuple, edgecolor=None, colors=y_colors_tuple, zorder=10, lw=0, **k_dict['k_line'])
+
+            # ============================== Y1 Axis Min/Max ==============================
+            # Min and Max are not 'None'.
+            # the p_dict['data_array'] contains individual data points and doesn't take
+            # into account the additive nature of the plot. Therefore, we get the axis
+            # scaling values from the plot and then use those for min/max.
+            [p_dict['data_array'].append(node) for node in ax.get_ylim()]
+
+            self.format_axis_y1_min_max(p_dict, log)
+
+            # Transparent Chart Fill
+            if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
+
+            # ================================== Legend ===================================
+            if p_dict['showLegend']:
+
+                # Amend the headers if there are any custom legend entries defined.
+                counter = 1
+                final_headers = []
+
+                headers = [_.decode('utf-8') for _ in p_dict['headers']]
+
+                for header in headers:
+                    if p_dict['area{0}Legend'.format(counter)] == "":
+                        final_headers.append(header)
+                    else:
+                        final_headers.append(p_dict['area{0}Legend'.format(counter)])
+                    counter += 1
+
+                # Set the legend
+                # Reorder the headers and colors so that they fill by row instead of by column
+                num_col = int(p_dict['legendColumns'])
+                iter_headers = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+                final_headers = [_ for _ in iter_headers]
+
+                iter_colors = itertools.chain(*[y_colors_tuple[i::num_col] for i in range(num_col)])
+                final_colors = [_ for _ in iter_colors]
+
+                # Note that the legend does not support the PolyCollection created by the
+                # stackplot. Therefore we have to use a proxy artist.
+                # https://stackoverflow.com/a/14534830/2827397
+                p1 = patches.Rectangle((0, 0), 1, 1)
+                p2 = patches.Rectangle((0, 0), 1, 1)
+
+                legend = ax.legend([p1, p2], final_headers, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=num_col, prop={'size': float(p_dict['legendFontSize'])})
+
+                # Set legend font color
+                [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+
+                # Set legend area color
+                num_handles = len(legend.legendHandles)
+                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
+
+                frame = legend.get_frame()
+                frame.set_alpha(0)
+
+            for area in range(1, 9, 1):
+
+                suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
+
+                if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
+                    # Note that we do these after the legend is drawn so that these areas don't
+                    # affect the legend.
+
+                    # We need to reload the dates to ensure that they match the area being plotted
+                    # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(area)], log)
+
+                    # =============================== Best Fit Line ===============================
+                    if dev.pluginProps.get('line{0}BestFit'.format(area), False):
+                        self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(area)], area, p_dict, log)
+
+                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
+
+                    # =============================== Min/Max Lines ===============================
+                    # if p_dict['plotArea{0}Min'.format(area)]:
+                    #     ax.axhline(y=min(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_min'])
+                    # if p_dict['plotArea{0}Max'.format(area)]:
+                    #     ax.axhline(y=max(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_max'])
+                    # if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                    #     ax.axhline(y=0, color=p_dict['spineColor'])
+
+            self.format_custom_line_segments(ax, p_dict, k_dict, log)
+            self.format_grids(p_dict, k_dict, log)
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
+            self.format_axis_x_label(dev, p_dict, k_dict, log)
+            self.format_axis_y1_label(p_dict, k_dict, log)
+            self.format_axis_y_ticks(p_dict, k_dict, log)
+            self.save_chart_image(plt, p_dict, k_dict, log)
+            self.process_log(dev, log, return_queue)
+
+        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
+
+        except Exception as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
     def chart_bar(self, dev, p_dict, k_dict, return_queue):
