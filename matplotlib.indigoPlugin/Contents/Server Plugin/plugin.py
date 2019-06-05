@@ -110,7 +110,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.18"
+__version__   = "0.8.19"
 
 # =============================================================================
 
@@ -3074,7 +3074,9 @@ class MakeChart(object):
     # TODO: Markers will need to be added through a secondary plot which uses a
     #       line plot (stackplots don't support markers).
     # TODO: Min, Max and annotations plot on their absolute value and not the spot
-    #       where they are.
+    #       where they are. Annotations will need to include the ability to plot
+    #       the relative value or absolute value (its own value or where it is on
+    #       the plot.
     # =============================================================================
     def chart_area(self, dev, p_dict, k_dict, return_queue):
         """
@@ -3096,9 +3098,10 @@ class MakeChart(object):
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            x_obs          = ''
-            y_obs_tuple    = ()  # Y values
-            y_colors_tuple = ()  # Y area colors
+            x_obs           = ''
+            y_obs_tuple     = ()  # Y values
+            y_obs_tuple_rel = ()  # TODO:
+            y_colors_tuple  = ()  # Y area colors
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
@@ -3172,9 +3175,28 @@ class MakeChart(object):
                     x_obs = p_dict['x_obs{0}'.format(area)]
 
                     # ================================ Annotations ================================
-                    # if p_dict['area{0}Annotate'.format(area)]:
-                    #     for xy in zip(p_dict['x_obs{0}'.format(area)], p_dict['y_obs{0}'.format(area)]):
-                    #         ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
+                    y_obs_tuple_rel = ()
+
+                    # New annotations code begins here - DaveL17 2019-06-05
+                    for _ in range(1, area + 1, 1):
+
+                        tup = ()
+
+                        # We start with the ordinal list and create a tuple to hold all the lists that come before it.
+                        for k in range(_, 0, -1):
+
+                            tup += (p_dict['y_obs{0}'.format(k)],)
+
+                        # The relative value is the sum of each list element plus the ones that come before it
+                        # (i.e., tup[n][0] + tup[n-1][0] + tup[n-2][0]
+                        y_obs_tuple_rel = [sum(t) for t in zip(*tup)]
+
+                    # New annotations code ends here - DaveL17 2019-06-05
+
+                    if p_dict['area{0}Annotate'.format(area)]:
+                        # for xy in zip(p_dict['x_obs{0}'.format(area)], p_dict['y_obs{0}'.format(area)]):
+                        for xy in zip(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel):
+                            ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             ax.stackplot(x_obs, y_obs_tuple, edgecolor=None, colors=y_colors_tuple, zorder=10, lw=0, **k_dict['k_line'])
 
@@ -3252,12 +3274,12 @@ class MakeChart(object):
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
 
                     # =============================== Min/Max Lines ===============================
-                    # if p_dict['plotArea{0}Min'.format(area)]:
-                    #     ax.axhline(y=min(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_min'])
-                    # if p_dict['plotArea{0}Max'.format(area)]:
-                    #     ax.axhline(y=max(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_max'])
-                    # if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
-                    #     ax.axhline(y=0, color=p_dict['spineColor'])
+                    if p_dict['plotArea{0}Min'.format(area)]:
+                        ax.axhline(y=min(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_min'])
+                    if p_dict['plotArea{0}Max'.format(area)]:
+                        ax.axhline(y=max(p_dict['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_max'])
+                    if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                        ax.axhline(y=0, color=p_dict['spineColor'])
 
             self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)

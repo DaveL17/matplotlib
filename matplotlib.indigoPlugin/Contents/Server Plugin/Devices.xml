@@ -188,10 +188,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area1Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area1Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area1Legend" type="textfield" defaultValue="Area 1" visibleBindingId="areaLabel1" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -255,15 +255,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea1Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea1Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea1Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea1Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea1" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -286,10 +286,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area2Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area2Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area2Legend" type="textfield" defaultValue="Area 2" visibleBindingId="areaLabel2" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -353,15 +353,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea2Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea2Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea2Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea2Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea2" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -384,10 +384,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area3Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area3Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area3Legend" type="textfield" defaultValue="Area 3" visibleBindingId="areaLabel3" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -451,15 +451,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea3Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea3Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea3Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea3Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea3" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -482,10 +482,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area4Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area4Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area4Legend" type="textfield" defaultValue="Area 4" visibleBindingId="areaLabel4" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -549,15 +549,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea4Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea4Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea4Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea4Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea4" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -580,10 +580,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area5Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area5Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area5Legend" type="textfield" defaultValue="Area 5" visibleBindingId="areaLabel5" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -647,15 +647,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea5Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea5Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea5Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea5Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea5" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -678,10 +678,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area6Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area6Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area6Legend" type="textfield" defaultValue="Area 6" visibleBindingId="areaLabel6" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -745,15 +745,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea6Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea6Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea6Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea6Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea6" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -774,10 +774,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area7Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area7Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area7Legend" type="textfield" defaultValue="Area 7" visibleBindingId="areaLabel7" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -841,15 +841,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea7Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea7Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea7Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea7Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea7" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>
@@ -870,10 +870,10 @@
                 <Label>Adjustment Factor</Label>
             </Field>
 
-<!--            <Field id="area8Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">-->
-<!--                <Label>Annotate?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="area8Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="area8Legend" type="textfield" defaultValue="Area 8" visibleBindingId="areaLabel8" visibleBindingValue="true"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -937,15 +937,15 @@
 <!--                </List>-->
 <!--            </Field>-->
 
-<!--            <Field id="plotArea8Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">-->
-<!--                <Label>Plot Min?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea8Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">
+                <Label>Plot Min?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
-<!--            <Field id="plotArea8Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot maximum value.">-->
-<!--                <Label>Plot Max?</Label>-->
-<!--                <Description>Yes/No</Description>-->
-<!--            </Field>-->
+            <Field id="plotArea8Max" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot maximum value.">
+                <Label>Plot Max?</Label>
+                <Description>Yes/No</Description>
+            </Field>
 
             <Field id="suppressArea8" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to hide this area when plotting.">
                 <Label>Suppress Area?</Label>

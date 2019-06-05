@@ -1,3 +1,7 @@
+v0.8.19
+- Adds annotations to Area Chart device. Note that annotation reflects the
+  cumulative value of the data point and not its absolute value.
+
 v0.8.18
 - Adds Area Chart device type. Note that v0.8.18 does not support some
   features for Area Chart devices that other device types support (min, max,
