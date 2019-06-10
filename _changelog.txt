@@ -1,3 +1,7 @@
+v0.8.21
+- Adds markers to Area Chart device. Note that the marker will be placed
+  at the cumulative value of the data point and not its absolute value.
+
 v0.8.20
 - Adds plot min and max to Area Chart device. Note that the min/max lines
   reflect the cumulative value of the data point and not its absolute value.

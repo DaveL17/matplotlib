@@ -56,7 +56,6 @@ the proper Fantastic Weather devices.
 #       date range.)
 # TODO: When the number of bars to be plotted is less than the number of bars
 #       requested (because there isn't enough data), the bars plot funny.
-# TODO: add each devices.xml section to its own template file.
 # TODO: do stack plots support markers? Not inherently (apparently) but you
 #       can fool it by laying a line on top of the stack. May want to just not
 #       support it for now...
@@ -110,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.20"
+__version__   = "0.8.21"
 
 # =============================================================================
 
@@ -3071,10 +3070,6 @@ class MakeChart(object):
         self.final_data = []
         self.host_plugin = plugin
 
-    # TODO: Markers will need to be added through a secondary plot which uses a
-    #       line plot (stackplots don't support markers).
-    # TODO: Min, Max and annotations plot on their absolute value and not the spot
-    #       where they are.
     # =============================================================================
     def chart_area(self, dev, p_dict, k_dict, return_queue):
         """
@@ -3098,7 +3093,7 @@ class MakeChart(object):
             p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             x_obs           = ''
             y_obs_tuple     = ()  # Y values
-            y_obs_tuple_rel = {}
+            y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
             y_colors_tuple  = ()  # Y area colors
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
@@ -3112,7 +3107,7 @@ class MakeChart(object):
 
                 p_dict['area{0}Color'.format(area)] = r"#{0}".format(p_dict['area{0}Color'.format(area)].replace(' ', '').replace('#', ''))
 
-                # p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', ''))
+                p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', ''))
 
                 # If area color is the same as the background color, alert the user.
                 if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor']:
@@ -3190,7 +3185,6 @@ class MakeChart(object):
 
                     # New annotations code ends here - DaveL17 2019-06-05
 
-                    log['Info'].append(u"{0}".format(y_obs_tuple_rel))
                     if p_dict['area{0}Annotate'.format(area)]:
                         for xy in zip(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)]):
                             ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
@@ -3277,6 +3271,12 @@ class MakeChart(object):
                         ax.axhline(y=max(y_obs_tuple_rel['y_obs{0}'.format(area)]), color=p_dict['area{0}Color'.format(area)], **k_dict['k_max'])
                     if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
                         ax.axhline(y=0, color=p_dict['spineColor'])
+
+                    # ================================== Markers ==================================
+                    # Note that stackplots don't support markers, so we need to plot a line (with
+                    # no width) on the plot to receive the markers.
+                    ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)], marker=p_dict['area{0}Marker'.format(area)],
+                                 markeredgecolor=p_dict['area{0}MarkerColor'.format(area)], markerfacecolor=p_dict['area{0}MarkerColor'.format(area)], zorder=10, lw=0)
 
             self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
