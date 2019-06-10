@@ -219,41 +219,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel1" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area1MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area1Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel1" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's first area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area1Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's first area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea1Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -317,41 +317,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel2" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area2MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area2Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel2" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's second area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area2Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's second area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea2Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -415,41 +415,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel3" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area3MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area3Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel3" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's third area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area3Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's third area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea3Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -513,41 +513,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel4" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area4MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area4Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel4" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's fourth area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area4Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's fourth area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea4Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -611,41 +611,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area5MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel5" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area5MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area5Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel5" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's fifth area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area5Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's fifth area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea5Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -709,41 +709,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area6MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel6" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area6MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area6Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel6" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's sixth area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area6Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's sixth area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea6Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -805,41 +805,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area7MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel7" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area7MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area7Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel7" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's seventh area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area7Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's seventh area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea7Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
@@ -901,41 +901,41 @@
                 </List>
             </Field>
 
-<!--            <Field id="area8MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel8" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the color of your chart's markers.">-->
-<!--                <Label>Marker Color:</Label>-->
-<!--            </Field>-->
+            <Field id="area8MarkerColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
 
-<!--            <Field id="area8Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel8" visibleBindingValue="true"-->
-<!--                   tooltip="Select preference for the marker style for your chart's eighth area.">-->
-<!--                <Label>Marker Style:</Label>-->
-<!--                <List>-->
-<!--                    <Option value="o">Circle</Option>-->
-<!--                    <Option value="D">Diamond</Option>-->
-<!--                    <Option value="d">Diamond (Thin)</Option>-->
-<!--                    <Option value="h">Hexagon 1</Option>-->
-<!--                    <Option value="H">Hexagon 2</Option>-->
-<!--                    <Option value="-">Horizontal Line</Option>-->
-<!--                    <Option value="8">Octagon</Option>-->
-<!--                    <Option value="p">Pentagon</Option>-->
-<!--                    <Option value="PIX">Pixel</Option>-->
-<!--                    <Option value="+">Plus</Option>-->
-<!--                    <Option value=".">Point</Option>-->
-<!--                    <Option value="*">Star</Option>-->
-<!--                    <Option value="s">Square</Option>-->
-<!--                    <Option value="v">Triangle Down</Option>-->
-<!--                    <Option value="TL">Triangle Left</Option>-->
-<!--                    <Option value="TR">Triangle Right</Option>-->
-<!--                    <Option value="1">Tri Down</Option>-->
-<!--                    <Option value="2">Tri Up</Option>-->
-<!--                    <Option value="3">Tri Left</Option>-->
-<!--                    <Option value="4">Tri Right</Option>-->
-<!--                    <Option value="|">Vertical Line</Option>-->
-<!--                    <Option value="x">X</Option>-->
-<!--                    <Option value="-1">%%separator%%</Option>-->
-<!--                    <Option value="None">None*</Option>-->
-<!--                </List>-->
-<!--            </Field>-->
+            <Field id="area8Marker" type="menu" defaultValue="None" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the marker style for your chart's eighth area.">
+                <Label>Marker Style:</Label>
+                <List>
+                    <Option value="o">Circle</Option>
+                    <Option value="D">Diamond</Option>
+                    <Option value="d">Diamond (Thin)</Option>
+                    <Option value="h">Hexagon 1</Option>
+                    <Option value="H">Hexagon 2</Option>
+                    <Option value="-">Horizontal Line</Option>
+                    <Option value="8">Octagon</Option>
+                    <Option value="p">Pentagon</Option>
+                    <Option value="PIX">Pixel</Option>
+                    <Option value="+">Plus</Option>
+                    <Option value=".">Point</Option>
+                    <Option value="*">Star</Option>
+                    <Option value="s">Square</Option>
+                    <Option value="v">Triangle Down</Option>
+                    <Option value="TL">Triangle Left</Option>
+                    <Option value="TR">Triangle Right</Option>
+                    <Option value="1">Tri Down</Option>
+                    <Option value="2">Tri Up</Option>
+                    <Option value="3">Tri Left</Option>
+                    <Option value="4">Tri Right</Option>
+                    <Option value="|">Vertical Line</Option>
+                    <Option value="x">X</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="None">None*</Option>
+                </List>
+            </Field>
 
             <Field id="plotArea8Min" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot minimum value.">
                 <Label>Plot Min?</Label>
