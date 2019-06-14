@@ -1,3 +1,6 @@
+v0.8.22
+- Adds lines to Area Chart device.
+
 v0.8.21
 - Adds markers to Area Chart device. Note that the marker will be placed
   at the cumulative value of the data point and not its absolute value.

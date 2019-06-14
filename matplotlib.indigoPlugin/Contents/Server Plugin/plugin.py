@@ -25,40 +25,30 @@ the proper Fantastic Weather devices.
 
 # =================================== TO DO ===================================
 
-# TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like
-#              device battery levels.)
+# TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery
+#              levels.)
 # TODO: NEW -- Create an "error" chart with min/max/avg
 # TODO: NEW -- Create a floating bar chart
-# TODO: NEW -- Create generic weather forecast charts to support any weather
-#              services
-# TODO: NEW -- Standard chart types with pre-populated data that link to types
-#              of Indigo devices.
-# TODO: NEW -- Add config dialog to rcparams device that's generated
-#              automatically?
+# TODO: NEW -- Create generic weather forecast charts to support any weather services
+# TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Try to address annotation collisions.
-# TODO: Add facility to have different Y1 and Y2. Add a new group of controls
-#       (like Y1) for Y2 and then have a control to allow user to elect when Y
-#       axis to assign the line to.
+# TODO: Add facility to have different Y1 and Y2. Add a new group of controls (like Y1) for Y2 and
+#       then have a control to allow user to elect when Y axis to assign the line to.
 # TODO: Remove matplotlib_version.html after deprecation
-# TODO: Add validation that will not allow custom tick locations to be outside
-#       the boundaries of the axis min/max.
+# TODO: Add validation that will not allow custom tick locations to be outside the boundaries of
+#       the axis min/max.
 # TODO: Add adjustment factor to scatter charts
 # TODO: Add props to adjust the figure to API.
-# TODO: Enable substitutions for custom line segments. For example, on a
-#       temperature chart, you might want to plot the day's forecast high
-#       temperature (%%d:733695023:d01_temperatureHigh%%, 'blue')
-# TODO: Allow scripting control or a tool to repopulate color controls so that
-#       you can change all bars/lines/scatter etc in one go.
-
-# TODO: Consider adding a leading zero obs when date range limited data is less
-#       than the specified date range (so the chart always shows the specified
-#       date range.)
-# TODO: When the number of bars to be plotted is less than the number of bars
-#       requested (because there isn't enough data), the bars plot funny.
-# TODO: do stack plots support markers? Not inherently (apparently) but you
-#       can fool it by laying a line on top of the stack. May want to just not
-#       support it for now...
+# TODO: Enable substitutions for custom line segments. For example, on a temperature chart, you
+#       might want to plot the day's forecast high temperature
+#       (%%d:733695023:d01_temperatureHigh%%, 'blue')
+# TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
+#       bars/lines/scatter etc in one go.
+# TODO: Consider adding a leading zero obs when date range limited data is less than the specified
+#       date range (so the chart always shows the specified date range.)
+# TODO: When the number of bars to be plotted is less than the number of bars requested (because
+#       there isn't enough data), the bars plot funny.
 
 # ================================== IMPORTS ==================================
 
@@ -109,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.21"
+__version__   = "0.8.22"
 
 # =============================================================================
 
@@ -318,6 +308,8 @@ class Plugin(indigo.PluginBase):
                         values_dict['area{0}MarkerColor'.format(_)]  = 'FF FF FF'
                         values_dict['area{0}Source'.format(_)]       = 'None'
                         values_dict['area{0}Style'.format(_)]        = '-'
+                        values_dict['line{0}Color'.format(_)]        = 'FF FF FF'
+                        values_dict['line{0}Style'.format(_)]        = 'None'
 
                     values_dict['customLineStyle']     = '-'
                     values_dict['customTickFontSize']  = 8
@@ -3106,7 +3098,7 @@ class MakeChart(object):
                 suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
 
                 p_dict['area{0}Color'.format(area)] = r"#{0}".format(p_dict['area{0}Color'.format(area)].replace(' ', '').replace('#', ''))
-
+                p_dict['line{0}Color'.format(area)] = r"#{0}".format(p_dict['line{0}Color'.format(area)].replace(' ', '').replace('#', ''))
                 p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', ''))
 
                 # If area color is the same as the background color, alert the user.
@@ -3275,8 +3267,12 @@ class MakeChart(object):
                     # ================================== Markers ==================================
                     # Note that stackplots don't support markers, so we need to plot a line (with
                     # no width) on the plot to receive the markers.
-                    ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)], marker=p_dict['area{0}Marker'.format(area)],
-                                 markeredgecolor=p_dict['area{0}MarkerColor'.format(area)], markerfacecolor=p_dict['area{0}MarkerColor'.format(area)], zorder=10, lw=0)
+                    if p_dict['area{0}Marker'.format(area)] != 'None':
+                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)], marker=p_dict['area{0}Marker'.format(area)],
+                                     markeredgecolor=p_dict['area{0}MarkerColor'.format(area)], markerfacecolor=p_dict['area{0}MarkerColor'.format(area)], zorder=11, lw=0)
+
+                    if p_dict['line{0}Style'.format(area)] != 'None':
+                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)], zorder=10, lw=1, ls='-', marker=None, color=p_dict['line{0}Color'.format(area)])
 
             self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)

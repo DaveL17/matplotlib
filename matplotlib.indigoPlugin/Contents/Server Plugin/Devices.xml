@@ -203,19 +203,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area1Style" type="menu" defaultValue="-" visibleBindingId="areaLabel1" visibleBindingValue="true"
+            <Field id="line1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line1Style" type="menu" defaultValue="None" visibleBindingId="areaLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's first area.">
-                <Label>Area Style:</Label>
+                <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -301,19 +306,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area2Style" type="menu" defaultValue="-" visibleBindingId="areaLabel2" visibleBindingValue="true"
+            <Field id="line2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line2Style" type="menu" defaultValue="None" visibleBindingId="areaLabel2" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's second area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -399,19 +409,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area3Style" type="menu" defaultValue="-" visibleBindingId="areaLabel3" visibleBindingValue="true"
+            <Field id="line3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line3Style" type="menu" defaultValue="None" visibleBindingId="areaLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's third area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -497,19 +512,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area4Style" type="menu" defaultValue="-" visibleBindingId="areaLabel4" visibleBindingValue="true"
+            <Field id="line4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line4Style" type="menu" defaultValue="None" visibleBindingId="areaLabel4" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fourth area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -595,19 +615,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area5Style" type="menu" defaultValue="-" visibleBindingId="areaLabel5" visibleBindingValue="true"
+            <Field id="line5Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line5Style" type="menu" defaultValue="None" visibleBindingId="areaLabel5" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's fifth area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -693,19 +718,24 @@
                 <Label>Line Color:</Label>
             </Field>
 
-            <Field id="area6Style" type="menu" defaultValue="-" visibleBindingId="areaLabel6" visibleBindingValue="true"
+            <Field id="line6Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel6" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line6Style" type="menu" defaultValue="None" visibleBindingId="areaLabel6" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's sixth area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -789,19 +819,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area7Style" type="menu" defaultValue="-" visibleBindingId="areaLabel7" visibleBindingValue="true"
+            <Field id="line7Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel7" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line7Style" type="menu" defaultValue="None" visibleBindingId="areaLabel7" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's seventh area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 
@@ -885,19 +920,24 @@
                 <Label>Area Color:</Label>
             </Field>
 
-            <Field id="area8Style" type="menu" defaultValue="-" visibleBindingId="areaLabel8" visibleBindingValue="true"
+            <Field id="line8Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="areaLabel8" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's line.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="line8Style" type="menu" defaultValue="None" visibleBindingId="areaLabel8" visibleBindingValue="true"
                    tooltip="Select preference for the style of your chart's eighth area.">
                 <Label>Line Style:</Label>
                 <List>
                     <Option value="--">Dashed</Option>
                     <Option value=":">Dotted</Option>
                     <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
+                    <Option value="-">Solid</Option>
                     <Option value="steps">Steps</Option>
                     <Option value="steps-mid">Steps Mid</Option>
                     <Option value="steps-post">Steps Post</Option>
                     <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
+                    <Option value="None">None*</Option>
                 </List>
             </Field>
 

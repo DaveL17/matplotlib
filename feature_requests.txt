@@ -3,6 +3,13 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
+2019-06-10  jltnol
+===============================================================================
+Create charts where the plotted data can be stock values (instead of flow). For
+example, a bar chart where each bar is a distinct variable or device state
+value.
+
+===============================================================================
 2019-05-02  Londonmark
 ===============================================================================
 Would it be possible to pull the precipintensity field from Fantastic Weather
