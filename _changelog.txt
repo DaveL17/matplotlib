@@ -1,3 +1,8 @@
+v0.8.23
+- Adds Composite Weather Device type.
+- Fixes bug in selection menu for date format (DD MMM) which was improperly
+  defined.
+
 v0.8.22
 - Adds lines to Area Chart device.
 

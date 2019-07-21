@@ -361,6 +361,7 @@ class Maintain(object):
                          'batteryHealthDevice': True,
                          'calendarChartingDevice': True,
                          'csvEngine': False,
+                         'compositeForecastDevice': True,
                          'forecastChartingDevice': True,
                          'lineChartingDevice': True,
                          'multiLineText': True,

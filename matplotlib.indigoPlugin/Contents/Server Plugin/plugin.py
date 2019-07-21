@@ -99,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.22"
+__version__   = "0.8.23"
 
 # =============================================================================
 
@@ -415,6 +415,10 @@ class Plugin(indigo.PluginBase):
                     values_dict['xAxisLabelFormat']     = '%A'
                     values_dict['showDaytime']          = 'true'
                     values_dict['daytimeColor']         = '33 33 33'
+
+            # ========================= Composite Forecast Device =========================
+            if type_id == "compositeForecastDevice":
+                pass
 
             if self.pluginPrefs.get('enableCustomLineSegments', False):
                 values_dict['enableCustomLineSegmentsSetting'] = True
@@ -918,6 +922,25 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
                 error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
                 return False, values_dict, error_msg_dict
+
+        # ========================== Composite Weather Chart ==========================
+        if type_id == 'compositeForecastDevice':
+
+            if not values_dict['forecastSourceDevice']:
+                error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
+                error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
+                return False, values_dict, error_msg_dict
+
+            # n = 0
+            # plots = ('show_barometric_pressure', 'show_high_low_temperature', 'show_high_temperature', 'show_humidity', 'show_low_temperature', 'show_precipitation', 'show_wind')
+            # for plot in plots:
+            #     if values_dict[plot]:
+            #         n += 1
+            #
+            # if n < 2:
+            #     # error_msg_dict['linesLabel'] = u"You must select at least two plot elements."
+            #     error_msg_dict['showAlertText'] = u"Plot Controls Error.\n\nYou must select at least two plot elements for a composite weather plot."
+            #     return False, values_dict, error_msg_dict
 
         # ============================== All Chart Types ==============================
         # The following validation blocks are applied to all graphical chart device
@@ -2207,7 +2230,7 @@ class Plugin(indigo.PluginBase):
                           ("%d", dt.datetime.strftime(now, "%d") + ' (date)'),
                           ("%Y", dt.datetime.strftime(now, "%Y") + ' (year)'),
                           ("%b %d", dt.datetime.strftime(now, "%b %d") + ' (month date)'),
-                          ("%b %d", dt.datetime.strftime(now, "%d %b") + ' (date month)'),
+                          ("%d %b", dt.datetime.strftime(now, "%d %b") + ' (date month)'),
                           ("%y %b", dt.datetime.strftime(now, "%b %y") + ' (month year)'),
                           ("%y %b", dt.datetime.strftime(now, "%y %b") + ' (year month)'),
                           ("%b %d %Y", dt.datetime.strftime(now, "%b %d %Y") + ' (full date)'),
@@ -2839,11 +2862,10 @@ class Plugin(indigo.PluginBase):
                             p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00').replace('#', '')
 
                         # ============================== Phantom Labels ===============================
-                        # Since users may or may not include axis labels and
-                        # because we want to ensure that all plot areas present
-                        # in the same way, we need to create 'phantom' labels that
-                        # are plotted but not visible.  Setting the font color to
-                        # 'None' will effectively hide them.
+                        # Since users may or may not include axis labels and because we want to ensure
+                        # that all plot areas present in the same way, we need to create 'phantom'
+                        # labels that are plotted but not visible.  Setting the font color to 'None'
+                        # will effectively hide them.
                         try:
                             if p_dict['customAxisLabelX'].isspace() or p_dict['customAxisLabelX'] == '':
                                 p_dict['customAxisLabelX'] = 'null'
@@ -3006,6 +3028,18 @@ class Plugin(indigo.PluginBase):
                                                                     args=(dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue,))
                                 p_weather.start()
 
+                        # ========================== Weather Composite Charts =========================
+                        if dev.deviceTypeId == "compositeForecastDevice":
+
+                            dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
+                            state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
+
+                            if __name__ == '__main__':
+                                p_composite = multiprocessing.Process(name='p_composite',
+                                                                      target=MakeChart(self).chart_weather_composite,
+                                                                      args=(dev, dev_type, p_dict, k_dict, state_list, return_queue,))
+                                p_composite.start()
+
                         # ========================= Process the output queue ==========================
                         self.processLogQueue(dev, return_queue)
 
@@ -3071,7 +3105,7 @@ class MakeChart(object):
 
         -----
 
-        :param class 'indigo.Device'e dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -4637,6 +4671,205 @@ class MakeChart(object):
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
+    def chart_weather_composite(self, dev, dev_type, p_dict, k_dict, state_list, return_queue):
+        """
+        Creates a composite weather chart
+
+        The composite weather chart is a dynamic chart that allows users to add or
+        remove weather charts at will.  For example, the user could create one
+        chart that contains subplots for high temperature, wind, and precipitation.
+        Using the chart configuration dialog, the user would be able to add or
+        remove elements and the chart would adjust accordingly (additional sublplots
+        will be added or removed as needed.)
+
+        -----
+
+        """
+        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
+
+        dpi             = int(plt.rcParams['savefig.dpi'])
+        forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
+        height          = int(dev.pluginProps['height'])
+        width           = int(dev.pluginProps['width'])
+
+        dates_to_plot    = ()
+        precipitation    = ()
+        humidity         = ()
+        temperature_high = ()
+        temperature_low  = ()
+        pressure         = ()
+        wind_speed       = ()
+        wind_bearing     = ()
+
+        def format_subplot(s_plot):
+
+            self.format_axis_x_ticks(s_plot, p_dict, k_dict, log)
+            self.format_axis_y(s_plot, p_dict, k_dict, log)
+
+            # if not p_dict['customAxisLabelX'].isspace() and p_dict['customAxisLabelX'] not in ("", "None"):
+            #     self.format_axis_x_label(dev, p_dict, k_dict, log)
+            #
+            if p_dict['showxAxisGrid']:
+                plot.xaxis.grid(True, **k_dict['k_grid_fig'])
+
+            if p_dict['showyAxisGrid']:
+                plot.yaxis.grid(True, **k_dict['k_grid_fig'])
+
+        try:
+            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['lineColor']       = r"#{0}".format(p_dict['lineColor'].replace(' ', '').replace('#', ''))
+            p_dict['lineMarkerColor'] = r"#{0}".format(p_dict['lineMarkerColor'].replace(' ', '').replace('#', ''))
+
+            # ================================ Set Up Axes ================================
+            # axes     = dev.pluginProps['component_list'].split(', ')
+            axes     = dev.pluginProps['component_list']
+            num_axes = len(axes)
+
+            # ============================ X Axis Observations ============================
+            # Daily
+            if dev_type in ('Daily', 'wundergroundTenDay'):
+                for _ in range(1, forecast_length[dev_type] + 1):
+                    dates_to_plot    += (state_list[u'd0{0}_date'.format(_)],)
+                    humidity         += (state_list[u'd0{0}_humidity'.format(_)],)
+                    precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
+                    pressure         += (state_list[u'd0{0}_pressure'.format(_)],)
+                    temperature_high += (state_list[u'd0{0}_temperatureHigh'.format(_)],)
+                    temperature_low  += (state_list[u'd0{0}_temperatureLow'.format(_)],)
+                    wind_speed       += (state_list[u'd0{0}_windSpeed'.format(_)],)
+                    wind_bearing     += (state_list[u'd0{0}_windBearing'.format(_)],)
+
+                x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in dates_to_plot]
+                x_offset = dt.timedelta(hours=1)
+
+            # Hourly
+            else:
+                for _ in range(1, forecast_length[dev_type] + 1):
+
+                    if _ <= 9:
+                        _ = '0{0}'.format(_)
+
+                    dates_to_plot    += (state_list[u'h{0}_epoch'.format(_)],)
+                    humidity         += (state_list[u'h{0}_humidity'.format(_)],)
+                    precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
+                    pressure         += (state_list[u'h{0}_pressure'.format(_)],)
+                    temperature_high += (state_list[u'h{0}_temperature'.format(_)],)
+                    temperature_low  += (state_list[u'h{0}_temperature'.format(_)],)
+                    wind_speed       += (state_list[u'h{0}_windSpeed'.format(_)],)
+                    wind_bearing     += (state_list[u'h{0}_windBearing'.format(_)],)
+
+                x1 = [dt.datetime.fromtimestamp(_) for _ in dates_to_plot]
+                x_offset = dt.timedelta(hours=4)
+
+            # ================================ Set Up Plot ================================
+            fig, subplot = plt.subplots(nrows=num_axes, sharex=True, figsize=(width / dpi, height * num_axes / dpi))
+
+            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.99))
+
+            try:
+                for plot in subplot:
+                    plot.set_axis_bgcolor(p_dict['backgroundColor'])
+                    [plot.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+
+            except IndexError:
+                subplot.set_axis_bgcolor(p_dict['backgroundColor'])
+                [subplot.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+
+            # ============================= Temperature High ==============================
+            if 'show_high_temperature' in axes:
+                subplot[0].set_title('high temperature', **k_dict['k_title_font'])  # The subplot title
+                subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])    # Plot it
+                format_subplot(subplot[0])                                          # Format the subplot
+
+                subplot = np.delete(subplot, 0)
+
+            # ============================== Temperature Low ==============================
+            if 'show_low_temperature' in axes:
+                subplot[0].set_title('low temperature', **k_dict['k_title_font'])
+                subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
+                format_subplot(subplot[0])
+
+                subplot = np.delete(subplot, 0)
+
+            # =========================== Temperature High/Low ============================
+            if 'show_high_low_temperature' in axes:
+                subplot[0].set_title('high/low temperature', **k_dict['k_title_font'])
+                subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])
+                subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
+                format_subplot(subplot[0])
+
+                subplot = np.delete(subplot, 0)
+
+            # ================================= Humidity ==================================
+            if 'show_humidity' in axes:
+                subplot[0].set_title('humidity', **k_dict['k_title_font'])
+                subplot[0].plot(x1, humidity, color=p_dict['lineColor'])
+                format_subplot(subplot[0])
+
+                subplot = np.delete(subplot, 0)
+
+            # ============================ Barometric Pressure ============================
+            if 'show_barometric_pressure' in axes:
+                subplot[0].set_title('barometric pressure', **k_dict['k_title_font'])
+                subplot[0].plot(x1, pressure, color=p_dict['lineColor'])
+                format_subplot(subplot[0])
+
+                subplot = np.delete(subplot, 0)
+
+            # ========================== Wind Speed and Bearing ===========================
+            if 'show_wind' in axes:
+                data = zip(x1, wind_speed, wind_bearing)
+                subplot[0].set_title('wind', **k_dict['k_title_font'])
+                subplot[0].plot(x1, wind_speed, color=p_dict['lineColor'])
+                subplot[0].set_ylim(0, max(wind_speed) + 1)
+
+                for _ in data:
+                    day = mdate.date2num(_[0])
+                    location = _[1]
+
+                    # Points to where the wind is going to.
+                    subplot[0].text(day, location, "  .  ", size=5, va="center", ha="center", rotation=(_[2] * -1) + 90, color=p_dict['lineMarkerColor'],
+                                    bbox=dict(boxstyle="larrow, pad=0.3", fc=p_dict['lineMarkerColor'], ec="none", alpha=0.75))
+
+                subplot[0].set_xlim(min(x1) - x_offset, max(x1) + x_offset)
+                my_fmt = mdate.DateFormatter(dev.pluginProps['xAxisLabelFormat'])
+                subplot[0].xaxis.set_major_formatter(my_fmt)
+                subplot[0].set_xticks(x1)
+                format_subplot(subplot[0])
+
+                subplot = np.delete(subplot, 0)
+
+            # =============================== Precipitation ===============================
+            # Precip intensity is in inches of liquid rain per hour.
+            if 'show_precipitation' in axes:
+                subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
+                subplot[0].plot(x1, precipitation, color=p_dict['lineColor'])
+                format_subplot(subplot[0])
+                subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))  # Force precip to 2 decimals regardless of device setting.
+
+                # Technically, we don't need this one.  But if we add another element later,
+                # it will be important.
+                subplot = np.delete(subplot, 0)
+
+            # if not p_dict['customAxisLabelY'].isspace() and p_dict['customAxisLabelY'] not in ("", "None"):
+            #     plt.text(0.015, 0.5, p_dict['customAxisLabelY'], transform=plt.gcf().transFigure, rotation=90, **k_dict['k_y_axis_font'])
+            #
+            top_space = 1 - (50.0 / (height * num_axes))
+            bottom_space = 40.0 / (height * num_axes)
+
+            self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': bottom_space, 'left': 0.07, 'top': top_space, 'right': 0.95})
+            self.process_log(dev, log, return_queue)
+
+        except (KeyError, ValueError) as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
+
+        except Exception as sub_error:
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
+
+    # =============================================================================
     def clean_string(self, val):
         """
         Cleans long strings of whitespace and formats certain characters
@@ -5398,6 +5631,8 @@ class MakeChart(object):
                 for key in size.keys():
                     parms[key] = size[key]
 
+            # Note that subplots_adjust affects the space surrounding the subplots and not
+            # the fig.
             plt.subplots_adjust(top=parms['top'],
                                 bottom=parms['bottom'],
                                 left=parms['left'],

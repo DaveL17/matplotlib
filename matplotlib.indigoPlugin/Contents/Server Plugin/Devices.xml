@@ -3925,6 +3925,170 @@ number and the color value should be enclosed in double quotes. Multiple entries
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
+<!-- Composite Forecast Device -->
+    <Device id="compositeForecastDevice" type="custom">
+        <Name>Composite Forecast Chart</Name>
+
+        <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+                <Label>Composite Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices. Note that hourly forecast devices only provide one forecast temperature so, for these charts, the high and low temperature values will be the same.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <Field id="fileName" type="textfield" defaultValue="chart_forecast.png" tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Template file="Templates/refresh_interval.xml" />
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <Field id="forecastSourceDevice" type="menu" tooltip="Select source device for the weather forecast chart.">
+                <Label>Source Device:</Label>
+                <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
+            </Field>
+
+            <Field id="height" type="textfield" defaultValue="300"
+                   tooltip="This value will control the height of each forecast element. For example, at 300 pixels, a chart with two elements displayed will be 600 pixels high.">
+                <Label>Height:</Label>
+            </Field>
+
+            <Field id="width" type="textfield" defaultValue="600"
+                   tooltip="This value will control the width of the entire plot.">
+                <Label>Width:</Label>
+            </Field>
+
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Template file="Templates/custom_title_font_size.xml" />
+
+            <Template file="Templates/custom_tick_font_size.xml" />
+
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <!-- Note that composite devices don't have legends, but we keep the parm to make sure the legend prop exists. -->
+            <Field id="showLegend" type="checkbox" defaultValue="false" hidden="true">
+                <Label>Display Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Axis Controls</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected axis.</Label>
+            </Field>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
+                <Label>Format:</Label>
+                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+            </Field>
+
+<!--            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"-->
+<!--                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">-->
+<!--                <Label>Label</Label>-->
+<!--            </Field>-->
+
+            <Template file="Templates/x_axis_bins.xml" />
+
+            <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!--            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"-->
+<!--                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">-->
+<!--                <Label>Label</Label>-->
+<!--            </Field>-->
+
+            <Template file="Templates/y_axis_precision.xml" />
+
+            <Field id="precip_precision" type="label" fontSize="small" alignWithControl="true" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Note that the precision setting does not affect the precipitation plot which requires two decimal points.</Label>
+            </Field>
+
+            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Controls Label</Label>
+            </Field>
+
+            <Field id="linesSeparator" type="separator"/>
+
+            <Field id="featureText" type="label" fontSize="small">
+                <Label>Use this section to control which available forecast elements to include in the composite chart. Check each box to add the selected forecast element to the chart.</Label>
+            </Field>
+
+            <Field id="lineColor" type="colorpicker" defaultValue="00 00 FF" tooltip="Select preference for the color of your chart's lines.">
+                <Label>Line Color:</Label>
+            </Field>
+
+            <Field id="lineMarkerColor" type="colorpicker" defaultValue="FF 00 00" tooltip="Select preference for the color of your chart's markers.">
+                <Label>Marker Color:</Label>
+            </Field>
+
+            <Field id="component_list" type="list" defaultValue="show_high_low_temperature,show_precipitation">
+                <Label>Plot Elements:</Label>
+                <List>
+                    <Option value="show_high_temperature">High Temperature</Option>
+                    <Option value="show_low_temperature">Low Temperature</Option>
+                    <Option value="show_high_low_temperature">High/Low Temperature</Option>
+                    <Option value="show_humidity">Humidity</Option>
+                    <Option value="show_barometric_pressure">Barometric Pressure</Option>
+                    <Option value="show_wind">Composite Wind</Option>
+                    <Option value="show_precipitation">Total Precipitation</Option>
+                </List>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+    </Device>
+
 <!-- CSV Engine -->
     <Device id="csvEngine" type="custom">
         <Name>CSV Engine Device</Name>
