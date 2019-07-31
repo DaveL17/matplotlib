@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Template>
+
+        <Field id="import_export_header" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+               alignText="right">
+            <Label>Import Settings</Label>
+        </Field>
+
+        <Field id="import_export_separator" type="separator"/>
+
+        <Field id="import_export_label" type="label" fontColor="black" fontSize="small">
+            <Label>Use this section to import the settings from another device (of the same type).</Label>
+        </Field>
+
+        <Field id="importDevice" type="menu" tooltip="Please select the device to import.">
+            <Label>Import From:</Label>
+            <List class="indigo.devices" filter="self.areaChartingDevice" method="" dynamicReload="true"/>
+        </Field>
+
+        <Field id="import_button" type="button">
+            <Label/>
+            <Title>Import</Title>
+            <CallbackMethod>device_import</CallbackMethod>
+        </Field>
+
+
+</Template>

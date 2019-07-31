@@ -1005,10 +1005,12 @@
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
-                <Label>Constants:</Label>l
+                <Label>Constants:</Label>
             </Field>
 
             <Template file="Templates/custom_line_style.xml" />
+
+<!--            <Template file="Templates/import_export.xml" />-->
 
             <Field id="bottomSeparator" type="separator"/>
 
@@ -2713,7 +2715,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
-                <Label>Constants:</Label>l
+                <Label>Constants:</Label>
             </Field>
 
             <Template file="Templates/custom_line_style.xml" />
@@ -3509,7 +3511,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
-                <Label>Constants:</Label>l
+                <Label>Constants:</Label>
             </Field>
 
             <Template file="Templates/custom_line_style.xml" />
@@ -3897,7 +3899,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
                    tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
-                <Label>Constants:</Label>l
+                <Label>Constants:</Label>
             </Field>
 
             <Template file="Templates/custom_line_style.xml" />
@@ -3927,7 +3929,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
 <!-- Composite Forecast Device -->
     <Device id="compositeForecastDevice" type="custom">
-        <Name>Composite Forecast Chart</Name>
+        <Name>Weather Forecast Composite Chart</Name>
 
         <ConfigUI>
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
@@ -4012,11 +4014,6 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-<!--            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"-->
-<!--                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">-->
-<!--                <Label>Label</Label>-->
-<!--            </Field>-->
-
             <Template file="Templates/x_axis_bins.xml" />
 
             <Field id="yAxisSeparator" type="separator" visibleBindingId="xAxisLabel" visibleBindingValue="true"/>
@@ -4030,25 +4027,60 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-<!--            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"-->
-<!--                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">-->
-<!--                <Label>Label</Label>-->
-<!--            </Field>-->
-
             <Template file="Templates/y_axis_precision.xml" />
 
-            <Field id="precip_precision" type="label" fontSize="small" alignWithControl="true" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+            <Field id="precip_precision_label" type="label" fontSize="small" alignWithControl="true" visibleBindingId="yAxisLabel" visibleBindingValue="true">
                 <Label>Note that the precision setting does not affect the precipitation plot which requires two decimal points.</Label>
             </Field>
 
+            <Field id="pressure_min" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Pressure Min:</Label>
+            </Field>
+
+            <Field id="pressure_max" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Pressure Max:</Label>
+            </Field>
+
+            <Field id="temperature_min" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Temperature Min:</Label>
+            </Field>
+
+            <Field id="temperature_max" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Temperature Max:</Label>
+            </Field>
+
+            <Field id="humidity_min" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Humidity Min:</Label>
+            </Field>
+
+            <Field id="humidity_max" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Humidity Max:</Label>
+            </Field>
+
+            <Field id="precipitation_min" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Precipitation Min:</Label>
+            </Field>
+
+            <Field id="precipitation_max" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Precipitation Max:</Label>
+            </Field>
+
+            <Field id="wind_min" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Wind Min:</Label>
+            </Field>
+
+            <Field id="wind_max" type="textfield" defaultValue="" tooltip="" visibleBindingId="yAxisLabel" visibleBindingValue="true">
+                <Label>Wind Max:</Label>
+            </Field>
+
             <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-                <Label>Controls Label</Label>
+                <Label>Forecast Elements</Label>
             </Field>
 
             <Field id="linesSeparator" type="separator"/>
 
             <Field id="featureText" type="label" fontSize="small">
-                <Label>Use this section to control which available forecast elements to include in the composite chart. Check each box to add the selected forecast element to the chart.</Label>
+                <Label>Use this section to control which available forecast elements to include in the composite chart. Select forecast element to the chart below.</Label>
             </Field>
 
             <Field id="lineColor" type="colorpicker" defaultValue="00 00 FF" tooltip="Select preference for the color of your chart's lines.">
@@ -4062,13 +4094,14 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="component_list" type="list" defaultValue="show_high_low_temperature,show_precipitation">
                 <Label>Plot Elements:</Label>
                 <List>
+                    <Option value="show_barometric_pressure">Barometric Pressure</Option>
+                    <Option value="show_high_low_temperature">High/Low Temperature</Option>
                     <Option value="show_high_temperature">High Temperature</Option>
                     <Option value="show_low_temperature">Low Temperature</Option>
-                    <Option value="show_high_low_temperature">High/Low Temperature</Option>
                     <Option value="show_humidity">Humidity</Option>
-                    <Option value="show_barometric_pressure">Barometric Pressure</Option>
-                    <Option value="show_wind">Composite Wind</Option>
-                    <Option value="show_precipitation">Total Precipitation</Option>
+                    <Option value="show_precipitation">Total Precipitation (Line)</Option>
+                    <Option value="show_precipitation_bar">Total Precipitation (Bar)</Option>
+                    <Option value="show_wind">Wind</Option>
                 </List>
             </Field>
 

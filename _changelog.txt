@@ -1,3 +1,11 @@
+v0.8.24
+- Adds precipitation bar chart option for composite forecast devices.
+- Adds min/max settings for composite weather device elements.
+- Changes device type name for composite forecast devices.
+- Reorders plot elements list for composite forecast device.
+- Enables validation for composite forecast device.
+- Code refinements.
+
 v0.8.23
 - Adds Composite Weather Device type.
 - Fixes bug in selection menu for date format (DD MMM) which was improperly

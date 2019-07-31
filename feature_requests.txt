@@ -10,19 +10,6 @@ example, a bar chart where each bar is a distinct variable or device state
 value.
 
 ===============================================================================
-2019-05-02  Londonmark
-===============================================================================
-Would it be possible to pull the precipintensity field from Fantastic Weather
-so we could straightforwardly show the amount of precipitation expected hour
-by hour / day by day?
-
-DaveL17 - look at other fields too. Requests for:
-    precip intensity
-    wind speed
-    wind direction
-    temperature
-
-===============================================================================
 2019-02-12  Rogue Proeliator
 ===============================================================================
 Include a facility to import/export constructed chart devices and have some
@@ -51,7 +38,16 @@ COMPLETED =====================================================================
 ===============================================================================
 
 ===============================================================================
-2019-05-20  norcoscia
+2019-05-02  Londonmark  [COMPLETE]
+===============================================================================
+Would it be possible to pull the precipintensity field from Fantastic Weather
+so we could straightforwardly show the amount of precipitation expected hour
+by hour / day by day?
+
+DaveL17 - Composite Weather Device added with v0.8.23.
+
+===============================================================================
+2019-05-20  norcoscia  [COMPLETE]
 ===============================================================================
 Support area charts.
 
