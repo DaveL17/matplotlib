@@ -4364,7 +4364,7 @@ class MakeChart(object):
         -----
 
         """
-        # TODO: Make a collapsable section to set min/max Y ranges for each distinct range [temp, humidity, pressure, wind, precip]
+        # TODO: Make a collapsible section to set min/max Y ranges for each distinct range [temp, humidity, pressure, wind, precip]
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
         height          = int(dev.pluginProps['height'])
