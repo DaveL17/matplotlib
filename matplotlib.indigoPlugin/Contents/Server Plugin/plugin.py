@@ -4364,7 +4364,7 @@ class MakeChart(object):
         -----
 
         """
-        # TODO: Make a collapseable section to set min/max Y ranges for each distinct range [temp, humidity, pressure, wind, precip]
+        # TODO: Make a collapsable section to set min/max Y ranges for each distinct range [temp, humidity, pressure, wind, precip]
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
         height          = int(dev.pluginProps['height'])
@@ -4572,8 +4572,9 @@ class MakeChart(object):
                 if p_dict['precipitation_max'] not in ("", "None"):
                     subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
 
-                subplot = np.delete(subplot, 0)  # We don't use the subplot variable after this; but this command
-                                                 # will be important if we add more subplots.
+                # We don't use the subplot variable after this; but this command
+                # will be important if we add more subplots.
+                subplot = np.delete(subplot, 0)
 
             top_space = 1 - (50.0 / (height * num_axes))
             bottom_space = 40.0 / (height * num_axes)
