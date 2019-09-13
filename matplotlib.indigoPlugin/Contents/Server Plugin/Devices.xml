@@ -1010,8 +1010,6 @@
 
             <Template file="Templates/custom_line_style.xml" />
 
-<!--            <Template file="Templates/import_export.xml" />-->
-
             <Field id="bottomSeparator" type="separator"/>
 
             <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">

@@ -1,27 +1,63 @@
 <?xml version="1.0"?>
 <Template>
 
-        <Field id="import_export_header" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
-               alignText="right">
-            <Label>Import Settings</Label>
-        </Field>
+    <Field id="share_utility_label" type="label" fontSize="small">
+        <Label>Use this tool to share (import and export) plugin devices with other users.
 
-        <Field id="import_export_separator" type="separator"/>
+The import utility requires that a device file be located in the plugin log folder in order to import a device that another user has shared with you.
 
-        <Field id="import_export_label" type="label" fontColor="black" fontSize="small">
-            <Label>Use this section to import the settings from another device (of the same type).</Label>
-        </Field>
+The export utility will create a device file which is saved to the plugin log folder (a message will be written to the log with the destination) which you can then share with other users.
 
-        <Field id="importDevice" type="menu" tooltip="Please select the device to import.">
-            <Label>Import From:</Label>
-            <List class="indigo.devices" filter="self.areaChartingDevice" method="" dynamicReload="true"/>
-        </Field>
+You can import and export as many devices as you like. Select the Close button when you are done.</Label>
+    </Field>
 
-        <Field id="import_button" type="button">
-            <Label/>
-            <Title>Import</Title>
-            <CallbackMethod>device_import</CallbackMethod>
-        </Field>
+    <!-- Props Import -->
+    <Field id="import_header" type="label" fontSize="regular" alignText="right">
+        <Label>Import Utility</Label>
+    </Field>
 
+    <Field id="import_separator" type="separator"/>
+
+    <Field id="import_label" type="label" fontSize="small">
+        <Label>Use this section to import the settings from another device. If you want to delete the props file after the import is complete, check the appropriate box.</Label>
+    </Field>
+
+    <Field id="import_file" type="menu" tooltip="">
+        <Label>Import From This File:</Label>
+        <List class="self" filter="" method="import_devices" dynamicReload="true"/>
+    </Field>
+
+    <Field id="delete_file" type="checkbox" tooltip="">
+        <Label>Delete the File after Import?</Label>
+        <Description>Yes/No</Description>
+    </Field>
+
+    <Field id="import_button" type="button">
+        <Label/>
+        <Title>Import</Title>
+        <CallbackMethod>device_import</CallbackMethod>
+    </Field>
+
+    <!-- Props Export -->
+    <Field id="export_header" type="label" fontSize="regular" alignText="right">
+        <Label>Export Utility</Label>
+    </Field>
+
+    <Field id="export_separator" type="separator"/>
+
+    <Field id="export_label" type="label" fontSize="small">
+        <Label>Use this section to export the settings from a device.</Label>
+    </Field>
+
+    <Field id="export_device" type="menu" tooltip="Please select the device to export.">
+        <Label>Export This Device:</Label>
+        <List class="indigo.devices" filter="self" method="" dynamicReload="false"/>
+    </Field>
+
+    <Field id="export_button" type="button">
+        <Label/>
+        <Title>Export</Title>
+        <CallbackMethod>device_export</CallbackMethod>
+    </Field>
 
 </Template>

@@ -10,18 +10,6 @@ example, a bar chart where each bar is a distinct variable or device state
 value.
 
 ===============================================================================
-2019-02-12  Rogue Proeliator
-===============================================================================
-Include a facility to import/export constructed chart devices and have some
-option to dump the Properties to JSON or XML.  Then create a generic import
-that can read those in... that way you don't have to maintain any particular
-import/export -- it just exports/imports all plugin props it finds on the
-device and/or XML file during import.
-
-DaveL17 - this will be easier to do once the device definitions are locked
-          down.
-
-===============================================================================
 2019-01-04  Autolog
 ===============================================================================
 I would like to be able to specify a different scale on the Y2 axis - Is this
@@ -36,6 +24,17 @@ valve opening against the temperature.
 ===============================================================================
 COMPLETED =====================================================================
 ===============================================================================
+
+===============================================================================
+2019-02-12  RogueProeliator [COMPLETE]
+===============================================================================
+Include a facility to import/export constructed chart devices and have some
+option to dump the Properties to JSON or XML.  Then create a generic import
+that can read those in... that way you don't have to maintain any particular
+import/export -- it just exports/imports all plugin props it finds on the
+device and/or XML file during import.
+
+DaveL17 - Device import/export utility added with v0.8.25.
 
 ===============================================================================
 2019-05-02  Londonmark  [COMPLETE]

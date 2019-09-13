@@ -50,7 +50,8 @@ the proper Fantastic Weather devices.
 #       day's forecast high temperature. ('%%d:733695023:d01_temperatureHigh%%', 'blue'). Note
 #       that this is non-trivial because it requires a round-trip outside the class. Needs a
 #       pipe to send things to the host plugin and get a response.
-
+# TODO: we use `dev.pluginProps.get() which likely involves a round trip to the server. Can we load
+#       the props once per refresh to speed things up?
 # ================================== IMPORTS ==================================
 
 try:
@@ -2000,21 +2001,6 @@ class Plugin(indigo.PluginBase):
             return [(k, dev_dict[k][0]) for k in dev_dict]
 
     # =============================================================================
-    def device_import(self, values_dict=None, type_id="", dev_id=0, target_id=0):
-
-        error_msg_dict = indigo.Dict()
-
-        try:
-            import_device = int(values_dict['importDevice'])
-            props         = indigo.devices[import_device].pluginProps
-            self.logger.info(u"Importing device: {0}.xml".format(props))
-
-        except ValueError:
-            error_msg_dict['importDevice'] = u"You must select a source device to import from."
-            error_msg_dict['showAlertText'] = u"Import Error.\n\nYou must select a source device to import from."
-            return values_dict, error_msg_dict
-
-    # =============================================================================
     def deviceStateValueListAdd(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Formulates list of device states for CSV engine
@@ -3111,6 +3097,7 @@ class Plugin(indigo.PluginBase):
 
         self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
 
+    # =============================================================================
     def log_me(self, message="", level='info'):
 
         indigo.server.log(message)
@@ -3332,7 +3319,8 @@ class MakeChart(object):
                                      markeredgecolor=p_dict['area{0}MarkerColor'.format(area)], markerfacecolor=p_dict['area{0}MarkerColor'.format(area)], zorder=11, lw=0)
 
                     if p_dict['line{0}Style'.format(area)] != 'None':
-                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)], zorder=10, lw=1, ls='-', marker=None, color=p_dict['line{0}Color'.format(area)])
+                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)],
+                                     zorder=10, lw=1, ls='-', marker=None, color=p_dict['line{0}Color'.format(area)])
 
             self.format_custom_line_segments(ax, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
@@ -3811,8 +3799,8 @@ class MakeChart(object):
                     # ======================== Convert Dates for Charting =========================
                     p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
-                    ax.plot_date(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)], linestyle=p_dict['line{0}Style'.format(line)],
-                                 marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
+                    ax.plot_date(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)], color=p_dict['line{0}Color'.format(line)],
+                                 linestyle=p_dict['line{0}Style'.format(line)], marker=p_dict['line{0}Marker'.format(line)], markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
                                  markerfacecolor=p_dict['line{0}MarkerColor'.format(line)], zorder=10, **k_dict['k_line'])
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
@@ -4584,7 +4572,8 @@ class MakeChart(object):
                 if p_dict['precipitation_max'] not in ("", "None"):
                     subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
 
-                subplot = np.delete(subplot, 0)
+                subplot = np.delete(subplot, 0)  # We don't use the subplot variable after this; but this command
+                                                 # will be important if we add more subplots.
 
             top_space = 1 - (50.0 / (height * num_axes))
             bottom_space = 40.0 / (height * num_axes)
