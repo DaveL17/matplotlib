@@ -1,3 +1,8 @@
+v0.8.25
+- Improves Calendar Chart devices which no longer require monospace fonts. A
+  few additional settings added including a format specifier for how days
+  are reflected (i.e., 'M', 'Mon', 'Monday').
+
 v0.8.24
 - Adds precipitation bar chart option for composite forecast devices.
 - Adds min/max settings for composite weather device elements.

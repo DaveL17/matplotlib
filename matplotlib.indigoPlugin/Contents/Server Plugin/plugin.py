@@ -3678,33 +3678,81 @@ class MakeChart(object):
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: return queue
         """
-        # TODO: See if this can be extended using plt.table; then we can use TT fonts.
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
 
             import calendar
-            calendar.setfirstweekday(int(dev.pluginProps['firstDayOfWeek']))
-            today = dt.datetime.today()
-            cal   = calendar.month(today.year, today.month)
-            size  = float(self.host_plugin.pluginPrefs.get('sqChartSize', 250))
 
-            ax = self.make_chart_figure(size, size, p_dict)
+            def format_axis(ax_obj):
+                """
+                Set various axis properties
 
-            ax.text(0, 1, cal, transform=ax.transAxes, color=p_dict['fontColor'], fontname='Andale Mono', fontsize=dev.pluginProps['fontSize'], backgroundcolor=p_dict['faceColor'],
-                    bbox=dict(pad=3), **k_dict['k_calendar'])
-            ax.axes.get_xaxis().set_visible(False)
-            ax.axes.get_yaxis().set_visible(False)
+                Note that this method purposefully accesses protected members of the _text class.
+
+                -----
+                :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
+                """
+
+                ax_props = ax_obj.properties()
+                ax_cells = ax_props['child_artists']
+                for cell in ax_cells:
+                    cell.set_facecolor(p_dict['faceColor'])
+                    cell._text.set_color(p_dict['fontColor'])
+                    cell._text.set_fontname(p_dict['fontMain'])
+                    cell._text.set_fontsize(int(dev.pluginProps['fontSize']))
+                    # cell._text.set_fontstretch(1000)  # TODO: This may not be supportable without including fonts with the plugin.
+                    cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
+
+                    # Controls grid display
+                    if dev.pluginProps.get('calendarGrid', True):
+                        cell.set_edgecolor(p_dict['spineColor'])
+                    else:
+                        cell.set_edgecolor(p_dict['faceColor'])
+
+            fmt = {'short': {0: ["M", "T", "W", "T", "F", "S", "S"],
+                             6: ["S", "M", "T", "W", "T", "F", "S"]},
+                   'mid':   {0: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                             6: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]},
+                   'long':  {0: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                             6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
+                   }
+
+            first_day   = int(dev.pluginProps.get('firstDayOfWeek', 6))
+            day_format  = dev.pluginProps.get('dayOfWeekFormat', 'mid')
+            days_labels = fmt[day_format][first_day]
+
+            my_cal    = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
+            today     = dt.datetime.today()
+            cal       = my_cal.monthdatescalendar(today.year, today.month)
+
+            try:
+                height = int(dev.pluginProps.get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+            except ValueError:
+                height = 3
+
+            try:
+                width = int(dev.pluginProps.get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+            except ValueError:
+                width = 5
+
+            # final_cal contains just the date value from the date object
+            final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
+
+            fig = plt.figure(figsize=(width, height))
+            ax = fig.add_subplot(111)
             ax.axis('off')
 
-            self.save_chart_image(plt, p_dict, k_dict, log)
+            month_row = ax.table(cellText=[" "], colLabels=[dt.datetime.strftime(today, "%B")], loc='top', bbox=[0, 0.5, 1, .5])  # bbox = [left, bottom, width, height]
+            format_axis(month_row)
+
+            days_rows = ax.table(cellText=final_cal, colLabels=days_labels, loc='top', cellLoc=dev.pluginProps.get('dayOfWeekAlignment', 'right'), bbox=[0, -0.5, 1, 1.25])
+            format_axis(days_rows)
+
+            self.save_chart_image(plt, p_dict, k_dict, log, size={'top': 0.97, 'bottom': 0.34, 'left': 0.02, 'right': 0.98, 'hspace': None, 'wspace': None})
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
-
-        except Exception as sub_error:
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 

@@ -1586,24 +1586,54 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="topSeparator" type="separator"/>
 
-            <Field id="fileName" type="textfield" defaultValue="chart_calendar.png" tooltip="Enter the file name of your chart (filename.png).">
+            <Field id="fileName" type="textfield" defaultValue="chart_calendar.png" tooltip="Please enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
             </Field>
 
             <Template file="Templates/refresh_interval.xml" />
 
             <Field id="customSizeHeight" type="textfield" defaultValue="None"
-                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None.">
+                   tooltip="This value overrides the size value set in the main plugin configuration. To set it back to the default size, enter None. (pixels)">
                 <Label>Custom Height:</Label>
             </Field>
 
-            <Field id="customSizeWidth" type="textfield" defaultValue="None" tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None.">
+            <Field id="customSizeWidth" type="textfield" defaultValue="None"
+                   tooltip="This value overrides the size value set in the main plugin configuration. To set it back to the default size, enter None. (pixels)">
                 <Label>Custom Width:</Label>
+            </Field>
+
+            <Field id="displayText" type="label" fontColor="black" fontSize="regular" alignText="right">
+                <Label>Display Controls</Label>
+            </Field>
+
+            <Field id="displaySeparator" type="separator"/>
+
+            <Field id="dayOfWeekAlignment" type="menu" defaultValue="right" tooltip="Please select how the day numbers within the calendar will be aligned.">
+                <Label>Date Alignment:</Label>
+                <List>
+                    <Option value="left">Left</Option>
+                    <Option value="center">Center</Option>
+                    <Option value="right">Right*</Option>
+                </List>
+            </Field>
+
+            <Field id="dayOfWeekFormat" type="menu" defaultValue="mid" tooltip="Please select the desired day of week format.">
+                <Label>Day Name Format:</Label>
+                <List>
+                    <Option value="short">S, M, T...</Option>
+                    <Option value="mid">Sun, Mon, Tue...*</Option>
+                    <Option value="long">Sunday, Monday, Tuesday...</Option>
+                </List>
+            </Field>
+
+            <Field id="calendarGrid" type="checkbox" defaultValue="true" tooltip="Display grid lines on calendar?">
+                <Label>Display Grid:</Label>
+                <Description/>
             </Field>
 
             <Template file="Templates/custom_font_size.xml" />
 
-            <Field id="firstDayOfWeek" type="menu" defaultValue="6" tooltip="Select the first day of the week.">
+            <Field id="firstDayOfWeek" type="menu" defaultValue="6" tooltip="Please select the first day of the week.">
                 <Label>Week Starts on:</Label>
                 <List>
                     <Option value="6">Sunday*</Option>
