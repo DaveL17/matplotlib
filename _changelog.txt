@@ -1,3 +1,6 @@
+v0.8.26
+- Version sync
+
 v0.8.25
 - Improves Calendar Chart devices which no longer require monospace fonts. A
   few additional settings added including a format specifier for how days
