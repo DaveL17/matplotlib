@@ -1,3 +1,8 @@
+v0.8.27
+- Fixes bug in Area, Bar, Line, and Scatter Chart devices where ticking the
+  Suppress [item] checkbox did not silence the warnings that the [item] color
+  is the same as the plot area color.
+
 v0.8.26
 - Version sync
 

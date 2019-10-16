@@ -50,8 +50,6 @@ the proper Fantastic Weather devices.
 #       day's forecast high temperature. ('%%d:733695023:d01_temperatureHigh%%', 'blue'). Note
 #       that this is non-trivial because it requires a round-trip outside the class. Needs a
 #       pipe to send things to the host plugin and get a response.
-# TODO: we use `dev.pluginProps.get() which likely involves a round trip to the server. Can we load
-#       the props once per refresh to speed things up?
 # ================================== IMPORTS ==================================
 
 try:
@@ -101,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.26"
+__version__   = "0.8.27"
 
 # =============================================================================
 
@@ -571,8 +569,6 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def validatePrefsConfigUi(self, values_dict=None):
 
-        changed_keys   = ()
-        config_changed = False
         error_msg_dict = indigo.Dict()
 
         self.debug_level = int(values_dict['showDebugLevel'])
@@ -649,6 +645,9 @@ class Plugin(indigo.PluginBase):
         # TODO: consider adding this feature to DLFramework and including in all plugins.
         # ============================== Log All Changes ==============================
         # Log any changes to the plugin preferences.
+        changed_keys   = ()
+        config_changed = False
+
         for key in values_dict.keys():
             try:
                 if values_dict[key] != self.pluginPrefs[key]:
@@ -1096,10 +1095,6 @@ class Plugin(indigo.PluginBase):
                 for thing in column_dict.items():
                     full_path = data_path + thing[1][0] + ".csv"
 
-                    # TODO: does it make sense to combine this with the check that happens at CSV device refresh?
-                    #       could do passed device or if no passed device do all devices. Note that they are
-                    #       constructed slightly differently now.
-
                     # ============================= Create (if needed) ============================
                     # If the appropriate CSV file doesn't exist, create it and write the header
                     # line.
@@ -1146,8 +1141,6 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         # TODO: migrate this to DLFramework
-        # TODO: add facility to compare current value to available values (i.e., a
-        #       control value is no longer an available option.)
 
         import xml.etree.ElementTree as eTree
 
@@ -3149,7 +3142,7 @@ class MakeChart(object):
                 p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', ''))
 
                 # If area color is the same as the background color, alert the user.
-                if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor']:
+                if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
                     log['Warning'].append(u"[{0}] Area {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, area))
 
                 # If the area is suppressed, remind the user they suppressed it.
@@ -3374,7 +3367,7 @@ class MakeChart(object):
                 p_dict['bar{0}Color'.format(thing)] = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
 
                 # If the bar color is the same as the background color, alert the user.
-                if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor']:
+                if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
                     log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
                 # If the bar is suppressed, remind the user they suppressed it.
@@ -3794,7 +3787,7 @@ class MakeChart(object):
                 p_dict['line{0}BestFitColor'.format(line)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
 
                 # If line color is the same as the background color, alert the user.
-                if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
+                if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
                     log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, line))
 
                 # If the line is suppressed, remind the user they suppressed it.
@@ -4263,7 +4256,7 @@ class MakeChart(object):
                 p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
 
                 # If dot color is the same as the background color, alert the user.
-                if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor']:
+                if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_group:
                     log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not be able to see it).".format(dev.name, thing))
 
                 # If the group is suppressed, remind the user they suppressed it.
@@ -4412,7 +4405,6 @@ class MakeChart(object):
         -----
 
         """
-        # TODO: Make a collapsible section to set min/max Y ranges for each distinct range [temp, humidity, pressure, wind, precip]
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
         height          = int(dev.pluginProps['height'])
