@@ -50,6 +50,7 @@ the proper Fantastic Weather devices.
 #       day's forecast high temperature. ('%%d:733695023:d01_temperatureHigh%%', 'blue'). Note
 #       that this is non-trivial because it requires a round-trip outside the class. Needs a
 #       pipe to send things to the host plugin and get a response.
+# TODO: Make precipitation bars for hourly forecast and daily forecast look the same.
 # ================================== IMPORTS ==================================
 
 try:
@@ -67,6 +68,7 @@ import logging
 import multiprocessing
 import numpy as np
 import os
+import re
 import traceback
 import unicodedata
 
@@ -99,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.27"
+__version__   = "0.8.29"
 
 # =============================================================================
 
@@ -589,6 +591,30 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
                 return False, values_dict, error_msg_dict
 
+        # =============================== Chart Colors ================================
+        # Inspects various color controls and sets them to default when the value is not hex.
+        color_dict = {'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF",
+                      'backgroundColor': "00 00 00", 'faceColor': "00 00 00",
+                      'gridColor': "88 88 88", 'spineColor': "88 88 88", 'tickColor': "88 88 88",
+                      }
+
+        for item in color_dict.keys():
+            if re.search(r"^[0-9A-Fa-f]+$", values_dict[item].replace(" ", "")) is None:
+                values_dict[item] = color_dict[item]
+                self.logger.warning(u"Invalid color code found in plugin preferences [{0}], resetting to default.".format(item))
+
+        # ============================= Chart Dimensions ==============================
+        for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize'):
+            try:
+                if float(values_dict[dimension_prop]) < 75:
+                    error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
+                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be greater than 75 pixels"
+                    return False, values_dict, error_msg_dict
+            except ValueError:
+                error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
+                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be a real number."
+                return False, values_dict, error_msg_dict
+
         # ============================= Chart Resolution ==============================
         # Note that chart resolution includes a warning feature that will pass the
         # value after the warning is cleared.
@@ -618,18 +644,6 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
             error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
             return False, values_dict, error_msg_dict
-
-        # ============================= Chart Dimensions ==============================
-        for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize'):
-            try:
-                if float(values_dict[dimension_prop]) < 75:
-                    error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
-                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be greater than 75 pixels"
-                    return False, values_dict, error_msg_dict
-            except ValueError:
-                error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
-                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be a real number."
-                return False, values_dict, error_msg_dict
 
         # ================================ Line Weight ================================
         try:
@@ -1205,6 +1219,33 @@ class Plugin(indigo.PluginBase):
             self.logger.warning(u"Audit device props error: {0}".format(sub_error))
 
             return False
+
+    # =============================================================================
+    def audit_p_dict(self, p_dict):
+        """
+        """
+
+        def fix_rgb(c):
+
+            return r"#{0}".format(c.replace(' ', '').replace('#', ''))
+
+        # Colors are stored in values_dict as "XX XX XX", and we need to convert them to "#XXXXXX".
+        for k in p_dict.keys():
+            if 'color' in k:
+                p_dict[k] = fix_rgb(p_dict[k])
+
+        # # Format color values
+        # plt.rcParams['grid.color']    = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        # plt.rcParams['xtick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        # plt.rcParams['ytick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        # p_dict['faceColor']           = fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
+        # p_dict['fontColor']           = fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
+        # p_dict['fontColorAnnotation'] = fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
+        # p_dict['gridColor']           = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        # p_dict['spineColor']          = fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
+        # p_dict['backgroundColor']     = fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
+
+        return p_dict
 
     # =============================================================================
     def audit_save_paths(self):
@@ -2439,11 +2480,11 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Scripting payload: {0}".format(dict(plugin_action.props)))
 
-        dpi        = int(self.pluginPrefs.get('chartResolution', 100))
-        height     = float(self.pluginPrefs.get('rectChartHeight', 250))
-        width      = float(self.pluginPrefs.get('rectChartWidth', 600))
-        face_color = '#' + self.pluginPrefs.get('faceColor', '00 00 00').replace(' ', '')
-        canvas_color = '#' + self.pluginPrefs.get('backgroundColor', '00 00 00').replace(' ', '')
+        dpi          = int(self.pluginPrefs.get('chartResolution', 100))
+        height       = float(self.pluginPrefs.get('rectChartHeight', 250))
+        width        = float(self.pluginPrefs.get('rectChartWidth', 600))
+        face_color   = r'#{0}'.format(self.pluginPrefs.get('faceColor', '00 00 00').replace(' ', '').replace('#', ''))
+        canvas_color = r'#{0}'.format(self.pluginPrefs.get('backgroundColor', '00 00 00').replace(' ', '').replace('#', ''))
 
         try:
             fig = plt.figure(1, figsize=(width / dpi, height / dpi))
@@ -2640,12 +2681,15 @@ class Plugin(indigo.PluginBase):
             p_dict  = dict(self.pluginPrefs)  # A dict of plugin preferences (we set defaults and override with pluginPrefs).
 
             try:
-                p_dict['font_style']  = 'normal'
-                p_dict['font_weight'] = 'normal'
-                p_dict['tick_bottom'] = 'on'
-                p_dict['tick_left']   = 'on'
-                p_dict['tick_right']  = 'off'
-                p_dict['tick_top']    = 'off'
+                p_dict = self.audit_p_dict(p_dict)
+
+                p_dict['font_style']    = 'normal'
+                p_dict['font_weight']   = 'normal'
+                p_dict['tick_bottom']   = 'on'
+                p_dict['tick_left']     = 'on'
+                p_dict['tick_right']    = 'off'
+                p_dict['tick_top']      = 'off'
+                p_dict['legendColumns'] = self.pluginPrefs.get('legendColumns', 5)
 
                 # ============================ rcParams overrides =============================
                 plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
@@ -2658,39 +2702,26 @@ class Plugin(indigo.PluginBase):
                 plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
                 plt.rcParams['ytick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
 
-                plt.rcParams['grid.color']  = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
-                plt.rcParams['xtick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
-                plt.rcParams['ytick.color'] = r"#{0}".format(self.pluginPrefs.get('tickColor', '88 88 88').replace(' ', '').replace('#', ''))
-
-                p_dict['faceColor']           = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-                p_dict['fontColor']           = r"#{0}".format(self.pluginPrefs.get('fontColor', 'FF FF FF').replace(' ', '').replace('#', ''))
-                p_dict['fontColorAnnotation'] = r"#{0}".format(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF').replace(' ', '').replace('#', ''))
-                p_dict['gridColor']           = r"#{0}".format(self.pluginPrefs.get('gridColor', '88 88 88').replace(' ', '').replace('#', ''))
-                p_dict['spineColor']          = r"#{0}".format(self.pluginPrefs.get('spineColor', '88 88 88').replace(' ', '').replace('#', ''))
-
-                p_dict['legendColumns']       = self.pluginPrefs.get('legendColumns', 5)
-
                 # ============================= Background color ==============================
+                # Note that 'other' colors are no longer used, but need to be supported for legacy installs.
                 if not self.pluginPrefs.get('backgroundColorOther', 'false'):
                     p_dict['transparent_charts'] = False
-                    p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
                 elif self.pluginPrefs.get('backgroundColorOther', 'false') == 'false':
                     p_dict['transparent_charts'] = False
-                    p_dict['backgroundColor']    = r"#{0}".format(self.pluginPrefs.get('backgroundColor', 'FF FF FF').replace(' ', '').replace('#', ''))
                 else:
                     p_dict['transparent_charts'] = True
-                    p_dict['backgroundColor'] = '#000000'
+                    p_dict['backgroundColor']    = '#000000'
 
                 # ============================== Plot Area color ==============================
                 if not self.pluginPrefs.get('faceColorOther', 'false'):
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
                 elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'false').replace(' ', '').replace('#', ''))
+                    p_dict['faceColor']          = r"#{0}".format(self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', ''))
                 else:
                     p_dict['transparent_filled'] = False
-                    p_dict['faceColor'] = '#000000'
+                    p_dict['faceColor']          = '#000000'
 
                 # A list of chart ids may be passed to the method. In that case, refresh only
                 # those charts. Otherwise, chart_id is None and we evaluate all of the charts
@@ -2710,6 +2741,8 @@ class Plugin(indigo.PluginBase):
 
                             if refresh_needed:
                                 dev_list.append(dev)
+
+                p_dict = self.audit_p_dict(p_dict)
 
                 for dev in dev_list:
 
@@ -2864,7 +2897,7 @@ class Plugin(indigo.PluginBase):
                         # ============================== Best Fit Lines ===============================
                         # Set the defaults for best fit lines in p_dict.
                         for _ in range(1, 9, 1):
-                            p_dict['line{0}BestFitColor'.format(_)] = dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00').replace('#', '')
+                            p_dict['line{0}BestFitColor'.format(_)] = r"#{0}".format(dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00').replace('#', ''))
 
                         # ============================== Phantom Labels ===============================
                         # Since users may or may not include axis labels and because we want to ensure
@@ -3122,7 +3155,7 @@ class MakeChart(object):
         try:
 
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor'] = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
             x_obs           = ''
             y_obs_tuple     = ()  # Y values
             y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
@@ -3351,10 +3384,11 @@ class MakeChart(object):
 
         try:
 
-            num_obs                   = p_dict['numObs']
+            bar_colors = []
+            num_obs    = p_dict['numObs']
+
             p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
             p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            bar_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
@@ -4253,7 +4287,7 @@ class MakeChart(object):
 
                 p_dict['group{0}Color'.format(thing)]       = r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
                 p_dict['group{0}MarkerColor'.format(thing)] = r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', 'FF 00 00'))
+                p_dict['line{0}BestFitColor'.format(thing)] = r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', ''))
 
                 # If dot color is the same as the background color, alert the user.
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_group:
@@ -4654,13 +4688,14 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
-            p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
-            p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
-            p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
-            p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
+            log['Info'].append(u"{0}".format(p_dict))
+            # p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            # p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            # p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            # p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            # p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            # p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
+            # p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
 
             dates_to_plot = p_dict['dates_to_plot']
 

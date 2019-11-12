@@ -130,8 +130,8 @@
     <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's annotation text.">
         <Label>Annotation Color:</Label>
     </Field>
-    <!-- Background Color -->
 
+    <!-- Background Color -->
     <Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00" tooltip="Select preference for the background color of your chart.">
         <Label>Canvas Color:</Label>
     </Field>

@@ -1,3 +1,11 @@
+v0.8.29
+- Removes all references to legacy version checking.
+
+v0.8.28
+- Provides additional validation to ensure that required plugin configuration
+fields are non-empty.
+- Bug fixes.
+
 v0.8.27
 - Fixes bug in Area, Bar, Line, and Scatter Chart devices where ticking the
   Suppress [item] checkbox did not silence the warnings that the [item] color
