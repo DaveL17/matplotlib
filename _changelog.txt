@@ -1,9 +1,14 @@
+v0.8.30
+- Fixes bug where y axis min not formatted properly when set automatically.
+- Improves error handling in csv_refresh_process.
+- Code refinements.
+
 v0.8.29
 - Removes all references to legacy version checking.
 
 v0.8.28
 - Provides additional validation to ensure that required plugin configuration
-fields are non-empty.
+  fields are non-empty.
 - Bug fixes.
 
 v0.8.27

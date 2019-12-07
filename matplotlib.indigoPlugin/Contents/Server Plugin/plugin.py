@@ -51,6 +51,11 @@ the proper Fantastic Weather devices.
 #       that this is non-trivial because it requires a round-trip outside the class. Needs a
 #       pipe to send things to the host plugin and get a response.
 # TODO: Make precipitation bars for hourly forecast and daily forecast look the same.
+
+# TODO: Improve error trapping in csv_refresh_process
+# TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
+#       and don't even cycle the plugin when the location is gone.
+# TODO: Improve RGB handling.
 # ================================== IMPORTS ==================================
 
 try:
@@ -69,6 +74,7 @@ import multiprocessing
 import numpy as np
 import os
 import re
+import shutil
 import traceback
 import unicodedata
 
@@ -100,8 +106,8 @@ __author__    = Dave.__author__
 __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
-__title__     = "Matplotlib Plugin for Indigo Home Control"
-__version__   = "0.8.29"
+__title__     = u"Matplotlib Plugin for Indigo Home Control"
+__version__   = u"0.8.30"
 
 # =============================================================================
 
@@ -1235,15 +1241,15 @@ class Plugin(indigo.PluginBase):
                 p_dict[k] = fix_rgb(p_dict[k])
 
         # # Format color values
-        # plt.rcParams['grid.color']    = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        # plt.rcParams['xtick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        # plt.rcParams['ytick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        # p_dict['faceColor']           = fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
-        # p_dict['fontColor']           = fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
-        # p_dict['fontColorAnnotation'] = fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
-        # p_dict['gridColor']           = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        # p_dict['spineColor']          = fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
-        # p_dict['backgroundColor']     = fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
+        plt.rcParams['grid.color']    = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        plt.rcParams['xtick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        plt.rcParams['ytick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        p_dict['faceColor']           = fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
+        p_dict['fontColor']           = fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
+        p_dict['fontColorAnnotation'] = fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
+        p_dict['gridColor']           = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        p_dict['spineColor']          = fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
+        p_dict['backgroundColor']     = fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
 
         return p_dict
 
@@ -1694,8 +1700,6 @@ class Plugin(indigo.PluginBase):
 
         try:
 
-            import shutil
-
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
             delta        = dev.pluginProps.get('numLinesToKeepTime', '72')
             cycle_time   = dt.datetime.now()
@@ -1721,29 +1725,26 @@ class Plugin(indigo.PluginBase):
                         os.makedirs(self.pluginPrefs['dataPath'])
                         self.logger.warning(u"Target data folder does not exist. Creating it.")
 
-                    except IOError:
+                    except OSError:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
 
-                    except OSError:
+                if not os.path.isfile(full_path):
+                    try:
+                        self.logger.debug(u"CSV does not exist. Creating: {0}".format(full_path))
+                        csv_file = open(full_path, 'w')
+                        csv_file.write('{0},{1}\n'.format('Timestamp', v[0].encode("utf-8")))
+                        csv_file.close()
+                        self.sleep(1)
+
+                    except IOError:
                         self.pluginErrorHandler(traceback.format_exc())
                         self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
-
-                if not os.path.isfile(full_path):
-                    self.logger.debug(u"CSV does not exist. Creating: {0}".format(full_path))
-                    csv_file = open(full_path, 'w')
-                    csv_file.write('{0},{1}\n'.format('Timestamp', v[0].encode("utf-8")))
-                    csv_file.close()
-                    self.sleep(1)
 
                 # =============================== Create Backup ===============================
                 # Make a backup of the CSV file in case something goes wrong.
                 try:
                     shutil.copyfile(full_path, backup)
-
-                except ImportError as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"[{0}] The CSV Engine facility requires the shutil module: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
                 except Exception as sub_error:
                     self.pluginErrorHandler(traceback.format_exc())
@@ -4688,14 +4689,13 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            log['Info'].append(u"{0}".format(p_dict))
-            # p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            # p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            # p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
-            # p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
-            # p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
-            # p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
-            # p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
+            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
+            p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
+            p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
+            p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
 
             dates_to_plot = p_dict['dates_to_plot']
 
@@ -5311,6 +5311,7 @@ class MakeChart(object):
             y_min_wanted = p_dict['yAxisMin']
             y_max_wanted = p_dict['yAxisMax']
 
+
             # Since the min / max is used here only for chart boundaries, we "trick"
             # Matplotlib by using a number that's very nearly zero.
             if y_min == 0:
@@ -5321,13 +5322,20 @@ class MakeChart(object):
 
             # Y min
             if isinstance(y_min_wanted, unicode) and y_min_wanted.lower() == 'none':
-                y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
+                if y_min > 0:
+                    y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
+                else:
+                    y_axis_min = y_min * (1 + (1 / abs(y_min) ** 1.25))
             else:
                 y_axis_min = float(y_min_wanted)
 
             # Y max
             if isinstance(y_max_wanted, unicode) and y_max_wanted.lower() == 'none':
-                y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
+                if y_max > 0:
+                    y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
+                else:
+                    y_axis_max = y_max * (1 - (1 / abs(y_max) ** 1.25))
+
             else:
                 y_axis_max = float(y_max_wanted)
 
