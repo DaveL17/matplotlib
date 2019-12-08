@@ -52,12 +52,12 @@ the proper Fantastic Weather devices.
 #       pipe to send things to the host plugin and get a response.
 # TODO: Make precipitation bars for hourly forecast and daily forecast look the same.
 
-# TODO: Improve error trapping in csv_refresh_process
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Improve RGB handling.
+# TODO: Import / Export is unfinished
 # ================================== IMPORTS ==================================
-
+s
 try:
     import indigo
 except ImportError as error:
@@ -107,7 +107,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo Home Control"
-__version__   = u"0.8.30"
+__version__   = u"0.8.31"
 
 # =============================================================================
 

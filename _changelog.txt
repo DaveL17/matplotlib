@@ -1,3 +1,6 @@
+v0.8.31
+- Fixes broken link to repo.
+
 v0.8.30
 - Fixes bug where y axis min not formatted properly when set automatically.
 - Improves error handling in csv_refresh_process.
