@@ -57,7 +57,7 @@ the proper Fantastic Weather devices.
 # TODO: Improve RGB handling.
 # TODO: Import / Export is unfinished
 # ================================== IMPORTS ==================================
-s
+
 try:
     import indigo
 except ImportError as error:
@@ -107,7 +107,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo Home Control"
-__version__   = u"0.8.31"
+__version__   = u"0.8.32"
 
 # =============================================================================
 

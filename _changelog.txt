@@ -1,3 +1,6 @@
+v0.8.32
+- Fixes initialization error.
+
 v0.8.31
 - Fixes broken link to repo.
 
