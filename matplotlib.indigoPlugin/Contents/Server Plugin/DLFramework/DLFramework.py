@@ -20,7 +20,7 @@ __build__ = "Unused"
 __copyright__ = "Copyright 2017-2019 DaveL17"
 __license__ = "MIT"
 __title__ = "DLFramework"
-__version__ = "0.1.01"
+__version__ = "0.1.02"
 
 
 class Fogbert(object):

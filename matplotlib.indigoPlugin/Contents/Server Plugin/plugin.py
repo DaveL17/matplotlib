@@ -35,9 +35,6 @@ the proper Fantastic Weather devices.
 # TODO: Try to address annotation collisions.
 # TODO: Add facility to have different Y1 and Y2. Add a new group of controls (like Y1) for Y2 and
 #       then have a control to allow user to elect when Y axis to assign the line to.
-# TODO: Remove matplotlib_version.html after deprecation
-# TODO: Add validation that will not allow custom tick locations to be outside the boundaries of
-#       the axis min/max.
 # TODO: Add adjustment factor to scatter charts
 # TODO: Add props to adjust the figure to API.
 # TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
@@ -50,8 +47,6 @@ the proper Fantastic Weather devices.
 #       day's forecast high temperature. ('%%d:733695023:d01_temperatureHigh%%', 'blue'). Note
 #       that this is non-trivial because it requires a round-trip outside the class. Needs a
 #       pipe to send things to the host plugin and get a response.
-# TODO: Make precipitation bars for hourly forecast and daily forecast look the same.
-
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Improve RGB handling.
@@ -107,7 +102,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo Home Control"
-__version__   = u"0.8.32"
+__version__   = u"0.8.33"
 
 # =============================================================================
 
@@ -584,18 +579,14 @@ class Plugin(indigo.PluginBase):
 
         self.logger.threaddebug(u"Validating plugin configuration parameters.")
 
-        # ================================= Data Path =================================
+        # ================================ Data Paths =================================
         for path_prop in ('chartPath', 'dataPath'):
             try:
                 if not values_dict[path_prop].endswith('/'):
-                    error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
-                    error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                    return False, values_dict, error_msg_dict
+                    error_msg_dict[path_prop] = u"The path must end with a forward slash '/'."
 
             except AttributeError:
-                error_msg_dict[path_prop]       = u"The path must end with a forward slash '/'."
-                error_msg_dict['showAlertText'] = u"Path Error.\n\nYou have entered a path that does not end with a forward slash '/'."
-                return False, values_dict, error_msg_dict
+                error_msg_dict[path_prop] = u"The path must end with a forward slash '/'."
 
         # =============================== Chart Colors ================================
         # Inspects various color controls and sets them to default when the value is not hex.
@@ -611,15 +602,12 @@ class Plugin(indigo.PluginBase):
 
         # ============================= Chart Dimensions ==============================
         for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth', 'sqChartSize'):
+            values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
             try:
                 if float(values_dict[dimension_prop]) < 75:
-                    error_msg_dict[dimension_prop]  = u"The dimension value must be greater than 75 pixels."
-                    error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be greater than 75 pixels"
-                    return False, values_dict, error_msg_dict
+                    error_msg_dict[dimension_prop] = u"The dimension value must be greater than 75 pixels."
             except ValueError:
-                error_msg_dict[dimension_prop]  = u"The dimension value must be a real number."
-                error_msg_dict['showAlertText'] = u"Dimension Error.\n\nThe dimension value must be a real number."
-                return False, values_dict, error_msg_dict
+                error_msg_dict[dimension_prop] = u"The dimension value must be a real number."
 
         # ============================= Chart Resolution ==============================
         # Note that chart resolution includes a warning feature that will pass the
@@ -632,107 +620,148 @@ class Plugin(indigo.PluginBase):
 
             # If warning flag and the value is potentially too small.
             elif values_dict['dpiWarningFlag'] and 0 < int(values_dict['chartResolution']) < 80:
-                error_msg_dict['chartResolution'] = u"It is recommended that you enter a value of 80 or more for best results."
-                error_msg_dict['showAlertText']   = u"Chart Resolution Warning.\n\nIt is recommended that you enter a value of 80 or more for best results."
-                values_dict['dpiWarningFlag']      = False
-                return False, values_dict, error_msg_dict
+                values_dict['dpiWarningFlag'] = False
+                error_msg_dict['showAlertText'] = u"It is recommended that you enter a value of 80 or more for best results."
 
             # If no warning flag and the value is good.
             elif not values_dict['dpiWarningFlag'] or int(values_dict['chartResolution']) >= 80:
-                pass
+                # Just in case, strip any embedded spaces
+                values_dict['chartResolution'] = values_dict['chartResolution'].replace(" ", "")
 
             else:
                 error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
-                error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
-                return False, values_dict, error_msg_dict
 
         except ValueError:
-            error_msg_dict['chartResolution'] = u"The chart resolution value must be an integer."
-            error_msg_dict['showAlertText']   = u"Chart Resolution Error.\n\nThe chart resolution must be an integer greater than zero."
-            return False, values_dict, error_msg_dict
+            error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
 
         # ================================ Line Weight ================================
         try:
             if float(values_dict['lineWeight']) <= 0:
-                error_msg_dict['lineWeight']    = u"The line weight value must be greater than zero."
-                error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be greater than zero"
-                return False, values_dict, error_msg_dict
+                error_msg_dict['lineWeight'] = u"The line weight value must be greater than zero."
         except ValueError:
-            error_msg_dict['lineWeight']    = u"The line weight value must be a real number."
-            error_msg_dict['showAlertText'] = u"Line Weight Error.\n\nThe line weight value must be a real number"
+            error_msg_dict['lineWeight'] = u"The line weight value must be a real number."
+
+        if len(error_msg_dict) > 0:
             return False, values_dict, error_msg_dict
 
-        # TODO: consider adding this feature to DLFramework and including in all plugins.
-        # ============================== Log All Changes ==============================
-        # Log any changes to the plugin preferences.
-        changed_keys   = ()
-        config_changed = False
+        else:
+            # TODO: consider adding this feature to DLFramework and including in all plugins.
+            # ============================== Log All Changes ==============================
+            # Log any changes to the plugin preferences.
+            changed_keys   = ()
+            config_changed = False
 
-        for key in values_dict.keys():
-            try:
-                if values_dict[key] != self.pluginPrefs[key]:
-                    config_changed = True
-                    changed_keys += (u"{0}".format(key), u"Old: {0}".format(self.pluginPrefs[key]), u"New: {0}".format(values_dict[key]),)
-            # Missing keys will be config dialog format props like labels and separators
-            except KeyError:
-                pass
+            for key in values_dict.keys():
+                try:
+                    if values_dict[key] != self.pluginPrefs[key]:
+                        config_changed = True
+                        changed_keys += (u"{0}".format(key), u"Old: {0}".format(self.pluginPrefs[key]), u"New: {0}".format(values_dict[key]),)
+                # Missing keys will be config dialog format props like labels and separators
+                except KeyError:
+                    pass
 
-        if config_changed:
-            self.logger.threaddebug(u"values_dict changed: {0}".format(changed_keys))
+            if config_changed:
+                self.logger.threaddebug(u"values_dict changed: {0}".format(changed_keys))
 
-        values_dict['dpiWarningFlag'] = True
-        self.logger.threaddebug(u"Preferences validated successfully.")
-        return True, values_dict
+            values_dict['dpiWarningFlag'] = True
+            self.logger.threaddebug(u"Preferences validated successfully.")
+            return True, values_dict
 
     # =============================================================================
     def validateDeviceConfigUi(self, values_dict=None, type_id="", dev_id=0):
 
         error_msg_dict = indigo.Dict()
-        dev = indigo.devices[int(dev_id)]
-
         self.logger.threaddebug(u"Validating device configuration parameters.")
 
         # ================================ Area Chart =================================
         if type_id == 'areaChartingDevice':
-
             # There must be at least 1 source selected
             if values_dict['area1Source'] == 'None':
                 error_msg_dict['area1Source'] = u"You must select at least one data source."
-                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, values_dict, error_msg_dict
 
             # Iterate for each area group (1-6).
             for area in range(1, 9, 1):
-
                 # Line adjustment values
                 for char in values_dict['area{0}adjuster'.format(area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['area{0}adjuster'.format(area)] = u"Valid operators are +, -, *, /"
-                        error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
-                        return False, values_dict, error_msg_dict
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+                    for tick in custom_ticks:
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
 
         # ================================= Bar Chart =================================
         if type_id == 'barChartingDevice':
 
-            bar_1_source = values_dict['bar1Source']
-
             # Must select at least one source (bar 1)
-            if bar_1_source == 'None':
+            if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
-                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, values_dict, error_msg_dict
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
-                bar_width = float(values_dict['barWidth'])
-
-                if not bar_width >= 0:
+                if not float(values_dict['barWidth']) >= 0:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
-                error_msg_dict['showAlertText'] = u"Bar Width Error.\n\nYou must enter a bar width greater than 0."
-                return False, values_dict, error_msg_dict
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+
+                    for tick in custom_ticks:
+                        # Ensure all custom tick locations are within bounds.
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
 
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
@@ -740,15 +769,10 @@ class Plugin(indigo.PluginBase):
             for prop in ('cautionLevel', 'warningLevel'):
                 try:
                     # Bar width must be greater than 0. Will also trap strings.
-                    alert_level = float(values_dict[prop])
-
-                    if not 0 <= alert_level <= 100:
+                    if not 0 <= float(values_dict[prop]) <= 100:
                         raise ValueError
-
                 except ValueError:
                     error_msg_dict[prop] = u"Alert levels must between 0 and 100 (integer)."
-                    error_msg_dict['showAlertText'] = u"Alert Level Error.\n\nYou must enter an alert level between 0 and 100 (integer)."
-                    return False, values_dict, error_msg_dict
 
         # ============================== Calendar Chart ===============================
         # There are currently no unique validation steps needed for calendar devices
@@ -760,45 +784,27 @@ class Plugin(indigo.PluginBase):
 
             # ========================== Number of Observations ===========================
             try:
-                # Will catch strings and floats cast as strings
-                obs = int(values_dict['numLinesToKeep'])
-
                 # Must be 1 or greater
-                if obs < 1:
+                if int(values_dict['numLinesToKeep']) < 1:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['numLinesToKeep'] = u"The observation value must be a whole number integer greater than zero."
-                error_msg_dict['showAlertText'] = u"Observation Value Error.\n\nThe observation value must be a whole number integer greater than zero."
-                return False, values_dict, error_msg_dict
 
             # ================================= Duration ==================================
             try:
-                duration = float(values_dict['numLinesToKeepTime'])
-
                 # Must be zero or greater
-                if duration < 0:
+                if float(values_dict['numLinesToKeepTime']) < 0:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['numLinesToKeepTime'] = u"The duration value must be an integer or float greater than zero."
-                error_msg_dict['showAlertText'] = u"Duration Value Error.\n\nThe observation value must be an integer or float greater than zero."
-                return False, values_dict, error_msg_dict
-
-            self.logger.threaddebug(u"[{0}] Settings validated successfully.".format(dev.name))
 
             # ============================= Refresh Interval ==============================
             try:
-                refresh = int(values_dict['refreshInterval'])
-
                 # Must be zero or greater
-                if refresh < 0:
+                if int(values_dict['refreshInterval']) < 0:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['refreshInterval'] = u"The refresh interval must be a whole number integer and greater than zero."
-                error_msg_dict['showAlertText'] = u"Refresh interval Value Error.\n\nThe observation value must be a whole number integer and greater than zero."
-                return False, values_dict, error_msg_dict
 
             # =============================== Data Sources ================================
             try:
@@ -814,11 +820,8 @@ class Plugin(indigo.PluginBase):
                     # If columnDict has no keys, we know that won't work either.
                     if len(sources.keys()) == 0:
                         raise ValueError
-
             except ValueError:
                 error_msg_dict['addSource'] = u"You must create at least one CSV data source."
-                error_msg_dict['showAlertText'] = u"You must create at least one CSV data source. If you have filled in the entries, you may need to click the 'Add Item' button."
-                return False, values_dict, error_msg_dict
 
         # ================================ Line Chart =================================
         if type_id == 'lineChartingDevice':
@@ -826,8 +829,6 @@ class Plugin(indigo.PluginBase):
             # There must be at least 1 source selected
             if values_dict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
-                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, values_dict, error_msg_dict
 
             # Iterate for each line group (1-6).
             for area in range(1, 9, 1):
@@ -836,121 +837,139 @@ class Plugin(indigo.PluginBase):
                 for char in values_dict['line{0}adjuster'.format(area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['line{0}adjuster'.format(area)] = u"Valid operators are +, -, *, /"
-                        error_msg_dict['showAlertText'] = u"Adjuster Error.\n\nValid operators are +, -, *, /."
-                        return False, values_dict, error_msg_dict
 
                 # Fill is illegal for the steps line type
                 if values_dict['line{0}Style'.format(area)] == 'steps' and values_dict['line{0}Fill'.format(area)]:
                     error_msg_dict['line{0}Fill'.format(area)] = u"Fill is not supported for the Steps line type."
-                    error_msg_dict['line{0}Style'.format(area)] = u"Fill is not supported for the Steps line type."
-                    error_msg_dict['showAlertText'] = u"Settings Conflict.\n\nFill is not supported for the Steps line style. Select a different line style or turn off the fill setting."
-                    return False, values_dict, error_msg_dict
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+
+                    for tick in custom_ticks:
+                        # Ensure all custom tick locations are within bounds.
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
 
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
 
             for prop in ('thing', 'thingState'):
-
                 # A data source must be selected
                 if not values_dict[prop] or values_dict[prop] == 'None':
                     error_msg_dict[prop] = u"You must select a data source."
-                    error_msg_dict['showAlertText'] = u"Source Error.\n\nYou must select a text source for charting."
-                    return False, values_dict, error_msg_dict
 
             try:
-                # Number of characters. Will catch strings and floats
-                characters = int(values_dict['numberOfCharacters'])
-
-                # Must be zero or greater
-                if characters < 1:
+                if int(values_dict['numberOfCharacters']) < 1:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number greater than zero (integer)."
-                error_msg_dict['showAlertText'] = u"Number of Characters Error.\n\nThe number of characters must be a positive number greater than zero (integer)."
-                return False, values_dict, error_msg_dict
 
             # Figure width and height.
             for prop in ('figureWidth', 'figureHeight'):
                 try:
-                    # Will catch strings and floats
-                    figure_size = int(values_dict[prop])
-
-                    # Must be zero or greater
-                    if figure_size < 1:
+                    if int(values_dict[prop]) < 1:
                         raise ValueError
-
                 except ValueError:
                     error_msg_dict[prop] = u"The figure width and height must be positive whole numbers greater than zero (pixels)."
-                    error_msg_dict['showAlertText'] = u"Figure Dimensions Error.\n\nThe figure width and height must be positive whole numbers greater than zero (pixels)."
-                    return False, values_dict, error_msg_dict
 
             # Font size
             try:
-                # Will catch strings
-                font_size = float(values_dict['multilineFontSize'])
-
-                # Must be zero or greater
-                if font_size < 0:
+                if float(values_dict['multilineFontSize']) < 0:
                     raise ValueError
-
             except ValueError:
                 error_msg_dict['multilineFontSize'] = u"The font size must be a positive real number greater than zero."
-                error_msg_dict['showAlertText'] = u"Font Size Error.\n\nThe font size must be a positive real number greater than zero."
-                return False, values_dict, error_msg_dict
 
         # ================================ Polar Chart ================================
         if type_id == 'polarChartingDevice':
 
             if not values_dict['thetaValue']:
                 error_msg_dict['thetaValue'] = u"You must select a direction source."
-                error_msg_dict['showAlertText'] = u"Direction Source Error.\n\nYou must select a direction source for charting."
-                return False, values_dict, error_msg_dict
 
             if not values_dict['radiiValue']:
                 error_msg_dict['radiiValue'] = u"You must select a magnitude source."
-                error_msg_dict['showAlertText'] = u"Magnitude Source Error.\n\nYou must select a magnitude source for charting."
-                return False, values_dict, error_msg_dict
 
             # Number of observations
             try:
-                # Will catch strings and floats
-                num_obs = int(values_dict['numObs'])
-
-                # Must be 1 or greater
-                if num_obs < 1:
+                if int(values_dict['numObs']) < 1:
                     error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number integer)."
-                    error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nYou must specify at least 1 observation (must be a whole number integer)."
-                    return False, values_dict, error_msg_dict
-
             except ValueError:
-                error_msg_dict['numObs'] = u"The number of observations must be a whole number integer)."
-                error_msg_dict['showAlertText'] = u"Number of Observations Error.\n\nThe number of observations must be a whole number integer)."
-                return False, values_dict, error_msg_dict
+                    error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number integer)."
 
         # =============================== Scatter Chart ===============================
         if type_id == 'scatterChartingDevice':
 
             if not values_dict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
-                error_msg_dict['showAlertText'] = u"Data Source Error.\n\nYou must select at least one source for charting."
-                return False, values_dict, error_msg_dict
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+
+                    for tick in custom_ticks:
+                        # Ensure all custom tick locations are within bounds.
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the boundaries of the Y axis."
 
         # =============================== Weather Chart ===============================
         if type_id == 'forecastChartingDevice':
 
             if not values_dict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
-                error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
-                return False, values_dict, error_msg_dict
 
         # ========================== Composite Weather Chart ==========================
         if type_id == 'compositeForecastDevice':
 
             if not values_dict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
-                error_msg_dict['showAlertText'] = u"Forecast Device Source Error.\n\nYou must select a weather forecast source device for charting."
-                return False, values_dict, error_msg_dict
 
             for _ in ('pressure_min', 'pressure_max',
                       'temperature_min', 'temperature_max',
@@ -965,13 +984,9 @@ class Plugin(indigo.PluginBase):
                         pass
                     else:
                         error_msg_dict[_] = u"The value must be empty, 'None', or a numeric value."
-                        error_msg_dict['showAlertText'] = u"Min/Max Error.\n\nThe value must be empty, 'None', or a numeric value."
-                        return False, values_dict, error_msg_dict
 
             if len(values_dict['component_list']) < 2:
                 error_msg_dict['component_list'] = u"You must select at least two plot elements."
-                error_msg_dict['showAlertText'] = u"Plot Controls Error.\n\nYou must select at least two plot elements for a composite weather plot."
-                return False, values_dict, error_msg_dict
 
         # ============================== All Chart Types ==============================
         # The following validation blocks are applied to all graphical chart device
@@ -983,14 +998,8 @@ class Plugin(indigo.PluginBase):
             try:
                 if custom_dimension_prop in values_dict.keys() and values_dict[custom_dimension_prop] != 'None' and float(values_dict[custom_dimension_prop]) < 75:
                     error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
-                    error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is less than 75 pixels."
-                    return False, values_dict, error_msg_dict
-
             except ValueError:
-                error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number."
-                error_msg_dict['showAlertText']       = u"Chart Dimension Error.\n\nYou have entered a chart dimension value that is not a real number."
-                values_dict[custom_dimension_prop]     = 'None'
-                return False, values_dict, error_msg_dict
+                error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number greater than 75 pixels."
 
         # ================================ Axis Limits ================================
         # Check to see that each axis limit matches one of the accepted formats
@@ -1008,13 +1017,13 @@ class Plugin(indigo.PluginBase):
                 try:
                     if values_dict[limit_prop] not in ('None', '0'):
                         float(values_dict[limit_prop])
-
                 except ValueError:
-                    error_msg_dict[limit_prop]      = u"The axis limit must be a real number or None."
-                    error_msg_dict['showAlertText'] = u"Axis limit Error.\n\n" \
-                                                      u"A valid axis limit must be in the form of a real number or None ({0} = {1}).".format(limit_prop, values_dict[limit_prop])
                     values_dict[limit_prop] = 'None'
-                    return False, values_dict, error_msg_dict
+                    error_msg_dict[limit_prop] = u"The axis limit must be a real number or None."
+
+        if len(error_msg_dict) > 0:
+            error_msg_dict['showAlertText'] = u"Configuration Errors\n\nThere are one or more settings that need to be corrected. Fields requiring attention will be highlighted."
+            return False, values_dict, error_msg_dict
 
         self.logger.threaddebug(u"Preferences validated successfully.")
         return True, values_dict, error_msg_dict
