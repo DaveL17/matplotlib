@@ -446,8 +446,7 @@ class Plugin(indigo.PluginBase):
             return values_dict
 
         except KeyError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
 
         return True, values_dict
 
@@ -545,7 +544,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        # =========================== Check Indigo Version ============================
+        # =========================== Audit Server Version ============================
         self.Fogbert.audit_server_version(min_ver=7)
 
         # =========================== Check CSV Uniqueness ============================
@@ -1133,12 +1132,14 @@ class Plugin(indigo.PluginBase):
                             self.logger.warning(u"Target data folder does not exist. Creating it.")
 
                         except IOError:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
+                            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable "
+                                                 u"to create it. See plugin log for more information.".format(dev.name))
 
                         except OSError:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
+                            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. "
+                                                 u"See plugin log for more information.".format(dev.name))
 
                     if not os.path.isfile(full_path):
                         self.logger.warning(u"CSV file does not exist. Creating a new one: {0}".format(full_path))
@@ -1230,8 +1231,9 @@ class Plugin(indigo.PluginBase):
 
             return True
 
-        except Exception as sub_error:
-            self.logger.warning(u"Audit device props error: {0}".format(sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.warning(u"Audit device props error.")
 
             return False
 
@@ -1289,8 +1291,9 @@ class Plugin(indigo.PluginBase):
                     self.logger.warning(u"Target folder does not exist. Creating path:{0}".format(path_name))
 
                 except (IOError, OSError):
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See plugin log for more information.")
+                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                    self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See "
+                                         u"plugin log for more information.")
 
         # Test to ensure that each path is writeable.
         for path_name in path_list:
@@ -1324,9 +1327,9 @@ class Plugin(indigo.PluginBase):
             try:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 indigo.device.enable(dev, value=False)
-            except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more information.".format(sub_error))
+            except Exception:
+                self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"Exception when trying to kill all comms.")
 
     # =============================================================================
     def commsUnkillAll(self):
@@ -1344,9 +1347,9 @@ class Plugin(indigo.PluginBase):
         for dev in indigo.devices.itervalues("self"):
             try:
                 indigo.device.enable(dev, value=True)
-            except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more information.".format(sub_error))
+            except Exception:
+                self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"Exception when trying to kill all comms.")
 
     # =============================================================================
     def convert_custom_colors(self):
@@ -1465,11 +1468,12 @@ class Plugin(indigo.PluginBase):
                 else:
                     self.logger.info(u"Pruning CSV Engine.")
 
-            values_dict['columnDict'] = str(new_dict)  # Convert column_dict back to a string and prepare it for storage.
+            # Convert column_dict back to a string and prepare it for storage.
+            values_dict['columnDict'] = str(new_dict)
 
-        except AttributeError, sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"[{0}] Error adding CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
+        except AttributeError:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error adding CSV item. See plugin log for more information.")
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
         file_name = values_dict['addValue']
@@ -1513,9 +1517,9 @@ class Plugin(indigo.PluginBase):
             values_dict["editKey"] = values_dict["csv_item_list"]
             del column_dict[values_dict['editKey']]
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"[{0}] Error deleting CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error deleting CSV item.".format(dev.name))
 
         values_dict['csv_item_list'] = ""
         values_dict['editKey']     = ""
@@ -1551,9 +1555,9 @@ class Plugin(indigo.PluginBase):
             column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
             prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"[{0}] Error generating CSV item list: {0}. See plugin log for more information.".format(dev.name, sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error generating CSV item list.".format(dev.namer))
             prop_list = []
 
         result = sorted(prop_list, key=lambda tup: tup[1].lower())  # Return a list sorted by the value and not the key. Case insensitive sort.
@@ -1600,9 +1604,9 @@ class Plugin(indigo.PluginBase):
             if not len(error_msg_dict):
                 values_dict['previousKey'] = key
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"[{0}] Error updating CSV item: {1}. See plugin log for more information.".format(dev.name, sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error updating CSV item.".format(dev.name))
 
         # Remove any empty entries as they're not going to do any good anyway.
         new_dict = {}
@@ -1646,9 +1650,9 @@ class Plugin(indigo.PluginBase):
             values_dict['isColumnSelected'] = True
             values_dict['previousKey']      = values_dict['csv_item_list']
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose: {1}. See plugin log for more information.".format(dev.name, sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose.")
         return values_dict
 
     # =============================================================================
@@ -1735,8 +1739,9 @@ class Plugin(indigo.PluginBase):
                         self.logger.warning(u"Target data folder does not exist. Creating it.")
 
                     except OSError:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to create it. See plugin log for more information.".format(dev.name))
+                        self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to "
+                                             u"create it. See plugin log for more information.".format(dev.name))
 
                 if not os.path.isfile(full_path):
                     try:
@@ -1747,17 +1752,18 @@ class Plugin(indigo.PluginBase):
                         self.sleep(1)
 
                     except IOError:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See plugin log for more information.".format(dev.name))
+                        self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See "
+                                             u"plugin log for more information.".format(dev.name))
 
                 # =============================== Create Backup ===============================
                 # Make a backup of the CSV file in case something goes wrong.
                 try:
                     shutil.copyfile(full_path, backup)
 
-                except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"[{0}] Unable to backup CSV file: {1}. See plugin log for more information.".format(dev.name, sub_error))
+                except Exception:
+                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Unable to backup CSV file.".format(dev.name))
 
                 # ================================= Load Data =================================
                 # Read CSV data into data frame
@@ -1810,13 +1816,13 @@ class Plugin(indigo.PluginBase):
                     now = dt.datetime.strftime(cycle_time, '%Y-%m-%d %H:%M:%S.%f')
                     data.append([now, state_to_write])
 
-                except ValueError as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"[{0}] Invalid Indigo ID: {1}. See plugin log for more information.".format(dev.name, sub_error))
+                except ValueError:
+                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Invalid Indigo ID. See plugin log for more information.")
 
-                except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"[{0}] Invalid CSV definition: {1}".format(dev.name, sub_error))
+                except Exception:
+                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Invalid CSV definition.")
 
                 # ============================= Limit for Length ==============================
                 # The data frame (with the newest observation included) may now be too long.
@@ -1837,9 +1843,9 @@ class Plugin(indigo.PluginBase):
                 try:
                     os.remove(backup)
 
-                except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
-                    self.logger.error(u"[{0}] Unable to delete backup file. {1}".format(dev.name, sub_error))
+                except Exception:
+                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Unable to delete backup file.".format(dev.name))
 
             dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                       {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
@@ -1848,12 +1854,11 @@ class Plugin(indigo.PluginBase):
             dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
         except ValueError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"[{0}] Critical error. See plugin log for more information.")
 
     # =============================================================================
     def csv_refresh_device_action(self, plugin_action, dev, caller_waiting_for_result=False):
@@ -2353,8 +2358,8 @@ class Plugin(indigo.PluginBase):
             file_name_list_menu = file_name_list_menu + [(u"-5", u"%%separator%%"), (u"None", u"None")]
 
         except IOError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error generating file list: {0}. See plugin log for more information.".format(sub_error))
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error generating file list. See plugin log for more information.")
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
@@ -2386,9 +2391,9 @@ class Plugin(indigo.PluginBase):
                 if font_name not in font_menu:
                     font_menu.append(font_name)
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error building font list.  Returning generic list. {0}. See plugin log for more information.".format(sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error building font list. Returning generic list.")
 
             font_menu = ['Arial',
                          'Apple Chancery',
@@ -2452,9 +2457,9 @@ class Plugin(indigo.PluginBase):
                 if dev.deviceTypeId in ('wundergroundTenDay', 'wundergroundHourly'):
                     forecast_source_menu.append((dev.id, dev.name))
 
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            self.logger.error(u"Error getting list of forecast devices: {0}. See plugin log for more information.".format(sub_error))
+        except Exception:
+            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error getting list of forecast devices.")
 
         self.logger.threaddebug(u"Forecast device list generated successfully: {0}".format(forecast_source_menu))
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
@@ -2505,8 +2510,8 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             if caller_waiting_for_result:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.error(u"[{0}] Error: {0}. See plugin log for more information.".format(dev.name, sub_error))
+                self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"[{0}] Error. See plugin log for more information.".format(dev.name))
                 return {'success': False, 'message': u"{0}".format(sub_error)}
 
         if caller_waiting_for_result:
@@ -2547,30 +2552,6 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))  # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.threaddebug(u"{0:<31} {1}".format('Initial Plugin Prefs:', dict(self.pluginPrefs)))
         self.logger.info(u"{0:{1}^135}".format("", "="))
-
-    # =============================================================================
-    def pluginErrorHandler(self, sub_error):
-        """
-        Centralized handling of traceback messages
-
-        Centralized handling of traceback messages formatted for pretty display in the
-        plugin log file. If sent here, they will not be displayed in the Indigo Events
-        log. Use the following syntax to send exceptions here::
-
-            self.pluginErrorHandler(traceback.format_exc())
-
-        -----
-
-        :param traceback object sub_error:
-        """
-
-        sub_error = sub_error.splitlines()
-        self.logger.critical(u"{0:!^80}".format(" TRACEBACK "))
-
-        for line in sub_error:
-            self.logger.critical(u"!!! {0}".format(line))
-
-        self.logger.critical(u"!" * 80)
 
     # =============================================================================
     def processLogQueue(self, dev, return_queue):
@@ -2856,9 +2837,10 @@ class Plugin(indigo.PluginBase):
                             # Only some devices will have their own numObs.
                             pass
 
-                        except ValueError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. See plugin log for more information.".format(dev.name, sub_error))
+                        except ValueError:
+                            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] The number of observations must be a positive number. See "
+                                                u"plugin log for more information.")
 
                         # ============================ Custom Square Size =============================
                         try:
@@ -2869,8 +2851,9 @@ class Plugin(indigo.PluginBase):
                                 p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
 
                         except ValueError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
-                            self.logger.warning(u"[{0}] Custom size must be a positive number or None: {1}".format(dev.name, sub_error))
+                            self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] Custom size must be a positive number or "
+                                                u"None.".format(dev.name))
 
                         except KeyError:
                             pass
@@ -2998,13 +2981,16 @@ class Plugin(indigo.PluginBase):
                                     if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
                                         device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                                    # The following line is used for testing the battery health code; it isn't needed in production.
-                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8', 'Device 4': '4', 'Device 5': '92',
-                                    #                'Device 6': '72', 'Device 7': '47', 'Device 8': '68', 'Device 9': '0', 'Device 10': '47'}
+                                    # The following line is used for testing the battery health code; it isn't needed
+                                    # in production.
+                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
+                                    #                'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
+                                    #                'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
+                                    #                'Device 10': '47'}
 
-                                except Exception as sub_error:
-                                    self.pluginErrorHandler(traceback.format_exc())
-                                    self.logger.error(u"[{0}] Error reading battery devices: {1}".format(batt_dev.name, sub_error))
+                                except Exception:
+                                    self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                                    self.logger.error(u"[{0}] Error reading battery devices.".format(batt_dev.name))
 
                             if device_dict == {}:
                                 device_dict['No Battery Devices'] = 0
@@ -3102,17 +3088,16 @@ class Plugin(indigo.PluginBase):
                         dev.updateStatesOnServer(kv_list)
 
                     except RuntimeError as sub_error:
-                        self.pluginErrorHandler(traceback.format_exc())
-                        self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
+                        self.Fogbert.pluginErrorHandler(traceback.format_exc())
                         self.logger.critical(u"Skipping device.")
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
                 # Ensure the flag is in the proper state for the next automatic refresh.
                 self.skipRefreshDateUpdate = False
 
-            except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
-                self.logger.critical(u"[{0}] Error: {0}. See plugin log for more information.".format(unicode(sub_error)))
+            except Exception:
+                self.Fogbert.pluginErrorHandler(traceback.format_exc())
+                self.logger.critical(u"Error. See plugin log for more information.")
 
     # =============================================================================
     def refreshTheChartsAction(self, plugin_action):
@@ -3368,11 +3353,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -3538,11 +3523,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -3693,11 +3678,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -3790,7 +3775,8 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
+
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -3982,11 +3968,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -4055,11 +4041,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -4257,11 +4243,11 @@ class MakeChart(object):
                 self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -4427,11 +4413,11 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -4666,12 +4652,13 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
+            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
+                                  u"WUnderground forecast devices.")
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -5001,12 +4988,13 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground forecast devices.")
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
+            log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
+                                  u"WUnderground forecast devices.")
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True, 'Log': log, 'Message': u"{0}. See plugin log for more information.".format(sub_error), 'Name': dev.name})
 
     # =============================================================================
@@ -5152,7 +5140,7 @@ class MakeChart(object):
                 log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart legend.".format(dev.name))
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X labels: showLegend = {0}".format(p_dict['showLegend']))
             log['Threaddebug'].append(u"Problem formatting X labels: customAxisLabelX = {0}".format(p_dict['customAxisLabelX']))
             log['Threaddebug'].append(u"Problem formatting X labels: k_x_axis_font = {0}".format(k_dict['k_x_axis_font']))
@@ -5207,7 +5195,7 @@ class MakeChart(object):
                 plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X axis scale: x_axis_bins = {0}".format(x_axis_bins))
 
     # =============================================================================
@@ -5238,7 +5226,7 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X ticks: k_major_x = {0}".format(k_dict['k_major_x']))
             log['Threaddebug'].append(u"Problem formatting X ticks: k_minor_x = {0}".format(k_dict['k_minor_x']))
             log['Threaddebug'].append(u"Problem formatting X ticks: xAxisLabelFormat = {0}".format(mdate.DateFormatter(p_dict['xAxisLabelFormat'])))
@@ -5291,7 +5279,7 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_major_y = {0}".format(k_dict['k_major_y']))
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_minor_x = {0}".format(k_dict['k_minor_y']))
             log['Threaddebug'].append(u"Problem formatting Y ticks: xAxisLabelFormat = {0}".format(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision'])))))
@@ -5351,7 +5339,7 @@ class MakeChart(object):
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = {0}".format(p_dict['yAxisMax']))
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMin = {0}".format(p_dict['yAxisMin']))
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: Data Min/Max = {0}/{1}".format(min(p_dict['data_array']), max(p_dict['data_array'])))
@@ -5375,7 +5363,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
@@ -5420,10 +5408,10 @@ class MakeChart(object):
             plt.yticks(marks, labels)
 
         except (KeyError, ValueError):
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY = {0}".format(p_dict['customAxisLabelY']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customTicksY = {0}".format(p_dict['customTicksY']))
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
 
     # =============================================================================
     # TODO: this is currently unused.
@@ -5444,7 +5432,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = {0}".format(p_dict['customAxisLabelY2']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = {0}".format(k_dict['k_y_axis_font']))
 
@@ -5476,7 +5464,7 @@ class MakeChart(object):
             return ax
 
         except TypeError as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"p_dict: {0}.".format(p_dict))
             log['Threaddebug'].append(u"dates_to_plot: {0}.".format(dates_to_plot))
             log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. See plugin log for more information.".format(sub_error))
@@ -5524,7 +5512,7 @@ class MakeChart(object):
                 return cls
 
             except Exception as sub_error:
-                self.host_plugin.pluginErrorHandler(traceback.format_exc())
+                self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
                 log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin log for more information.".format(sub_error))
 
                 return ax
@@ -5553,7 +5541,7 @@ class MakeChart(object):
             return dates_to_plot_m
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting dates: list_of_dates = {0}".format(list_of_dates))
             log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = {0}".format(dates_to_plot))
             log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = {0}".format(dates_to_plot_m))
@@ -5581,7 +5569,7 @@ class MakeChart(object):
                 plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {0}".format(p_dict['showxAxisGrid']))
             log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
 
@@ -5639,7 +5627,7 @@ class MakeChart(object):
         # If we can't find the target CSV file, we create a phony proxy which the plugin
         # can process without dying.
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
             log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more information.".format(sub_error))
 
@@ -5795,7 +5783,5 @@ class MakeChart(object):
                 plot.close('all')
 
         except RuntimeError as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.host_plugin.Fogbert.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See plugin log for more information.".format(sub_error))
-
-    # =============================================================================

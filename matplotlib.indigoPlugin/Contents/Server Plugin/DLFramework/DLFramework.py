@@ -4,23 +4,28 @@
 """
 DLFramework is a framework to consolidate methods used throughout all
 Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
-.
+.1.
 """
 
 import ast
-import indigo
 import logging
 import operator as op
 import os
 import platform
 import sys
+import traceback
+
+try:
+    import indigo
+except ImportError:
+    pass
 
 __author__ = "DaveL17"
 __build__ = "Unused"
-__copyright__ = "Copyright 2017-2019 DaveL17"
+__copyright__ = "Copyright 2017-2020 DaveL17"
 __license__ = "MIT"
 __title__ = "DLFramework"
-__version__ = "0.1.02"
+__version__ = "0.1.04"
 
 
 class Fogbert(object):
@@ -74,6 +79,30 @@ class Fogbert(object):
         self.plugin.logger.info(u"{0:<31} {1}".format("Mac OS Version:", platform.mac_ver()[0]))
         self.plugin.logger.info(u"{0:<31} {1}".format("Process ID:", os.getpid()))
         self.plugin.logger.info(u"{0:{1}^135}".format("", "="))
+
+    # =============================================================================
+    def pluginErrorHandler(self, sub_error):
+        """
+        Centralized handling of traceback messages
+
+        Centralized handling of traceback messages formatted for pretty display in the
+        plugin log file. If sent here, they will not be displayed in the Indigo Events
+        log. Use the following syntax to send exceptions here::
+
+            self.pluginErrorHandler(traceback.format_exc())
+
+        -----
+
+        :param traceback object sub_error:
+        """
+
+        sub_error = sub_error.splitlines()
+        self.plugin.logger.critical(u"{0:!^80}".format(" TRACEBACK "))
+
+        for line in sub_error:
+            self.plugin.logger.critical(u"!!! {0}".format(line))
+
+        self.plugin.logger.critical(u"!" * 80)
 
     def convertDebugLevel(self, debug_val):
         """
@@ -176,6 +205,14 @@ class Fogbert(object):
         ver = self.plugin.versStrToTuple(indigo.server.version)
         if ver[0] < min_ver:
             self.plugin.stopPlugin(u"This plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
+
+    def audit_os_version(self, min_ver):
+
+        # =========================== Audit Operating System Version ============================
+        ver = platform.mac_ver()[0].split('.')
+
+        if int(ver[1]) < min_ver:
+            self.plugin.stopPlugin(u"This plugin requires Mac OS version 10.{0} or above.".format(min_ver), isError=True)
 
 
 class Formatter(object):
