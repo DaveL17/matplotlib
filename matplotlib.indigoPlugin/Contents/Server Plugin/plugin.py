@@ -2494,7 +2494,8 @@ class Plugin(indigo.PluginBase):
                          'Textile',
                          'Verdana',
                          'Western',
-                         'Zapf Chancery']
+                         'Zapf Chancery'
+                         ]
 
         return sorted(font_menu)
 
@@ -3962,7 +3963,10 @@ class MakeChart(object):
             y_values = np.arange(len(y_text))
 
             # Create the chart figure
-            ax = self.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+            ax = self.make_chart_figure(width=p_dict['chart_width'],
+                                        height=p_dict['chart_height'],
+                                        p_dict=p_dict
+                                        )
 
             # =============================== Plot the Bars ===============================
             # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
@@ -3986,13 +3990,13 @@ class MakeChart(object):
                 # With bbox.  We give a little extra room horizontally for the bbox.
                 if show_level in ('true', 'True', True) and level_box:
                     if width >= caution_level:
-                        plt.annotate(u"{0:.0f}".format(width),
+                        plt.annotate(text=u"{0:.0f}".format(width),
                                      xy=(width - 3, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_annotation_battery']
                                      )
                     else:
-                        plt.annotate(u"{0:.0f}".format(width),
+                        plt.annotate(text=u"{0:.0f}".format(width),
                                      xy=(width + 3, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_annotation_battery']
@@ -4001,13 +4005,13 @@ class MakeChart(object):
                 # Without bbox.
                 elif show_level in ('true', 'True', True):
                     if width >= caution_level:
-                        plt.annotate(u"{0:.0f}".format(width),
+                        plt.annotate(text=u"{0:.0f}".format(width),
                                      xy=(width - 2, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_battery']
                                      )
                     else:
-                        plt.annotate(u"{0:.0f}".format(width),
+                        plt.annotate(text=u"{0:.0f}".format(width),
                                      xy=(width + 2, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_battery']
