@@ -4669,7 +4669,8 @@ class MakeChart(object):
                 color_increment = 1.0 / num_obs
                 color = color_increment
                 for item in range(0, num_obs, 1):
-                    p_dict['bar_colors'].append("%0.3f" % color)
+                    # p_dict['bar_colors'].append("%0.3f" % color)
+                    p_dict['bar_colors'].append("{0:.3f}".format(color))
                     color += color_increment
                 p_dict['bar_colors'][num_obs - 1] = p_dict['currentWindColor']
 
@@ -4696,7 +4697,12 @@ class MakeChart(object):
                 # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the
                 # grid defaults to z = 2.)
                 for w in wind:
-                    ax.plot(x=(0, w[0]), y=(0, w[1]), color=w[2], linewidth=2, zorder=3)
+                    ax.plot(x=(0, w[0]),
+                            y=(0, w[1]),
+                            color=w[2],
+                            linewidth=2,
+                            zorder=3
+                            )
 
                 # Right-size the grid (must be done after the plot), and customize the tick
                 # labels. The default covers anything over 50.
@@ -4989,12 +4995,12 @@ class MakeChart(object):
                         labels.append(p_dict['group{0}Legend'.format(counter)])
 
                     legend_styles.append(tuple(plt.plot([],
-                                                        color=p_dict['group{0}MarkerColor'.format(counter)],
-                                                        linestyle='',
-                                                        marker=p_dict['group{0}Marker'.format(counter)],
-                                                        markerfacecolor=final_colors[counter-1],
-                                                        markeredgewidth=.8,
-                                                        markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])
+                                               color=p_dict['group{0}MarkerColor'.format(counter)],
+                                               linestyle='',
+                                               marker=p_dict['group{0}Marker'.format(counter)],
+                                               markerfacecolor=final_colors[counter-1],
+                                               markeredgewidth=.8,
+                                               markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])
                                                )
                                          )
                     counter += 1
@@ -5510,7 +5516,8 @@ class MakeChart(object):
                 # Precipitation bar annotations
                 if p_dict['line3Annotate']:
                     for xy in zip(dates_to_plot, p_dict['y_obs3']):
-                        ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
+                        # ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
+                        ax1.annotate('{0:.0f}'.format(xy[1]), xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
             # ============================== Precip Min/Max ===============================
             if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
@@ -5637,7 +5644,8 @@ class MakeChart(object):
 
                     if p_dict['line{0}Annotate'.format(line)]:
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
-                            ax2.annotate(text='%.0f' % xy[1],
+                            # ax2.annotate(text='%.0f' % xy[1],
+                            ax2.annotate(text='{0:.0f}'.format(xy[1]),
                                          xy=xy,
                                          xytext=(0, 0),
                                          zorder=(11 - line),
