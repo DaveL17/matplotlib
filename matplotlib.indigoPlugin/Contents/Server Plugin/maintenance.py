@@ -6,16 +6,16 @@ maintenance is a container for code that makes specific to consolidate methods u
 Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
 """
 
-import logging
-import re
 try:
     import indigo
 except ImportError:
     pass
+import logging
+import re
 
 __author__ = "DaveL17"
 __build__ = "Unused"
-__copyright__ = "Copyright 2017-2020 DaveL17"
+__copyright__ = "Copyright 2017-2019 DaveL17"
 __license__ = "MIT"
 __title__ = "maintenance"
 __version__ = "0.1.02"
@@ -27,8 +27,8 @@ class Maintain(object):
         self.plugin = plugin
         self.pluginPrefs = plugin.pluginPrefs
 
-        log_fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt=log_fmt, datefmt='%Y-%m-%d %H:%M:%S'))
+        fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
+        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S'))
 
         self.plugin.logger.threaddebug(u"Initializing maintenance framework.")
 
@@ -380,7 +380,7 @@ class Maintain(object):
         if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
 
             # Remove legacy cruft from csv engine and rcParams device props
-            props = self.clean_prefs(dev_name=dev.name, prefs=props)
+            props = self.clean_prefs(dev.name, props)
 
         # =============================== Chart Devices ===============================
         elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
@@ -405,8 +405,8 @@ class Maintain(object):
                     if 'color' in prop.lower():
                         if props[prop] in ('#custom', 'custom'):
 
-                            self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to "
-                                                     u"new color picker.")
+                            self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to new "
+                                                     u"color picker.")
 
                             if props[u'{0}Other'.format(prop)]:
                                 props[prop] = props[u'{0}Other'.format(prop)]

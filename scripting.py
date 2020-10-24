@@ -1,6 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+try:
+    import indigo
+except ImportError:
+    pass
+
+
 matplotlibPlugin = indigo.server.getPlugin("com.fogbert.indigoplugin.matplotlib")
 payload = {'x_values': [1, 2, 3],
            'y_values': [2, 4, 7],

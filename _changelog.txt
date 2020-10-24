@@ -1,3 +1,10 @@
+v0.8.37
+- Adds feature to force leading and trailing bars with zero values to be
+  plotted (to overcome matplotlib bug).
+
+v0.8.36
+- Additional bar chart error trapping.
+
 v0.8.35
 - Code refinements.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -102,8 +102,8 @@ __author__    = Dave.__author__
 __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
-__title__     = u"Matplotlib Plugin for Indigo Home Control"
-__version__   = u"0.8.35"
+__title__     = u"Matplotlib Plugin for Indigo"
+__version__   = u"0.8.37"
 
 # =============================================================================
 
@@ -171,8 +171,8 @@ class Plugin(indigo.PluginBase):
         self.pluginEnvironmentLogger()
 
         # ============================= Initialize Logger =============================
-        log_format = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin_file_handler.setFormatter(fmt=logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S'))
+        fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
+        self.plugin_file_handler.setFormatter(logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S'))
         self.debug_level = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debug_level)
 
@@ -447,8 +447,9 @@ class Plugin(indigo.PluginBase):
 
             return values_dict
 
-        except KeyError:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+        except KeyError as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         return True, values_dict
 
@@ -510,8 +511,8 @@ class Plugin(indigo.PluginBase):
                          'tickColor': '88 88 88',
                          'tickFontSize': '8'}
 
-        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the defaults_
-        # dict above. This should only be necessary the first time the plugin is configured.
+        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the
+        # defaults_dict above. This should only be necessary the first time the plugin is configured.
         for key, value in defaults_dict.items():
             plugin_prefs[key] = plugin_prefs.get(key, value)
 
@@ -547,7 +548,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def startup(self):
 
-        # =========================== Audit Server Version ============================
+        # =========================== Check Indigo Version ============================
         self.Fogbert.audit_server_version(min_ver=7)
 
         # =========================== Check CSV Uniqueness ============================
@@ -605,8 +606,7 @@ class Plugin(indigo.PluginBase):
 
         # ============================= Chart Dimensions ==============================
         for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth',
-                               'sqChartSize'
-                               ):
+                               'sqChartSize'):
             values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
             try:
                 if float(values_dict[dimension_prop]) < 75:
@@ -619,7 +619,8 @@ class Plugin(indigo.PluginBase):
         # value after the warning is cleared.
         try:
             # If value is null, a null string, or all whitespace.
-            if not values_dict['chartResolution'] or values_dict['chartResolution'] == "" or \
+            if not values_dict['chartResolution'] or \
+                    values_dict['chartResolution'] == "" or \
                     str(values_dict['chartResolution']).isspace():
                 values_dict['chartResolution'] = "100"
                 self.logger.warning(u"No resolution value entered. Resetting resolution to 100 DPI.")
@@ -627,16 +628,11 @@ class Plugin(indigo.PluginBase):
             # If warning flag and the value is potentially too small.
             elif values_dict['dpiWarningFlag'] and 0 < int(values_dict['chartResolution']) < 80:
                 values_dict['dpiWarningFlag'] = False
-                error_msg_dict['showAlertText'] = u"It is recommended that you enter a value of 80 or more for best " \
-                                                  u"results."
-
-            # If no warning flag and the value is good.
-            elif not values_dict['dpiWarningFlag'] or int(values_dict['chartResolution']) >= 80:
-                # Just in case, strip any embedded spaces
-                values_dict['chartResolution'] = values_dict['chartResolution'].replace(" ", "")
+                error_msg_dict['showAlertText'] = u"It is recommended that you enter a value of 80 or more for " \
+                                                  u"best results."
 
             else:
-                error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
+                pass
 
         except ValueError:
             error_msg_dict['chartResolution'] = u"The chart resolution value must be greater than 0."
@@ -664,8 +660,7 @@ class Plugin(indigo.PluginBase):
                         config_changed = True
                         changed_keys += (u"{0}".format(key),
                                          u"Old: {0}".format(self.pluginPrefs[key]),
-                                         u"New: {0}".format(values_dict[key]),
-                                         )
+                                         u"New: {0}".format(values_dict[key]),)
                 # Missing keys will be config dialog format props like labels and separators
                 except KeyError:
                     pass
@@ -803,8 +798,8 @@ class Plugin(indigo.PluginBase):
                 if int(values_dict['numLinesToKeep']) < 1:
                     raise ValueError
             except ValueError:
-                error_msg_dict['numLinesToKeep'] = u"The observation value must be a whole number integer " \
-                                                   u"greater than zero."
+                error_msg_dict['numLinesToKeep'] = u"The observation value must be a whole number integer greater " \
+                                                   u"than zero."
 
             # ================================= Duration ==================================
             try:
@@ -812,8 +807,8 @@ class Plugin(indigo.PluginBase):
                 if float(values_dict['numLinesToKeepTime']) < 0:
                     raise ValueError
             except ValueError:
-                error_msg_dict['numLinesToKeepTime'] = u"The duration value must be an integer or float " \
-                                                       u"greater than zero."
+                error_msg_dict['numLinesToKeepTime'] = u"The duration value must be an integer or float greater " \
+                                                       u"than zero."
 
             # ============================= Refresh Interval ==============================
             try:
@@ -879,8 +874,8 @@ class Plugin(indigo.PluginBase):
                 if len(custom_tick_labels) != len(custom_ticks):
                     error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the " \
                                                           u"same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the " \
-                                                     u"same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same " \
+                                                     u"length."
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -909,8 +904,8 @@ class Plugin(indigo.PluginBase):
                 if int(values_dict['numberOfCharacters']) < 1:
                     raise ValueError
             except ValueError:
-                error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number " \
-                                                       u"greater than zero (integer)."
+                error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number greater " \
+                                                       u"than zero (integer)."
 
             # Figure width and height.
             for prop in ('figureWidth', 'figureHeight'):
@@ -940,10 +935,11 @@ class Plugin(indigo.PluginBase):
             # Number of observations
             try:
                 if int(values_dict['numObs']) < 1:
-                    error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole " \
-                                               u"number integer)."
+                    error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number " \
+                                               u"integer)."
             except ValueError:
-                error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number integer)."
+                error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number " \
+                                           u"integer)."
 
         # =============================== Scatter Chart ===============================
         if type_id == 'scatterChartingDevice':
@@ -970,8 +966,8 @@ class Plugin(indigo.PluginBase):
                 if len(custom_tick_labels) != len(custom_ticks):
                     error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the " \
                                                           u"same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the " \
-                                                     u"same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same " \
+                                                     u"length."
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -1030,8 +1026,8 @@ class Plugin(indigo.PluginBase):
                         float(values_dict[custom_dimension_prop]) < 75:
                     error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be greater than 75 pixels."
             except ValueError:
-                error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number " \
-                                                        u"greater than 75 pixels."
+                error_msg_dict[custom_dimension_prop] = u"The chart dimension value must be a real number greater " \
+                                                        u"than 75 pixels."
 
         # ================================ Axis Limits ================================
         # Check to see that each axis limit matches one of the accepted formats
@@ -1054,8 +1050,8 @@ class Plugin(indigo.PluginBase):
                     error_msg_dict[limit_prop] = u"The axis limit must be a real number or None."
 
         if len(error_msg_dict) > 0:
-            error_msg_dict['showAlertText'] = u"Configuration Errors\n\nThere are one or more settings that " \
-                                              u"need to be corrected. Fields requiring attention will be highlighted."
+            error_msg_dict['showAlertText'] = u"Configuration Errors\n\nThere are one or more settings that need to " \
+                                              u"be corrected. Fields requiring attention will be highlighted."
             return False, values_dict, error_msg_dict
 
         self.logger.threaddebug(u"Preferences validated successfully.")
@@ -1166,16 +1162,17 @@ class Plugin(indigo.PluginBase):
                             self.logger.warning(u"Target data folder does not exist. Creating it.")
 
                         except IOError:
-                            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable "
-                                                 u"to create it. See plugin log for more information.".format(dev.name))
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is "
+                                                 u"unable to create it. See plugin log for more "
+                                                 u"information.".format(dev.name))
 
                         except OSError:
-                            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+                            self.pluginErrorHandler(traceback.format_exc())
                             self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. "
                                                  u"See plugin log for more information.".format(dev.name))
 
-                    if not os.path.isfile(path=full_path):
+                    if not os.path.isfile(full_path):
                         self.logger.warning(u"CSV file does not exist. Creating a new one: {0}".format(full_path))
                         csv_file = open(full_path, 'w')
                         csv_file.write('{0},{1}\n'.format('Timestamp', thing[1][2].encode("utf-8")))
@@ -1266,9 +1263,8 @@ class Plugin(indigo.PluginBase):
 
             return True
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.warning(u"Audit device props error.")
+        except Exception as sub_error:
+            self.logger.warning(u"Audit device props error: {0}".format(sub_error))
 
             return False
 
@@ -1277,25 +1273,21 @@ class Plugin(indigo.PluginBase):
         """
         """
 
-        def fix_rgb(c):
-
-            return r"#{0}".format(c.replace(' ', '').replace('#', ''))
-
         # Colors are stored in values_dict as "XX XX XX", and we need to convert them to "#XXXXXX".
         for k in p_dict.keys():
             if 'color' in k:
-                p_dict[k] = fix_rgb(p_dict[k])
+                p_dict[k] = self.fix_rgb(p_dict[k])
 
         # # Format color values
-        plt.rcParams['grid.color']    = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        plt.rcParams['xtick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        plt.rcParams['ytick.color']   = fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        p_dict['faceColor']           = fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
-        p_dict['fontColor']           = fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
-        p_dict['fontColorAnnotation'] = fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
-        p_dict['gridColor']           = fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        p_dict['spineColor']          = fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
-        p_dict['backgroundColor']     = fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
+        plt.rcParams['grid.color']    = self.fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        plt.rcParams['xtick.color']   = self.fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        plt.rcParams['ytick.color']   = self.fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
+        p_dict['faceColor']           = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
+        p_dict['fontColor']           = self.fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
+        p_dict['fontColorAnnotation'] = self.fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
+        p_dict['gridColor']           = self.fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
+        p_dict['spineColor']          = self.fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
+        p_dict['backgroundColor']     = self.fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
 
         return p_dict
 
@@ -1326,7 +1318,7 @@ class Plugin(indigo.PluginBase):
                     self.logger.warning(u"Target folder does not exist. Creating path:{0}".format(path_name))
 
                 except (IOError, OSError):
-                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+                    self.pluginErrorHandler(traceback.format_exc())
                     self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See "
                                          u"plugin log for more information.")
 
@@ -1363,9 +1355,10 @@ class Plugin(indigo.PluginBase):
             try:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 indigo.device.enable(dev, value=False)
-            except Exception:
-                self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms.")
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more "
+                                  u"information.".format(sub_error))
 
     # =============================================================================
     def commsUnkillAll(self):
@@ -1383,9 +1376,10 @@ class Plugin(indigo.PluginBase):
         for dev in indigo.devices.itervalues("self"):
             try:
                 indigo.device.enable(dev, value=True)
-            except Exception:
-                self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                self.logger.error(u"Exception when trying to kill all comms.")
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more "
+                                  u"information.".format(sub_error))
 
     # =============================================================================
     def convert_custom_colors(self):
@@ -1469,7 +1463,8 @@ class Plugin(indigo.PluginBase):
         error_msg_dict = indigo.Dict()
 
         try:
-            column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict
+            # Convert column_dict from a string to a literal dict
+            column_dict = literal_eval(values_dict['columnDict'])
             lister = [0]
             num_lister = []
 
@@ -1513,9 +1508,10 @@ class Plugin(indigo.PluginBase):
             # Convert column_dict back to a string and prepare it for storage.
             values_dict['columnDict'] = str(new_dict)
 
-        except AttributeError:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"[{0}] Error adding CSV item. See plugin log for more information.")
+        except AttributeError, sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error adding CSV item: {1}. See plugin log for more "
+                              u"information.".format(dev.name, sub_error))
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
         file_name = values_dict['addValue']
@@ -1559,9 +1555,10 @@ class Plugin(indigo.PluginBase):
             values_dict["editKey"] = values_dict["csv_item_list"]
             del column_dict[values_dict['editKey']]
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"[{0}] Error deleting CSV item.".format(dev.name))
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error deleting CSV item: {1}. See plugin log for more "
+                              u"information.".format(dev.name, sub_error))
 
         values_dict['csv_item_list'] = ""
         values_dict['editKey']     = ""
@@ -1574,7 +1571,7 @@ class Plugin(indigo.PluginBase):
         return values_dict
 
     # =============================================================================
-    def csv_item_list(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def csv_item_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Construct the list of CSV items
 
@@ -1584,7 +1581,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -1599,9 +1596,10 @@ class Plugin(indigo.PluginBase):
             column_dict = literal_eval(values_dict['columnDict'])
             prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"[{0}] Error generating CSV item list.".format(dev.namer))
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error generating CSV item list: {0}. See plugin log for more "
+                              u"information.".format(dev.name, sub_error))
             prop_list = []
 
         # Return a list sorted by the value and not the key. Case insensitive sort.
@@ -1653,9 +1651,10 @@ class Plugin(indigo.PluginBase):
             if not len(error_msg_dict):
                 values_dict['previousKey'] = key
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"[{0}] Error updating CSV item.".format(dev.name))
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] Error updating CSV item: {1}. See plugin log for more "
+                              u"information.".format(dev.name, sub_error))
 
         # Remove any empty entries as they're not going to do any good anyway.
         new_dict = {}
@@ -1699,9 +1698,10 @@ class Plugin(indigo.PluginBase):
             values_dict['isColumnSelected'] = True
             values_dict['previousKey']      = values_dict['csv_item_list']
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose.")
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose: {1}. "
+                              u"See plugin log for more information.".format(dev.name, sub_error))
         return values_dict
 
     # =============================================================================
@@ -1743,7 +1743,7 @@ class Plugin(indigo.PluginBase):
                         csv_dict = literal_eval(csv_dict_str)
 
                         self.logger.threaddebug(u"[{0}] Refreshing CSV Device: {1}".format(dev.name, dict(csv_dict)))
-                        self.csv_refresh_process(dev=dev, csv_dict=csv_dict)
+                        self.csv_refresh_process(dev, csv_dict)
 
     # =============================================================================
     def csv_refresh_process(self, dev, csv_dict):
@@ -1765,6 +1765,7 @@ class Plugin(indigo.PluginBase):
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
             delta        = dev.pluginProps.get('numLinesToKeepTime', '72')
             cycle_time   = dt.datetime.now()
+            data = []
 
             # If delta isn't a valid float, set it to zero.
             try:
@@ -1788,9 +1789,8 @@ class Plugin(indigo.PluginBase):
                         self.logger.warning(u"Target data folder does not exist. Creating it.")
 
                     except OSError:
-                        self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                        self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is unable to "
-                                             u"create it. See plugin log for more information.".format(dev.name))
+                        self.logger.critical(u"[{0}] Target data folder either does not exist or the plugin is "
+                                             u"unable to access/create it.".format(dev.name))
 
                 if not os.path.isfile(full_path):
                     try:
@@ -1801,31 +1801,38 @@ class Plugin(indigo.PluginBase):
                         self.sleep(1)
 
                     except IOError:
-                        self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                        self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. See "
-                                             u"plugin log for more information.".format(dev.name))
+                        self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. "
+                                             u"See plugin log for more information.".format(dev.name))
 
                 # =============================== Create Backup ===============================
                 # Make a backup of the CSV file in case something goes wrong.
                 try:
                     shutil.copyfile(full_path, backup)
 
-                except Exception:
-                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                    self.logger.error(u"[{0}] Unable to backup CSV file.".format(dev.name))
+                except IOError as sub_error:
+                    self.logger.error(u"[{0}] Unable to backup CSV file: {1}.".format(dev.name, sub_error))
+
+                except Exception as sub_error:
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Unable to backup CSV file: {1}. See plugin log for more "
+                                      u"information.".format(dev.name, sub_error))
 
                 # ================================= Load Data =================================
                 # Read CSV data into data frame
-                with open(full_path) as in_file:
-                    raw_data = [row for row in csv.reader(in_file, delimiter=',')]
+                try:
+                    with open(full_path) as in_file:
+                        raw_data = [row for row in csv.reader(in_file, delimiter=',')]
 
-                # Split the headers and the data
-                column_names = raw_data[:1]
-                data         = raw_data[1:]
+                    # Split the headers and the data
+                    column_names = raw_data[:1]
+                    data         = raw_data[1:]
 
-                # Coerce header 0 to be 'Timestamp'
-                if column_names[0][0] != u'Timestamp':
-                    column_names[0][0] = u'Timestamp'
+                    # Coerce header 0 to be 'Timestamp'
+                    if column_names[0][0] != u'Timestamp':
+                        column_names[0][0] = u'Timestamp'
+
+                except IOError as sub_error:
+                    self.logger.error(u"[{0}] Unable to load CSV data: {1}.".format(dev.name, sub_error))
 
                 # ============================== Limit for Time ===============================
                 # Limit data by time
@@ -1868,13 +1875,14 @@ class Plugin(indigo.PluginBase):
                     now = dt.datetime.strftime(cycle_time, '%Y-%m-%d %H:%M:%S.%f')
                     data.append([now, state_to_write])
 
-                except ValueError:
-                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                    self.logger.error(u"[{0}] Invalid Indigo ID. See plugin log for more information.")
+                except ValueError as sub_error:
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Invalid Indigo ID: {1}. See plugin log for more "
+                                      u"information.".format(dev.name, sub_error))
 
-                except Exception:
-                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                    self.logger.error(u"[{0}] Invalid CSV definition.")
+                except Exception as sub_error:
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Invalid CSV definition: {1}".format(dev.name, sub_error))
 
                 # ============================= Limit for Length ==============================
                 # The data frame (with the newest observation included) may now be too long.
@@ -1895,9 +1903,9 @@ class Plugin(indigo.PluginBase):
                 try:
                     os.remove(backup)
 
-                except Exception:
-                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                    self.logger.error(u"[{0}] Unable to delete backup file.".format(dev.name))
+                except Exception as sub_error:
+                    self.pluginErrorHandler(traceback.format_exc())
+                    self.logger.error(u"[{0}] Unable to delete backup file. {1}".format(dev.name, sub_error))
 
             dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
                                       {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
@@ -1905,12 +1913,17 @@ class Plugin(indigo.PluginBase):
             self.logger.info(u"[{0}] CSV data updated successfully.".format(dev.name))
             dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
-        except ValueError:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+        except UnboundLocalError:
+            self.logger.critical(u"[{0}] Unable to reach storage location. Check connections and "
+                                 u"permissions.".format(dev.name))
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.critical(u"[{0}] Critical error. See plugin log for more information.")
+        except ValueError as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
+
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
     # =============================================================================
     def csv_refresh_device_action(self, plugin_action, dev, caller_waiting_for_result=False):
@@ -1940,7 +1953,7 @@ class Plugin(indigo.PluginBase):
             # Convert column_dict from a string to a literal dict.
             csv_dict = literal_eval(csv_dict_str)
 
-            self.csv_refresh_process(dev=dev, csv_dict=csv_dict)
+            self.csv_refresh_process(dev, csv_dict)
 
         else:
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
@@ -1974,7 +1987,7 @@ class Plugin(indigo.PluginBase):
             temp_dict     = literal_eval(dev.pluginProps['columnDict'])
             foo           = {target_source: temp_dict[target_source]}
 
-            self.csv_refresh_process(dev=dev, csv_dict=foo)
+            self.csv_refresh_process(dev, foo)
 
         else:
             self.logger.warning(u'CSV data not updated. Reason: target device disabled.')
@@ -2072,34 +2085,34 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
-    def get_csv_device_list(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def get_csv_device_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV Engine devices set to manual refresh
 
         The get_csv_device_list() method returns a list of CSV Engine devices with a
         manual refresh interval.
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param target_id:
         :return:
         """
 
-        # Return a list of tuples that contains only CSV devices set to manual refresh (refreshInterval = 0) for
-        # config menu.
+        # Return a list of tuples that contains only CSV devices set to manual refresh
+        # (refreshInterval = 0) for config menu.
         return [(dev.id, dev.name) for dev in indigo.devices.iter("self") if
                 dev.deviceTypeId == "csvEngine" and dev.pluginProps['refreshInterval'] == "0"]
 
     # =============================================================================
-    def get_csv_source_list(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def get_csv_source_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV sources from CSV Engine devices set to manual refresh
 
         The get_csv_source_list() method returns a list of CSV sources for the target
         CSV Engine device.
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param target_id:
@@ -2200,6 +2213,10 @@ class Plugin(indigo.PluginBase):
         else:
             return [('None', u'Please select a data source first')]
 
+    def fix_rgb(self, c):
+
+        return r"#{0}".format(c.replace(' ', '').replace('#', ''))
+
     # =============================================================================
     def formatMarkers(self, p_dict):
         """
@@ -2232,7 +2249,7 @@ class Plugin(indigo.PluginBase):
         return p_dict
 
     # =============================================================================
-    def generatorDeviceStates(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceStates(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of device states for the provided device or variable id.
 
@@ -2247,7 +2264,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2260,7 +2277,7 @@ class Plugin(indigo.PluginBase):
             return [("Select a Source Above", "Select a Source Above")]
 
     # =============================================================================
-    def generatorDeviceList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
 
@@ -2274,7 +2291,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2283,7 +2300,7 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceList()
 
     # =============================================================================
-    def generatorDeviceAndVariableList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceAndVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of devices and variables for config menu controls
 
@@ -2300,7 +2317,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2309,7 +2326,7 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceAndVariableList()
 
     # =============================================================================
-    def generatorVariableList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def generatorVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
 
@@ -2323,7 +2340,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2332,7 +2349,7 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.variableList()
 
     # =============================================================================
-    def getAxisList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def getAxisList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of axis formats.
 
@@ -2341,7 +2358,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param str filter_value:
+        :param str filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2370,7 +2387,7 @@ class Plugin(indigo.PluginBase):
         return axis_list_menu
 
     # =============================================================================
-    def getBatteryDeviceList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of battery-powered devices
 
@@ -2380,7 +2397,7 @@ class Plugin(indigo.PluginBase):
         holder.
 
         -----
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2394,7 +2411,7 @@ class Plugin(indigo.PluginBase):
         return batt_list
 
 # =============================================================================
-    def getFileList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def getFileList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Get list of CSV files for various dropdown menus.
 
@@ -2404,7 +2421,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2428,15 +2445,16 @@ class Plugin(indigo.PluginBase):
             # Add 'None' as an option, and show it first in list
             file_name_list_menu = file_name_list_menu + [(u"-5", u"%%separator%%"), (u"None", u"None")]
 
-        except IOError:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"Error generating file list. See plugin log for more information.")
+        except IOError as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error generating file list: {0}. See plugin log for more "
+                              u"information.".format(sub_error))
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
 
     # =============================================================================
-    def getFontList(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def getFontList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Provide a list of font names for various dropdown menus.
 
@@ -2446,7 +2464,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2462,9 +2480,10 @@ class Plugin(indigo.PluginBase):
                 if font_name not in font_menu:
                     font_menu.append(font_name)
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"Error building font list. Returning generic list.")
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error building font list.  Returning generic list. {0}. See plugin log for more "
+                              u"information.".format(sub_error))
 
             font_menu = ['Arial',
                          'Apple Chancery',
@@ -2494,13 +2513,12 @@ class Plugin(indigo.PluginBase):
                          'Textile',
                          'Verdana',
                          'Western',
-                         'Zapf Chancery'
-                         ]
+                         'Zapf Chancery']
 
         return sorted(font_menu)
 
     # =============================================================================
-    def getForecastSource(self, filter_value="", values_dict=None, type_id="", target_id=0):
+    def getForecastSource(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of WUnderground devices for forecast chart devices
 
@@ -2510,7 +2528,7 @@ class Plugin(indigo.PluginBase):
 
         -----
 
-        :param unicode filter_value:
+        :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2529,9 +2547,10 @@ class Plugin(indigo.PluginBase):
                 if dev.deviceTypeId in ('wundergroundTenDay', 'wundergroundHourly'):
                     forecast_source_menu.append((dev.id, dev.name))
 
-        except Exception:
-            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            self.logger.error(u"Error getting list of forecast devices.")
+        except Exception as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            self.logger.error(u"Error getting list of forecast devices: {0}. See plugin log for more "
+                              u"information.".format(sub_error))
 
         self.logger.threaddebug(u"Forecast device list generated successfully: {0}".format(forecast_source_menu))
         self.logger.threaddebug(u"forecast_source_menu: {0}".format(forecast_source_menu))
@@ -2570,23 +2589,20 @@ class Plugin(indigo.PluginBase):
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))
         width        = float(self.pluginPrefs.get('rectChartWidth', 600))
-        face_color   = r'#{0}'.format(self.pluginPrefs.get('faceColor', '00 00 00').replace(' ', '').replace('#', ''))
-        canvas = r'#{0}'.format(self.pluginPrefs.get('backgroundColor', '00 00 00').replace(' ', '').replace('#', ''))
+        face_color   = self.fix_rgb(self.pluginPrefs.get('faceColor', '00 00 00'))
+        bk_color     = self.fix_rgb(self.pluginPrefs.get('backgroundColor', '00 00 00'))
 
         try:
             fig = plt.figure(1, figsize=(width / dpi, height / dpi))
             ax = fig.add_subplot(111, axisbg=face_color)
-            ax.plot(x=plugin_action.props['x_values'],
-                    y=plugin_action.props['y_values'],
-                    **plugin_action.props['kwargs']
-                    )
+            ax.plot(plugin_action.props['x_values'], plugin_action.props['y_values'], **plugin_action.props['kwargs'])
             plt.savefig(u"{0}{1}".format(plugin_action.props['path'], plugin_action.props['filename']))
             plt.close('all')
 
         except Exception as sub_error:
             if caller_waiting_for_result:
-                self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                self.logger.error(u"[{0}] Error. See plugin log for more information.".format(dev.name))
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.error(u"[{0}] Error: {0}. See plugin log for more information.".format(dev.name, sub_error))
                 return {'success': False, 'message': u"{0}".format(sub_error)}
 
         if caller_waiting_for_result:
@@ -2625,9 +2641,34 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<31} {1}".format("Matplotlib Plugin log location:", log_path))
         self.logger.info(u"{0:<31} {1}".format("Number of Chart Devices:", chart_devices))
         self.logger.info(u"{0:<31} {1}".format("Number of CSV Engine Devices:", csv_engines))
+        # rcParams is a dict containing all of the initial matplotlibrc settings
         self.logger.threaddebug(u"{0:<31} {1}".format("Matplotlib base rcParams:", dict(rcParams)))
         self.logger.threaddebug(u"{0:<31} {1}".format('Initial Plugin Prefs:', dict(self.pluginPrefs)))
         self.logger.info(u"{0:{1}^135}".format("", "="))
+
+    # =============================================================================
+    def pluginErrorHandler(self, sub_error):
+        """
+        Centralized handling of traceback messages
+
+        Centralized handling of traceback messages formatted for pretty display in the
+        plugin log file. If sent here, they will not be displayed in the Indigo Events
+        log. Use the following syntax to send exceptions here::
+
+            self.pluginErrorHandler(traceback.format_exc())
+
+        -----
+
+        :param traceback object sub_error:
+        """
+
+        sub_error = sub_error.splitlines()
+        self.logger.critical(u"{0:!^80}".format(" TRACEBACK "))
+
+        for line in sub_error:
+            self.logger.critical(u"!!! {0}".format(line))
+
+        self.logger.critical(u"!" * 80)
 
     # =============================================================================
     def processLogQueue(self, dev, return_queue):
@@ -2708,7 +2749,7 @@ class Plugin(indigo.PluginBase):
 
         # Indigo will trap if device is disabled.
         dev = indigo.devices[plugin_action.deviceId]
-        self.charts_refresh(dev_list=[dev])
+        self.charts_refresh([dev])
 
     # =============================================================================
     def refresh_the_charts_now(self):
@@ -2723,9 +2764,9 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         self.skipRefreshDateUpdate = True
-        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and
-                              dev.deviceTypeId != 'csvEngine']
-        self.charts_refresh(dev_list=devices_to_refresh)
+        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if
+                              dev.enabled and dev.deviceTypeId != 'csvEngine']
+        self.charts_refresh(devices_to_refresh)
         self.logger.info(u"{0:{1}^80}".format(' Redraw Charts Now Menu Action Complete ', '='))
 
     # =============================================================================
@@ -2746,7 +2787,8 @@ class Plugin(indigo.PluginBase):
             return_queue = multiprocessing.Queue()
 
             k_dict  = {}  # A dict of kwarg dicts
-            p_dict  = dict(self.pluginPrefs)  # Plugin preferences (we set defaults and override with pluginPrefs).
+            # A dict of plugin preferences (we set defaults and override with pluginPrefs).
+            p_dict  = dict(self.pluginPrefs)
 
             try:
                 p_dict = self.audit_p_dict(p_dict)
@@ -2783,15 +2825,13 @@ class Plugin(indigo.PluginBase):
                 # ============================== Plot Area color ==============================
                 if not self.pluginPrefs.get('faceColorOther', 'false'):
                     p_dict['transparent_filled'] = True
-                    face_color = self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', '')
-                    p_dict['faceColor'] = r"#{0}".format(face_color)
+                    p_dict['faceColor'] = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
                 elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
                     p_dict['transparent_filled'] = True
-                    face_color = self.pluginPrefs.get('faceColor', 'FF FF FF').replace(' ', '').replace('#', '')
-                    p_dict['faceColor']          = r"#{0}".format(face_color)
+                    p_dict['faceColor'] = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
                 else:
                     p_dict['transparent_filled'] = False
-                    p_dict['faceColor']          = '#000000'
+                    p_dict['faceColor'] = '#000000'
 
                 # A list of chart ids may be passed to the method. In that case, refresh only
                 # those charts. Otherwise, chart_id is None and we evaluate all of the charts
@@ -2865,22 +2905,12 @@ class Plugin(indigo.PluginBase):
                                                 'textcoords': 'offset points',
                                                 'verticalalignment': 'center'
                                                 }
-                    k_dict['k_bar']          = {'alpha': 1.0,
-                                                'zorder': 10
-                                                }
-                    k_dict['k_base_font']    = {'size': float(p_dict['mainFontSize']),
-                                                'weight': p_dict['font_weight']
-                                                }
+                    k_dict['k_bar']          = {'alpha': 1.0, 'zorder': 10}
+                    k_dict['k_base_font']    = {'size': float(p_dict['mainFontSize']), 'weight': p_dict['font_weight']}
                     k_dict['k_calendar']     = {'verticalalignment': 'top'}
-                    k_dict['k_custom']       = {'alpha': 1.0,
-                                                'zorder': 3
-                                                }
-                    k_dict['k_fill']         = {'alpha': 0.7,
-                                                'zorder': 10
-                                                }
-                    k_dict['k_grid_fig']     = {'which': 'major',
-                                                'zorder': 1
-                                                }
+                    k_dict['k_custom']       = {'alpha': 1.0, 'zorder': 3}
+                    k_dict['k_fill']         = {'alpha': 0.7, 'zorder': 10}
+                    k_dict['k_grid_fig']     = {'which': 'major', 'zorder': 1}
                     k_dict['k_line']         = {'alpha': 1.0}
                     k_dict['k_major_x']      = {'bottom': p_dict['tick_bottom'],
                                                 'reset': False,
@@ -2897,16 +2927,8 @@ class Plugin(indigo.PluginBase):
                                                 'right': p_dict['tick_right'],
                                                 'which': 'major'
                                                 }
-                    k_dict['k_max']          = {'linestyle': 'dotted',
-                                                'marker': None,
-                                                'alpha': 1.0,
-                                                'zorder': 1
-                                                }
-                    k_dict['k_min']          = {'linestyle': 'dotted',
-                                                'marker': None,
-                                                'alpha': 1.0,
-                                                'zorder': 1
-                                                }
+                    k_dict['k_max']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
+                    k_dict['k_min']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
                     k_dict['k_minor_x']      = {'bottom': p_dict['tick_bottom'],
                                                 'reset': False,
                                                 'top': p_dict['tick_top'],
@@ -2922,8 +2944,7 @@ class Plugin(indigo.PluginBase):
                                                 'right': p_dict['tick_right'],
                                                 'which': 'minor'
                                                 }
-                    k_dict['k_rgrids']       = {'angle': 67,
-                                                'color': p_dict['fontColor'],
+                    k_dict['k_rgrids']       = {'angle': 67, 'color': p_dict['fontColor'],
                                                 'horizontalalignment': 'left',
                                                 'verticalalignment': 'center'
                                                 }
@@ -2956,8 +2977,8 @@ class Plugin(indigo.PluginBase):
                                                 'visible': True
                                                 }
 
-                    # If the user has selected transparent in the plugin menu, we account for that here when setting
-                    # up the kwargs for savefig().
+                    # If the user has selected transparent in the plugin menu, we account for that here when
+                    # setting up the kwargs for savefig().
                     if p_dict['transparent_charts']:
                         k_dict['k_plot_fig'] = {'bbox_extra_artists': None,
                                                 'bbox_inches': None,
@@ -2987,16 +3008,12 @@ class Plugin(indigo.PluginBase):
                     p_dict.update(dev.pluginProps)
 
                     for _ in ('bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot',
-                              'headers', 'wind_direction', 'wind_speed',
-                              'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6', 'x_obs7', 'x_obs8',
-                              'y_obs1', 'y_obs1_max', 'y_obs1_min',
-                              'y_obs2', 'y_obs2_max', 'y_obs2_min',
-                              'y_obs3', 'y_obs3_max', 'y_obs3_min',
-                              'y_obs4', 'y_obs4_max', 'y_obs4_min',
-                              'y_obs5', 'y_obs5_max', 'y_obs5_min',
-                              'y_obs6', 'y_obs6_max', 'y_obs6_min',
-                              'y_obs7', 'y_obs7_max', 'y_obs7_min',
-                              'y_obs8', 'y_obs8_max', 'y_obs8_min'
+                              'headers', 'wind_direction', 'wind_speed', 'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4',
+                              'x_obs5', 'x_obs6', 'x_obs7', 'x_obs8', 'y_obs1', 'y_obs1_max', 'y_obs1_min', 'y_obs2',
+                              'y_obs2_max', 'y_obs2_min', 'y_obs3', 'y_obs3_max', 'y_obs3_min', 'y_obs4',
+                              'y_obs4_max', 'y_obs4_min', 'y_obs5', 'y_obs5_max', 'y_obs5_min', 'y_obs6',
+                              'y_obs6_max', 'y_obs6_min', 'y_obs7', 'y_obs7_max', 'y_obs7_min', 'y_obs8',
+                              'y_obs8_max', 'y_obs8_min'
                               ):
                         p_dict[_] = []
 
@@ -3017,10 +3034,10 @@ class Plugin(indigo.PluginBase):
                             # Only some devices will have their own numObs.
                             pass
 
-                        except ValueError:
-                            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                            self.logger.warning(u"[{0}] The number of observations must be a positive number. See "
-                                                u"plugin log for more information.")
+                        except ValueError as sub_error:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. "
+                                                u"See plugin log for more information.".format(dev.name, sub_error))
 
                         # ============================ Custom Square Size =============================
                         try:
@@ -3030,10 +3047,10 @@ class Plugin(indigo.PluginBase):
                             else:
                                 p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
 
-                        except ValueError:
-                            self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                            self.logger.warning(u"[{0}] Custom size must be a positive number or "
-                                                u"None.".format(dev.name))
+                        except ValueError as sub_error:
+                            self.pluginErrorHandler(traceback.format_exc())
+                            self.logger.warning(u"[{0}] Custom size must be a positive number or None: "
+                                                u"{1}".format(dev.name, sub_error))
 
                         except KeyError:
                             pass
@@ -3070,10 +3087,9 @@ class Plugin(indigo.PluginBase):
                         # ============================== Best Fit Lines ===============================
                         # Set the defaults for best fit lines in p_dict.
                         for _ in range(1, 9, 1):
-                            p_dict['line{0}BestFitColor'.format(_)] = \
-                                r"#{0}".format(dev.pluginProps.get('line{0}BestFitColor'.format(_),
-                                                                   'FF 00 00').replace('#', '')
-                                               )
+
+                            lbfc1 = self.fix_rgb(dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00'))
+                            p_dict['line{0}BestFitColor'.format(_)] = lbfc1
 
                         # ============================== Phantom Labels ===============================
                         # Since users may or may not include axis labels and because we want to ensure
@@ -3144,7 +3160,7 @@ class Plugin(indigo.PluginBase):
                         # example, matplotlib uses '<', '>' and '.' as markers but storing these values
                         # will blow up the XML.  So we need to convert them. (See self.formatMarkers()
                         # method.)
-                        p_dict = self.formatMarkers(p_dict=p_dict)
+                        p_dict = self.formatMarkers(p_dict)
 
                         # Note that the logging of p_dict and k_dict are handled within the thread.
                         self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
@@ -3188,16 +3204,18 @@ class Plugin(indigo.PluginBase):
                                     if batt_dev.batteryLevel is not None and batt_dev.id not in exclude_list:
                                         device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                                    # The following line is used for testing the battery health code; it isn't needed
-                                    # in production.
+                                    # The following line is used for testing the battery health code; it isn't
+                                    # needed in production.
                                     # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
                                     #                'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
                                     #                'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
-                                    #                'Device 10': '47'}
+                                    #                'Device 10': '47'
+                                    #                }
 
-                                except Exception:
-                                    self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                                    self.logger.error(u"[{0}] Error reading battery devices.".format(batt_dev.name))
+                                except Exception as sub_error:
+                                    self.pluginErrorHandler(traceback.format_exc())
+                                    self.logger.error(u"[{0}] Error reading battery devices: "
+                                                      u"{1}".format(batt_dev.name, sub_error))
 
                             if device_dict == {}:
                                 device_dict['No Battery Devices'] = 0
@@ -3220,7 +3238,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_calendar = multiprocessing.Process(name='p_calendar',
                                                                      target=MakeChart(self).chart_calendar,
-                                                                     args=(dev, p_dict, k_dict, return_queue,))
+                                                                     args=(dev, p_dict, k_dict, return_queue,)
+                                                                     )
                                 p_calendar.start()
 
                         # ================================ Line Charts ================================
@@ -3229,7 +3248,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_line = multiprocessing.Process(name='p_line',
                                                                  target=MakeChart(self).chart_line,
-                                                                 args=(dev, p_dict, k_dict, return_queue,))
+                                                                 args=(dev, p_dict, k_dict, return_queue,)
+                                                                 )
                                 p_line.start()
 
                         # ============================== Multiline Text ===============================
@@ -3239,8 +3259,8 @@ class Plugin(indigo.PluginBase):
                             # devices and variables to the method (the process does not have access to the
                             # Indigo server).
                             if int(p_dict['thing']) in indigo.devices:
-                                text_to_plot = \
-                                    unicode(indigo.devices[int(p_dict['thing'])].states[p_dict['thingState']])
+                                dev_id = int(p_dict['thing'])
+                                text_to_plot = unicode(indigo.devices[dev_id].states[p_dict['thingState']])
 
                             elif int(p_dict['thing']) in indigo.variables:
                                 text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
@@ -3268,7 +3288,10 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_polar = multiprocessing.Process(name='p_polar',
                                                                   target=MakeChart(self).chart_polar,
-                                                                  args=(dev, p_dict, k_dict, return_queue,
+                                                                  args=(dev,
+                                                                        p_dict,
+                                                                        k_dict,
+                                                                        return_queue,
                                                                         )
                                                                   )
                                 p_polar.start()
@@ -3279,7 +3302,10 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_scatter = multiprocessing.Process(name='p_scatter',
                                                                     target=MakeChart(self).chart_scatter,
-                                                                    args=(dev, p_dict, k_dict, return_queue,
+                                                                    args=(dev,
+                                                                          p_dict,
+                                                                          k_dict,
+                                                                          return_queue,
                                                                           )
                                                                     )
                                 p_scatter.start()
@@ -3337,17 +3363,20 @@ class Plugin(indigo.PluginBase):
 
                         dev.updateStatesOnServer(kv_list)
 
-                    except RuntimeError:
-                        self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+                    except RuntimeError as sub_error:
+                        self.pluginErrorHandler(traceback.format_exc())
+                        self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more "
+                                             u"information.".format(dev.name, sub_error))
                         self.logger.critical(u"Skipping device.")
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
                 # Ensure the flag is in the proper state for the next automatic refresh.
                 self.skipRefreshDateUpdate = False
 
-            except Exception:
-                self.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-                self.logger.critical(u"Error. See plugin log for more information.")
+            except Exception as sub_error:
+                self.pluginErrorHandler(traceback.format_exc())
+                self.logger.critical(u"[{0}] Error: {0}. See plugin log for more "
+                                     u"information.".format(unicode(sub_error)))
 
     # =============================================================================
     def refreshTheChartsAction(self, plugin_action):
@@ -3362,18 +3391,17 @@ class Plugin(indigo.PluginBase):
         :param class 'indigo.PluginAction' plugin_action:
         """
         self.skipRefreshDateUpdate = True
-        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if dev.enabled and
-                              dev.deviceTypeId != 'csvEngine']
+        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if
+                              dev.enabled and dev.deviceTypeId != 'csvEngine']
 
-        self.charts_refresh(dev_list=devices_to_refresh)
+        self.charts_refresh(devices_to_refresh)
 
         self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
 
-    # TODO: PyCharm reports as unused.  Delete.
     # =============================================================================
-    # def log_me(self, message="", level='info'):
-    #
-    #     indigo.server.log(message)
+    def log_me(self, message="", level='info'):
+
+        indigo.server.log(message)
 
 
 class MakeChart(object):
@@ -3401,14 +3429,14 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
             x_obs           = ''
             y_obs_tuple     = ()  # Y values
             y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
             y_colors_tuple  = ()  # Y area colors
 
-            ax = self.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
@@ -3417,12 +3445,9 @@ class MakeChart(object):
 
                 suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
 
-                area_color = p_dict['area{0}Color'.format(area)].replace(' ', '').replace('#', '')
-                p_dict['area{0}Color'.format(area)] = r"#{0}".format(area_color)
-                line_color = p_dict['line{0}Color'.format(area)].replace(' ', '').replace('#', '')
-                p_dict['line{0}Color'.format(area)] = r"#{0}".format(line_color)
-                marker_color = p_dict['area{0}MarkerColor'.format(area)].replace(' ', '').replace('#', '')
-                p_dict['area{0}MarkerColor'.format(area)] = r"#{0}".format(marker_color)
+                p_dict['area{0}Color'.format(area)] = self.host_plugin.fix_rgb(p_dict['area{0}Color'.format(area)])
+                p_dict['line{0}Color'.format(area)] = self.host_plugin.fix_rgb(p_dict['line{0}Color'.format(area)])
+                p_dict['area{0}MarkerColor'.format(area)] = self.host_plugin.fix_rgb(p_dict['area{0}MarkerColor'.format(area)])
 
                 # If area color is the same as the background color, alert the user.
                 if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
@@ -3438,9 +3463,9 @@ class MakeChart(object):
                 # Plot the areas. If suppress_area is True, we skip it.
                 if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
 
-                    data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
+                    data_path   = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
                     area_source = p_dict['area{0}Source'.format(area)].encode("utf-8")
-                    data_column, log = self.get_data(data_source=u'{0}{1}'.format(data_path, area_source), log=log)
+                    data_column, log = self.get_data('{0}{1}'.format(data_path, area_source), log)
                     log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
 
                     # Pull the headers
@@ -3474,13 +3499,10 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs = p_dict['y_obs{0}'.format(area)]
                         new_old = dev.pluginProps['limitDataRange']
-                        p_dict['x_obs{0}'.format(area)], p_dict['y_obs{0}'.format(area)] = \
-                            self.prune_data(x_data=dates_to_plot,
-                                            y_data=y_obs,
-                                            limit=limit,
-                                            new_old=new_old,
-                                            log=log
-                                            )
+
+                        x_index = 'x_obs{0}'.format(area)
+                        y_index = 'y_obs{0}'.format(area)
+                        p_dict[x_index], p_dict[y_index] = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
 
                     # ======================== Convert Dates for Charting =========================
                     p_dict['x_obs{0}'.format(area)] = self.format_dates(p_dict['x_obs{0}'.format(area)], log)
@@ -3512,21 +3534,9 @@ class MakeChart(object):
 
                     if p_dict['area{0}Annotate'.format(area)]:
                         for xy in zip(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)]):
-                            ax.annotate(text=u"{0}".format(xy[1]),
-                                        xy=xy,
-                                        xytext=(0, 0),
-                                        zorder=10,
-                                        **k_dict['k_annotation']
-                                        )
+                            ax.annotate(u"{0}".format(xy[1]), xy=xy, xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
 
-            ax.stackplot(x=x_obs,
-                         y=y_obs_tuple,
-                         edgecolor=None,
-                         colors=y_colors_tuple,
-                         zorder=10,
-                         lw=0,
-                         **k_dict['k_line']
-                         )
+            ax.stackplot(x_obs, y_obs_tuple, edgecolor=None, colors=y_colors_tuple, zorder=10, lw=0, **k_dict['k_line'])
 
             # ============================== Y1 Axis Min/Max ==============================
             # Min and Max are not 'None'.
@@ -3539,9 +3549,7 @@ class MakeChart(object):
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle(xy=(0, 0),
-                                               width=1,
-                                               height=1,
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                                transform=ax.transAxes,
                                                facecolor=p_dict['faceColor'],
                                                zorder=1
@@ -3576,16 +3584,14 @@ class MakeChart(object):
                 # Note that the legend does not support the PolyCollection created by the
                 # stackplot. Therefore we have to use a proxy artist.
                 # https://stackoverflow.com/a/14534830/2827397
-                p1 = patches.Rectangle(xy=(0, 0), width=1, height=1)
-                p2 = patches.Rectangle(xy=(0, 0), width=1, height=1)
+                p1 = patches.Rectangle((0, 0), 1, 1)
+                p2 = patches.Rectangle((0, 0), 1, 1)
 
-                legend = ax.legend(handles=[p1, p2],
-                                   labels=final_headers,
+                legend = ax.legend([p1, p2], final_headers,
                                    loc='upper center',
                                    bbox_to_anchor=(0.5, -0.1),
                                    ncol=num_col,
-                                   prop={'size': float(p_dict['legendFontSize'])
-                                         }
+                                   prop={'size': float(p_dict['legendFontSize'])}
                                    )
 
                 # Set legend font color
@@ -3635,8 +3641,7 @@ class MakeChart(object):
                     # Note that stackplots don't support markers, so we need to plot a line (with
                     # no width) on the plot to receive the markers.
                     if p_dict['area{0}Marker'.format(area)] != 'None':
-                        ax.plot_date(x=p_dict['x_obs{0}'.format(area)],
-                                     y=y_obs_tuple_rel['y_obs{0}'.format(area)],
+                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)],
                                      marker=p_dict['area{0}Marker'.format(area)],
                                      markeredgecolor=p_dict['area{0}MarkerColor'.format(area)],
                                      markerfacecolor=p_dict['area{0}MarkerColor'.format(area)],
@@ -3645,8 +3650,7 @@ class MakeChart(object):
                                      )
 
                     if p_dict['line{0}Style'.format(area)] != 'None':
-                        ax.plot_date(x=p_dict['x_obs{0}'.format(area)],
-                                     y=y_obs_tuple_rel['y_obs{0}'.format(area)],
+                        ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)],
                                      zorder=10,
                                      lw=1,
                                      ls='-',
@@ -3661,24 +3665,22 @@ class MakeChart(object):
             self.format_axis_y1_label(p_dict, k_dict, log)
             self.format_axis_y_ticks(p_dict, k_dict, log)
             self.save_chart_image(plt, p_dict, k_dict, log)
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
     # =============================================================================
@@ -3703,10 +3705,10 @@ class MakeChart(object):
             bar_colors = []
             num_obs    = p_dict['numObs']
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
 
-            ax = self.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
@@ -3714,8 +3716,7 @@ class MakeChart(object):
 
                 suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
 
-                bar_color = r"#{0}".format(p_dict['bar{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
-                p_dict['bar{0}Color'.format(thing)] = bar_color
+                p_dict['bar{0}Color'.format(thing)] = self.host_plugin.fix_rgb(p_dict['bar{0}Color'.format(thing)])
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
@@ -3734,9 +3735,10 @@ class MakeChart(object):
                     bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                     # Get the data and grab the header.
-                    data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
-                    bar_source = p_dict['bar{0}Source'.format(thing)]
-                    data_column, log = self.get_data(data_source=u'{0}{1}'.format(data_path, bar_source), log=log)
+                    dc = u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"),
+                                          p_dict['bar{0}Source'.format(thing)]
+                                          )
+                    data_column, log = self.get_data(dc, log)
                     log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
 
                     # Pull the headers
@@ -3760,27 +3762,31 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
                         new_old = dev.pluginProps['limitDataRange']
-                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = \
-                            self.prune_data(x_data=dates_to_plot,
-                                            y_data=y_obs,
-                                            limit=limit,
-                                            new_old=new_old,
-                                            log=log
-                                            )
+                        dtp = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = dtp
 
                     # Convert the date strings for charting.
                     p_dict['x_obs{0}'.format(thing)] = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # If the user sets the width to 0, this will perform an introspection of the
                     # dates to plot and get the minimum of the difference between the dates.
-                    if float(p_dict['barWidth']) == 0.0:
-                        width = np.min(np.diff(p_dict['x_obs{0}'.format(thing)])) * 0.8
-                    else:
-                        width = float(p_dict['barWidth'])
+                    try:
+                        if float(p_dict['barWidth']) == 0.0:
+                            width = np.min(np.diff(p_dict['x_obs{0}'.format(thing)])) * 0.8
+                        else:
+                            width = float(p_dict['barWidth'])
+                    except ValueError as sub_error:
+                        width = 1
+                        return_queue.put({'Error': True,
+                                          'Log': log,
+                                          'Message': u"{0}. Setting bar width to 1. See plugin log for more "
+                                                     u"information.".format(sub_error),
+                                          'Name': dev.name}
+                                         )
 
                     # Plot the bar. Note: hatching is not supported in the PNG backend.
-                    ax.bar(x=p_dict['x_obs{0}'.format(thing)][num_obs * -1:],
-                           height=p_dict['y_obs{0}'.format(thing)][num_obs * -1:],
+                    ax.bar(p_dict['x_obs{0}'.format(thing)][num_obs * -1:],
+                           p_dict['y_obs{0}'.format(thing)][num_obs * -1:],
                            align='center',
                            width=width,
                            color=p_dict['bar{0}Color'.format(thing)],
@@ -3793,11 +3799,17 @@ class MakeChart(object):
                     # If annotations desired, plot those too.
                     if p_dict['bar{0}Annotate'.format(thing)]:
                         for xy in zip(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)]):
-                            ax.annotate(text=u"{0}".format(xy[1]),
+                            ax.annotate(u"{0}".format(xy[1]),
                                         xy=xy,
                                         xytext=(0, 0),
-                                        zorder=10, **k_dict['k_annotation']
+                                        zorder=10,
+                                        **k_dict['k_annotation']
                                         )
+
+            # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
+            # With this setting, we force the x axis to display them (if setting is true).
+            if p_dict.get('showZeroBars', False):
+                ax.set_xlim(0, num_obs + 1)
 
             self.format_axis_y1_min_max(p_dict, log)
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3805,9 +3817,7 @@ class MakeChart(object):
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle(xy=(0, 0),
-                                               width=1,
-                                               height=1,
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                                transform=ax.transAxes,
                                                facecolor=p_dict['faceColor'],
                                                zorder=1
@@ -3840,12 +3850,11 @@ class MakeChart(object):
                 iter_colors  = itertools.chain(*[bar_colors[i::num_col] for i in range(num_col)])
                 final_colors = [_ for _ in iter_colors]
 
-                legend = ax.legend(handles=final_headers,
+                legend = ax.legend(final_headers,
                                    loc='upper center',
                                    bbox_to_anchor=(0.5, -0.1),
                                    ncol=int(p_dict['legendColumns']),
-                                   prop={'size': float(p_dict['legendFontSize'])
-                                         }
+                                   prop={'size': float(p_dict['legendFontSize'])}
                                    )
 
                 # Set legend font color
@@ -3881,24 +3890,22 @@ class MakeChart(object):
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_y_ticks(p_dict, k_dict, log)
             self.save_chart_image(plt, p_dict, k_dict, log)
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
+                              'Name': dev.name}
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
+                              'Name': dev.name}
                              )
 
     # =============================================================================
@@ -3922,15 +3929,15 @@ class MakeChart(object):
 
         try:
             bar_colors    = []
-            caution_color = r"#{0}".format(p_dict['cautionColor'].replace(' ', '').replace('#', ''))
+            caution_color = self.host_plugin.fix_rgb(p_dict['cautionColor'])
             caution_level = int(p_dict['cautionLevel'])
             chart_data    = {}
             font_size     = plt.rcParams['ytick.labelsize']
-            healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
+            healthy_color = self.host_plugin.fix_rgb(p_dict['healthyColor'])
             level_box     = p_dict['showBatteryLevelBackground']
             show_level    = p_dict['showBatteryLevel']
             dead_ones     = p_dict.get('showDeadBattery', False)
-            warning_color = r"#{0}".format(p_dict['warningColor'].replace(' ', '').replace('#', ''))
+            warning_color = self.host_plugin.fix_rgb(p_dict['warningColor'])
             warning_level = int(p_dict['warningLevel'])
             x_values      = []
             y_text        = []
@@ -3963,21 +3970,12 @@ class MakeChart(object):
             y_values = np.arange(len(y_text))
 
             # Create the chart figure
-            ax = self.make_chart_figure(width=p_dict['chart_width'],
-                                        height=p_dict['chart_height'],
-                                        p_dict=p_dict
-                                        )
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             # =============================== Plot the Bars ===============================
             # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
             # it off the origin.
-            rects = ax.barh(y=(y_values + 1),
-                            width=x_values,
-                            color=bar_colors,
-                            align='center',
-                            linewidth=0,
-                            **k_dict['k_bar']
-                            )
+            rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
 
             # ================================ Data Labels ================================
             # Plot data labels inside or outside depending on bar length
@@ -3990,28 +3988,26 @@ class MakeChart(object):
                 # With bbox.  We give a little extra room horizontally for the bbox.
                 if show_level in ('true', 'True', True) and level_box:
                     if width >= caution_level:
-                        plt.annotate(text=u"{0:.0f}".format(width),
+                        plt.annotate(u"{0:.0f}".format(width),
                                      xy=(width - 3, y + height / 2),
-                                     fontsize=font_size,
-                                     **k_dict['k_annotation_battery']
+                                     fontsize=font_size, **k_dict['k_annotation_battery']
                                      )
                     else:
-                        plt.annotate(text=u"{0:.0f}".format(width),
+                        plt.annotate(u"{0:.0f}".format(width),
                                      xy=(width + 3, y + height / 2),
-                                     fontsize=font_size,
-                                     **k_dict['k_annotation_battery']
+                                     fontsize=font_size, **k_dict['k_annotation_battery']
                                      )
 
                 # Without bbox.
                 elif show_level in ('true', 'True', True):
                     if width >= caution_level:
-                        plt.annotate(text=u"{0:.0f}".format(width),
+                        plt.annotate(u"{0:.0f}".format(width),
                                      xy=(width - 2, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_battery']
                                      )
                     else:
-                        plt.annotate(text=u"{0:.0f}".format(width),
+                        plt.annotate(u"{0:.0f}".format(width),
                                      xy=(width + 2, y + height / 2),
                                      fontsize=font_size,
                                      **k_dict['k_battery']
@@ -4067,9 +4063,7 @@ class MakeChart(object):
 
             # Add a patch so that we can have transparent charts but a filled plot area.
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle(xy=(0, 0),
-                                               width=1,
-                                               height=1,
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                                transform=ax.transAxes,
                                                facecolor=p_dict['faceColor'],
                                                zorder=1
@@ -4081,24 +4075,22 @@ class MakeChart(object):
             plt.clf()
             plt.close('all')
 
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
     # =============================================================================
@@ -4139,11 +4131,10 @@ class MakeChart(object):
                     cell._text.set_color(p_dict['fontColor'])
                     cell._text.set_fontname(p_dict['fontMain'])
                     cell._text.set_fontsize(int(dev.pluginProps['fontSize']))
-                    # TODO: This may not be supportable without including fonts with the plugin.
-
-                    # cell._text.set_fontstretch(1000)
-
                     cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
+
+                    # TODO: This may not be supportable without including fonts with the plugin.
+                    # cell._text.set_fontstretch(1000)
 
                     # Controls grid display
                     if dev.pluginProps.get('calendarGrid', True):
@@ -4184,13 +4175,11 @@ class MakeChart(object):
             ax = fig.add_subplot(111)
             ax.axis('off')
 
-            # bbox = [left, bottom, width, height]
             month_row = ax.table(cellText=[" "],
                                  colLabels=[dt.datetime.strftime(today, "%B")],
                                  loc='top',
-                                 bbox=[0, 0.5, 1, .5]
-                                 )
-            format_axis(ax_obj=month_row)
+                                 bbox=[0, 0.5, 1, .5])  # bbox = [left, bottom, width, height]
+            format_axis(month_row)
 
             days_rows = ax.table(cellText=final_cal,
                                  colLabels=days_labels,
@@ -4198,12 +4187,12 @@ class MakeChart(object):
                                  cellLoc=dev.pluginProps.get('dayOfWeekAlignment', 'right'),
                                  bbox=[0, -0.5, 1, 1.25]
                                  )
-            format_axis(ax_obj=days_rows)
+            format_axis(days_rows)
 
-            self.save_chart_image(plot=plt,
-                                  p_dict=p_dict,
-                                  k_dict=k_dict,
-                                  log=log,
+            self.save_chart_image(plt,
+                                  p_dict,
+                                  k_dict,
+                                  log,
                                   size={'top': 0.97,
                                         'bottom': 0.34,
                                         'left': 0.02,
@@ -4212,11 +4201,10 @@ class MakeChart(object):
                                         'wspace': None
                                         }
                                   )
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4233,7 +4221,7 @@ class MakeChart(object):
 
         -----
 
-        :param class 'indigo.Device'e dev: indigo device instance
+        :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -4243,14 +4231,11 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
             line_colors = []
 
-            ax = self.make_chart_figure(width=p_dict['chart_width'],
-                                        height=p_dict['chart_height'],
-                                        p_dict=p_dict
-                                        )
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
@@ -4259,13 +4244,14 @@ class MakeChart(object):
 
                 suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
-                p_dict['line{0}Color'.format(line)] = \
-                    r"#{0}".format(p_dict['line{0}Color'.format(line)].replace(' ', '').replace('#', ''))
+                lc_index = 'line{0}Color'.format(line)
+                p_dict[lc_index] = self.host_plugin.fix_rgb(p_dict[lc_index])
 
-                p_dict['line{0}MarkerColor'.format(line)]  = \
-                    r"#{0}".format(p_dict['line{0}MarkerColor'.format(line)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}BestFitColor'.format(line)] = \
-                    r"#{0}".format(p_dict['line{0}BestFitColor'.format(line)].replace(' ', '').replace('#', ''))
+                lmc_index = 'line{0}MarkerColor'.format(line)
+                p_dict[lmc_index]  = self.host_plugin.fix_rgb(p_dict[lmc_index])
+
+                lbf_index = 'line{0}BestFitColor'.format(line)
+                p_dict[lbf_index] = self.host_plugin.fix_rgb(p_dict[lbf_index])
 
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
@@ -4274,8 +4260,8 @@ class MakeChart(object):
 
                 # If the line is suppressed, remind the user they suppressed it.
                 if suppress_line:
-                    log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in "
-                                       u"the device configuration menu.".format(dev.name, line))
+                    log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
+                                       u"device configuration menu.".format(dev.name, line))
 
                 # ============================== Plot the Lines ===============================
                 # Plot the lines. If suppress_line is True, we skip it.
@@ -4286,7 +4272,8 @@ class MakeChart(object):
 
                     data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
                     line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
-                    data_column, log = self.get_data(data_source=u'{0}{1}'.format(data_path, line_source), log=log)
+                    data_column, log = self.get_data('{0}{1}'.format(data_path, line_source), log)
+
                     log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
 
                     # Pull the headers
@@ -4320,14 +4307,15 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(line)]
                         new_old = dev.pluginProps['limitDataRange']
-                        p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = \
-                            self.prune_data(x_data=dates_to_plot, y_data=y_obs, limit=limit, new_old=new_old, log=log)
+
+                        prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
 
                     # ======================== Convert Dates for Charting =========================
                     p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
-                    ax.plot_date(x=p_dict['x_obs{0}'.format(line)],
-                                 y=p_dict['y_obs{0}'.format(line)],
+                    ax.plot_date(p_dict['x_obs{0}'.format(line)],
+                                 p_dict['y_obs{0}'.format(line)],
                                  color=p_dict['line{0}Color'.format(line)],
                                  linestyle=p_dict['line{0}Style'.format(line)],
                                  marker=p_dict['line{0}Marker'.format(line)],
@@ -4340,9 +4328,9 @@ class MakeChart(object):
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
                     if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(x=p_dict['x_obs{0}'.format(line)],
-                                        y1=0,
-                                        y2=p_dict['y_obs{0}'.format(line)],
+                        ax.fill_between(p_dict['x_obs{0}'.format(line)],
+                                        0,
+                                        p_dict['y_obs{0}'.format(line)],
                                         color=p_dict['line{0}Color'.format(line)],
                                         **k_dict['k_fill']
                                         )
@@ -4350,7 +4338,7 @@ class MakeChart(object):
                     # ================================ Annotations ================================
                     if p_dict['line{0}Annotate'.format(line)]:
                         for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
-                            ax.annotate(text=u"{0}".format(xy[1]),
+                            ax.annotate(u"{0}".format(xy[1]),
                                         xy=xy,
                                         xytext=(0, 0),
                                         zorder=10,
@@ -4363,9 +4351,7 @@ class MakeChart(object):
 
             # Transparent Chart Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle(xy=(0, 0),
-                                               width=1,
-                                               height=1,
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                                transform=ax.transAxes,
                                                facecolor=p_dict['faceColor'],
                                                zorder=1
@@ -4397,12 +4383,11 @@ class MakeChart(object):
                 iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
                 final_colors = [_ for _ in iter_colors]
 
-                legend = ax.legend(handles=final_headers,
+                legend = ax.legend(final_headers,
                                    loc='upper center',
                                    bbox_to_anchor=(0.5, -0.1),
                                    ncol=num_col,
-                                   prop={'size': float(p_dict['legendFontSize'])
-                                         }
+                                   prop={'size': float(p_dict['legendFontSize'])}
                                    )
 
                 # Set legend font color
@@ -4434,9 +4419,9 @@ class MakeChart(object):
 
                     # =============================== Fill Between ================================
                     if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(x=p_dict['x_obs{0}'.format(line)],
-                                        y1=0,
-                                        y2=p_dict['y_obs{0}'.format(line)],
+                        ax.fill_between(p_dict['x_obs{0}'.format(line)],
+                                        0,
+                                        p_dict['y_obs{0}'.format(line)],
                                         color=p_dict['line{0}Color'.format(line)],
                                         **k_dict['k_fill']
                                         )
@@ -4445,8 +4430,7 @@ class MakeChart(object):
                     if p_dict['plotLine{0}Min'.format(line)]:
                         ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
                                    color=p_dict['line{0}Color'.format(line)],
-                                   **k_dict['k_min']
-                                   )
+                                   **k_dict['k_min'])
                     if p_dict['plotLine{0}Max'.format(line)]:
                         ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
                                    color=p_dict['line{0}Color'.format(line)],
@@ -4462,24 +4446,22 @@ class MakeChart(object):
             self.format_axis_y1_label(p_dict, k_dict, log)
             self.format_axis_y_ticks(p_dict, k_dict, log)
             self.save_chart_image(plt, p_dict, k_dict, log)
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
+                              'Name': dev.name}
                              )
 
     # =============================================================================
@@ -4505,9 +4487,9 @@ class MakeChart(object):
 
             import textwrap
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['textColor']       = r"#{0}".format(p_dict['textColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['textColor']       = self.host_plugin.fix_rgb(p_dict['textColor'])
             p_dict['figureWidth']     = float(dev.pluginProps['figureWidth'])
             p_dict['figureHeight']    = float(dev.pluginProps['figureHeight'])
 
@@ -4531,11 +4513,10 @@ class MakeChart(object):
                                          replace_whitespace=p_dict['cleanTheText']
                                          )
 
-            ax = self.make_chart_figure(width=p_dict['figureWidth'], height=p_dict['figureHeight'], p_dict=p_dict)
+            ax = self.make_chart_figure(p_dict['figureWidth'], p_dict['figureHeight'], p_dict)
 
-            ax.text(x=0.01,
-                    y=0.95,
-                    s=text_to_plot,
+            ax.text(0.01, 0.95,
+                    text_to_plot,
                     transform=ax.transAxes,
                     color=p_dict['textColor'],
                     fontname=p_dict['fontMain'],
@@ -4551,9 +4532,7 @@ class MakeChart(object):
 
             # Transparent Charts Fill
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle(xy=(0, 0),
-                                               width=1,
-                                               height=1,
+                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                                transform=ax.transAxes,
                                                facecolor=p_dict['faceColor'],
                                                zorder=1
@@ -4562,10 +4541,10 @@ class MakeChart(object):
 
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4574,7 +4553,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4608,30 +4587,25 @@ class MakeChart(object):
         try:
 
             num_obs                    = p_dict['numObs']
-            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['currentWindColor'] = r"#{0}".format(p_dict['currentWindColor'].replace(' ', '').replace('#', ''))
-            p_dict['maxWindColor']     = r"#{0}".format(p_dict['maxWindColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']        = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['currentWindColor'] = self.host_plugin.fix_rgb(p_dict['currentWindColor'])
+            p_dict['maxWindColor']     = self.host_plugin.fix_rgb(p_dict['maxWindColor'])
 
             # ============================== Column Headings ==============================
             # Pull the column headings for the labels, then delete the row from
             # self.final_data.
-
-            # The name of the theta file:
             theta_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'],
-                                         p_dict['thetaValue'].encode('utf-8')
-                                         )
-            # The name of the radii file:
+                                         p_dict['thetaValue'].encode('utf-8'))
             radii_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'],
-                                         p_dict['radiiValue'].encode('utf-8')
-                                         )
+                                         p_dict['radiiValue'].encode('utf-8'))
 
             if theta_path != 'None' and radii_path != 'None':
 
                 # Get the data.
-                theta, log = self.get_data(data_source=theta_path, log=log)
+                theta, log = self.get_data(theta_path, log)
                 self.final_data.append(theta)
-                radii, log = self.get_data(data_source=radii_path, log=log)
+                radii, log = self.get_data(radii_path, log)
                 self.final_data.append(radii)
 
                 log['Threaddebug'].append(u"Data: {0}".format(self.final_data))
@@ -4669,8 +4643,7 @@ class MakeChart(object):
                 color_increment = 1.0 / num_obs
                 color = color_increment
                 for item in range(0, num_obs, 1):
-                    # p_dict['bar_colors'].append("%0.3f" % color)
-                    p_dict['bar_colors'].append("{0:.3f}".format(color))
+                    p_dict['bar_colors'].append("%0.3f" % color)
                     color += color_increment
                 p_dict['bar_colors'][num_obs - 1] = p_dict['currentWindColor']
 
@@ -4697,12 +4670,7 @@ class MakeChart(object):
                 # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the
                 # grid defaults to z = 2.)
                 for w in wind:
-                    ax.plot(x=(0, w[0]),
-                            y=(0, w[1]),
-                            color=w[2],
-                            linewidth=2,
-                            zorder=3
-                            )
+                    ax.plot((0, w[0]), (0, w[1]), color=w[2], linewidth=2, zorder=3)
 
                 # Right-size the grid (must be done after the plot), and customize the tick
                 # labels. The default covers anything over 50.
@@ -4734,9 +4702,8 @@ class MakeChart(object):
                     grids = range(10, 60, 10)
 
                 elif 50 < max_wind_speed:
-                    plt.text(x=0.5,
-                             y=0.5,
-                             s=u"Holy crap!",
+                    plt.text(0.5, 0.5,
+                             u"Holy crap!",
                              color='FF FF FF',
                              horizontalalignment='center',
                              verticalalignment='center',
@@ -4759,8 +4726,8 @@ class MakeChart(object):
                 # transform can be done one of two ways: access the private attribute
                 # "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
                 fig = plt.gcf()
-                max_wind_circle = plt.Circle(xy=(0, 0),
-                                             radius=(max(p_dict['wind_speed']) * 0.99),
+                max_wind_circle = plt.Circle((0, 0),
+                                             (max(p_dict['wind_speed']) * 0.99),
                                              transform=ax.transProjectionAffine + ax.transAxes,
                                              fill=False,
                                              edgecolor=p_dict['maxWindColor'],
@@ -4770,8 +4737,7 @@ class MakeChart(object):
                                              )
                 fig.gca().add_artist(max_wind_circle)
 
-                last_wind_circle = plt.Circle(xy=(0, 0),
-                                              radius=(p_dict['wind_speed'][-1] * 0.99),
+                last_wind_circle = plt.Circle((0, 0), (p_dict['wind_speed'][-1] * 0.99),
                                               transform=ax.transProjectionAffine + ax.transAxes,
                                               fill=False,
                                               edgecolor=p_dict['currentWindColor'],
@@ -4784,8 +4750,7 @@ class MakeChart(object):
                 # ================================== No Wind ==================================
                 # If latest obs is a speed of zero, plot something that we can see.
                 if p_dict['wind_speed'][-1] == 0:
-                    zero_wind_circle = plt.Circle(xy=(0, 0),
-                                                  radius=0.15,
+                    zero_wind_circle = plt.Circle((0, 0), 0.15,
                                                   transform=ax.transProjectionAffine + ax.transAxes,
                                                   fill=True,
                                                   facecolor=p_dict['currentWindColor'],
@@ -4799,8 +4764,8 @@ class MakeChart(object):
                 # ========================== Transparent Chart Fill ===========================
                 if p_dict['transparent_charts'] and p_dict['transparent_filled']:
                     ylim = ax.get_ylim()
-                    patch = plt.Circle(xy=(0, 0),
-                                       radius=ylim[1],
+                    patch = plt.Circle((0, 0),
+                                       ylim[1],
                                        transform=ax.transProjectionAffine + ax.transAxes,
                                        fill=True,
                                        facecolor=p_dict['faceColor'],
@@ -4815,12 +4780,11 @@ class MakeChart(object):
                 # custom line segments).
 
                 if p_dict['showLegend']:
-                    legend = ax.legend(handles=([u"Current", u"Maximum"]),
+                    legend = ax.legend(([u"Current", u"Maximum"]),
                                        loc='upper center',
                                        bbox_to_anchor=(0.5, -0.05),
                                        ncol=2,
-                                       prop={'size': float(p_dict['legendFontSize'])
-                                             }
+                                       prop={'size': float(p_dict['legendFontSize'])}
                                        )
                     legend.legendHandles[0].set_color(p_dict['currentWindColor'])
                     legend.legendHandles[1].set_color(p_dict['maxWindColor'])
@@ -4833,11 +4797,16 @@ class MakeChart(object):
                                       p_dict,
                                       k_dict,
                                       log,
-                                      size={'top': 0.85, 'bottom': 0.15, 'left': 0.15, 'right': 0.85})
-                self.process_log(dev=dev, log=log, return_queue=return_queue)
+                                      size={'top': 0.85,
+                                            'bottom': 0.15,
+                                            'left': 0.15,
+                                            'right': 0.85
+                                            }
+                                      )
+                self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4846,7 +4815,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4873,11 +4842,11 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
             group_colors = []
 
-            ax = self.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
             self.format_axis_y(ax, p_dict, k_dict, log)
 
@@ -4885,22 +4854,23 @@ class MakeChart(object):
 
                 suppress_group = p_dict.get('suppressGroup{0}'.format(thing), False)
 
-                p_dict['group{0}Color'.format(thing)]       = \
-                    r"#{0}".format(p_dict['group{0}Color'.format(thing)].replace(' ', '').replace('#', ''))
-                p_dict['group{0}MarkerColor'.format(thing)] = \
-                    r"#{0}".format(p_dict['group{0}MarkerColor'.format(thing)].replace(' ', '').replace('#', ''))
-                p_dict['line{0}BestFitColor'.format(thing)] = \
-                    r"#{0}".format(p_dict['line{0}BestFitColor'.format(thing)].replace(' ', '').replace('#', ''))
+                p_dict['group{0}Color'.format(thing)] = self.host_plugin.fix_rgb(p_dict['group{0}Color'.format(thing)])
+
+                gmc2 = self.host_plugin.fix_rgb(p_dict['group{0}MarkerColor'.format(thing)])
+                p_dict['group{0}MarkerColor'.format(thing)] = gmc2
+
+                best_fit = self.host_plugin.fix_rgb(p_dict['line{0}BestFitColor'.format(thing)])
+                p_dict['line{0}BestFitColor'.format(thing)] = best_fit
 
                 # If dot color is the same as the background color, alert the user.
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_group:
-                    log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may "
-                                        u"not be able to see it).".format(dev.name, thing))
+                    log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not "
+                                        u"be able to see it).".format(dev.name, thing))
 
                 # If the group is suppressed, remind the user they suppressed it.
                 if suppress_group:
-                    log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in "
-                                       u"the device configuration menu.".format(dev.name, thing))
+                    log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in the "
+                                       u"device configuration menu.".format(dev.name, thing))
 
                 # ============================== Plot the Points ==============================
                 # Plot the groups. If suppress_group is True, we skip it.
@@ -4915,11 +4885,9 @@ class MakeChart(object):
                         p_dict['group{0}Marker'.format(thing)] = '.'
                         p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
-                    column_0 = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
-                    column_1 = p_dict['group{0}Source'.format(thing)].encode("utf-8")
-                    data_column, log = self.get_data(data_source='{0}{1}'.format(column_0, column_1),
-                                                     log=log
-                                                     )
+                    data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
+                    group_source = p_dict['group{0}Source'.format(thing)].encode("utf-8")
+                    data_column, log = self.get_data('{0}{1}'.format(data_path, group_source), log)
                     log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
 
                     # Pull the headers
@@ -4943,15 +4911,16 @@ class MakeChart(object):
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
                         new_old = dev.pluginProps['limitDataRange']
-                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = \
-                            self.prune_data(x_data=dates_to_plot, y_data=y_obs, limit=limit, new_old=new_old, log=log)
+
+                        prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+                        p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = prune
 
                     # Convert the date strings for charting.
                     p_dict['x_obs{0}'.format(thing)] = self.format_dates(p_dict['x_obs{0}'.format(thing)], log)
 
                     # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
-                    ax.scatter(x=p_dict['x_obs{0}'.format(thing)],
-                               y=p_dict['y_obs{0}'.format(thing)],
+                    ax.scatter(p_dict['x_obs{0}'.format(thing)],
+                               p_dict['y_obs{0}'.format(thing)],
                                c=p_dict['group{0}Color'.format(thing)],
                                marker=p_dict['group{0}Marker'.format(thing)],
                                edgecolor=p_dict['group{0}MarkerColor'.format(thing)],
@@ -4995,12 +4964,13 @@ class MakeChart(object):
                         labels.append(p_dict['group{0}Legend'.format(counter)])
 
                     legend_styles.append(tuple(plt.plot([],
-                                               color=p_dict['group{0}MarkerColor'.format(counter)],
-                                               linestyle='',
-                                               marker=p_dict['group{0}Marker'.format(counter)],
-                                               markerfacecolor=final_colors[counter-1],
-                                               markeredgewidth=.8,
-                                               markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)])
+                                                        color=p_dict['group{0}MarkerColor'.format(counter)],
+                                                        linestyle='',
+                                                        marker=p_dict['group{0}Marker'.format(counter)],
+                                                        markerfacecolor=final_colors[counter-1],
+                                                        markeredgewidth=.8,
+                                                        markeredgecolor=p_dict['group{0}MarkerColor'.format(counter)]
+                                                        )
                                                )
                                          )
                     counter += 1
@@ -5009,15 +4979,14 @@ class MakeChart(object):
                 iter_headers   = itertools.chain(*[labels[i::num_col] for i in range(num_col)])
                 final_headers = [_ for _ in iter_headers]
 
-                legend = ax.legend(handles=legend_styles,
-                                   labels=final_headers,
+                legend = ax.legend(legend_styles,
+                                   final_headers,
                                    loc='upper center',
                                    bbox_to_anchor=(0.5, -0.1),
                                    ncol=int(p_dict['legendColumns']),
                                    numpoints=1,
                                    markerscale=0.6,
-                                   prop={'size': float(p_dict['legendFontSize'])
-                                         }
+                                   prop={'size': float(p_dict['legendFontSize'])}
                                    )
 
                 # Set legend font colors
@@ -5051,10 +5020,10 @@ class MakeChart(object):
             self.format_axis_y1_label(p_dict, k_dict, log)
             self.format_axis_y_ticks(p_dict, k_dict, log)
             self.save_chart_image(plt, p_dict, k_dict, log)
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5063,7 +5032,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5113,10 +5082,10 @@ class MakeChart(object):
                 plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
         try:
-            p_dict['backgroundColor'] = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']       = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['lineColor']       = r"#{0}".format(p_dict['lineColor'].replace(' ', '').replace('#', ''))
-            p_dict['lineMarkerColor'] = r"#{0}".format(p_dict['lineMarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['lineColor']       = self.host_plugin.fix_rgb(p_dict['lineColor'])
+            p_dict['lineMarkerColor'] = self.host_plugin.fix_rgb(p_dict['lineMarkerColor'])
 
             # ================================ Set Up Axes ================================
             axes     = dev.pluginProps['component_list']
@@ -5174,7 +5143,7 @@ class MakeChart(object):
             # ============================= Temperature High ==============================
             if 'show_high_temperature' in axes:
                 subplot[0].set_title('high temperature', **k_dict['k_title_font'])  # The subplot title
-                subplot[0].plot(x=x1, y=temperature_high, color=p_dict['lineColor'])    # Plot it
+                subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])    # Plot it
                 format_subplot(subplot[0])                                          # Format the subplot
 
                 if p_dict['temperature_min'] not in ("", "None"):
@@ -5187,7 +5156,7 @@ class MakeChart(object):
             # ============================== Temperature Low ==============================
             if 'show_low_temperature' in axes:
                 subplot[0].set_title('low temperature', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=temperature_low, color=p_dict['lineColor'])
+                subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
                 format_subplot(subplot[0])
 
                 if p_dict['temperature_min'] not in ("", "None"):
@@ -5200,8 +5169,8 @@ class MakeChart(object):
             # =========================== Temperature High/Low ============================
             if 'show_high_low_temperature' in axes:
                 subplot[0].set_title('high/low temperature', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=temperature_high, color=p_dict['lineColor'])
-                subplot[0].plot(x=x1, y=temperature_low, color=p_dict['lineColor'])
+                subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])
+                subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
                 format_subplot(subplot[0])
 
                 if p_dict['temperature_min'] not in ("", "None"):
@@ -5214,7 +5183,7 @@ class MakeChart(object):
             # ================================= Humidity ==================================
             if 'show_humidity' in axes:
                 subplot[0].set_title('humidity', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=humidity, color=p_dict['lineColor'])
+                subplot[0].plot(x1, humidity, color=p_dict['lineColor'])
                 format_subplot(subplot[0])
 
                 if p_dict['humidity_min'] not in ("", "None"):
@@ -5227,7 +5196,7 @@ class MakeChart(object):
             # ============================ Barometric Pressure ============================
             if 'show_barometric_pressure' in axes:
                 subplot[0].set_title('barometric pressure', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=pressure, color=p_dict['lineColor'])
+                subplot[0].plot(x1, pressure, color=p_dict['lineColor'])
                 format_subplot(subplot[0])
 
                 if p_dict['pressure_min'] not in ("", "None"):
@@ -5241,7 +5210,7 @@ class MakeChart(object):
             if 'show_wind' in axes:
                 data = zip(x1, wind_speed, wind_bearing)
                 subplot[0].set_title('wind', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=wind_speed, color=p_dict['lineColor'])
+                subplot[0].plot(x1, wind_speed, color=p_dict['lineColor'])
                 subplot[0].set_ylim(0, max(wind_speed) + 1)
 
                 for _ in data:
@@ -5249,9 +5218,9 @@ class MakeChart(object):
                     location = _[1]
 
                     # Points to where the wind is going to.
-                    subplot[0].text(x=day,
-                                    y=location,
-                                    s="  .  ",
+                    subplot[0].text(day,
+                                    location,
+                                    "  .  ",
                                     size=5,
                                     va="center",
                                     ha="center",
@@ -5281,8 +5250,9 @@ class MakeChart(object):
             # Precip intensity is in inches of liquid rain per hour. using a line chart.
             if 'show_precipitation' in axes:
                 subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
-                subplot[0].plot(x=x1, y=precipitation, color=p_dict['lineColor'])
+                subplot[0].plot(x1, precipitation, color=p_dict['lineColor'])
                 format_subplot(subplot[0])
+
                 # Force precip to 2 decimals regardless of device setting.
                 subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
 
@@ -5297,8 +5267,9 @@ class MakeChart(object):
             # Precip intensity is in inches of liquid rain per hour using a bar chart.
             if 'show_precipitation_bar' in axes:
                 subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
-                subplot[0].bar(x=x1, height=precipitation, width=0.4, align='center', color=p_dict['lineColor'])
+                subplot[0].bar(x1, precipitation, width=0.4, align='center', color=p_dict['lineColor'])
                 format_subplot(subplot[0])
+
                 # Force precip to 2 decimals regardless of device setting.
                 subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
 
@@ -5323,10 +5294,10 @@ class MakeChart(object):
                                         'right': 0.95
                                         }
                                   )
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
                                   u"WUnderground forecast devices.")
             return_queue.put({'Error': True,
@@ -5337,7 +5308,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5369,21 +5340,21 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            p_dict['backgroundColor']  = r"#{0}".format(p_dict['backgroundColor'].replace(' ', '').replace('#', ''))
-            p_dict['faceColor']        = r"#{0}".format(p_dict['faceColor'].replace(' ', '').replace('#', ''))
-            p_dict['line1Color']       = r"#{0}".format(p_dict['line1Color'].replace(' ', '').replace('#', ''))
-            p_dict['line2Color']       = r"#{0}".format(p_dict['line2Color'].replace(' ', '').replace('#', ''))
-            p_dict['line3Color']       = r"#{0}".format(p_dict['line3Color'].replace(' ', '').replace('#', ''))
-            p_dict['line1MarkerColor'] = r"#{0}".format(p_dict['line1MarkerColor'].replace(' ', '').replace('#', ''))
-            p_dict['line2MarkerColor'] = r"#{0}".format(p_dict['line2MarkerColor'].replace(' ', '').replace('#', ''))
+            p_dict['backgroundColor']  = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']        = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['line1Color']       = self.host_plugin.fix_rgb(p_dict['line1Color'])
+            p_dict['line2Color']       = self.host_plugin.fix_rgb(p_dict['line2Color'])
+            p_dict['line3Color']       = self.host_plugin.fix_rgb(p_dict['line3Color'])
+            p_dict['line1MarkerColor'] = self.host_plugin.fix_rgb(p_dict['line1MarkerColor'])
+            p_dict['line2MarkerColor'] = self.host_plugin.fix_rgb(p_dict['line2MarkerColor'])
 
             dates_to_plot = p_dict['dates_to_plot']
 
             for line in range(1, 4, 1):
 
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
-                    log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will "
-                                        u"not be able to see it).".format(dev.name))
+                    log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not "
+                                        u"be able to see it).".format(dev.name))
 
             # ========================== Fantastic Hourly Device ==========================
             if dev_type == 'Hourly':
@@ -5411,7 +5382,7 @@ class MakeChart(object):
                     p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
                     # that Matplotlib interprets the legend as a tuple.
                     p_dict['headers_2']    = ('Precipitation',)
-                    p_dict['daytimeColor'] = r"#{0}".format(p_dict['daytimeColor'].replace(' ', '').replace('#', ''))
+                    p_dict['daytimeColor'] = self.host_plugin.fix_rgb(p_dict['daytimeColor'])
 
             # ======================== WUnderground Hourly Device =========================
             elif dev_type == 'wundergroundHourly':
@@ -5434,7 +5405,7 @@ class MakeChart(object):
                     p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
                     # that Matplotlib interprets the legend as a tuple.
                     p_dict['headers_2']    = ('Precipitation',)
-                    p_dict['daytimeColor'] = r"#{0}".format(p_dict['daytimeColor'].replace(' ', '').replace('#', ''))
+                    p_dict['daytimeColor'] = self.host_plugin.fix_rgb(p_dict['daytimeColor'])
 
             # ========================== Fantastic Daily Device ===========================
             elif dev_type == 'Daily':
@@ -5450,8 +5421,8 @@ class MakeChart(object):
                     # Convert the date strings for charting.
                     dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
-                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly
-                    # if that's the case.
+                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
+                    # that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
                         p_dict['y_obs3'][0] = 1.0
 
@@ -5472,8 +5443,8 @@ class MakeChart(object):
                     # Convert the date strings for charting.
                     dates_to_plot = self.format_dates(p_dict['x_obs1'], log)
 
-                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly
-                    # if that's the case.
+                    # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
+                    # that's the case.
                     if set(p_dict['y_obs3']) == {0.0}:
                         p_dict['y_obs3'][0] = 1.0
 
@@ -5486,7 +5457,7 @@ class MakeChart(object):
 
             log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
 
-            ax1 = self.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+            ax1 = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax1, p_dict, k_dict, log)
             self.format_axis_y(ax1, p_dict, k_dict, log)
 
@@ -5497,16 +5468,16 @@ class MakeChart(object):
             # Plot precipitation bars
             if p_dict['y_obs3']:
                 if len(dates_to_plot) <= 15:
-                    ax1.bar(x=dates_to_plot,
-                            height=p_dict['y_obs3'],
+                    ax1.bar(dates_to_plot,
+                            p_dict['y_obs3'],
                             align='center',
                             color=p_dict['line3Color'],
                             width=((1.0 / len(dates_to_plot)) * 5),
                             zorder=10
                             )
                 else:
-                    ax1.bar(x=dates_to_plot,
-                            height=p_dict['y_obs3'],
+                    ax1.bar(dates_to_plot,
+                            p_dict['y_obs3'],
                             align='center',
                             color=p_dict['line3Color'],
                             width=(1.0 / (len(dates_to_plot) * 1.75)),
@@ -5516,8 +5487,12 @@ class MakeChart(object):
                 # Precipitation bar annotations
                 if p_dict['line3Annotate']:
                     for xy in zip(dates_to_plot, p_dict['y_obs3']):
-                        # ax1.annotate('%.0f' % xy[1], xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
-                        ax1.annotate('{0:.0f}'.format(xy[1]), xy=(xy[0], 5), xytext=(0, 0), zorder=10, **k_dict['k_annotation'])
+                        ax1.annotate('%.0f' % xy[1],
+                                     xy=(xy[0], 5),
+                                     xytext=(0, 0),
+                                     zorder=10,
+                                     **k_dict['k_annotation']
+                                     )
 
             # ============================== Precip Min/Max ===============================
             if p_dict['y2AxisMin'] != 'None' and p_dict['y2AxisMax'] != 'None':
@@ -5536,11 +5511,14 @@ class MakeChart(object):
                 if max(p_dict['y_obs3']) - min(p_dict['y_obs3']) == 0:
                     y2_axis_min = 0
                     y2_axis_max = 1
+
                 elif max(p_dict['y_obs3']) != 0 and \
                         min(p_dict['y_obs3']) != 0 and \
                         0 < max(p_dict['y_obs3']) - min(p_dict['y_obs3']) <= 1:
+
                     y2_axis_min = min(p_dict['y_obs3']) * (1 - (1 / min(p_dict['y_obs3']) ** 1.25))
                     y2_axis_max = max(p_dict['y_obs3']) * (1 + (1 / max(p_dict['y_obs3']) ** 1.25))
+
                 else:
                     if min(p_dict['y_obs3']) < 0:
                         y2_axis_min = min(p_dict['y_obs3']) * 1.5
@@ -5584,9 +5562,9 @@ class MakeChart(object):
 
             # ========================== Transparent Charts Fill ==========================
             if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax1.add_patch(patches.Rectangle(xy=(0, 0),
-                                                width=1,
-                                                height=1,
+                ax1.add_patch(patches.Rectangle((0, 0),
+                                                1,
+                                                1,
                                                 transform=ax1.transAxes,
                                                 facecolor=p_dict['faceColor'],
                                                 zorder=1
@@ -5630,8 +5608,8 @@ class MakeChart(object):
 
             for line in range(1, 3, 1):
                 if p_dict['y_obs{0}'.format(line)]:
-                    ax2.plot(x=dates_to_plot,
-                             y=p_dict['y_obs{0}'.format(line)],
+                    ax2.plot(dates_to_plot,
+                             p_dict['y_obs{0}'.format(line)],
                              color=p_dict['line{0}Color'.format(line)],
                              linestyle=p_dict['line{0}Style'.format(line)],
                              marker=p_dict['line{0}Marker'.format(line)],
@@ -5644,8 +5622,7 @@ class MakeChart(object):
 
                     if p_dict['line{0}Annotate'.format(line)]:
                         for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
-                            # ax2.annotate(text='%.0f' % xy[1],
-                            ax2.annotate(text='{0:.0f}'.format(xy[1]),
+                            ax2.annotate('%.0f' % xy[1],
                                          xy=xy,
                                          xytext=(0, 0),
                                          zorder=(11 - line),
@@ -5681,11 +5658,13 @@ class MakeChart(object):
                 if max(p_dict['data_array']) - min(p_dict['data_array']) == 0:
                     y_axis_min = 0
                     y_axis_max = 1
+
                 elif max(p_dict['data_array']) != 0 and \
                         min(p_dict['data_array']) != 0 and \
                         0 < max(p_dict['data_array']) - min(p_dict['data_array']) <= 1:
                     y_axis_min = min(p_dict['data_array']) * (1 - (1 / abs(min(p_dict['data_array'])) ** 1.25))
                     y_axis_max = max(p_dict['data_array']) * (1 + (1 / abs(max(p_dict['data_array'])) ** 1.25))
+
                 else:
                     if min(p_dict['data_array']) < 0:
                         y_axis_min = min(p_dict['data_array']) * 1.5
@@ -5715,8 +5694,7 @@ class MakeChart(object):
                                     loc='upper left',
                                     bbox_to_anchor=(0.0, -0.12),
                                     ncol=2,
-                                    prop={'size': float(p_dict['legendFontSize'])
-                                          }
+                                    prop={'size': float(p_dict['legendFontSize'])}
                                     )
                 [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
                 frame = legend.get_frame()
@@ -5726,10 +5704,10 @@ class MakeChart(object):
             self.format_grids(p_dict, k_dict, log)
             plt.tight_layout(pad=1)
             self.save_chart_image(plt, p_dict, k_dict, log, size={'left': 0.05, 'right': 0.95})
-            self.process_log(dev=dev, log=log, return_queue=return_queue)
+            self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
                                   u"WUnderground forecast devices.")
             return_queue.put({'Error': True,
@@ -5740,7 +5718,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5801,22 +5779,8 @@ class MakeChart(object):
         :param unicode data_source:
         """
 
-        converter = {'true': 1,
-                     'false': 0,
-                     'open': 1,
-                     'closed': 0,
-                     'on': 1,
-                     'off': 0,
-                     'locked': 1,
-                     'unlocked': 0,
-                     'up': 1,
-                     'down': 0,
-                     '1': 1,
-                     '0': 0,
-                     'heat': 1,
-                     'armed': 1,
-                     'disarmed': 0
-                     }
+        converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
+                     'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1, 'armed': 1, 'disarmed': 0}
         now       = dt.datetime.now()
         now_text  = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
 
@@ -5907,7 +5871,7 @@ class MakeChart(object):
                                     u"legend.".format(dev.name))
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X labels: showLegend = "
                                       u"{0}".format(p_dict['showLegend']))
             log['Threaddebug'].append(u"Problem formatting X labels: customAxisLabelX = "
@@ -5965,7 +5929,7 @@ class MakeChart(object):
                 plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X axis scale: x_axis_bins = {0}".format(x_axis_bins))
 
     # =============================================================================
@@ -5996,7 +5960,7 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X ticks: k_major_x = "
                                       u"{0}".format(k_dict['k_major_x']))
             log['Threaddebug'].append(u"Problem formatting X ticks: k_minor_x = "
@@ -6053,14 +6017,14 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_major_y = "
                                       u"{0}".format(k_dict['k_major_y']))
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_minor_x = "
                                       u"{0}".format(k_dict['k_minor_y']))
+            lbl_fmt = mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision'])))
             log['Threaddebug'].append(u"Problem formatting Y ticks: xAxisLabelFormat = "
-                                      u"{0}".format(mtick.FormatStrFormatter(u"%.{0}f"
-                                                                             .format(int(p_dict['yAxisPrecision'])))))
+                                      u"{0}".format(lbl_fmt))
             log['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValues = "
                                       u"{0}".format(p_dict['yMirrorValues']))
             log['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValuesAlsoY1 = "
@@ -6118,16 +6082,13 @@ class MakeChart(object):
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = "
                                       u"{0}".format(p_dict['yAxisMax']))
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMin = "
                                       u"{0}".format(p_dict['yAxisMin']))
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: Data Min/Max = "
-                                      u"{0}/{1}".format(min(p_dict['data_array']),
-                                                        max(p_dict['data_array'])
-                                                        )
-                                      )
+                                      u"{0}/{1}".format(min(p_dict['data_array']), max(p_dict['data_array'])))
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
 
     # =============================================================================
@@ -6148,7 +6109,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
         except (ValueError, TypeError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = "
                                       u"{0}".format(p_dict['customAxisLabelY']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
@@ -6195,13 +6156,13 @@ class MakeChart(object):
             plt.yticks(marks, labels)
 
         except (KeyError, ValueError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY = "
                                       u"{0}".format(p_dict['customAxisLabelY']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
                                       u"{0}".format(k_dict['k_y_axis_font']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customTicksY = "
                                       u"{0}".format(p_dict['customTicksY']))
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
 
     # =============================================================================
     # TODO: this is currently unused.
@@ -6222,7 +6183,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
 
         except (KeyError, ValueError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "
                                       u"{0}".format(p_dict['customAxisLabelY2']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
@@ -6251,16 +6212,16 @@ class MakeChart(object):
         try:
             color = p_dict.get('line{0}BestFitColor'.format(line), '#FF0000')
 
-            ax.plot(x=np.unique(dates_to_plot),
-                    y=np.poly1d(np.polyfit(dates_to_plot,
-                                           p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)),
+            ax.plot(np.unique(dates_to_plot),
+                    np.poly1d(np.polyfit(dates_to_plot, p_dict['y_obs{0}'.format(line)], 1))(np.unique(dates_to_plot)),
                     color=color,
-                    zorder=1)
+                    zorder=1
+                    )
 
             return ax
 
         except TypeError as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"p_dict: {0}.".format(p_dict))
             log['Threaddebug'].append(u"dates_to_plot: {0}.".format(dates_to_plot))
             log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. "
@@ -6286,7 +6247,8 @@ class MakeChart(object):
         # the legend is established, otherwise some of the characteristics of the
         # min/max lines will take over the legend props.
 
-        if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
+        if p_dict['enableCustomLineSegments'] and \
+                p_dict['customLineSegments'] not in ("", "None"):
 
             try:
                 constants_to_plot = literal_eval(p_dict['customLineSegments'])
@@ -6320,7 +6282,7 @@ class MakeChart(object):
                 return cls
 
             except Exception as sub_error:
-                self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+                self.host_plugin.pluginErrorHandler(traceback.format_exc())
                 log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin "
                                       u"log for more information.".format(sub_error))
 
@@ -6350,13 +6312,10 @@ class MakeChart(object):
             return dates_to_plot_m
 
         except (KeyError, ValueError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            log['Threaddebug'].append(u"Problem formatting dates: list_of_dates = "
-                                      u"{0}".format(list_of_dates))
-            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = "
-                                      u"{0}".format(dates_to_plot))
-            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = "
-                                      u"{0}".format(dates_to_plot_m))
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting dates: list_of_dates = {0}".format(list_of_dates))
+            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = {0}".format(dates_to_plot))
+            log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = {0}".format(dates_to_plot_m))
 
     # =============================================================================
     def format_grids(self, p_dict, k_dict, log):
@@ -6381,11 +6340,9 @@ class MakeChart(object):
                 plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
         except (KeyError, ValueError):
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
-            log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = "
-                                      u"{0}".format(p_dict['showxAxisGrid']))
-            log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = "
-                                      u"{0}".format(k_dict['k_grid_fig']))
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {0}".format(p_dict['showxAxisGrid']))
+            log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
 
     # =============================================================================
     def format_title(self, p_dict, k_dict, log, loc, align='center'):
@@ -6402,10 +6359,7 @@ class MakeChart(object):
         :return:
         """
         try:
-            plt.suptitle(p_dict['chartTitle'],
-                         position=loc,
-                         ha=align,
-                         **k_dict['k_title_font'])
+            plt.suptitle(p_dict['chartTitle'], position=loc, ha=align, **k_dict['k_title_font'])
 
         except KeyError as sub_error:
             log['Warning'].append(u"Title Error: {0}".format(sub_error))
@@ -6444,7 +6398,7 @@ class MakeChart(object):
         # If we can't find the target CSV file, we create a phony proxy which the plugin
         # can process without dying.
         except Exception as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
             log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more "
                                   u"information.".format(sub_error))
@@ -6470,9 +6424,9 @@ class MakeChart(object):
         height = float(height)
         width = float(width)
 
-        fig = plt.figure(num=1, figsize=(width / dpi, height / dpi))
+        fig = plt.figure(1, figsize=(width / dpi, height / dpi))
         ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
-        ax.margins(x=0.04, y=0.05)
+        ax.margins(0.04, 0.05)
         [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
         return ax
@@ -6505,12 +6459,7 @@ class MakeChart(object):
                              )
 
         else:
-            return_queue.put({'Error': False,
-                              'Log': log,
-                              'Message': u'Chart updated successfully.',
-                              'Name': dev.name
-                              }
-                             )
+            return_queue.put({'Error': False, 'Log': log, 'Message': u'Chart updated successfully.', 'Name': dev.name})
 
     # =============================================================================
     def prune_data(self, x_data, y_data, limit, new_old, log):
@@ -6589,7 +6538,7 @@ class MakeChart(object):
 
         try:
 
-            # if a parm is sent here, replace the default with the payload
+            # if a parm is sent here,   the default with the payload
             if size:
                 for key in size.keys():
                     parms[key] = size[key]
@@ -6611,6 +6560,8 @@ class MakeChart(object):
                 plot.close('all')
 
         except RuntimeError as sub_error:
-            self.host_plugin.Fogbert.pluginErrorHandler(sub_error=traceback.format_exc())
+            self.host_plugin.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See "
                                   u"plugin log for more information.".format(sub_error))
+
+    # =============================================================================

@@ -1097,17 +1097,22 @@
 
             <Template file="Templates/legend_columns.xml" />
 
-            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of bars for the chart (integer). Enter zero to plot all observations.">
-                <Label>Number of Bars:</Label>
-            </Field>
-
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
+            </Field>
+
+            <Field id="numObs" type="textfield" defaultValue="20" tooltip="Enter the number of bars for the chart (integer). Enter zero to plot all observations.">
+                <Label>Number of Bars:</Label>
             </Field>
 
             <Field id="barWidth" type="textfield" defaultValue="0"
                    tooltip="To control the width of the bars. Zero will cause bar width to be set automatically. Enter a float greater than zero to set it manually.">
                 <Label>Width of Bars:</Label>
+            </Field>
+
+            <Field id="showZeroBars" type="checkbox" defaultValue="false" tooltip="Check to keep zero value bars from being truncated from start and end of chart.">
+                <Label>Display Zero Bars?</Label>
+                <Description>Yes/No</Description>
             </Field>
 
             <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
