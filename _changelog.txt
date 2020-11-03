@@ -1,3 +1,6 @@
+v0.8.38
+- Pre-release of all changes to this point. Includes final zero bar error fix.
+
 v0.8.37
 - Adds feature to force leading and trailing bars with zero values to be
   plotted (to overcome matplotlib bug).

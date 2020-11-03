@@ -8,22 +8,24 @@ Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
 """
 
 import ast
-try:
-    import indigo
-except ImportError:
-    pass
 import logging
 import operator as op
 import os
 import platform
 import sys
+import traceback
+
+try:
+    import indigo
+except ImportError:
+    pass
 
 __author__ = "DaveL17"
 __build__ = "Unused"
 __copyright__ = "Copyright 2017-2020 DaveL17"
 __license__ = "MIT"
 __title__ = "DLFramework"
-__version__ = "0.1.02"
+__version__ = "0.1.04"
 
 
 class Fogbert(object):
@@ -33,8 +35,8 @@ class Fogbert(object):
         self.plugin.debugLog(u"Initializing DLFramework...")
         self.pluginPrefs = plugin.pluginPrefs
 
-        fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S'))
+        log_format = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
+        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt=log_format, datefmt='%Y-%m-%d %H:%M:%S'))
 
     def pluginEnvironment(self):
         """
@@ -79,6 +81,30 @@ class Fogbert(object):
         self.plugin.logger.info(u"{0:<31} {1}".format("Process ID:", os.getpid()))
         self.plugin.logger.info(u"{0:{1}^135}".format("", "="))
 
+    # =============================================================================
+    def pluginErrorHandler(self, sub_error):
+        """
+        Centralized handling of traceback messages
+
+        Centralized handling of traceback messages formatted for pretty display in the
+        plugin log file. If sent here, they will not be displayed in the Indigo Events
+        log. Use the following syntax to send exceptions here::
+
+            self.pluginErrorHandler(traceback.format_exc())
+
+        -----
+
+        :param traceback object sub_error:
+        """
+
+        sub_error = sub_error.splitlines()
+        self.plugin.logger.critical(u"{0:!^80}".format(" TRACEBACK "))
+
+        for line in sub_error:
+            self.plugin.logger.critical(u"!!! {0}".format(line))
+
+        self.plugin.logger.critical(u"!" * 80)
+
     def convertDebugLevel(self, debug_val):
         """
         The convertDebugLevel method is used to standardize the various implementations
@@ -99,7 +125,7 @@ class Fogbert(object):
 
         return debug_val
 
-    def deviceList(self, filter=None):
+    def deviceList(self, dev_filter=None):
         """
         Returns a list of tuples containing Indigo devices for use in
         config dialogs (etc.)
@@ -107,10 +133,10 @@ class Fogbert(object):
         :return: [(ID, "Name"), (ID, "Name")]
         """
         devices_list = [('None', 'None')]
-        [devices_list.append((dev.id, dev.name)) for dev in indigo.devices.iter(filter)]
+        [devices_list.append((dev.id, dev.name)) for dev in indigo.devices.iter(dev_filter)]
         return devices_list
 
-    def deviceListEnabled(self, filter=None):
+    def deviceListEnabled(self, dev_filter=None):
         """
         Returns a list of tuples containing Indigo devices for use in
         config dialogs (etc.) Returns enabled devices only.
@@ -118,7 +144,7 @@ class Fogbert(object):
         :return: [(ID, "Name"), (ID, "Name")]
         """
         devices_list = [('None', 'None')]
-        [devices_list.append((dev.id, dev.name)) for dev in indigo.devices.iter(filter) if dev.enabled]
+        [devices_list.append((dev.id, dev.name)) for dev in indigo.devices.iter(dev_filter) if dev.enabled]
         return devices_list
 
     def variableList(self):
@@ -146,21 +172,21 @@ class Fogbert(object):
         devices_and_variables_list.append(('None', 'None'),)
         return devices_and_variables_list
 
-    def launchWebPage(self, url):
+    def launchWebPage(self, launch_url):
         """
         The launchWebPage method is used to direct a call to the registered
         default browser and open the page referenced by the parameter 'URL'.
         """
         import webbrowser
 
-        webbrowser.open(url)
+        webbrowser.open(url=launch_url)
 
-    def generatorStateOrValue(self, id):
+    def generatorStateOrValue(self, dev_id):
         """The generatorStateOrValue() method returns a list to populate the relevant
         device states or variable value to populate a menu control."""
 
         try:
-            id_number = int(id)
+            id_number = int(dev_id)
 
             if id_number in indigo.devices.keys():
                 state_list = [(state, state) for state in indigo.devices[id_number].states if not state.endswith('.ui')]
@@ -180,6 +206,15 @@ class Fogbert(object):
         ver = self.plugin.versStrToTuple(indigo.server.version)
         if ver[0] < min_ver:
             self.plugin.stopPlugin(u"This plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
+
+    def audit_os_version(self, min_ver):
+
+        # =========================== Audit Operating System Version ============================
+        ver = platform.mac_ver()[0].split('.')
+
+        if int(ver[1]) < min_ver:
+            self.plugin.stopPlugin(u"This plugin requires Mac OS version 10.{0} or above.".format(min_ver),
+                                   isError=True)
 
 
 class Formatter(object):

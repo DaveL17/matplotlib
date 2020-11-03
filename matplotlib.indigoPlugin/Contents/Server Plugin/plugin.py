@@ -4,7 +4,6 @@
 """
 matplotlib plugin
 author: DaveL17
-
 The matplotlib plugin is used to produce various types of charts and graphics
 for use on Indigo control pages. The key benefits of the plugin are its ability
 to make global changes to all generated charts (i.e., fonts, colors) and its
@@ -60,6 +59,7 @@ except ImportError as error:
 
 # Built-in modules
 from ast import literal_eval
+import copy
 import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
@@ -103,7 +103,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.8.37"
+__version__   = u"0.8.38"
 
 # =============================================================================
 
@@ -1061,11 +1061,8 @@ class Plugin(indigo.PluginBase):
     def __log_dicts(self, dev=None):
         """
         Write parameters dicts to log under verbose logging
-
         Simple method to write rcParm and kwarg dicts to debug log.
-
         -----
-
         :param dev:
         """
 
@@ -1075,13 +1072,10 @@ class Plugin(indigo.PluginBase):
     def dummyCallback(self, values_dict=None, type_id="", target_id=0):
         """
         Dummy callback method to force dialog refreshes
-
         The purpose of the dummyCallback method is to provide something for
         configuration dialogs to call in order to force a refresh of any dynamic
         controls (dynamicReload=True).
-
         -----
-
         :param unicode type_id:
         :param class 'indigo.Dict' values_dict:
         :param int target_id:
@@ -1093,14 +1087,11 @@ class Plugin(indigo.PluginBase):
     def advancedSettingsExecuted(self, values_dict=None, menu_id=0):
         """
         Save advanced settings menu items to plugin props for storage
-
         The advancedSettingsExecuted() method is a place where advanced settings will
         be controlled. This method takes the returned values and sends them to the
         pluginPrefs for permanent storage. Note that valuesDict here is for the menu,
         not all plugin prefs.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param int menu_id:
         """
@@ -1117,12 +1108,9 @@ class Plugin(indigo.PluginBase):
     def advancedSettingsMenu(self, values_dict=None, type_id="", dev_id=0):
         """
         Write advanced settings menu selections to the log
-
         The advancedSettingsMenu() method is called when actions are taken within the
         Advanced Settings Menu item from the plugin menu.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int dev_id:
@@ -1134,13 +1122,10 @@ class Plugin(indigo.PluginBase):
     def audit_csv_health(self):
         """
         Creates any missing CSV files before beginning
-
         Iterate through all existing CSV Engine devices. It doesn't matter if the
         device is enabled or not, since we're only creating the file if it doesn't
         exist, and we're only going to add the header to the file.
-
         -----
-
         :return:
         """
 
@@ -1182,7 +1167,6 @@ class Plugin(indigo.PluginBase):
     def audit_device_props(self):
         """
         Audit device properties to ensure they match the current config.
-
         The audit_device_props method performs two functions. It compares the current
         device config XML layout to the current dev.pluginProps, and (1) where the
         current config has fields that are missing from the device, they will be
@@ -1190,15 +1174,12 @@ class Plugin(indigo.PluginBase):
         defaultValue attribute if specified; if unspecified, the value will be set to
         False.) and (2) where the current pluginProps contains keys that are not in
         the config, they will be _removed_ from the device.
-
         The method will return True if it has run error free; False on exception.
-
         Note that this method should _not_ be called from deviceStartComm() as it will
         cause an infinite loop--the call to dev.replacePluginPropsOnServer() from this
         method automatically calls deviceStartComm(). It is recommended that the method
         be called from plugin's startup() method.
         -----
-
         :return:
         """
         # TODO: migrate this to DLFramework
@@ -1295,14 +1276,11 @@ class Plugin(indigo.PluginBase):
     def audit_save_paths(self):
         """
         Audit plugin save locations to ensure validity
-
         The audit_save_paths() method will attempt to access the configured paths
         (CSV save location, chart save location) to ensure that they are accessible
         to the plugin. It will attempt to write to the paths and warn the user if
         unsuccessful.
-
         -----
-
         :return:
         """
         # ============================= Audit Save Paths ==============================
@@ -1343,11 +1321,8 @@ class Plugin(indigo.PluginBase):
     def commsKillAll(self):
         """
         Deactivate communication with all plugin devices
-
         commsKillAll() sets the enabled status of all plugin devices to false.
-
         -----
-
         """
         self.logger.info(u"Stopping communication with all plugin devices.")
 
@@ -1364,11 +1339,8 @@ class Plugin(indigo.PluginBase):
     def commsUnkillAll(self):
         """
         Establish communication for all disabled plugin devices
-
         commsUnkillAll() sets the enabled status of all plugin devices to true.
-
         -----
-
         """
 
         self.logger.info(u"Starting communication with all plugin devices.")
@@ -1385,15 +1357,12 @@ class Plugin(indigo.PluginBase):
     def convert_custom_colors(self):
         """
         Convert legacy custom hex color values to raw color values
-
         Initially, the plugin was constructed with a standard set of colors that could
         be overwritten by selecting a custom color value. With the inclusion of the
         color picker control, this is no longer needed. So we try to set the color
         field to the custom value. This block is for plugin color preferences. Example:
         convert '#FFFFFF' to 'FF FF FF'.
-
         -----
-
         """
 
         if '#custom' in self.pluginPrefs.values():
@@ -1412,7 +1381,6 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def csv_check_unique(self):
         """
-
         :return:
         """
         titles = {}
@@ -1446,12 +1414,9 @@ class Plugin(indigo.PluginBase):
     def csv_item_add(self, values_dict=None, type_id="", dev_id=0):
         """
         Add new item to CSV engine
-
         The csv_item_add() method is called when the user clicks on the 'Add Item'
         button in the CSV Engine config dialog.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int dev_id:
@@ -1535,12 +1500,9 @@ class Plugin(indigo.PluginBase):
     def csv_item_delete(self, values_dict=None, type_id="", dev_id=0):
         """
         Deletes items from the CSV Engine configuration dialog
-
         The csv_item_delete() method is called when the user clicks on the "Delete
         Item" button in the CSV Engine config dialog.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int dev_id:
@@ -1574,13 +1536,10 @@ class Plugin(indigo.PluginBase):
     def csv_item_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Construct the list of CSV items
-
         The csv_item_list() method generates the list of Item Key : Item Value
         pairs that will be presented in the CVS Engine device config dialog. It's
         called at open and routinely as changes are made in the dialog.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -1610,12 +1569,9 @@ class Plugin(indigo.PluginBase):
     def csv_item_update(self, values_dict=None, type_id="", dev_id=0):
         """
         Updates items from the CSV Engine configuration dialog
-
         When the user selects the 'Update Item' button, update the dict of CSV engine
         items.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int dev_id:
@@ -1673,14 +1629,11 @@ class Plugin(indigo.PluginBase):
     def csv_item_select(self, values_dict=None, type_id="", dev_id=0):
         """
         Populates CSV engine controls for updates and deletions
-
         The csv_item_select() method is called when the user actually selects something
         within the CSV engine Item List dropdown menu. When the user selects an item
         from the Item List, we populate the Title, ID, and Data controls with the
         relevant Item properties.
-
         -----
-
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int dev_id:
@@ -1708,11 +1661,8 @@ class Plugin(indigo.PluginBase):
     def csv_refresh(self):
         """
         Refreshes data for all CSV custom devices
-
         The csv_refresh() method manages CSV files through CSV Engine custom devices.
-
         -----
-
         """
         if not self.pluginIsShuttingDown:
             for dev in indigo.devices.itervalues("self"):
@@ -1749,12 +1699,9 @@ class Plugin(indigo.PluginBase):
     def csv_refresh_process(self, dev, csv_dict):
         """
         The csv_refresh_process() method processes CSV update requests
-
          We import shutil here so that users who don't use CSV Engines don't need
          to import it.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict csv_dict:
         :return:
@@ -1929,14 +1876,11 @@ class Plugin(indigo.PluginBase):
     def csv_refresh_device_action(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Perform a manual refresh of a single CSV Device
-
         The csv_refresh_device_action() method will allow for the update of a single
         CSV Engine device. This method will update all CSV sources associated with the
         selected CSV Engine device each time the Action item is called. Only CSV Engine
         devices set to a manual refresh interval will be presented.
-
         -----
-
         :param class 'indigo.PluginAction' plugin_action:
         :param class 'indigo.Device' dev:
         :param bool caller_waiting_for_result:
@@ -1962,20 +1906,16 @@ class Plugin(indigo.PluginBase):
     def csv_refresh_source_action(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Perform a manual refresh of a single CSV Source
-
         The csv_refresh_source_action() method will allow for the update of a single
         CSV source from a CSV Engine device. When creating a new Action item, the user
         selects a target CSV Engine device and then the available CSV sources will be
         displayed. The user selects a single CSV source that will be updated each time
         the Action is called. Only CSV Engine devices set to a manual refresh interval
         will be presented.
-
         -----
-
         :param class 'indigo.PluginAction' plugin_action:
         :param class 'indigo.Device' dev:
         :param bool caller_waiting_for_result:
-
         :return:
         """
 
@@ -1996,15 +1936,12 @@ class Plugin(indigo.PluginBase):
     def csv_source(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Construct a list of devices and variables for the CSV engine
-
         Constructs a list of devices and variables for the user to select within the
         CSV engine configuration dialog box. Devices and variables are listed in
         alphabetical order with devices first and then variables. Devices are prepended
         with '(D)' and variables with '(V)'. Category labels are also included for
         visual clarity.
-
         -----
-
         :param unicode type_id:
         :param class 'indigo.Dict' values_dict:
         :param int dev_id:
@@ -2042,15 +1979,12 @@ class Plugin(indigo.PluginBase):
     def csv_source_edit(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Construct a list of devices and variables for the CSV engine
-
         Constructs a list of devices and variables for the user to select within the
         CSV engine configuration dialog box. Devices and variables are listed in
         alphabetical order with devices first and then variables. Devices are prepended
         with '(D)' and variables with '(V)'. Category labels are also included for
         visual clarity.
-
         -----
-
         :param unicode type_id:
         :param class 'indigo.Dict' values_dict:
         :param int dev_id:
@@ -2088,10 +2022,8 @@ class Plugin(indigo.PluginBase):
     def get_csv_device_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV Engine devices set to manual refresh
-
         The get_csv_device_list() method returns a list of CSV Engine devices with a
         manual refresh interval.
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2108,10 +2040,8 @@ class Plugin(indigo.PluginBase):
     def get_csv_source_list(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV sources from CSV Engine devices set to manual refresh
-
         The get_csv_source_list() method returns a list of CSV sources for the target
         CSV Engine device.
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2135,14 +2065,11 @@ class Plugin(indigo.PluginBase):
     def deviceStateValueListAdd(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Formulates list of device states for CSV engine
-
         Once a user selects a device or variable within the CSV engine configuration
         dialog, we need to obtain the relevant device states to chose from. If the
         user selects a variable, we simply return the variable value identifier. The
         return is a list of tuples of the form:
-
         -----
-
         :param unicode type_id:
         :param class 'indigo.Dict' values_dict:
         :param int dev_id:
@@ -2176,14 +2103,11 @@ class Plugin(indigo.PluginBase):
     def deviceStateValueListEdit(self, type_id="", values_dict=None, dev_id=0, target_id=0):
         """
         Formulates list of device states for CSV engine
-
         Once a user selects a device or variable within the CSV engine configuration
         dialog, we need to obtain the relevant device states to chose from. If the
         user selects a variable, we simply return the variable value identifier. The
         return is a list of tuples of the form:
-
         -----
-
         :param unicode type_id:
         :param class 'indigo.Dict' values_dict:
         :param int dev_id:
@@ -2221,14 +2145,11 @@ class Plugin(indigo.PluginBase):
     def formatMarkers(self, p_dict):
         """
         Format matplotlib markers
-
         The devices.xml file cannot contain '<' or '>' as a value, as this conflicts
         with the construction of the XML code. Matplotlib needs these values for
         select built-in marker styles, so we need to change them to what MPL is
         expecting.
-
         -----
-
         :param p_dict:
         """
 
@@ -2252,18 +2173,14 @@ class Plugin(indigo.PluginBase):
     def generatorDeviceStates(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of device states for the provided device or variable id.
-
         The generatorDeviceStates() method returns a list of device states each list
         includes only states for the selected device. If a variable id is provided, the
         list returns one element.
-
         Returns:
           [('dev state name', 'dev state name'), ('dev state name', 'dev state name')]
         or
           [('value', 'value')]
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2280,17 +2197,12 @@ class Plugin(indigo.PluginBase):
     def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
-
         Provides a list of Indigo variables for various dropdown menus. The method is
         agnostic as to whether the variable is enabled or disabled. The method returns
         a list of tuples in the form::
-
             [(dev.id, dev.name), (dev.id, dev.name)].
-
         The list is generated within the DLFramework module.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2303,20 +2215,14 @@ class Plugin(indigo.PluginBase):
     def generatorDeviceAndVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of devices and variables for config menu controls
-
         Provides a list of Indigo devices and variables for various dropdown menus. The
         method is agnostic as to whether the devices and variables are enabled or
         disabled. All devices are listed first and then all variables. The method
         returns a list of tuples in the form::
-
             [(dev.id, dev.name), (var.id, var.name)].
-
         It prepends (D) or (V) to make it easier to distinguish between the two.
-
         The list is generated within the DLFramework module.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2329,17 +2235,12 @@ class Plugin(indigo.PluginBase):
     def generatorVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
-
         Provides a list of Indigo variables for various dropdown menus. The method is
         agnostic as to whether the variable is enabled or disabled. The method returns
         a list of tuples in the form::
-
             [(var.id, var.name), (var.id, var.name)].
-
         The list is generated within the DLFramework module.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2352,12 +2253,9 @@ class Plugin(indigo.PluginBase):
     def getAxisList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of axis formats.
-
         Returns a list of Python date formatting strings for use in plotting date
         labels.  The list does not include all Python format specifiers.
-
         -----
-
         :param str filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2390,12 +2288,10 @@ class Plugin(indigo.PluginBase):
     def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of battery-powered devices
-
         Creates a list of tuples that contains the device ID and device name of all
         Indigo devices that report a batterLevel device property that is not None.
         If no devices meet the criteria, a single tuple is returned as a place-
         holder.
-
         -----
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
@@ -2414,13 +2310,10 @@ class Plugin(indigo.PluginBase):
     def getFileList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Get list of CSV files for various dropdown menus.
-
         Generates a list of CSV source files that are located in the folder specified
         within the plugin configuration dialog. If the method is unable to find any CSV
         files, an empty list is returned.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2457,13 +2350,10 @@ class Plugin(indigo.PluginBase):
     def getFontList(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Provide a list of font names for various dropdown menus.
-
         Note that these are the fonts that Matplotlib can see, not necessarily all of
         the fonts installed on the system. If matplotlib can't find any fonts, then a
         default list of fonts that matplotlib supports natively are provided.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2521,13 +2411,10 @@ class Plugin(indigo.PluginBase):
     def getForecastSource(self, filter="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of WUnderground devices for forecast chart devices
-
         Generates and returns a list of potential forecast devices for the forecast
         devices type. Presently, the plugin only works with WUnderground devices, but
         the intention is to expand the list of compatible devices going forward.
-
         -----
-
         :param unicode filter:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
@@ -2561,13 +2448,10 @@ class Plugin(indigo.PluginBase):
     def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
         """
         Plugin API handler
-
         A container for simple API calls to the matplotlib plugin. All payload elements
         are required, although kwargs can be an empty dict if no kwargs desired. If
         caller is waiting for a result (recommended), returns a dict.
-
         Receives::
-
             payload = {'x_values': [1, 2, 3],
                        'y_values': [2, 4, 6],
                        'kwargs': {'linestyle': 'dashed',
@@ -2576,9 +2460,7 @@ class Plugin(indigo.PluginBase):
                                   'markerfacecolor': 'b'},
                        'path': '/full/path/name/',
                        'filename': 'chart_filename.png'}
-
         -----
-
         :param class 'indigo.PluginAction' plugin_action:
         :param class 'indigo.Device' dev:
         :param bool caller_waiting_for_result:
@@ -2612,12 +2494,9 @@ class Plugin(indigo.PluginBase):
     def pluginEnvironmentLogger(self):
         """
         Log information about the plugin resource environment.
-
         Write select information about the environment that the plugin is running in.
         This method is only called once, when the plugin is first loaded (or reloaded).
-
         -----
-
         :var int chart_devices:
         :var int csv_devices:
         """
@@ -2650,15 +2529,11 @@ class Plugin(indigo.PluginBase):
     def pluginErrorHandler(self, sub_error):
         """
         Centralized handling of traceback messages
-
         Centralized handling of traceback messages formatted for pretty display in the
         plugin log file. If sent here, they will not be displayed in the Indigo Events
         log. Use the following syntax to send exceptions here::
-
             self.pluginErrorHandler(traceback.format_exc())
-
         -----
-
         :param traceback object sub_error:
         """
 
@@ -2674,13 +2549,10 @@ class Plugin(indigo.PluginBase):
     def processLogQueue(self, dev, return_queue):
         """
         Process output of multiprocessing queue messages
-
         The processLogQueue() method accepts a multiprocessing queue that contains log
         messages. The method parses those messages across the various self.logger.x
         calls.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param class 'multiprocessing.queues.Queue' return_queue:
         """
@@ -2715,13 +2587,10 @@ class Plugin(indigo.PluginBase):
     def rcParamsDeviceUpdate(self, dev):
         """
         Update rcParams device with updated state values
-
         Push the rcParams settings to the rcParams Device. The state names have already
         been created by getDeviceStateList() which will ensure that future rcParams
         will be picked up if they're ever added to the file.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         """
 
@@ -2737,13 +2606,10 @@ class Plugin(indigo.PluginBase):
     def refreshAChartAction(self, plugin_action):
         """
         Refreshes an individual plugin chart device.
-
         Process Indigo Action item call for a chart refresh. Passes the id of the
         device called from the action. This method is a handler to pass along the
         action call. The action will refresh only the specified chart.
-
         -----
-
         :param class 'indigo.PluginAction' plugin_action:
         """
 
@@ -2755,12 +2621,9 @@ class Plugin(indigo.PluginBase):
     def refresh_the_charts_now(self):
         """
         Refresh all enabled charts
-
         Refresh all enabled charts based on some user action (like an Indigo menu
         call).
-
         -----
-
         :return:
         """
         self.skipRefreshDateUpdate = True
@@ -2773,12 +2636,9 @@ class Plugin(indigo.PluginBase):
     def charts_refresh(self, dev_list=None):
         """
         Refreshes all the plugin chart devices.
-
         Iterate through each chart device and refresh the image. Only enabled chart
         devices will be refreshed.
-
         -----
-
         :param list dev_list: list of devices to be refreshed.
         """
 
@@ -3382,12 +3242,9 @@ class Plugin(indigo.PluginBase):
     def refreshTheChartsAction(self, plugin_action):
         """
         Called by an Indigo Action item.
-
         Allows the plugin to call the charts_refresh() method from an Indigo Action
         item. This action will refresh all charts.
-
         -----
-
         :param class 'indigo.PluginAction' plugin_action:
         """
         self.skipRefreshDateUpdate = True
@@ -3414,11 +3271,8 @@ class MakeChart(object):
     def chart_area(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the Area charts
-
         All steps required to generate area charts.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -3687,11 +3541,8 @@ class MakeChart(object):
     def chart_bar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the bar charts
-
         All steps required to generate bar charts.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -3784,6 +3635,13 @@ class MakeChart(object):
                                           'Name': dev.name}
                                          )
 
+                    # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
+                    # With this setting, we replace the Y values of zero with a very small positive value
+                    # (0 becomes 1e-06). We get a slice of the original data for annotations.
+                    annotation_values = p_dict['y_obs{0}'.format(thing)][:]
+                    if p_dict.get('showZeroBars', False):
+                        p_dict['y_obs{0}'.format(thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
+
                     # Plot the bar. Note: hatching is not supported in the PNG backend.
                     ax.bar(p_dict['x_obs{0}'.format(thing)][num_obs * -1:],
                            p_dict['y_obs{0}'.format(thing)][num_obs * -1:],
@@ -3798,18 +3656,14 @@ class MakeChart(object):
 
                     # If annotations desired, plot those too.
                     if p_dict['bar{0}Annotate'.format(thing)]:
-                        for xy in zip(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)]):
+                        # for xy in zip(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)]):
+                        for xy in zip(p_dict['x_obs{0}'.format(thing)], annotation_values):
                             ax.annotate(u"{0}".format(xy[1]),
                                         xy=xy,
                                         xytext=(0, 0),
                                         zorder=10,
                                         **k_dict['k_annotation']
                                         )
-
-            # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
-            # With this setting, we force the x axis to display them (if setting is true).
-            if p_dict.get('showZeroBars', False):
-                ax.set_xlim(0, num_obs + 1)
 
             self.format_axis_y1_min_max(p_dict, log)
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3912,11 +3766,9 @@ class MakeChart(object):
     def chart_battery_health(self, dev, device_list, p_dict, k_dict, return_queue):
         """
         Creates the battery health charts
-
         The chart_battery_health method creates battery health charts. These chart
         types are dynamic and are created "on the fly" rather than through direct
         user input.
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict device_list: dictionary of battery device names and battery levels
         :param dict p_dict: plotting parameters
@@ -4097,12 +3949,9 @@ class MakeChart(object):
     def chart_calendar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the calendar charts
-
         Given the unique nature of calendar charts, we use a separate method to
         construct them.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -4117,9 +3966,7 @@ class MakeChart(object):
             def format_axis(ax_obj):
                 """
                 Set various axis properties
-
                 Note that this method purposefully accesses protected members of the _text class.
-
                 -----
                 :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
                 """
@@ -4216,11 +4063,8 @@ class MakeChart(object):
     def chart_line(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the line charts
-
         All steps required to generate line charts.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -4468,12 +4312,9 @@ class MakeChart(object):
     def chart_multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
         """
         Creates the multiline text charts
-
         Given the unique nature of multiline text charts, we use a separate method
         to construct them.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -4565,7 +4406,6 @@ class MakeChart(object):
     def chart_polar(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the polar charts
-
         Note that the polar chart device can be used for other things, but it is coded
         like a wind rose which makes it easier to understand what's happening. Note
         that it would be possible to convert wind direction names (north-northeast) to
@@ -4573,9 +4413,7 @@ class MakeChart(object):
         all of the possible international Unicode values that could be passed to the
         device. Better to make it the responsibility of the user to convert their data
         to degrees.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -4827,11 +4665,8 @@ class MakeChart(object):
     def chart_scatter(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the scatter charts
-
         All steps required to generate scatter charts.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -5044,16 +4879,13 @@ class MakeChart(object):
     def chart_weather_composite(self, dev, dev_type, p_dict, k_dict, state_list, return_queue):
         """
         Creates a composite weather chart
-
         The composite weather chart is a dynamic chart that allows users to add or
         remove weather charts at will.  For example, the user could create one
         chart that contains subplots for high temperature, wind, and precipitation.
         Using the chart configuration dialog, the user would be able to add or
         remove elements and the chart would adjust accordingly (additional sublplots
         will be added or removed as needed.)
-
         -----
-
         """
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
@@ -5320,14 +5152,11 @@ class MakeChart(object):
     def chart_weather_forecast(self, dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue):
         """
         Creates the weather charts
-
         Given the unique nature of weather chart construction, we have a separate
         method for these charts. Note that it is not currently possible within the
         multiprocessing framework used to query the indigo server, so we need to
         send everything we need through the method call.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param unicode dev_type: device type name
         :param dict p_dict: plotting parameters
@@ -5730,14 +5559,11 @@ class MakeChart(object):
     def clean_string(self, val):
         """
         Cleans long strings of whitespace and formats certain characters
-
         The clean_string(self, val) method is used to scrub multiline text elements in
         order to try to make them more presentable. The need is easily seen by looking
         at the rough text that is provided by the U.S. National Weather Service, for
         example.
-
         -----
-
         :param unicode val:
         :return val:
         """
@@ -5765,15 +5591,12 @@ class MakeChart(object):
     def convert_the_data(self, final_data, log, data_source):
         """
         Convert data into form that matplotlib can understand
-
         Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for
         plotting. We do this on the fly and we don't change the underlying data in any
         way. Further, some data can be presented that should not be charted. For
         example, the WUnderground plugin will present '-99.0' when WUnderground is not
         able to deliver a rational value. Therefore, we convert '-99.0' to NaN values.
-
         -----
-
         :param list final_data: the data to be charted.
         :param dict log: plugin log dict
         :param unicode data_source:
@@ -5848,12 +5671,9 @@ class MakeChart(object):
     def format_axis_x_label(self, dev, p_dict, k_dict, log):
         """
         Format X axis label visibility and properties
-
         If the user chooses to display a legend, we don't want an axis label because
         they will fight with each other for space.
-
         -----
-
         :param class 'indigo.Device' dev: indigo device instance
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -5883,12 +5703,9 @@ class MakeChart(object):
     def format_axis_x_scale(self, x_axis_bins, log):
         """
         Format X axis scale based on user setting
-
         The format_axis_x_scale() method sets the bins for the X axis. Presently, we
         assume a date-based X axis.
-
         -----
-
         :param list x_axis_bins:
         :param dict log: logging dict
         """
@@ -5936,11 +5753,8 @@ class MakeChart(object):
     def format_axis_x_ticks(self, ax, p_dict, k_dict, log):
         """
         Format X axis tick properties
-
         Controls the format and placement of the tick marks on the X axis.
-
         -----
-
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -5974,11 +5788,8 @@ class MakeChart(object):
     def format_axis_y(self, ax, p_dict, k_dict, log):
         """
         Format Y1 axis display properties
-
         Controls the format and properties of the Y axis.
-
         -----
-
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -6034,13 +5845,10 @@ class MakeChart(object):
     def format_axis_y1_min_max(self, p_dict, log):
         """
         Format Y1 axis range limits
-
         Setting the limits before the plot turns off autoscaling, which causes the
         limit that's not set to behave weirdly at times. This block is meant to
         overcome that weirdness for something more desirable.
-
         -----
-
         :param dict p_dict: plotting parameters
         :param dict log: Logging dict
         """
@@ -6095,11 +5903,8 @@ class MakeChart(object):
     def format_axis_y1_label(self, p_dict, k_dict, log):
         """
         Format Y1 axis labels
-
         Controls the format and placement of labels for the Y1 axis.
-
         -----
-
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
@@ -6119,11 +5924,8 @@ class MakeChart(object):
     def format_axis_y_ticks(self, p_dict, k_dict, log):
         """
         Format Y axis tick marks
-
         Controls the format and placement of Y ticks.
-
         -----
-
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
@@ -6169,11 +5971,8 @@ class MakeChart(object):
     def format_axis_y2_label(self, p_dict, k_dict, log):
         """
         Format Y2 axis properties
-
         Controls the format and placement of labels for the Y2 axis.
-
         -----
-
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
@@ -6193,20 +5992,16 @@ class MakeChart(object):
     def format_best_fit_line_segments(self, ax, dates_to_plot, line, p_dict, log):
         """
         Adds best fit line segments to plots
-
         The format_best_fit_line_segments method provides a utility to add "best fit lines"
         to select types of charts (best fit lines are not appropriate for all chart
         types.
-
         -----
-
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param 'numpy.ndarray' dates_to_plot:
         :param int line:
         :param dict p_dict: plotting parameters
         :param dict log: logging dict
         :return ax:
-
         """
 
         try:
@@ -6231,12 +6026,9 @@ class MakeChart(object):
     def format_custom_line_segments(self, ax, p_dict, k_dict, log):
         """
         Chart custom line segments handler
-
         Process any custom line segments and add them to the
         matplotlib axes object.
-
         -----
-
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -6292,12 +6084,9 @@ class MakeChart(object):
     def format_dates(self, list_of_dates, log):
         """
         Convert date strings to date objects
-
         Convert string representations of date values to values to mdate values for
         charting.
-
         -----
-
         :param list list_of_dates:
         :param dict log: logging dict
         """
@@ -6321,15 +6110,11 @@ class MakeChart(object):
     def format_grids(self, p_dict, k_dict, log):
         """
         Format matplotlib grids
-
         Format grids for visibility and properties.
-
         -----
-
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
-
         """
 
         try:
@@ -6348,9 +6133,7 @@ class MakeChart(object):
     def format_title(self, p_dict, k_dict, log, loc, align='center'):
         """
         Plot the figure's title
-
         -----
-
         :param p_dict:
         :param k_dict:
         :param log:
@@ -6368,12 +6151,9 @@ class MakeChart(object):
     def get_data(self, data_source, log):
         """
         Retrieve data from CSV file.
-
         Reads data from source CSV file and returns a list of tuples for charting. The
         data are provided as unicode strings [('formatted date', 'observation'), ...]
-
         -----
-
         :param unicode data_source:
         :param dict log:
         """
@@ -6409,12 +6189,9 @@ class MakeChart(object):
     def make_chart_figure(self, width, height, p_dict):
         """
         Create the matplotlib figure object and create the main axes element.
-
         Create the figure object for charting and include one axes object. The method
         also add a few customizations when defining the objects.
-
         -----
-
         :param float width:
         :param float height:
         :param dict p_dict: plotting parameters
@@ -6435,9 +6212,7 @@ class MakeChart(object):
     def process_log(self, dev, log, return_queue):
         """
         Iterate the chart log and add it to the output queue
-
         -----
-
         :param dev:
         :param log:
         :param return_queue:
@@ -6465,12 +6240,10 @@ class MakeChart(object):
     def prune_data(self, x_data, y_data, limit, new_old, log):
         """
         Prune data to display subset of available data
-
         The prune_data() method is used to show a subset of available data. Users
         enter a number of days into a device config dialog, the method then drops
         any observations that are outside that window.
         -----
-
         :param list x_data:
         :param list y_data:
         :param int limit:
@@ -6516,10 +6289,8 @@ class MakeChart(object):
     def save_chart_image(self, plot, p_dict, k_dict, log, size=None):
         """
         Save the chart figure to a file.
-
         Uses the matplotlib savefig module to write the chart to a file.
         -----
-
         :param module plot:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
