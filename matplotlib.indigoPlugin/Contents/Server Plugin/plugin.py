@@ -103,7 +103,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.8.38"
+__version__   = u"0.8.39"
 
 # =============================================================================
 
@@ -607,7 +607,12 @@ class Plugin(indigo.PluginBase):
         # ============================= Chart Dimensions ==============================
         for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth',
                                'sqChartSize'):
-            values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
+
+            try:
+                values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
+            except AttributeError:
+                pass
+
             try:
                 if float(values_dict[dimension_prop]) < 75:
                     error_msg_dict[dimension_prop] = u"The dimension value must be greater than 75 pixels."
@@ -1066,7 +1071,7 @@ class Plugin(indigo.PluginBase):
         :param dev:
         """
 
-        self.logger.threaddebug(u"[{0:<19}] Props: {1}".format(dev.name, dict(dev.ownerProps)))
+        self.logger.threaddebug(u"[{0:<19}] Props: {1}".format(dev.name, dict(dev.pluginProps)))
 
     # =============================================================================
     def dummyCallback(self, values_dict=None, type_id="", target_id=0):
@@ -2506,7 +2511,7 @@ class Plugin(indigo.PluginBase):
 
         # ========================== Get Plugin Device Load ===========================
         for dev in indigo.devices.iter('self'):
-            if dev.ownerProps.get('isChart', False):
+            if dev.pluginProps.get('isChart', False):
                 chart_devices += 1
             elif dev.deviceTypeId == 'csvEngine':
                 csv_engines += 1
@@ -3032,14 +3037,24 @@ class Plugin(indigo.PluginBase):
 
                         # For the time being, we're running each device through its
                         # own process synchronously; parallel processing may come later.
+                        #
+                        # NOTE: elements passed to a multiprocessing process have to be pickleable.
+                        # Indigo device and plugin objets are not pickleable, so we create a proxy to
+                        # send to the process. Therefore, devices can't be changed in the processes.
+
+                        plug_dict = {}
+
+                        dev_dict = {}
+                        dev_dict['name'] = dev.name
+                        dev_dict['props'] = dict(dev.pluginProps)
 
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
 
                             if __name__ == '__main__':
                                 p_area = multiprocessing.Process(name='p_area',
-                                                                 target=MakeChart(self).chart_area,
-                                                                 args=(dev, p_dict, k_dict, return_queue,)
+                                                                 target=MakeChart().chart_area,
+                                                                 args=(dev_dict, p_dict, k_dict, return_queue,)
                                                                  )
                                 p_area.start()
 
@@ -3048,8 +3063,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_bar = multiprocessing.Process(name='p_bar',
-                                                                target=MakeChart(self).chart_bar,
-                                                                args=(dev, p_dict, k_dict, return_queue,)
+                                                                target=MakeChart().chart_bar,
+                                                                args=(dev_dict, p_dict, k_dict, return_queue,)
                                                                 )
                                 p_bar.start()
 
@@ -3082,8 +3097,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_battery = multiprocessing.Process(name='p_battery',
-                                                                    target=MakeChart(self).chart_battery_health,
-                                                                    args=(dev,
+                                                                    target=MakeChart().chart_battery_health,
+                                                                    args=(dev_dict,
                                                                           device_dict,
                                                                           p_dict,
                                                                           k_dict,
@@ -3097,8 +3112,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_calendar = multiprocessing.Process(name='p_calendar',
-                                                                     target=MakeChart(self).chart_calendar,
-                                                                     args=(dev, p_dict, k_dict, return_queue,)
+                                                                     target=MakeChart().chart_calendar,
+                                                                     args=(dev_dict, p_dict, k_dict, return_queue,)
                                                                      )
                                 p_calendar.start()
 
@@ -3107,8 +3122,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_line = multiprocessing.Process(name='p_line',
-                                                                 target=MakeChart(self).chart_line,
-                                                                 args=(dev, p_dict, k_dict, return_queue,)
+                                                                 target=MakeChart().chart_line,
+                                                                 args=(dev_dict, p_dict, k_dict, return_queue,)
                                                                  )
                                 p_line.start()
 
@@ -3132,8 +3147,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_multiline = multiprocessing.Process(name='p_multiline',
-                                                                      target=MakeChart(self).chart_multiline_text,
-                                                                      args=(dev,
+                                                                      target=MakeChart().chart_multiline_text,
+                                                                      args=(dev_dict,
                                                                             p_dict,
                                                                             k_dict,
                                                                             text_to_plot,
@@ -3147,8 +3162,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_polar = multiprocessing.Process(name='p_polar',
-                                                                  target=MakeChart(self).chart_polar,
-                                                                  args=(dev,
+                                                                  target=MakeChart().chart_polar,
+                                                                  args=(dev_dict,
                                                                         p_dict,
                                                                         k_dict,
                                                                         return_queue,
@@ -3161,8 +3176,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_scatter = multiprocessing.Process(name='p_scatter',
-                                                                    target=MakeChart(self).chart_scatter,
-                                                                    args=(dev,
+                                                                    target=MakeChart().chart_scatter,
+                                                                    args=(dev_dict,
                                                                           p_dict,
                                                                           k_dict,
                                                                           return_queue,
@@ -3179,8 +3194,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_weather = multiprocessing.Process(name='p_weather',
-                                                                    target=MakeChart(self).chart_weather_forecast,
-                                                                    args=(dev,
+                                                                    target=MakeChart().chart_weather_forecast,
+                                                                    args=(dev_dict,
                                                                           dev_type,
                                                                           p_dict,
                                                                           k_dict,
@@ -3199,8 +3214,8 @@ class Plugin(indigo.PluginBase):
 
                             if __name__ == '__main__':
                                 p_composite = multiprocessing.Process(name='p_composite',
-                                                                      target=MakeChart(self).chart_weather_composite,
-                                                                      args=(dev,
+                                                                      target=MakeChart().chart_weather_composite,
+                                                                      args=(dev_dict,
                                                                             dev_type,
                                                                             p_dict,
                                                                             k_dict,
@@ -3267,13 +3282,16 @@ class MakeChart(object):
         self.final_data = []
         self.host_plugin = plugin
 
+    path = "/Library/Application Support/Perceptive Automation/Indigo 7.4/Logs/com.fogbert.indigoplugin.matplotlib/"
+    logging.basicConfig(filename='{0}process.log'.format(path), level=logging.INFO)
+
     # =============================================================================
     def chart_area(self, dev, p_dict, k_dict, return_queue):
         """
         Creates the Area charts
         All steps required to generate area charts.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param class 'indigo.Device' dev: dict
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -3306,12 +3324,12 @@ class MakeChart(object):
                 # If area color is the same as the background color, alert the user.
                 if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
                     log['Warning'].append(u"[{0}] Area {1} color is the same as the background color (so you may "
-                                          u"not be able to see it).".format(dev.name, area))
+                                          u"not be able to see it).".format(dev['name'], area))
 
                 # If the area is suppressed, remind the user they suppressed it.
                 if suppress_area:
                     log['Info'].append(u"[{0}] Area {1} is suppressed by user setting. You can re-enable it in the "
-                                       u"device configuration menu.".format(dev.name, area))
+                                       u"device configuration menu.".format(dev['name'], area))
 
                 # ============================== Plot the Areas ===============================
                 # Plot the areas. If suppress_area is True, we skip it.
@@ -3334,10 +3352,10 @@ class MakeChart(object):
                     # ============================= Adjustment Factor =============================
                     # Allows user to shift data on the Y axis (for example, to display multiple
                     # binary sources on the same chart.)
-                    if dev.pluginProps['area{0}adjuster'.format(area)] != "":
+                    if dev['props']['area{0}adjuster'.format(area)] != "":
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(area)]:
-                            expr = u'{0}{1}'.format(obs, dev.pluginProps['area{0}adjuster'.format(area)])
+                            expr = u'{0}{1}'.format(obs, dev['props']['area{0}adjuster'.format(area)])
                             temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
                         p_dict['y_obs{0}'.format(area)] = temp_list
 
@@ -3346,13 +3364,13 @@ class MakeChart(object):
                     dates_to_plot = p_dict['x_obs{0}'.format(area)]
 
                     try:
-                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                        limit = float(dev['props']['limitDataRangeLength'])
                     except ValueError:
                         limit = 0
 
                     if limit > 0:
                         y_obs = p_dict['y_obs{0}'.format(area)]
-                        new_old = dev.pluginProps['limitDataRange']
+                        new_old = ['props']['limitDataRange']
 
                         x_index = 'x_obs{0}'.format(area)
                         y_index = 'y_obs{0}'.format(area)
@@ -3470,7 +3488,7 @@ class MakeChart(object):
                     # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(area)], log)
 
                     # =============================== Best Fit Line ===============================
-                    if dev.pluginProps.get('line{0}BestFit'.format(area), False):
+                    if dev['props'].get('line{0}BestFit'.format(area), False):
                         self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(area)], area, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
@@ -3526,7 +3544,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
         except Exception as sub_error:
@@ -3534,7 +3552,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
     # =============================================================================
@@ -3543,7 +3561,7 @@ class MakeChart(object):
         Creates the bar charts
         All steps required to generate bar charts.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param class 'indigo.Device' dev: dict
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -3572,12 +3590,12 @@ class MakeChart(object):
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
                     log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not be "
-                                       u"able to see it).".format(dev.name, thing))
+                                       u"able to see it).".format(dev['name'], thing))
 
                 # If the bar is suppressed, remind the user they suppressed it.
                 if suppress_bar:
                     log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the "
-                                       u"device configuration menu.".format(dev.name, thing))
+                                       u"device configuration menu.".format(dev['name'], thing))
 
                 # Plot the bars. If 'suppressBar{thing} is True, we skip it.
                 if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
@@ -3606,13 +3624,13 @@ class MakeChart(object):
                     dates_to_plot = p_dict['x_obs{0}'.format(thing)]
 
                     try:
-                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                        limit = float(dev['props']['limitDataRangeLength'])
                     except ValueError:
                         limit = 0
 
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
-                        new_old = dev.pluginProps['limitDataRange']
+                        new_old = dev['props']['limitDataRange']
                         dtp = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
                         p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = dtp
 
@@ -3632,7 +3650,7 @@ class MakeChart(object):
                                           'Log': log,
                                           'Message': u"{0}. Setting bar width to 1. See plugin log for more "
                                                      u"information.".format(sub_error),
-                                          'Name': dev.name}
+                                          'Name': dev['name']}
                                          )
 
                     # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
@@ -3751,7 +3769,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
         except Exception as sub_error:
@@ -3759,7 +3777,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
     # =============================================================================
@@ -3869,7 +3887,7 @@ class MakeChart(object):
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
 
             # =============================== Format Grids ================================
-            if dev.ownerProps.get('showxAxisGrid', False):
+            if dev['props'].get('showxAxisGrid', False):
                 for _ in (20, 40, 60, 80):
                     ax.axvline(x=_,
                                color=p_dict['gridColor'],
@@ -3934,7 +3952,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
         except Exception as sub_error:
@@ -3942,7 +3960,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
     # =============================================================================
@@ -3970,6 +3988,7 @@ class MakeChart(object):
                 -----
                 :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
                 """
+                logging.info(u'chart_calendar() called.')
 
                 ax_props = ax_obj.properties()
                 ax_cells = ax_props['child_artists']
@@ -3977,14 +3996,14 @@ class MakeChart(object):
                     cell.set_facecolor(p_dict['faceColor'])
                     cell._text.set_color(p_dict['fontColor'])
                     cell._text.set_fontname(p_dict['fontMain'])
-                    cell._text.set_fontsize(int(dev.pluginProps['fontSize']))
+                    cell._text.set_fontsize(int(dev['props']['fontSize']))
                     cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
 
                     # TODO: This may not be supportable without including fonts with the plugin.
                     # cell._text.set_fontstretch(1000)
 
                     # Controls grid display
-                    if dev.pluginProps.get('calendarGrid', True):
+                    if dev['props'].get('calendarGrid', True):
                         cell.set_edgecolor(p_dict['spineColor'])
                     else:
                         cell.set_edgecolor(p_dict['faceColor'])
@@ -3997,8 +4016,8 @@ class MakeChart(object):
                              6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
                    }
 
-            first_day   = int(dev.pluginProps.get('firstDayOfWeek', 6))
-            day_format  = dev.pluginProps.get('dayOfWeekFormat', 'mid')
+            first_day   = int(dev['props'].get('firstDayOfWeek', 6))
+            day_format  = dev['props'].get('dayOfWeekFormat', 'mid')
             days_labels = fmt[day_format][first_day]
 
             my_cal    = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
@@ -4006,12 +4025,12 @@ class MakeChart(object):
             cal       = my_cal.monthdatescalendar(today.year, today.month)
 
             try:
-                height = int(dev.pluginProps.get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+                height = int(dev['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
             except ValueError:
                 height = 3
 
             try:
-                width = int(dev.pluginProps.get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+                width = int(dev['props'].get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
             except ValueError:
                 width = 5
 
@@ -4031,10 +4050,11 @@ class MakeChart(object):
             days_rows = ax.table(cellText=final_cal,
                                  colLabels=days_labels,
                                  loc='top',
-                                 cellLoc=dev.pluginProps.get('dayOfWeekAlignment', 'right'),
-                                 bbox=[0, -0.5, 1, 1.25]
-                                 )
+                                 cellLoc=dev['props'].get('dayOfWeekAlignment', 'right'),
+                                 bbox=[0, -0.5, 1, 1.25])
             format_axis(days_rows)
+
+            logging.info(u"About to save fig. \n{0}".format(dev['props']))
 
             self.save_chart_image(plt,
                                   p_dict,
@@ -4048,16 +4068,22 @@ class MakeChart(object):
                                         'wspace': None
                                         }
                                   )
+
+            logging.info(u"Finished save fig.")
+
             self.process_log(dev, log, return_queue)
 
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
-                              }
-                             )
+        # except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+        #     self.host_plugin.pluginErrorHandler(traceback.format_exc())
+        #     return_queue.put({'Error': True,
+        #                       'Log': log,
+        #                       'Message': u"{0}. See plugin log for more information.".format(sub_error),
+        #                       'Name': dev['name']
+        #                       }
+        #                      )
+        #
+        except Exception as err:
+            logging.critical(u"{0}".format(err))
 
     # =============================================================================
     def chart_line(self, dev, p_dict, k_dict, return_queue):
@@ -4100,12 +4126,12 @@ class MakeChart(object):
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
                     log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
-                                          u"not be able to see it).".format(dev.name, line))
+                                          u"not be able to see it).".format(dev['name'], line))
 
                 # If the line is suppressed, remind the user they suppressed it.
                 if suppress_line:
                     log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
-                                       u"device configuration menu.".format(dev.name, line))
+                                       u"device configuration menu.".format(dev['name'], line))
 
                 # ============================== Plot the Lines ===============================
                 # Plot the lines. If suppress_line is True, we skip it.
@@ -4132,10 +4158,10 @@ class MakeChart(object):
                     # ============================= Adjustment Factor =============================
                     # Allows user to shift data on the Y axis (for example, to display multiple
                     # binary sources on the same chart.)
-                    if dev.pluginProps['line{0}adjuster'.format(line)] != "":
+                    if dev['props']['line{0}adjuster'.format(line)] != "":
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(line)]:
-                            expr = u'{0}{1}'.format(obs, dev.pluginProps['line{0}adjuster'.format(line)])
+                            expr = u'{0}{1}'.format(obs, dev['props']['line{0}adjuster'.format(line)])
                             temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
                         p_dict['y_obs{0}'.format(line)] = temp_list
 
@@ -4144,13 +4170,13 @@ class MakeChart(object):
                     dates_to_plot = p_dict['x_obs{0}'.format(line)]
 
                     try:
-                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                        limit = float(dev['props']['limitDataRangeLength'])
                     except ValueError:
                         limit = 0
 
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(line)]
-                        new_old = dev.pluginProps['limitDataRange']
+                        new_old = dev['props']['limitDataRange']
 
                         prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
                         p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
@@ -4256,7 +4282,7 @@ class MakeChart(object):
                     # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
 
                     # =============================== Best Fit Line ===============================
-                    if dev.pluginProps.get('line{0}BestFit'.format(line), False):
+                    if dev['props'].get('line{0}BestFit'.format(line), False):
                         self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(line)], line, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
@@ -4297,7 +4323,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
         except Exception as sub_error:
@@ -4305,7 +4331,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name}
+                              'Name': dev['name']}
                              )
 
     # =============================================================================
@@ -4331,8 +4357,8 @@ class MakeChart(object):
             p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
             p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
             p_dict['textColor']       = self.host_plugin.fix_rgb(p_dict['textColor'])
-            p_dict['figureWidth']     = float(dev.pluginProps['figureWidth'])
-            p_dict['figureHeight']    = float(dev.pluginProps['figureHeight'])
+            p_dict['figureWidth']     = float(dev['props']['figureWidth'])
+            p_dict['figureHeight']    = float(dev['props']['figureHeight'])
 
             # If the value to be plotted is empty, use the default text from the device
             # configuration.
@@ -4389,7 +4415,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4398,7 +4424,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4471,8 +4497,8 @@ class MakeChart(object):
                 # If at this point we still don't have an equal number of observations for both
                 # theta and radii, we shouldn't plot the chart.
                 if len(p_dict['wind_direction']) != len(p_dict['wind_speed']):
-                    log['Warning'].append(u"[{0}] Insufficient number of observations to plot.".format(dev.name))
-                    return_queue.put({'Error': False, 'Log': log, 'Message': 'Skipped.', 'Name': dev.name})
+                    log['Warning'].append(u"[{0}] Insufficient number of observations to plot.".format(dev['name']))
+                    return_queue.put({'Error': False, 'Log': log, 'Message': 'Skipped.', 'Name': dev['name']})
                     return
 
                 # Create the array of grey scale for the intermediate lines and set the last
@@ -4648,7 +4674,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4657,7 +4683,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4700,12 +4726,12 @@ class MakeChart(object):
                 # If dot color is the same as the background color, alert the user.
                 if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_group:
                     log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you may not "
-                                        u"be able to see it).".format(dev.name, thing))
+                                        u"be able to see it).".format(dev['name'], thing))
 
                 # If the group is suppressed, remind the user they suppressed it.
                 if suppress_group:
                     log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in the "
-                                       u"device configuration menu.".format(dev.name, thing))
+                                       u"device configuration menu.".format(dev['name'], thing))
 
                 # ============================== Plot the Points ==============================
                 # Plot the groups. If suppress_group is True, we skip it.
@@ -4739,13 +4765,13 @@ class MakeChart(object):
                     dates_to_plot = p_dict['x_obs{0}'.format(thing)]
 
                     try:
-                        limit = float(dev.pluginProps['limitDataRangeLength'])
+                        limit = float(dev['props']['limitDataRangeLength'])
                     except ValueError:
                         limit = 0
 
                     if limit > 0:
                         y_obs   = p_dict['y_obs{0}'.format(thing)]
-                        new_old = dev.pluginProps['limitDataRange']
+                        new_old = dev['props']['limitDataRange']
 
                         prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
                         p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = prune
@@ -4765,7 +4791,7 @@ class MakeChart(object):
                                )
 
                     # =============================== Best Fit Line ===============================
-                    if dev.pluginProps.get('line{0}BestFit'.format(thing), False):
+                    if dev['props'].get('line{0}BestFit'.format(thing), False):
                         self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(thing)], thing, p_dict, log)
 
                     [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)]]
@@ -4862,7 +4888,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4871,7 +4897,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -4889,9 +4915,9 @@ class MakeChart(object):
         """
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
-        height          = int(dev.pluginProps['height'])
+        height          = int(dev['props']['height'])
         log             = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-        width           = int(dev.pluginProps['width'])
+        width           = int(dev['props']['width'])
 
         dates_to_plot    = ()
         precipitation    = ()
@@ -4920,7 +4946,7 @@ class MakeChart(object):
             p_dict['lineMarkerColor'] = self.host_plugin.fix_rgb(p_dict['lineMarkerColor'])
 
             # ================================ Set Up Axes ================================
-            axes     = dev.pluginProps['component_list']
+            axes     = dev['props']['component_list']
             num_axes = len(axes)
 
             # ============================ X Axis Observations ============================
@@ -5066,7 +5092,7 @@ class MakeChart(object):
                                     )
 
                 subplot[0].set_xlim(min(x1) - x_offset, max(x1) + x_offset)
-                my_fmt = mdate.DateFormatter(dev.pluginProps['xAxisLabelFormat'])
+                my_fmt = mdate.DateFormatter(dev['props']['xAxisLabelFormat'])
                 subplot[0].xaxis.set_major_formatter(my_fmt)
                 subplot[0].set_xticks(x1)
                 format_subplot(subplot[0])
@@ -5135,7 +5161,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -5144,7 +5170,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -5183,7 +5209,7 @@ class MakeChart(object):
 
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
                     log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not "
-                                        u"be able to see it).".format(dev.name))
+                                        u"be able to see it).".format(dev['name']))
 
             # ========================== Fantastic Hourly Device ==========================
             if dev_type == 'Hourly':
@@ -5403,7 +5429,7 @@ class MakeChart(object):
             # ============================= Sunrise / Sunset ==============================
             # Note that this highlights daytime hours on the chart.
 
-            daylight = dev.pluginProps.get('showDaytime', True)
+            daylight = dev['props'].get('showDaytime', True)
 
             if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
@@ -5542,7 +5568,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -5551,7 +5577,7 @@ class MakeChart(object):
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
@@ -5684,11 +5710,11 @@ class MakeChart(object):
         try:
             if not p_dict['showLegend']:
                 plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-                log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev.name))
+                log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
 
             if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
                 log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
-                                    u"legend.".format(dev.name))
+                                    u"legend.".format(dev['name']))
 
         except (ValueError, TypeError):
             self.host_plugin.pluginErrorHandler(traceback.format_exc())
@@ -6229,12 +6255,12 @@ class MakeChart(object):
                               'Log': log,
                               'Message': u'Chart updated with messages (Warnings: {0}, Errors: {1}). See logs for '
                                          u'more information.'.format(errors['Warning'], errors['Critical']),
-                              'Name': dev.name
+                              'Name': dev['name']
                               }
                              )
 
         else:
-            return_queue.put({'Error': False, 'Log': log, 'Message': u'Chart updated successfully.', 'Name': dev.name})
+            return_queue.put({'Error': False, 'Log': log, 'Message': u'Chart updated successfully.', 'Name': dev['name']})
 
     # =============================================================================
     def prune_data(self, x_data, y_data, limit, new_old, log):
@@ -6325,6 +6351,7 @@ class MakeChart(object):
                                 )
 
             if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
+
                 plot.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
 
                 plot.clf()
@@ -6335,4 +6362,4 @@ class MakeChart(object):
             log['Warning'].append(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See "
                                   u"plugin log for more information.".format(sub_error))
 
-    # =============================================================================
+# =============================================================================

@@ -1,3 +1,6 @@
+v0.8.39
+- Fixes plugin configuration validation bug for new installs.
+
 v0.8.38
 - Pre-release of all changes to this point. Includes final zero bar error fix.
 
