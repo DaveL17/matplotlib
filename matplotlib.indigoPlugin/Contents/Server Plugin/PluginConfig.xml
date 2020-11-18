@@ -74,7 +74,7 @@
     </Field>
 
     <!-- Rectangular Charts -->
-    <Field id="rectChartLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+    <Field id="rectChartLabel" type="label" alignText="right">
         <Label>Rectangular Charts (Size 1)</Label>
     </Field>
 
@@ -91,7 +91,7 @@
     </Field>
 
     <!-- Rectangular Charts Special-->
-    <Field id="rectChartWideLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+    <Field id="rectChartWideLabel" type="label" alignText="right">
         <Label>Rectangular Charts (Size 2)</Label>
     </Field>
 
@@ -108,7 +108,7 @@
     </Field>
 
     <!-- Square Charts -->
-    <Field id="sqChartLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+    <Field id="sqChartLabel" type="label" alignText="right">
         <Label>Square Charts</Label>
     </Field>
 
@@ -120,7 +120,7 @@
         <Label>Chart Size:</Label>
     </Field>
 
-    <Field id="chartPropsLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+    <Field id="chartPropsLabel" type="label" alignText="right">
         <Label>Chart Properties</Label>
     </Field>
 
@@ -184,7 +184,7 @@
             <Option value="9">9</Option>
             <Option value="10">10</Option>
             <Option value="11">11</Option>
-            <Option value="12">12*</Option>
+            <Option value="12">12</Option>
             <Option value="13">13</Option>
             <Option value="14">14</Option>
             <Option value="15">15</Option>
@@ -234,7 +234,7 @@
             <Option value="9">9</Option>
             <Option value="10">10</Option>
             <Option value="11">11</Option>
-            <Option value="12">12*</Option>
+            <Option value="12">12</Option>
             <Option value="13">13</Option>
             <Option value="14">14</Option>
             <Option value="15">15</Option>
@@ -273,7 +273,7 @@
             <Option value="9">9</Option>
             <Option value="10">10*</Option>
             <Option value="11">11</Option>
-            <Option value="12">12*</Option>
+            <Option value="12">12</Option>
             <Option value="13">13</Option>
             <Option value="14">14</Option>
             <Option value="15">15</Option>
@@ -293,7 +293,7 @@
         <Label>Verbose Logging</Label>
         <Description>Enable/Disable</Description>
     </Field>
-    <Field id="verboseLoggingLabel" type="label" fontColor="black" fontSize="small" alignWithControl="True">
+    <Field id="verboseLoggingLabel" type="label" fontSize="small" alignWithControl="True">
         <Label>Check this box to enable verbose logging. Checking this box will only affect the level and amount of information written to the plugin log file (it will not affect the amount of information written to the Indigo Event Log).</Label>
     </Field>
 

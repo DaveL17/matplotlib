@@ -2725,6 +2725,29 @@ class Plugin(indigo.PluginBase):
         :param list dev_list: list of devices to be refreshed.
         """
 
+        def convert_to_native(obj):
+            """
+            Convert any indigo.Dict and indigo.List objects to native formats.
+
+            credit: Jay Martin
+                    https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
+            -----
+            :param obj:
+            :return:
+            """
+            if isinstance(obj, indigo.List):
+                native_list = list()
+                for item in obj:
+                    native_list.append(convert_to_native(item))
+                return native_list
+            elif isinstance(obj, indigo.Dict):
+                native_dict = dict()
+                for key, value in obj.items():
+                    native_dict[key] = convert_to_native(value)
+                return native_dict
+            else:
+                return obj
+
         if not self.pluginIsShuttingDown:
 
             return_queue = multiprocessing.Queue()
@@ -2853,39 +2876,60 @@ class Plugin(indigo.PluginBase):
                     k_dict['k_calendar']     = {'verticalalignment': 'top'}
                     k_dict['k_custom']       = {'alpha': 1.0, 'zorder': 3}
                     k_dict['k_fill']         = {'alpha': 0.7, 'zorder': 10}
-                    k_dict['k_grid_fig']     = {'which': 'major', 'zorder': 1}
+                    k_dict['k_grid_fig']     = {'which': 'major',
+                                                'color': p_dict['gridColor'],
+                                                'zorder': 1
+                                                }
                     k_dict['k_line']         = {'alpha': 1.0}
                     k_dict['k_major_x']      = {'bottom': p_dict['tick_bottom'],
                                                 'reset': False,
                                                 'top': p_dict['tick_top'],
-                                                'which': 'major'
+                                                'which': 'major',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['xtick.color']
                                                 }
                     k_dict['k_major_y']      = {'left': p_dict['tick_left'],
                                                 'reset': False,
                                                 'right': p_dict['tick_right'],
-                                                'which': 'major'
+                                                'which': 'major',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['ytick.color']
                                                 }
                     k_dict['k_major_y2']     = {'left': p_dict['tick_left'],
                                                 'reset': False,
                                                 'right': p_dict['tick_right'],
-                                                'which': 'major'
+                                                'which': 'major',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['ytick.color']
                                                 }
                     k_dict['k_max']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
                     k_dict['k_min']          = {'linestyle': 'dotted', 'marker': None, 'alpha': 1.0, 'zorder': 1}
                     k_dict['k_minor_x']      = {'bottom': p_dict['tick_bottom'],
                                                 'reset': False,
                                                 'top': p_dict['tick_top'],
-                                                'which': 'minor'
+                                                'which': 'minor',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['xtick.color']
                                                 }
                     k_dict['k_minor_y']      = {'left': p_dict['tick_left'],
                                                 'reset': False,
                                                 'right': p_dict['tick_right'],
-                                                'which': 'minor'
+                                                'which': 'minor',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['ytick.color']
                                                 }
                     k_dict['k_minor_y2']     = {'left': p_dict['tick_left'],
                                                 'reset': False,
                                                 'right': p_dict['tick_right'],
-                                                'which': 'minor'
+                                                'which': 'minor',
+                                                'labelcolor': p_dict['fontColor'],
+                                                'labelsize': float(p_dict['mainFontSize']),
+                                                'color': plt.rcParams['ytick.color']
                                                 }
                     k_dict['k_rgrids']       = {'angle': 67, 'color': p_dict['fontColor'],
                                                 'horizontalalignment': 'left',
@@ -3109,6 +3153,10 @@ class Plugin(indigo.PluginBase):
                         self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
                         self.__log_dicts(dev)
 
+                        plug_dict = dict(self.pluginPrefs)
+                        dev_dict = dict(dev.ownerProps)
+                        dev_dict['name'] = dev.name
+
                         # ============================== rcParams Device ==============================
                         if dev.deviceTypeId == 'rcParamsDevice':
                             self.rcParamsDeviceUpdate(dev)
@@ -3119,9 +3167,6 @@ class Plugin(indigo.PluginBase):
                         # NOTE: elements passed to a multiprocessing process have to be pickleable.
                         # Indigo device and plugin objets are not pickleable, so we create a proxy to
                         # send to the process. Therefore, devices can't be changed in the processes.
-
-                        plug_dict = dict(self.pluginPrefs)
-                        dev_dict = dict(dev.ownerProps)
 
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
@@ -3196,44 +3241,23 @@ class Plugin(indigo.PluginBase):
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
 
-                            def convert_to_native(obj):
-                                """
-                                Convert any indigo.Dict and indigo.List objects to native formats.
-
-                                credit: Jay Martin
-                                        https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
-                                -----
-                                :param obj:
-                                :return:
-                                """
-                                if isinstance(obj, indigo.List):
-                                    native_list = list()
-                                    for item in obj:
-                                        native_list.append(convert_to_native(item))
-                                    return native_list
-                                elif isinstance(obj, indigo.Dict):
-                                    native_dict = dict()
-                                    for key, value in obj.items():
-                                        native_dict[key] = convert_to_native(value)
-                                    return native_dict
-                                else:
-                                    return obj
-
                             self.logger.debug(u"chart_calendar.py called.")
 
                             # Payload sent to the subprocess script
-                            dave = {'prefs': plug_dict,
-                                    'props': dev_dict,
-                                    'p_dict': p_dict,
-                                    'k_dict': k_dict,
-                                    'data': None,
-                                    }
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
-                            dave = convert_to_native(dave)
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
 
                             # Serialize the payload
-                            payload = pickle.dumps(dave)
+                            payload = pickle.dumps(raw_payload)
 
                             # Run the plot
                             path_to_file = 'chart_calendar.py'
@@ -3251,22 +3275,46 @@ class Plugin(indigo.PluginBase):
                             if len(err) > 0:
                                 self.logger.warning(err)
 
-                        self.logger.debug(u'Calendar charting function complete.')
+                        self.logger.warning(u'Calendar charting function complete.')
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
 
-                            if __name__ == '__main__':
-                                p_line = multiprocessing.Process(name='p_line',
-                                                                 target=MakeChart().chart_line,
-                                                                 args=(plug_dict,
-                                                                       dev_dict,
-                                                                       p_dict,
-                                                                       k_dict,
-                                                                       return_queue,
-                                                                       )
-                                                                 )
-                                p_line.start()
+                            self.logger.debug(u"chart_line.py called.")
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_line.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            reply = pickle.loads(reply)
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.warning(err)
+
+                        self.logger.warning(u'Line charting function complete.')
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
@@ -4112,376 +4160,376 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_calendar(self, plug_dict, dev, p_dict, k_dict, return_queue):
-        """
-        Creates the calendar charts
-        Given the unique nature of calendar charts, we use a separate method to
-        construct them.
-        -----
-        :param dict plug_dict: plugin prefs
-        :param dict dev: device props
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        :param class 'multiprocessing.queues.Queue' return_queue: return queue
-        """
-        logging.info(u'chart_calendar() called.')
-        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-        try:
-
-            import calendar
-
-            def format_axis(ax_obj):
-                """
-                Set various axis properties
-                Note that this method purposefully accesses protected members of the _text class.
-                -----
-                :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
-                """
-
-                ax_props = ax_obj.properties()
-                ax_cells = ax_props['child_artists']
-                for cell in ax_cells:
-                    cell.set_facecolor(p_dict['faceColor'])
-                    cell._text.set_color(p_dict['fontColor'])
-                    cell._text.set_fontname(p_dict['fontMain'])
-                    cell._text.set_fontsize(int(dev['props']['fontSize']))
-                    cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
-
-                    # TODO: This may not be supportable without including fonts with the plugin.
-                    # cell._text.set_fontstretch(1000)
-
-                    # Controls grid display
-                    if dev['props'].get('calendarGrid', True):
-                        cell.set_edgecolor(p_dict['spineColor'])
-                    else:
-                        cell.set_edgecolor(p_dict['faceColor'])
-
-            fmt = {'short': {0: ["M", "T", "W", "T", "F", "S", "S"],
-                             6: ["S", "M", "T", "W", "T", "F", "S"]},
-                   'mid':   {0: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                             6: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]},
-                   'long':  {0: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                             6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
-                   }
-
-            first_day   = int(dev['props'].get('firstDayOfWeek', 6))
-            day_format  = dev['props'].get('dayOfWeekFormat', 'mid')
-            days_labels = fmt[day_format][first_day]
-
-            my_cal    = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
-            today     = dt.datetime.today()
-            cal       = my_cal.monthdatescalendar(today.year, today.month)
-
-            try:
-                height = int(dev['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
-            except ValueError:
-                height = 3
-
-            try:
-                width = int(dev['props'].get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
-            except ValueError:
-                width = 5
-
-            # final_cal contains just the date value from the date object
-            final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
-
-            fig = plt.figure(figsize=(width, height))
-            ax = fig.add_subplot(111)
-            ax.axis('off')
-
-            month_row = ax.table(cellText=[" "],
-                                 colLabels=[dt.datetime.strftime(today, "%B")],
-                                 loc='top',
-                                 bbox=[0, 0.5, 1, .5])  # bbox = [left, bottom, width, height]
-            format_axis(month_row)
-
-            days_rows = ax.table(cellText=final_cal,
-                                 colLabels=days_labels,
-                                 loc='top',
-                                 cellLoc=dev['props'].get('dayOfWeekAlignment', 'right'),
-                                 bbox=[0, -0.5, 1, 1.25])
-            format_axis(days_rows)
-
-            self.save_chart_image(plt,
-                                  p_dict,
-                                  k_dict,
-                                  log,
-                                  size={'top': 0.97,
-                                        'bottom': 0.34,
-                                        'left': 0.02,
-                                        'right': 0.98,
-                                        'hspace': None,
-                                        'wspace': None
-                                        }
-                                  )
-
-            logging.info(u"Finished save fig.")
-
-            self.process_log(dev, log, return_queue)
-
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']
-                              }
-                             )
-
-        except Exception as err:
-            logging.critical(u"{0}".format(err))
-
+    # def chart_calendar(self, plug_dict, dev, p_dict, k_dict, return_queue):
+    #     """
+    #     Creates the calendar charts
+    #     Given the unique nature of calendar charts, we use a separate method to
+    #     construct them.
+    #     -----
+    #     :param dict plug_dict: plugin prefs
+    #     :param dict dev: device props
+    #     :param dict p_dict: plotting parameters
+    #     :param dict k_dict: plotting kwargs
+    #     :param class 'multiprocessing.queues.Queue' return_queue: return queue
+    #     """
+    #     logging.info(u'chart_calendar() called.')
+    #     log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
+    #
+    #     try:
+    #
+    #         import calendar
+    #
+    #         def format_axis(ax_obj):
+    #             """
+    #             Set various axis properties
+    #             Note that this method purposefully accesses protected members of the _text class.
+    #             -----
+    #             :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
+    #             """
+    #
+    #             ax_props = ax_obj.properties()
+    #             ax_cells = ax_props['child_artists']
+    #             for cell in ax_cells:
+    #                 cell.set_facecolor(p_dict['faceColor'])
+    #                 cell._text.set_color(p_dict['fontColor'])
+    #                 cell._text.set_fontname(p_dict['fontMain'])
+    #                 cell._text.set_fontsize(int(dev['props']['fontSize']))
+    #                 cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
+    #
+    #                 # TODO: This may not be supportable without including fonts with the plugin.
+    #                 # cell._text.set_fontstretch(1000)
+    #
+    #                 # Controls grid display
+    #                 if dev['props'].get('calendarGrid', True):
+    #                     cell.set_edgecolor(p_dict['spineColor'])
+    #                 else:
+    #                     cell.set_edgecolor(p_dict['faceColor'])
+    #
+    #         fmt = {'short': {0: ["M", "T", "W", "T", "F", "S", "S"],
+    #                          6: ["S", "M", "T", "W", "T", "F", "S"]},
+    #                'mid':   {0: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    #                          6: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]},
+    #                'long':  {0: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    #                          6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
+    #                }
+    #
+    #         first_day   = int(dev['props'].get('firstDayOfWeek', 6))
+    #         day_format  = dev['props'].get('dayOfWeekFormat', 'mid')
+    #         days_labels = fmt[day_format][first_day]
+    #
+    #         my_cal    = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
+    #         today     = dt.datetime.today()
+    #         cal       = my_cal.monthdatescalendar(today.year, today.month)
+    #
+    #         try:
+    #             height = int(dev['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+    #         except ValueError:
+    #             height = 3
+    #
+    #         try:
+    #             width = int(dev['props'].get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+    #         except ValueError:
+    #             width = 5
+    #
+    #         # final_cal contains just the date value from the date object
+    #         final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
+    #
+    #         fig = plt.figure(figsize=(width, height))
+    #         ax = fig.add_subplot(111)
+    #         ax.axis('off')
+    #
+    #         month_row = ax.table(cellText=[" "],
+    #                              colLabels=[dt.datetime.strftime(today, "%B")],
+    #                              loc='top',
+    #                              bbox=[0, 0.5, 1, .5])  # bbox = [left, bottom, width, height]
+    #         format_axis(month_row)
+    #
+    #         days_rows = ax.table(cellText=final_cal,
+    #                              colLabels=days_labels,
+    #                              loc='top',
+    #                              cellLoc=dev['props'].get('dayOfWeekAlignment', 'right'),
+    #                              bbox=[0, -0.5, 1, 1.25])
+    #         format_axis(days_rows)
+    #
+    #         self.save_chart_image(plt,
+    #                               p_dict,
+    #                               k_dict,
+    #                               log,
+    #                               size={'top': 0.97,
+    #                                     'bottom': 0.34,
+    #                                     'left': 0.02,
+    #                                     'right': 0.98,
+    #                                     'hspace': None,
+    #                                     'wspace': None
+    #                                     }
+    #                               )
+    #
+    #         logging.info(u"Finished save fig.")
+    #
+    #         self.process_log(dev, log, return_queue)
+    #
+    #     except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    #         self.pluginErrorHandler(traceback.format_exc())
+    #         return_queue.put({'Error': True,
+    #                           'Log': log,
+    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
+    #                           'Name': dev['name']
+    #                           }
+    #                          )
+    #
+    #     except Exception as err:
+    #         logging.critical(u"{0}".format(err))
+    #
     # =============================================================================
-    def chart_line(self, plug_dict, dev, p_dict, k_dict, return_queue):
-        """
-        Creates the line charts
-        All steps required to generate line charts.
-        -----
-        :param dict plug_dict: plugin prefs
-        :param dict dev: device props
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
-        """
-
-        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-        try:
-
-            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
-            line_colors = []
-
-            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-
-            self.format_axis_x_ticks(ax, p_dict, k_dict, log)
-            self.format_axis_y(ax, p_dict, k_dict, log)
-
-            for line in range(1, 9, 1):
-
-                suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
-
-                lc_index = 'line{0}Color'.format(line)
-                p_dict[lc_index] = self.fix_rgb(p_dict[lc_index])
-
-                lmc_index = 'line{0}MarkerColor'.format(line)
-                p_dict[lmc_index]  = self.fix_rgb(p_dict[lmc_index])
-
-                lbf_index = 'line{0}BestFitColor'.format(line)
-                p_dict[lbf_index] = self.fix_rgb(p_dict[lbf_index])
-
-                # If line color is the same as the background color, alert the user.
-                if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
-                    log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
-                                          u"not be able to see it).".format(dev['name'], line))
-
-                # If the line is suppressed, remind the user they suppressed it.
-                if suppress_line:
-                    log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
-                                       u"device configuration menu.".format(dev['name'], line))
-
-                # ============================== Plot the Lines ===============================
-                # Plot the lines. If suppress_line is True, we skip it.
-                if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
-
-                    # Add line color to list for later use
-                    line_colors.append(p_dict['line{0}Color'.format(line)])
-
-                    data_path = plug_dict['prefs']['dataPath'].encode("utf-8")
-                    line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
-                    data_column, log = self.get_data('{0}{1}'.format(data_path, line_source), log)
-
-                    log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
-
-                    # Pull the headers
-                    p_dict['headers'].append(data_column[0][1])
-                    del data_column[0]
-
-                    # Pull the observations into distinct lists for charting.
-                    for element in data_column:
-                        p_dict['x_obs{0}'.format(line)].append(element[0])
-                        p_dict['y_obs{0}'.format(line)].append(float(element[1]))
-
-                    # ============================= Adjustment Factor =============================
-                    # Allows user to shift data on the Y axis (for example, to display multiple
-                    # binary sources on the same chart.)
-                    if dev['props']['line{0}adjuster'.format(line)] != "":
-                        temp_list = []
-                        for obs in p_dict['y_obs{0}'.format(line)]:
-                            expr = u'{0}{1}'.format(obs, dev['props']['line{0}adjuster'.format(line)])
-                            temp_list.append(self.eval_expr(expr))
-                        p_dict['y_obs{0}'.format(line)] = temp_list
-
-                    # ================================ Prune Data =================================
-                    # Prune the data if warranted
-                    dates_to_plot = p_dict['x_obs{0}'.format(line)]
-
-                    try:
-                        limit = float(dev['props']['limitDataRangeLength'])
-                    except ValueError:
-                        limit = 0
-
-                    if limit > 0:
-                        y_obs   = p_dict['y_obs{0}'.format(line)]
-                        new_old = dev['props']['limitDataRange']
-
-                        prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
-                        p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
-
-                    # ======================== Convert Dates for Charting =========================
-                    p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
-
-                    ax.plot_date(p_dict['x_obs{0}'.format(line)],
-                                 p_dict['y_obs{0}'.format(line)],
-                                 color=p_dict['line{0}Color'.format(line)],
-                                 linestyle=p_dict['line{0}Style'.format(line)],
-                                 marker=p_dict['line{0}Marker'.format(line)],
-                                 markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
-                                 markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
-                                 zorder=10,
-                                 **k_dict['k_line']
-                                 )
-
-                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
-
-                    if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(p_dict['x_obs{0}'.format(line)],
-                                        0,
-                                        p_dict['y_obs{0}'.format(line)],
-                                        color=p_dict['line{0}Color'.format(line)],
-                                        **k_dict['k_fill']
-                                        )
-
-                    # ================================ Annotations ================================
-                    if p_dict['line{0}Annotate'.format(line)]:
-                        for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
-                            ax.annotate(u"{0}".format(xy[1]),
-                                        xy=xy,
-                                        xytext=(0, 0),
-                                        zorder=10,
-                                        **k_dict['k_annotation']
-                                        )
-
-            # ============================== Y1 Axis Min/Max ==============================
-            # Min and Max are not 'None'.
-            self.format_axis_y1_min_max(p_dict, log)
-
-            # Transparent Chart Fill
-            if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                               transform=ax.transAxes,
-                                               facecolor=p_dict['faceColor'],
-                                               zorder=1
-                                               )
-                             )
-
-            # ================================== Legend ===================================
-            if p_dict['showLegend']:
-
-                # Amend the headers if there are any custom legend entries defined.
-                counter = 1
-                final_headers = []
-
-                headers = [_.decode('utf-8') for _ in p_dict['headers']]
-
-                for header in headers:
-                    if p_dict['line{0}Legend'.format(counter)] == "":
-                        final_headers.append(header)
-                    else:
-                        final_headers.append(p_dict['line{0}Legend'.format(counter)])
-                    counter += 1
-
-                # Set the legend
-                # Reorder the headers and colors so that they fill by row instead of by column
-                num_col = int(p_dict['legendColumns'])
-                iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
-                final_headers = [_ for _ in iter_headers]
-
-                iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
-                final_colors = [_ for _ in iter_colors]
-
-                legend = ax.legend(final_headers,
-                                   loc='upper center',
-                                   bbox_to_anchor=(0.5, -0.1),
-                                   ncol=num_col,
-                                   prop={'size': float(p_dict['legendFontSize'])}
-                                   )
-
-                # Set legend font color
-                [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
-
-                # Set legend line color
-                num_handles = len(legend.legendHandles)
-                [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
-
-                frame = legend.get_frame()
-                frame.set_alpha(0)
-
-            for line in range(1, 9, 1):
-
-                suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
-
-                if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
-                    # Note that we do these after the legend is drawn so that these lines don't
-                    # affect the legend.
-
-                    # We need to reload the dates to ensure that they match the line being plotted
-                    # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
-
-                    # =============================== Best Fit Line ===============================
-                    if dev['props'].get('line{0}BestFit'.format(line), False):
-                        self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(line)], line, p_dict, log)
-
-                    [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
-
-                    # =============================== Fill Between ================================
-                    if p_dict['line{0}Fill'.format(line)]:
-                        ax.fill_between(p_dict['x_obs{0}'.format(line)],
-                                        0,
-                                        p_dict['y_obs{0}'.format(line)],
-                                        color=p_dict['line{0}Color'.format(line)],
-                                        **k_dict['k_fill']
-                                        )
-
-                    # =============================== Min/Max Lines ===============================
-                    if p_dict['plotLine{0}Min'.format(line)]:
-                        ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
-                                   color=p_dict['line{0}Color'.format(line)],
-                                   **k_dict['k_min'])
-                    if p_dict['plotLine{0}Max'.format(line)]:
-                        ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
-                                   color=p_dict['line{0}Color'.format(line)],
-                                   **k_dict['k_max']
-                                   )
-                    if plug_dict['prefs'].get('forceOriginLines', True):
-                        ax.axhline(y=0, color=p_dict['spineColor'])
-
-            self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
-            self.format_grids(p_dict, k_dict, log)
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
-            self.format_axis_x_label(dev, p_dict, k_dict, log)
-            self.format_axis_y1_label(p_dict, k_dict, log)
-            self.format_axis_y_ticks(p_dict, k_dict, log)
-            self.save_chart_image(plt, p_dict, k_dict, log)
-            self.process_log(dev, log, return_queue)
-
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']}
-                             )
-
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']}
-                             )
-
+    # def chart_line(self, plug_dict, dev, p_dict, k_dict, return_queue):
+    #     """
+    #     Creates the line charts
+    #     All steps required to generate line charts.
+    #     -----
+    #     :param dict plug_dict: plugin prefs
+    #     :param dict dev: device props
+    #     :param dict p_dict: plotting parameters
+    #     :param dict k_dict: plotting kwargs
+    #     :param class 'multiprocessing.queues.Queue' return_queue: logging queue
+    #     """
+    #
+    #     log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
+    #
+    #     try:
+    #
+    #         p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+    #         p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
+    #         line_colors = []
+    #
+    #         ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    #
+    #         self.format_axis_x_ticks(ax, p_dict, k_dict, log)
+    #         self.format_axis_y(ax, p_dict, k_dict, log)
+    #
+    #         for line in range(1, 9, 1):
+    #
+    #             suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
+    #
+    #             lc_index = 'line{0}Color'.format(line)
+    #             p_dict[lc_index] = self.fix_rgb(p_dict[lc_index])
+    #
+    #             lmc_index = 'line{0}MarkerColor'.format(line)
+    #             p_dict[lmc_index]  = self.fix_rgb(p_dict[lmc_index])
+    #
+    #             lbf_index = 'line{0}BestFitColor'.format(line)
+    #             p_dict[lbf_index] = self.fix_rgb(p_dict[lbf_index])
+    #
+    #             # If line color is the same as the background color, alert the user.
+    #             if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
+    #                 log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
+    #                                       u"not be able to see it).".format(dev['name'], line))
+    #
+    #             # If the line is suppressed, remind the user they suppressed it.
+    #             if suppress_line:
+    #                 log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
+    #                                    u"device configuration menu.".format(dev['name'], line))
+    #
+    #             # ============================== Plot the Lines ===============================
+    #             # Plot the lines. If suppress_line is True, we skip it.
+    #             if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+    #
+    #                 # Add line color to list for later use
+    #                 line_colors.append(p_dict['line{0}Color'.format(line)])
+    #
+    #                 data_path = plug_dict['prefs']['dataPath'].encode("utf-8")
+    #                 line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
+    #                 data_column, log = self.get_data('{0}{1}'.format(data_path, line_source), log)
+    #
+    #                 log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
+    #
+    #                 # Pull the headers
+    #                 p_dict['headers'].append(data_column[0][1])
+    #                 del data_column[0]
+    #
+    #                 # Pull the observations into distinct lists for charting.
+    #                 for element in data_column:
+    #                     p_dict['x_obs{0}'.format(line)].append(element[0])
+    #                     p_dict['y_obs{0}'.format(line)].append(float(element[1]))
+    #
+    #                 # ============================= Adjustment Factor =============================
+    #                 # Allows user to shift data on the Y axis (for example, to display multiple
+    #                 # binary sources on the same chart.)
+    #                 if dev['props']['line{0}adjuster'.format(line)] != "":
+    #                     temp_list = []
+    #                     for obs in p_dict['y_obs{0}'.format(line)]:
+    #                         expr = u'{0}{1}'.format(obs, dev['props']['line{0}adjuster'.format(line)])
+    #                         temp_list.append(self.eval_expr(expr))
+    #                     p_dict['y_obs{0}'.format(line)] = temp_list
+    #
+    #                 # ================================ Prune Data =================================
+    #                 # Prune the data if warranted
+    #                 dates_to_plot = p_dict['x_obs{0}'.format(line)]
+    #
+    #                 try:
+    #                     limit = float(dev['props']['limitDataRangeLength'])
+    #                 except ValueError:
+    #                     limit = 0
+    #
+    #                 if limit > 0:
+    #                     y_obs   = p_dict['y_obs{0}'.format(line)]
+    #                     new_old = dev['props']['limitDataRange']
+    #
+    #                     prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
+    #                     p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
+    #
+    #                 # ======================== Convert Dates for Charting =========================
+    #                 p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+    #
+    #                 ax.plot_date(p_dict['x_obs{0}'.format(line)],
+    #                              p_dict['y_obs{0}'.format(line)],
+    #                              color=p_dict['line{0}Color'.format(line)],
+    #                              linestyle=p_dict['line{0}Style'.format(line)],
+    #                              marker=p_dict['line{0}Marker'.format(line)],
+    #                              markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
+    #                              markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
+    #                              zorder=10,
+    #                              **k_dict['k_line']
+    #                              )
+    #
+    #                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+    #
+    #                 if p_dict['line{0}Fill'.format(line)]:
+    #                     ax.fill_between(p_dict['x_obs{0}'.format(line)],
+    #                                     0,
+    #                                     p_dict['y_obs{0}'.format(line)],
+    #                                     color=p_dict['line{0}Color'.format(line)],
+    #                                     **k_dict['k_fill']
+    #                                     )
+    #
+    #                 # ================================ Annotations ================================
+    #                 if p_dict['line{0}Annotate'.format(line)]:
+    #                     for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
+    #                         ax.annotate(u"{0}".format(xy[1]),
+    #                                     xy=xy,
+    #                                     xytext=(0, 0),
+    #                                     zorder=10,
+    #                                     **k_dict['k_annotation']
+    #                                     )
+    #
+    #         # ============================== Y1 Axis Min/Max ==============================
+    #         # Min and Max are not 'None'.
+    #         self.format_axis_y1_min_max(p_dict, log)
+    #
+    #         # Transparent Chart Fill
+    #         if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+    #             ax.add_patch(patches.Rectangle((0, 0), 1, 1,
+    #                                            transform=ax.transAxes,
+    #                                            facecolor=p_dict['faceColor'],
+    #                                            zorder=1
+    #                                            )
+    #                          )
+    #
+    #         # ================================== Legend ===================================
+    #         if p_dict['showLegend']:
+    #
+    #             # Amend the headers if there are any custom legend entries defined.
+    #             counter = 1
+    #             final_headers = []
+    #
+    #             headers = [_.decode('utf-8') for _ in p_dict['headers']]
+    #
+    #             for header in headers:
+    #                 if p_dict['line{0}Legend'.format(counter)] == "":
+    #                     final_headers.append(header)
+    #                 else:
+    #                     final_headers.append(p_dict['line{0}Legend'.format(counter)])
+    #                 counter += 1
+    #
+    #             # Set the legend
+    #             # Reorder the headers and colors so that they fill by row instead of by column
+    #             num_col = int(p_dict['legendColumns'])
+    #             iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
+    #             final_headers = [_ for _ in iter_headers]
+    #
+    #             iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
+    #             final_colors = [_ for _ in iter_colors]
+    #
+    #             legend = ax.legend(final_headers,
+    #                                loc='upper center',
+    #                                bbox_to_anchor=(0.5, -0.1),
+    #                                ncol=num_col,
+    #                                prop={'size': float(p_dict['legendFontSize'])}
+    #                                )
+    #
+    #             # Set legend font color
+    #             [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+    #
+    #             # Set legend line color
+    #             num_handles = len(legend.legendHandles)
+    #             [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
+    #
+    #             frame = legend.get_frame()
+    #             frame.set_alpha(0)
+    #
+    #         for line in range(1, 9, 1):
+    #
+    #             suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
+    #
+    #             if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+    #                 # Note that we do these after the legend is drawn so that these lines don't
+    #                 # affect the legend.
+    #
+    #                 # We need to reload the dates to ensure that they match the line being plotted
+    #                 # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+    #
+    #                 # =============================== Best Fit Line ===============================
+    #                 if dev['props'].get('line{0}BestFit'.format(line), False):
+    #                     self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(line)], line, p_dict, log)
+    #
+    #                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+    #
+    #                 # =============================== Fill Between ================================
+    #                 if p_dict['line{0}Fill'.format(line)]:
+    #                     ax.fill_between(p_dict['x_obs{0}'.format(line)],
+    #                                     0,
+    #                                     p_dict['y_obs{0}'.format(line)],
+    #                                     color=p_dict['line{0}Color'.format(line)],
+    #                                     **k_dict['k_fill']
+    #                                     )
+    #
+    #                 # =============================== Min/Max Lines ===============================
+    #                 if p_dict['plotLine{0}Min'.format(line)]:
+    #                     ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
+    #                                color=p_dict['line{0}Color'.format(line)],
+    #                                **k_dict['k_min'])
+    #                 if p_dict['plotLine{0}Max'.format(line)]:
+    #                     ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
+    #                                color=p_dict['line{0}Color'.format(line)],
+    #                                **k_dict['k_max']
+    #                                )
+    #                 if plug_dict['prefs'].get('forceOriginLines', True):
+    #                     ax.axhline(y=0, color=p_dict['spineColor'])
+    #
+    #         self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
+    #         self.format_grids(p_dict, k_dict, log)
+    #         self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
+    #         self.format_axis_x_label(dev, p_dict, k_dict, log)
+    #         self.format_axis_y1_label(p_dict, k_dict, log)
+    #         self.format_axis_y_ticks(p_dict, k_dict, log)
+    #         self.save_chart_image(plt, p_dict, k_dict, log)
+    #         self.process_log(dev, log, return_queue)
+    #
+    #     except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    #         self.pluginErrorHandler(traceback.format_exc())
+    #         return_queue.put({'Error': True,
+    #                           'Log': log,
+    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
+    #                           'Name': dev['name']}
+    #                          )
+    #
+    #     except Exception as sub_error:
+    #         self.pluginErrorHandler(traceback.format_exc())
+    #         return_queue.put({'Error': True,
+    #                           'Log': log,
+    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
+    #                           'Name': dev['name']}
+    #                          )
+    #
     # =============================================================================
     def chart_multiline_text(self, plug_dict, dev, p_dict, k_dict, text_to_plot, return_queue):
         """
@@ -5858,18 +5906,18 @@ class MakeChart(object):
         return self.eval_(ast.parse(expr, mode='eval').body)
 
     # =============================================================================
-    def eval_(self, node):
+    def eval_(self, mode):
         operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
                      ast.BitXor: op.xor, ast.USub: op.neg}
 
-        if isinstance(node, ast.Num):  # <number>
-            return node.n
-        elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
-            return operators[type(node.op)](self.eval_(node.left), self.eval_(node.right))
-        elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
-            return operators[type(node.op)](self.eval_(node.operand))
+        if isinstance(mode, ast.Num):  # <number>
+            return mode.n
+        elif isinstance(mode, ast.BinOp):  # <left> <operator> <right>
+            return operators[type(mode.op)](self.eval_(mode.left), self.eval_(mode.right))
+        elif isinstance(mode, ast.UnaryOp):  # <operator> <operand> e.g., -1
+            return operators[type(mode.op)](self.eval_(mode.operand))
         else:
-            raise TypeError(node)
+            raise TypeError(mode)
 
     # =============================================================================
     def fix_rgb(self, c):

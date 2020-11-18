@@ -10,7 +10,7 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="areaChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="areaChartDeviceText" type="label" alignWithControl="false">
                 <Label>Area Chart Devices are probably the most useful in instances where there are a relatively large number of time series data. They are like Line Chart Devices, where the plots are cumulative. That is, the data for area 2 will be plotted above area 1 (and so on.)</Label>
             </Field>
 
@@ -71,7 +71,7 @@
                 <Label>Chart Title:</Label>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
 
@@ -164,7 +164,7 @@
                 <Label>Tick Locations:</Label>
             </Field>
 
-            <Field id="areasLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="areasLabel" type="label" alignText="right">
                 <Label>Area Controls</Label>
             </Field>
 
@@ -1041,7 +1041,7 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="barChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="barChartDeviceText" type="label" alignWithControl="false">
                 <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
             </Field>
 
@@ -1115,7 +1115,7 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
 
@@ -1208,7 +1208,7 @@
                 <Label>Tick Locations:</Label>
             </Field>
 
-            <Field id="barLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="barLabel" type="label" alignText="right">
                 <Label>Bar Controls:</Label>
             </Field>
 
@@ -1439,7 +1439,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="batteryDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="batteryDeviceText" type="label" alignWithControl="false">
                 <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.</Label>
             </Field>
 
@@ -1476,7 +1476,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Width:</Label>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls</Label>
             </Field>
 
@@ -1498,7 +1498,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="displayLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="displayLabel" type="label" alignText="right">
                 <Label>Display Controls</Label>
             </Field>
 
@@ -1585,7 +1585,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="CalendarDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="CalendarDeviceText" type="label" alignWithControl="false">
                 <Label>Calendar devices are used to create graphic representations of the current month.</Label>
             </Field>
 
@@ -1607,7 +1607,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Custom Width:</Label>
             </Field>
 
-            <Field id="displayText" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="displayText" type="label" alignText="right">
                 <Label>Display Controls</Label>
             </Field>
 
@@ -1673,7 +1673,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="lineChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="lineChartDeviceText" type="label" alignWithControl="false">
                 <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
 
@@ -1734,7 +1734,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Title:</Label>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
 
@@ -1827,7 +1827,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Tick Locations:</Label>
             </Field>
 
-            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="linesLabel" type="label" alignText="right">
                 <Label>Line Controls</Label>
             </Field>
 
@@ -2785,7 +2785,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="multilineTextDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="multilineTextDeviceText" type="label" alignWithControl="false">
                 <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.</Label>
             </Field>
 
@@ -2907,7 +2907,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="polarChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="polarChartDeviceText" type="label" alignWithControl="false">
                 <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).</Label>
             </Field>
 
@@ -3036,7 +3036,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="scatterChartDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="scatterChartDeviceText" type="label" alignWithControl="false">
                 <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
 
@@ -3098,7 +3098,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Title:</Label>
             </Field>
 <!--X Axis-->
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls:</Label>
             </Field>
 
@@ -3191,7 +3191,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Tick Locations:</Label>
             </Field>
 
-            <Field id="groupLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="groupLabel" type="label" alignText="right">
                 <Label>Group Controls</Label>
             </Field>
 
@@ -3581,7 +3581,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
                 <Label>Weather Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices.</Label>
             </Field>
 
@@ -3655,7 +3655,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Chart Title:</Label>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls</Label>
             </Field>
 
@@ -3747,7 +3747,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 </List>
             </Field>
 
-            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="linesLabel" type="label" alignText="right">
                 <Label>Line Controls</Label>
             </Field>
 
@@ -3969,7 +3969,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
-            <Field id="forecastSourceDeviceText" type="label" fontColor="black" fontSize="regular" alignWithControl="false">
+            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
                 <Label>Composite Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices. Note that hourly forecast devices only provide one forecast temperature so, for these charts, the high and low temperature values will be the same.</Label>
             </Field>
 
@@ -4023,7 +4023,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="AxisLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="AxisLabel" type="label" alignText="right">
                 <Label>Axis Controls</Label>
             </Field>
 
@@ -4106,7 +4106,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Wind Max:</Label>
             </Field>
 
-            <Field id="linesLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
+            <Field id="linesLabel" type="label" alignText="right">
                 <Label>Forecast Elements</Label>
             </Field>
 

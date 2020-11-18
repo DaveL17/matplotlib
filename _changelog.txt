@@ -1,3 +1,7 @@
+v0.9.03
+- Converts line charting code from multiprocessing to subprocess.Popen.
+- Code refinements.
+
 v0.9.02
 - Converts calendar charting code from multiprocessing to subprocess.Popen.
 
