@@ -15,6 +15,10 @@ import DLFramework as Dave
 # TODO: consider looking at Matt's logging handler and see if that's better.
 log = []
 
+
+def __init__():
+    pass
+
 # Unpickle the payload data. The first element of the payload is the name
 # of this script and we don't need that. As long as size isn't a limitation
 # we will always send the entire payload as element 1.

@@ -95,6 +95,7 @@ import matplotlib.font_manager as mfont
 #     pass
 
 # My modules
+import chart_tools
 import DLFramework.DLFramework as Dave
 import maintenance
 
@@ -105,7 +106,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.02"
+__version__   = u"0.9.05"
 
 # =============================================================================
 
@@ -3319,33 +3320,56 @@ class Plugin(indigo.PluginBase):
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
 
+                            self.logger.debug(u"chart_multiline.py called.")
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
+
                             # Get the text to plot. We do this here so we don't need to send all the
                             # devices and variables to the method (the process does not have access to the
                             # Indigo server).
                             if int(p_dict['thing']) in indigo.devices:
                                 dev_id = int(p_dict['thing'])
-                                text_to_plot = unicode(indigo.devices[dev_id].states[p_dict['thingState']])
+                                raw_payload['data'] = unicode(indigo.devices[dev_id].states[p_dict['thingState']])
 
                             elif int(p_dict['thing']) in indigo.variables:
-                                text_to_plot = unicode(indigo.variables[int(p_dict['thing'])].value)
+                                raw_payload['data'] = unicode(indigo.variables[int(p_dict['thing'])].value)
 
                             else:
-                                text_to_plot = u"Unable to reconcile plot text. Confirm device settings."
+                                raw_payload['data'] = u"Unable to reconcile plot text. Confirm device settings."
                                 self.logger.info(u"Presently, the plugin only supports device state and variable "
                                                  u"values.")
 
-                            if __name__ == '__main__':
-                                p_multiline = multiprocessing.Process(name='p_multiline',
-                                                                      target=MakeChart().chart_multiline_text,
-                                                                      args=(plug_dict,
-                                                                            dev_dict,
-                                                                            p_dict,
-                                                                            k_dict,
-                                                                            text_to_plot,
-                                                                            return_queue,
-                                                                            )
-                                                                      )
-                                p_multiline.start()
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_multiline.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            reply = pickle.loads(reply)
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.warning(err)
+
+                        self.logger.warning(u'Multiline text charting function complete.')
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
@@ -3973,656 +3997,6 @@ class MakeChart(object):
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
                               'Name': dev['name']}
-                             )
-
-    # =============================================================================
-    def chart_battery_health(self, plug_dict, dev, device_list, p_dict, k_dict, return_queue):
-        """
-        Creates the battery health charts
-        The chart_battery_health method creates battery health charts. These chart
-        types are dynamic and are created "on the fly" rather than through direct
-        user input.
-        :param dict plug_dict: plugin prefs
-        :param dict dev:device props
-        :param dict device_list: dictionary of battery device names and battery levels
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        :param class 'multiprocessing.queues.Queue' return_queue:
-        :return:
-        """
-
-        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-        try:
-            bar_colors    = []
-            caution_color = self.fix_rgb(p_dict['cautionColor'])
-            caution_level = int(p_dict['cautionLevel'])
-            chart_data    = {}
-            font_size     = plt.rcParams['ytick.labelsize']
-            healthy_color = self.fix_rgb(p_dict['healthyColor'])
-            level_box     = p_dict['showBatteryLevelBackground']
-            show_level    = p_dict['showBatteryLevel']
-            dead_ones     = p_dict.get('showDeadBattery', False)
-            warning_color = self.fix_rgb(p_dict['warningColor'])
-            warning_level = int(p_dict['warningLevel'])
-            x_values      = []
-            y_text        = []
-
-            # ============================ Create Device Dict =============================
-            # 'thing' here is a tuple ('name', 'battery level')
-            for thing in sorted(device_list.iteritems(), reverse=True):
-                chart_data[thing[0]] = {}
-
-                # Add the battery level for each device
-                try:
-                    chart_data[thing[0]]['batteryLevel'] = float(thing[1])
-                except ValueError:
-                    chart_data[thing[0]]['batteryLevel'] = 0.0
-
-                # Determine the appropriate bar color
-                if chart_data[thing[0]]['batteryLevel'] > caution_level:
-                    chart_data[thing[0]]['color'] = healthy_color
-                elif caution_level >= chart_data[thing[0]]['batteryLevel'] > warning_level:
-                    chart_data[thing[0]]['color'] = caution_color
-                else:
-                    chart_data[thing[0]]['color'] = warning_color
-
-                # =========================== Create Chart Elements ===========================
-                bar_colors.append(chart_data[thing[0]]['color'])
-                x_values.append(chart_data[thing[0]]['batteryLevel'])
-                y_text.append(unicode(thing[0]))
-
-            # Create a range of values to plot on the Y axis, since we can't plot on device names.
-            y_values = np.arange(len(y_text))
-
-            # Create the chart figure
-            ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-
-            # =============================== Plot the Bars ===============================
-            # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
-            # it off the origin.
-            rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
-
-            # ================================ Data Labels ================================
-            # Plot data labels inside or outside depending on bar length
-
-            for rect in rects:
-                width  = rect.get_width()    # horizontal width of bars
-                height = rect.get_height()   # vertical height of bars
-                y      = rect.get_y()        # Y axis position
-
-                # With bbox.  We give a little extra room horizontally for the bbox.
-                if show_level in ('true', 'True', True) and level_box:
-                    if width >= caution_level:
-                        plt.annotate(u"{0:.0f}".format(width),
-                                     xy=(width - 3, y + height / 2),
-                                     fontsize=font_size, **k_dict['k_annotation_battery']
-                                     )
-                    else:
-                        plt.annotate(u"{0:.0f}".format(width),
-                                     xy=(width + 3, y + height / 2),
-                                     fontsize=font_size, **k_dict['k_annotation_battery']
-                                     )
-
-                # Without bbox.
-                elif show_level in ('true', 'True', True):
-                    if width >= caution_level:
-                        plt.annotate(u"{0:.0f}".format(width),
-                                     xy=(width - 2, y + height / 2),
-                                     fontsize=font_size,
-                                     **k_dict['k_battery']
-                                     )
-                    else:
-                        plt.annotate(u"{0:.0f}".format(width),
-                                     xy=(width + 2, y + height / 2),
-                                     fontsize=font_size,
-                                     **k_dict['k_battery']
-                                     )
-
-            # ================================ Chart Title ================================
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
-
-            # =============================== Format Grids ================================
-            if dev['props'].get('showxAxisGrid', False):
-                for _ in (20, 40, 60, 80):
-                    ax.axvline(x=_,
-                               color=p_dict['gridColor'],
-                               linestyle=plug_dict['prefs'].get('gridStyle', ':')
-                               )
-
-            self.format_axis_x_label(dev, p_dict, k_dict, log)
-            ax.xaxis.set_ticks_position('bottom')
-
-            # ============================== X Axis Min/Max ===============================
-            # We want the X axis scale to always be 0-100.
-            plt.xlim(xmin=0, xmax=100)
-
-            # =============================== Y Axis Label ================================
-            # Hide major tick labels and right side ticks.
-            ax.set_yticklabels('')
-            ax.yaxis.set_ticks_position('left')
-
-            # Customize minor tick label position
-            ax.set_yticks([n for n in range(1, len(y_values) + 1)], minor=True)
-
-            # Assign device names to the minor ticks if wanted
-            if p_dict.get('showDeviceName', True):
-                ax.set_yticklabels(y_text, minor=True)
-
-            # Mark devices that have a battery level of zero by coloring their y axis label
-            # using the same warning color that is used for the bar.
-            if dead_ones:
-                counter = 0
-                for key, value in sorted(device_list.iteritems(), reverse=True):
-                    if int(value) == 0:
-                        ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
-                    counter += 1
-
-            # ============================== Y Axis Min/Max ===============================
-            # We never want the Y axis to go lower than 0.
-            plt.ylim(ymin=0)
-
-            # ================================== Spines ===================================
-            # Hide all but the bottom spine.
-            for spine in ('left', 'top', 'right'):
-                ax.spines[spine].set_visible(False)
-
-            # Add a patch so that we can have transparent charts but a filled plot area.
-            if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                               transform=ax.transAxes,
-                                               facecolor=p_dict['faceColor'],
-                                               zorder=1
-                                               )
-                             )
-
-            plt.tight_layout()
-            plt.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
-            plt.clf()
-            plt.close('all')
-
-            self.process_log(dev, log, return_queue)
-
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']}
-                             )
-
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']}
-                             )
-
-    # =============================================================================
-    # def chart_calendar(self, plug_dict, dev, p_dict, k_dict, return_queue):
-    #     """
-    #     Creates the calendar charts
-    #     Given the unique nature of calendar charts, we use a separate method to
-    #     construct them.
-    #     -----
-    #     :param dict plug_dict: plugin prefs
-    #     :param dict dev: device props
-    #     :param dict p_dict: plotting parameters
-    #     :param dict k_dict: plotting kwargs
-    #     :param class 'multiprocessing.queues.Queue' return_queue: return queue
-    #     """
-    #     logging.info(u'chart_calendar() called.')
-    #     log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-    #
-    #     try:
-    #
-    #         import calendar
-    #
-    #         def format_axis(ax_obj):
-    #             """
-    #             Set various axis properties
-    #             Note that this method purposefully accesses protected members of the _text class.
-    #             -----
-    #             :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
-    #             """
-    #
-    #             ax_props = ax_obj.properties()
-    #             ax_cells = ax_props['child_artists']
-    #             for cell in ax_cells:
-    #                 cell.set_facecolor(p_dict['faceColor'])
-    #                 cell._text.set_color(p_dict['fontColor'])
-    #                 cell._text.set_fontname(p_dict['fontMain'])
-    #                 cell._text.set_fontsize(int(dev['props']['fontSize']))
-    #                 cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
-    #
-    #                 # TODO: This may not be supportable without including fonts with the plugin.
-    #                 # cell._text.set_fontstretch(1000)
-    #
-    #                 # Controls grid display
-    #                 if dev['props'].get('calendarGrid', True):
-    #                     cell.set_edgecolor(p_dict['spineColor'])
-    #                 else:
-    #                     cell.set_edgecolor(p_dict['faceColor'])
-    #
-    #         fmt = {'short': {0: ["M", "T", "W", "T", "F", "S", "S"],
-    #                          6: ["S", "M", "T", "W", "T", "F", "S"]},
-    #                'mid':   {0: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    #                          6: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]},
-    #                'long':  {0: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-    #                          6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
-    #                }
-    #
-    #         first_day   = int(dev['props'].get('firstDayOfWeek', 6))
-    #         day_format  = dev['props'].get('dayOfWeekFormat', 'mid')
-    #         days_labels = fmt[day_format][first_day]
-    #
-    #         my_cal    = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
-    #         today     = dt.datetime.today()
-    #         cal       = my_cal.monthdatescalendar(today.year, today.month)
-    #
-    #         try:
-    #             height = int(dev['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
-    #         except ValueError:
-    #             height = 3
-    #
-    #         try:
-    #             width = int(dev['props'].get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
-    #         except ValueError:
-    #             width = 5
-    #
-    #         # final_cal contains just the date value from the date object
-    #         final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
-    #
-    #         fig = plt.figure(figsize=(width, height))
-    #         ax = fig.add_subplot(111)
-    #         ax.axis('off')
-    #
-    #         month_row = ax.table(cellText=[" "],
-    #                              colLabels=[dt.datetime.strftime(today, "%B")],
-    #                              loc='top',
-    #                              bbox=[0, 0.5, 1, .5])  # bbox = [left, bottom, width, height]
-    #         format_axis(month_row)
-    #
-    #         days_rows = ax.table(cellText=final_cal,
-    #                              colLabels=days_labels,
-    #                              loc='top',
-    #                              cellLoc=dev['props'].get('dayOfWeekAlignment', 'right'),
-    #                              bbox=[0, -0.5, 1, 1.25])
-    #         format_axis(days_rows)
-    #
-    #         self.save_chart_image(plt,
-    #                               p_dict,
-    #                               k_dict,
-    #                               log,
-    #                               size={'top': 0.97,
-    #                                     'bottom': 0.34,
-    #                                     'left': 0.02,
-    #                                     'right': 0.98,
-    #                                     'hspace': None,
-    #                                     'wspace': None
-    #                                     }
-    #                               )
-    #
-    #         logging.info(u"Finished save fig.")
-    #
-    #         self.process_log(dev, log, return_queue)
-    #
-    #     except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    #         self.pluginErrorHandler(traceback.format_exc())
-    #         return_queue.put({'Error': True,
-    #                           'Log': log,
-    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
-    #                           'Name': dev['name']
-    #                           }
-    #                          )
-    #
-    #     except Exception as err:
-    #         logging.critical(u"{0}".format(err))
-    #
-    # =============================================================================
-    # def chart_line(self, plug_dict, dev, p_dict, k_dict, return_queue):
-    #     """
-    #     Creates the line charts
-    #     All steps required to generate line charts.
-    #     -----
-    #     :param dict plug_dict: plugin prefs
-    #     :param dict dev: device props
-    #     :param dict p_dict: plotting parameters
-    #     :param dict k_dict: plotting kwargs
-    #     :param class 'multiprocessing.queues.Queue' return_queue: logging queue
-    #     """
-    #
-    #     log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-    #
-    #     try:
-    #
-    #         p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
-    #         p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
-    #         line_colors = []
-    #
-    #         ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
-    #
-    #         self.format_axis_x_ticks(ax, p_dict, k_dict, log)
-    #         self.format_axis_y(ax, p_dict, k_dict, log)
-    #
-    #         for line in range(1, 9, 1):
-    #
-    #             suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
-    #
-    #             lc_index = 'line{0}Color'.format(line)
-    #             p_dict[lc_index] = self.fix_rgb(p_dict[lc_index])
-    #
-    #             lmc_index = 'line{0}MarkerColor'.format(line)
-    #             p_dict[lmc_index]  = self.fix_rgb(p_dict[lmc_index])
-    #
-    #             lbf_index = 'line{0}BestFitColor'.format(line)
-    #             p_dict[lbf_index] = self.fix_rgb(p_dict[lbf_index])
-    #
-    #             # If line color is the same as the background color, alert the user.
-    #             if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
-    #                 log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
-    #                                       u"not be able to see it).".format(dev['name'], line))
-    #
-    #             # If the line is suppressed, remind the user they suppressed it.
-    #             if suppress_line:
-    #                 log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
-    #                                    u"device configuration menu.".format(dev['name'], line))
-    #
-    #             # ============================== Plot the Lines ===============================
-    #             # Plot the lines. If suppress_line is True, we skip it.
-    #             if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
-    #
-    #                 # Add line color to list for later use
-    #                 line_colors.append(p_dict['line{0}Color'.format(line)])
-    #
-    #                 data_path = plug_dict['prefs']['dataPath'].encode("utf-8")
-    #                 line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
-    #                 data_column, log = self.get_data('{0}{1}'.format(data_path, line_source), log)
-    #
-    #                 log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
-    #
-    #                 # Pull the headers
-    #                 p_dict['headers'].append(data_column[0][1])
-    #                 del data_column[0]
-    #
-    #                 # Pull the observations into distinct lists for charting.
-    #                 for element in data_column:
-    #                     p_dict['x_obs{0}'.format(line)].append(element[0])
-    #                     p_dict['y_obs{0}'.format(line)].append(float(element[1]))
-    #
-    #                 # ============================= Adjustment Factor =============================
-    #                 # Allows user to shift data on the Y axis (for example, to display multiple
-    #                 # binary sources on the same chart.)
-    #                 if dev['props']['line{0}adjuster'.format(line)] != "":
-    #                     temp_list = []
-    #                     for obs in p_dict['y_obs{0}'.format(line)]:
-    #                         expr = u'{0}{1}'.format(obs, dev['props']['line{0}adjuster'.format(line)])
-    #                         temp_list.append(self.eval_expr(expr))
-    #                     p_dict['y_obs{0}'.format(line)] = temp_list
-    #
-    #                 # ================================ Prune Data =================================
-    #                 # Prune the data if warranted
-    #                 dates_to_plot = p_dict['x_obs{0}'.format(line)]
-    #
-    #                 try:
-    #                     limit = float(dev['props']['limitDataRangeLength'])
-    #                 except ValueError:
-    #                     limit = 0
-    #
-    #                 if limit > 0:
-    #                     y_obs   = p_dict['y_obs{0}'.format(line)]
-    #                     new_old = dev['props']['limitDataRange']
-    #
-    #                     prune = self.prune_data(dates_to_plot, y_obs, limit, new_old, log)
-    #                     p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
-    #
-    #                 # ======================== Convert Dates for Charting =========================
-    #                 p_dict['x_obs{0}'.format(line)] = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
-    #
-    #                 ax.plot_date(p_dict['x_obs{0}'.format(line)],
-    #                              p_dict['y_obs{0}'.format(line)],
-    #                              color=p_dict['line{0}Color'.format(line)],
-    #                              linestyle=p_dict['line{0}Style'.format(line)],
-    #                              marker=p_dict['line{0}Marker'.format(line)],
-    #                              markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
-    #                              markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
-    #                              zorder=10,
-    #                              **k_dict['k_line']
-    #                              )
-    #
-    #                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
-    #
-    #                 if p_dict['line{0}Fill'.format(line)]:
-    #                     ax.fill_between(p_dict['x_obs{0}'.format(line)],
-    #                                     0,
-    #                                     p_dict['y_obs{0}'.format(line)],
-    #                                     color=p_dict['line{0}Color'.format(line)],
-    #                                     **k_dict['k_fill']
-    #                                     )
-    #
-    #                 # ================================ Annotations ================================
-    #                 if p_dict['line{0}Annotate'.format(line)]:
-    #                     for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
-    #                         ax.annotate(u"{0}".format(xy[1]),
-    #                                     xy=xy,
-    #                                     xytext=(0, 0),
-    #                                     zorder=10,
-    #                                     **k_dict['k_annotation']
-    #                                     )
-    #
-    #         # ============================== Y1 Axis Min/Max ==============================
-    #         # Min and Max are not 'None'.
-    #         self.format_axis_y1_min_max(p_dict, log)
-    #
-    #         # Transparent Chart Fill
-    #         if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-    #             ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-    #                                            transform=ax.transAxes,
-    #                                            facecolor=p_dict['faceColor'],
-    #                                            zorder=1
-    #                                            )
-    #                          )
-    #
-    #         # ================================== Legend ===================================
-    #         if p_dict['showLegend']:
-    #
-    #             # Amend the headers if there are any custom legend entries defined.
-    #             counter = 1
-    #             final_headers = []
-    #
-    #             headers = [_.decode('utf-8') for _ in p_dict['headers']]
-    #
-    #             for header in headers:
-    #                 if p_dict['line{0}Legend'.format(counter)] == "":
-    #                     final_headers.append(header)
-    #                 else:
-    #                     final_headers.append(p_dict['line{0}Legend'.format(counter)])
-    #                 counter += 1
-    #
-    #             # Set the legend
-    #             # Reorder the headers and colors so that they fill by row instead of by column
-    #             num_col = int(p_dict['legendColumns'])
-    #             iter_headers  = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
-    #             final_headers = [_ for _ in iter_headers]
-    #
-    #             iter_colors  = itertools.chain(*[line_colors[i::num_col] for i in range(num_col)])
-    #             final_colors = [_ for _ in iter_colors]
-    #
-    #             legend = ax.legend(final_headers,
-    #                                loc='upper center',
-    #                                bbox_to_anchor=(0.5, -0.1),
-    #                                ncol=num_col,
-    #                                prop={'size': float(p_dict['legendFontSize'])}
-    #                                )
-    #
-    #             # Set legend font color
-    #             [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
-    #
-    #             # Set legend line color
-    #             num_handles = len(legend.legendHandles)
-    #             [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
-    #
-    #             frame = legend.get_frame()
-    #             frame.set_alpha(0)
-    #
-    #         for line in range(1, 9, 1):
-    #
-    #             suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
-    #
-    #             if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
-    #                 # Note that we do these after the legend is drawn so that these lines don't
-    #                 # affect the legend.
-    #
-    #                 # We need to reload the dates to ensure that they match the line being plotted
-    #                 # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
-    #
-    #                 # =============================== Best Fit Line ===============================
-    #                 if dev['props'].get('line{0}BestFit'.format(line), False):
-    #                     self.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(line)], line, p_dict, log)
-    #
-    #                 [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
-    #
-    #                 # =============================== Fill Between ================================
-    #                 if p_dict['line{0}Fill'.format(line)]:
-    #                     ax.fill_between(p_dict['x_obs{0}'.format(line)],
-    #                                     0,
-    #                                     p_dict['y_obs{0}'.format(line)],
-    #                                     color=p_dict['line{0}Color'.format(line)],
-    #                                     **k_dict['k_fill']
-    #                                     )
-    #
-    #                 # =============================== Min/Max Lines ===============================
-    #                 if p_dict['plotLine{0}Min'.format(line)]:
-    #                     ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
-    #                                color=p_dict['line{0}Color'.format(line)],
-    #                                **k_dict['k_min'])
-    #                 if p_dict['plotLine{0}Max'.format(line)]:
-    #                     ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
-    #                                color=p_dict['line{0}Color'.format(line)],
-    #                                **k_dict['k_max']
-    #                                )
-    #                 if plug_dict['prefs'].get('forceOriginLines', True):
-    #                     ax.axhline(y=0, color=p_dict['spineColor'])
-    #
-    #         self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
-    #         self.format_grids(p_dict, k_dict, log)
-    #         self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
-    #         self.format_axis_x_label(dev, p_dict, k_dict, log)
-    #         self.format_axis_y1_label(p_dict, k_dict, log)
-    #         self.format_axis_y_ticks(p_dict, k_dict, log)
-    #         self.save_chart_image(plt, p_dict, k_dict, log)
-    #         self.process_log(dev, log, return_queue)
-    #
-    #     except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    #         self.pluginErrorHandler(traceback.format_exc())
-    #         return_queue.put({'Error': True,
-    #                           'Log': log,
-    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
-    #                           'Name': dev['name']}
-    #                          )
-    #
-    #     except Exception as sub_error:
-    #         self.pluginErrorHandler(traceback.format_exc())
-    #         return_queue.put({'Error': True,
-    #                           'Log': log,
-    #                           'Message': u"{0}. See plugin log for more information.".format(sub_error),
-    #                           'Name': dev['name']}
-    #                          )
-    #
-    # =============================================================================
-    def chart_multiline_text(self, plug_dict, dev, p_dict, k_dict, text_to_plot, return_queue):
-        """
-        Creates the multiline text charts
-        Given the unique nature of multiline text charts, we use a separate method
-        to construct them.
-        -----
-        :param dict plug_dict: plugin prefs
-        :param dict dev: device props
-        :param dict p_dict: plotting parameters
-        :param dict k_dict: plotting kwargs
-        :param unicode text_to_plot: the text to be plotted
-        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
-        """
-
-        log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-        try:
-
-            import textwrap
-
-            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
-            p_dict['textColor']       = self.fix_rgb(p_dict['textColor'])
-            p_dict['figureWidth']     = float(dev['props']['figureWidth'])
-            p_dict['figureHeight']    = float(dev['props']['figureHeight'])
-
-            # If the value to be plotted is empty, use the default text from the device
-            # configuration.
-            if len(text_to_plot) <= 1:
-                text_to_plot = unicode(p_dict['defaultText'])
-
-            else:
-                # The clean_string method tries to remove some potential ugliness from the text
-                # to be plotted. It's optional--defaulted to on. No need to call this if the
-                # default text is used.
-                if p_dict['cleanTheText']:
-                    text_to_plot = self.clean_string(text_to_plot)
-
-            log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
-
-            # Wrap the text and prepare it for plotting.
-            text_to_plot = textwrap.fill(text_to_plot,
-                                         int(p_dict['numberOfCharacters']),
-                                         replace_whitespace=p_dict['cleanTheText']
-                                         )
-
-            ax = self.make_chart_figure(p_dict['figureWidth'], p_dict['figureHeight'], p_dict)
-
-            ax.text(0.01, 0.95,
-                    text_to_plot,
-                    transform=ax.transAxes,
-                    color=p_dict['textColor'],
-                    fontname=p_dict['fontMain'],
-                    fontsize=p_dict['multilineFontSize'],
-                    verticalalignment='top'
-                    )
-
-            ax.axes.get_xaxis().set_visible(False)
-            ax.axes.get_yaxis().set_visible(False)
-
-            if not p_dict['textAreaBorder']:
-                [s.set_visible(False) for s in ax.spines.values()]
-
-            # Transparent Charts Fill
-            if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-                ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                               transform=ax.transAxes,
-                                               facecolor=p_dict['faceColor'],
-                                               zorder=1
-                                               )
-                             )
-
-            self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
-            self.save_chart_image(plt, p_dict, k_dict, log, size={'bottom': 0.05, 'left': 0.02, 'right': 0.98})
-            self.process_log(dev, log, return_queue)
-
-        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']
-                              }
-                             )
-
-        except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
-            return_queue.put({'Error': True,
-                              'Log': log,
-                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
-                              'Name': dev['name']
-                              }
                              )
 
     # =============================================================================

@@ -28,6 +28,7 @@ import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
 # import matplotlib.font_manager as mfont
 
+import chart_tools
 # import DLFramework as Dave
 
 # Collection of logging messages.
@@ -40,6 +41,9 @@ payload = pickle.loads(sys.argv[1])
 log['Debug'].append(u'payload unpickled successfully.')
 
 try:
+
+    def __init__():
+        pass
 
     # =============================================================================
     def convert_the_data(final_data, data_source):
@@ -137,10 +141,6 @@ try:
                 raise TypeError(mode)
 
         return eval_(ast.parse(expr_to_eval, mode='eval').body)
-
-    # =============================================================================
-    def fix_rgb(c):
-        return r"#{0}".format(c.replace(' ', '').replace('#', ''))
 
     # =============================================================================
     def format_axis_x_scale(x_axis_bins):
@@ -466,8 +466,8 @@ try:
             return final_data
 
 
-    payload['p_dict']['backgroundColor'] = fix_rgb(payload['p_dict']['backgroundColor'])
-    payload['p_dict']['faceColor'] = fix_rgb(payload['p_dict']['faceColor'])
+    payload['p_dict']['backgroundColor'] = chart_tools.fix_rgb(c=payload['p_dict']['backgroundColor'])
+    payload['p_dict']['faceColor'] = chart_tools.fix_rgb(c=payload['p_dict']['faceColor'])
     line_colors = []
 
     dpi = plt.rcParams['savefig.dpi']
@@ -511,13 +511,13 @@ try:
         suppress_line = payload['p_dict'].get('suppressLine{0}'.format(line), False)
 
         lc_index = 'line{0}Color'.format(line)
-        payload['p_dict'][lc_index] = fix_rgb(payload['p_dict'][lc_index])
+        payload['p_dict'][lc_index] = chart_tools.fix_rgb(c=payload['p_dict'][lc_index])
 
         lmc_index = 'line{0}MarkerColor'.format(line)
-        payload['p_dict'][lmc_index] = fix_rgb(payload['p_dict'][lmc_index])
+        payload['p_dict'][lmc_index] = chart_tools.fix_rgb(c=payload['p_dict'][lmc_index])
 
         lbf_index = 'line{0}BestFitColor'.format(line)
-        payload['p_dict'][lbf_index] = fix_rgb(payload['p_dict'][lbf_index])
+        payload['p_dict'][lbf_index] = chart_tools.fix_rgb(c=payload['p_dict'][lbf_index])
 
         # If line color is the same as the background color, alert the user.
         if payload['p_dict']['line{0}Color'.format(line)] == payload['p_dict']['backgroundColor'] and not suppress_line:
@@ -749,19 +749,7 @@ try:
                         wspace=None
                         )
 
-    if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
-        plt.savefig(u'{0}{1}'.format(payload['p_dict']['chartPath'], payload['p_dict']['fileName']),
-                    **payload['k_dict']['k_plot_fig']
-                    )
-        log['Debug'].append(u"Chart {0} saved.".format(payload['p_dict']['fileName']))
-
-    # Note that this garbage collection may be unneeded since the process will end.
-    plt.clf()
-    plt.close('all')
-
-    # Process any standard output. For now, we can only do this once, so we should
-    # combine any messages we want to send.
-    pickle.dump(log, sys.stdout)
+    chart_tools.save()
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass

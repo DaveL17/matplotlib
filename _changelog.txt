@@ -1,3 +1,9 @@
+v0.9.05
+- Converts battery health charting code from multiprocessing to subprocess.Popen.
+
+v0.9.04
+- Converts multiline charting code from multiprocessing to subprocess.Popen.
+
 v0.9.03
 - Converts line charting code from multiprocessing to subprocess.Popen.
 - Code refinements.
