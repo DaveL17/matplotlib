@@ -58,8 +58,7 @@ except ImportError as error:
     pass
 
 # Built-in modules
-from ast import literal_eval
-import copy
+import ast
 import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
@@ -67,9 +66,12 @@ import itertools
 import logging
 import multiprocessing
 import numpy as np
+import operator as op
 import os
+import pickle
 import re
 import shutil
+import subprocess
 import traceback
 import unicodedata
 
@@ -103,7 +105,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.8.39"
+__version__   = u"0.9.02"
 
 # =============================================================================
 
@@ -159,7 +161,7 @@ class Plugin(indigo.PluginBase):
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
-        self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
+        # self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
 
         # Log pluginEnvironment information when plugin is first started
         self.Fogbert.pluginEnvironmentLogger()
@@ -537,9 +539,81 @@ class Plugin(indigo.PluginBase):
                 # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
                 self.charts_refresh()
+                # self.test_chart()
                 self.sleep(15)
 
     # =============================================================================
+    # TODO: this can go away after refactoring for subprocess.Popen()
+    # def test_chart(self):
+    #
+    #     def convert_to_native(obj):
+    #         """
+    #         Convert any indigo.Dict and indigo.List objects to native formats.
+    #
+    #         credit: Jay Martin
+    #                 https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
+    #         -----
+    #         :param obj:
+    #         :return:
+    #         """
+    #         if isinstance(obj, indigo.List):
+    #             native_list = list()
+    #             for item in obj:
+    #                 native_list.append(convert_to_native(item))
+    #             return native_list
+    #         elif isinstance(obj, indigo.Dict):
+    #             native_dict = dict()
+    #             for key, value in obj.items():
+    #                 native_dict[key] = convert_to_native(value)
+    #             return native_dict
+    #         else:
+    #             return obj
+    #
+    #     self.logger.debug(u"test_chart called.")
+    #
+    #     # Payload sent to the subprocess script
+    #     dave = {'prefs': dict(self.pluginPrefs),
+    #             'props': None,
+    #             'p_dict': None,
+    #             'k_dict': None,
+    #             'data': {'x_obs': [0.3, 2.7],
+    #                      'y_obs': [0.5, 1.5]
+    #                      },
+    #             'kwargs': {'bbox_extra_artists': None,
+    #                        'orientation': None,
+    #                        'facecolor': '#FFFFFF',
+    #                        'papertype': None,
+    #                        'bbox_inches': None,
+    #                        'edgecolor': '#000000',
+    #                        'pad_inches': None,
+    #                        'format': None,
+    #                        'transparent': False,
+    #                        'frameon': None
+    #                        }
+    #             }
+    #
+    #     # Convert any nested indigo.Dict and indigo.List objects to native formats.
+    #     dave = convert_to_native(dave)
+    #
+    #     # Serialize the payload
+    #     payload = pickle.dumps(dave)
+    #
+    #     # Run the plot
+    #     path_to_file = 'test_chart.py'
+    #     proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+    #                             stdout=subprocess.PIPE,
+    #                             stderr=subprocess.PIPE,
+    #                             )
+    #
+    #     # Reply is a pickle, err is a string
+    #     reply, err = proc.communicate()
+    #     reply = pickle.loads(reply)
+    #
+    #     # Process any output.
+    #     self.logger.warning(reply)
+    #     if len(err) > 0:
+    #         self.logger.warning(err)
+
     def sendDevicePing(self, dev_id=0, suppress_logging=False):
 
         indigo.server.log(u"Matplotlib Plugin devices do not support the ping function.")
@@ -826,7 +900,7 @@ class Plugin(indigo.PluginBase):
 
             # =============================== Data Sources ================================
             try:
-                sources = literal_eval(values_dict['columnDict'])
+                sources = ast.literal_eval(values_dict['columnDict'])
 
                 # columnDict may contain a place-holder dict with one entry, so we test for
                 # that.
@@ -1138,7 +1212,7 @@ class Plugin(indigo.PluginBase):
 
         for dev in indigo.devices.iter(filter='self'):
             if dev.deviceTypeId == 'csvEngine':
-                column_dict = literal_eval(dev.pluginProps['columnDict'])
+                column_dict = ast.literal_eval(dev.pluginProps['columnDict'])
 
                 for thing in column_dict.items():
                     full_path = data_path + thing[1][0] + ".csv"
@@ -1395,7 +1469,7 @@ class Plugin(indigo.PluginBase):
             if dev.deviceTypeId == 'csvEngine':
 
                 # Get the list of CSV file titles
-                column_dict = literal_eval(dev.pluginProps['columnDict'])
+                column_dict = ast.literal_eval(dev.pluginProps['columnDict'])
 
                 # Build a dictionary where the file title is the key and the value is a list of
                 # devices that point to that title for a source.
@@ -1434,7 +1508,7 @@ class Plugin(indigo.PluginBase):
 
         try:
             # Convert column_dict from a string to a literal dict
-            column_dict = literal_eval(values_dict['columnDict'])
+            column_dict = ast.literal_eval(values_dict['columnDict'])
             lister = [0]
             num_lister = []
 
@@ -1516,7 +1590,7 @@ class Plugin(indigo.PluginBase):
         dev = indigo.devices[int(dev_id)]
         self.logger.threaddebug(u"[{0}] csv item delete values_dict: {1}".format(dev.name, dict(values_dict)))
 
-        column_dict = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
+        column_dict = ast.literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
         try:
             values_dict["editKey"] = values_dict["csv_item_list"]
@@ -1557,7 +1631,7 @@ class Plugin(indigo.PluginBase):
             # Returning an empty dict seems to work and may solve the 'None' issue
             values_dict['columnDict'] = values_dict.get('columnDict', '{}')
             # Convert column_dict from a string to a literal dict.
-            column_dict = literal_eval(values_dict['columnDict'])
+            column_dict = ast.literal_eval(values_dict['columnDict'])
             prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
 
         except Exception as sub_error:
@@ -1586,7 +1660,7 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"[{0}] csv item update values_dict: {1}".format(dev.name, dict(values_dict)))
 
         error_msg_dict = indigo.Dict()
-        column_dict  = literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
+        column_dict  = ast.literal_eval(values_dict['columnDict'])  # Convert column_dict from a string to a literal dict.
 
         try:
             key = values_dict['editKey']
@@ -1648,7 +1722,7 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"[{0}] csv item select values_dict: {1}".format(dev.name, dict(values_dict)))
 
         try:
-            column_dict                    = literal_eval(values_dict['columnDict'])
+            column_dict                    = ast.literal_eval(values_dict['columnDict'])
             values_dict['editKey']          = values_dict['csv_item_list']
             values_dict['editSource']       = column_dict[values_dict['csv_item_list']][1]
             values_dict['editState']        = column_dict[values_dict['csv_item_list']][2]
@@ -1695,7 +1769,7 @@ class Plugin(indigo.PluginBase):
                         csv_dict_str = dev.pluginProps['columnDict']
 
                         # Convert column_dict from a string to a literal dict.
-                        csv_dict = literal_eval(csv_dict_str)
+                        csv_dict = ast.literal_eval(csv_dict_str)
 
                         self.logger.threaddebug(u"[{0}] Refreshing CSV Device: {1}".format(dev.name, dict(csv_dict)))
                         self.csv_refresh_process(dev, csv_dict)
@@ -1900,7 +1974,7 @@ class Plugin(indigo.PluginBase):
             csv_dict_str = dev.pluginProps['columnDict']
 
             # Convert column_dict from a string to a literal dict.
-            csv_dict = literal_eval(csv_dict_str)
+            csv_dict = ast.literal_eval(csv_dict_str)
 
             self.csv_refresh_process(dev, csv_dict)
 
@@ -1929,7 +2003,7 @@ class Plugin(indigo.PluginBase):
 
         if dev.enabled:
             target_source = plugin_action.props['targetSource']
-            temp_dict     = literal_eval(dev.pluginProps['columnDict'])
+            temp_dict     = ast.literal_eval(dev.pluginProps['columnDict'])
             foo           = {target_source: temp_dict[target_source]}
 
             self.csv_refresh_process(dev, foo)
@@ -2062,7 +2136,7 @@ class Plugin(indigo.PluginBase):
         else:
             target_device = int(values_dict['targetDevice'])
             dev           = indigo.devices[target_device]
-            dev_dict      = literal_eval(dev.pluginProps['columnDict'])
+            dev_dict      = ast.literal_eval(dev.pluginProps['columnDict'])
 
             return [(k, dev_dict[k][0]) for k in dev_dict]
 
@@ -2142,6 +2216,7 @@ class Plugin(indigo.PluginBase):
         else:
             return [('None', u'Please select a data source first')]
 
+    # =============================================================================
     def fix_rgb(self, c):
 
         return r"#{0}".format(c.replace(' ', '').replace('#', ''))
@@ -2563,7 +2638,7 @@ class Plugin(indigo.PluginBase):
         """
 
         # ======================= Process Output Queue ========================
-        if dev.deviceTypeId != 'rcParamsDevice':
+        if dev.deviceTypeId != 'rcParamsDevice' and not return_queue.empty():
             result = return_queue.get()
 
             for event in result['Log']:
@@ -2587,6 +2662,9 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(u"[{0}] {1}".format(dev.name, result['Message']))
             else:
                 self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
+
+        else:
+            self.logger.info(u'Chart refresh completed. There were no messages.')
 
     # =============================================================================
     def rcParamsDeviceUpdate(self, dev):
@@ -3042,11 +3120,8 @@ class Plugin(indigo.PluginBase):
                         # Indigo device and plugin objets are not pickleable, so we create a proxy to
                         # send to the process. Therefore, devices can't be changed in the processes.
 
-                        plug_dict = {}
-
-                        dev_dict = {}
-                        dev_dict['name'] = dev.name
-                        dev_dict['props'] = dict(dev.pluginProps)
+                        plug_dict = dict(self.pluginPrefs)
+                        dev_dict = dict(dev.ownerProps)
 
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
@@ -3054,7 +3129,12 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_area = multiprocessing.Process(name='p_area',
                                                                  target=MakeChart().chart_area,
-                                                                 args=(dev_dict, p_dict, k_dict, return_queue,)
+                                                                 args=(plug_dict,
+                                                                       dev_dict,
+                                                                       p_dict,
+                                                                       k_dict,
+                                                                       return_queue,
+                                                                       )
                                                                  )
                                 p_area.start()
 
@@ -3064,7 +3144,12 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_bar = multiprocessing.Process(name='p_bar',
                                                                 target=MakeChart().chart_bar,
-                                                                args=(dev_dict, p_dict, k_dict, return_queue,)
+                                                                args=(plug_dict,
+                                                                      dev_dict,
+                                                                      p_dict,
+                                                                      k_dict,
+                                                                      return_queue,
+                                                                      )
                                                                 )
                                 p_bar.start()
 
@@ -3098,7 +3183,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_battery = multiprocessing.Process(name='p_battery',
                                                                     target=MakeChart().chart_battery_health,
-                                                                    args=(dev_dict,
+                                                                    args=(plug_dict,
+                                                                          dev_dict,
                                                                           device_dict,
                                                                           p_dict,
                                                                           k_dict,
@@ -3110,12 +3196,62 @@ class Plugin(indigo.PluginBase):
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
 
-                            if __name__ == '__main__':
-                                p_calendar = multiprocessing.Process(name='p_calendar',
-                                                                     target=MakeChart().chart_calendar,
-                                                                     args=(dev_dict, p_dict, k_dict, return_queue,)
-                                                                     )
-                                p_calendar.start()
+                            def convert_to_native(obj):
+                                """
+                                Convert any indigo.Dict and indigo.List objects to native formats.
+
+                                credit: Jay Martin
+                                        https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
+                                -----
+                                :param obj:
+                                :return:
+                                """
+                                if isinstance(obj, indigo.List):
+                                    native_list = list()
+                                    for item in obj:
+                                        native_list.append(convert_to_native(item))
+                                    return native_list
+                                elif isinstance(obj, indigo.Dict):
+                                    native_dict = dict()
+                                    for key, value in obj.items():
+                                        native_dict[key] = convert_to_native(value)
+                                    return native_dict
+                                else:
+                                    return obj
+
+                            self.logger.debug(u"chart_calendar.py called.")
+
+                            # Payload sent to the subprocess script
+                            dave = {'prefs': plug_dict,
+                                    'props': dev_dict,
+                                    'p_dict': p_dict,
+                                    'k_dict': k_dict,
+                                    'data': None,
+                                    }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            dave = convert_to_native(dave)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(dave)
+
+                            # Run the plot
+                            path_to_file = 'chart_calendar.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            reply = pickle.loads(reply)
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.warning(err)
+
+                        self.logger.debug(u'Calendar charting function complete.')
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
@@ -3123,7 +3259,12 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_line = multiprocessing.Process(name='p_line',
                                                                  target=MakeChart().chart_line,
-                                                                 args=(dev_dict, p_dict, k_dict, return_queue,)
+                                                                 args=(plug_dict,
+                                                                       dev_dict,
+                                                                       p_dict,
+                                                                       k_dict,
+                                                                       return_queue,
+                                                                       )
                                                                  )
                                 p_line.start()
 
@@ -3148,7 +3289,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_multiline = multiprocessing.Process(name='p_multiline',
                                                                       target=MakeChart().chart_multiline_text,
-                                                                      args=(dev_dict,
+                                                                      args=(plug_dict,
+                                                                            dev_dict,
                                                                             p_dict,
                                                                             k_dict,
                                                                             text_to_plot,
@@ -3163,7 +3305,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_polar = multiprocessing.Process(name='p_polar',
                                                                   target=MakeChart().chart_polar,
-                                                                  args=(dev_dict,
+                                                                  args=(plug_dict,
+                                                                        dev_dict,
                                                                         p_dict,
                                                                         k_dict,
                                                                         return_queue,
@@ -3177,7 +3320,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_scatter = multiprocessing.Process(name='p_scatter',
                                                                     target=MakeChart().chart_scatter,
-                                                                    args=(dev_dict,
+                                                                    args=(plug_dict,
+                                                                          dev_dict,
                                                                           p_dict,
                                                                           k_dict,
                                                                           return_queue,
@@ -3189,13 +3333,14 @@ class Plugin(indigo.PluginBase):
                         if dev.deviceTypeId == "forecastChartingDevice":
 
                             dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
-                            state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
+                            state_list = dict(indigo.devices[int(p_dict['forecastSourceDevice'])].states)
                             sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
 
                             if __name__ == '__main__':
                                 p_weather = multiprocessing.Process(name='p_weather',
                                                                     target=MakeChart().chart_weather_forecast,
-                                                                    args=(dev_dict,
+                                                                    args=(plug_dict,
+                                                                          dev_dict,
                                                                           dev_type,
                                                                           p_dict,
                                                                           k_dict,
@@ -3215,7 +3360,8 @@ class Plugin(indigo.PluginBase):
                             if __name__ == '__main__':
                                 p_composite = multiprocessing.Process(name='p_composite',
                                                                       target=MakeChart().chart_weather_composite,
-                                                                      args=(dev_dict,
+                                                                      args=(plug_dict,
+                                                                            dev_dict,
                                                                             dev_type,
                                                                             p_dict,
                                                                             k_dict,
@@ -3278,20 +3424,20 @@ class Plugin(indigo.PluginBase):
 
 class MakeChart(object):
 
-    def __init__(self, plugin):
+    def __init__(self):
         self.final_data = []
-        self.host_plugin = plugin
 
-    path = "/Library/Application Support/Perceptive Automation/Indigo 7.4/Logs/com.fogbert.indigoplugin.matplotlib/"
-    logging.basicConfig(filename='{0}process.log'.format(path), level=logging.INFO)
+        path = "/Library/Application Support/Perceptive Automation/Indigo 7.4/Logs/com.fogbert.indigoplugin.matplotlib/"
+        logging.basicConfig(filename='{0}process.log'.format(path), level=logging.INFO)
 
     # =============================================================================
-    def chart_area(self, dev, p_dict, k_dict, return_queue):
+    def chart_area(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the Area charts
         All steps required to generate area charts.
         -----
-        :param class 'indigo.Device' dev: dict
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -3301,8 +3447,8 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
             x_obs           = ''
             y_obs_tuple     = ()  # Y values
             y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
@@ -3317,9 +3463,9 @@ class MakeChart(object):
 
                 suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
 
-                p_dict['area{0}Color'.format(area)] = self.host_plugin.fix_rgb(p_dict['area{0}Color'.format(area)])
-                p_dict['line{0}Color'.format(area)] = self.host_plugin.fix_rgb(p_dict['line{0}Color'.format(area)])
-                p_dict['area{0}MarkerColor'.format(area)] = self.host_plugin.fix_rgb(p_dict['area{0}MarkerColor'.format(area)])
+                p_dict['area{0}Color'.format(area)] = self.fix_rgb(p_dict['area{0}Color'.format(area)])
+                p_dict['line{0}Color'.format(area)] = self.fix_rgb(p_dict['line{0}Color'.format(area)])
+                p_dict['area{0}MarkerColor'.format(area)] = self.fix_rgb(p_dict['area{0}MarkerColor'.format(area)])
 
                 # If area color is the same as the background color, alert the user.
                 if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
@@ -3335,7 +3481,7 @@ class MakeChart(object):
                 # Plot the areas. If suppress_area is True, we skip it.
                 if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
 
-                    data_path   = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
+                    data_path   = plug_dict['prefs']['dataPath'].encode("utf-8")
                     area_source = p_dict['area{0}Source'.format(area)].encode("utf-8")
                     data_column, log = self.get_data('{0}{1}'.format(data_path, area_source), log)
                     log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
@@ -3356,7 +3502,7 @@ class MakeChart(object):
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(area)]:
                             expr = u'{0}{1}'.format(obs, dev['props']['area{0}adjuster'.format(area)])
-                            temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
+                            temp_list.append(self.eval_expr(expr))
                         p_dict['y_obs{0}'.format(area)] = temp_list
 
                     # ================================ Prune Data =================================
@@ -3504,7 +3650,7 @@ class MakeChart(object):
                                    color=p_dict['area{0}Color'.format(area)],
                                    **k_dict['k_max']
                                    )
-                    if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                    if plug_dict['prefs'].get('forceOriginLines', True):
                         ax.axhline(y=0,
                                    color=p_dict['spineColor']
                                    )
@@ -3530,7 +3676,7 @@ class MakeChart(object):
                                      color=p_dict['line{0}Color'.format(area)]
                                      )
 
-            self.format_custom_line_segments(ax, p_dict, k_dict, log)
+            self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3540,7 +3686,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -3548,7 +3694,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -3556,12 +3702,13 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_bar(self, dev, p_dict, k_dict, return_queue):
+    def chart_bar(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the bar charts
         All steps required to generate bar charts.
         -----
-        :param class 'indigo.Device' dev: dict
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -3574,8 +3721,8 @@ class MakeChart(object):
             bar_colors = []
             num_obs    = p_dict['numObs']
 
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
             self.format_axis_x_ticks(ax, p_dict, k_dict, log)
@@ -3585,7 +3732,7 @@ class MakeChart(object):
 
                 suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
 
-                p_dict['bar{0}Color'.format(thing)] = self.host_plugin.fix_rgb(p_dict['bar{0}Color'.format(thing)])
+                p_dict['bar{0}Color'.format(thing)] = self.fix_rgb(p_dict['bar{0}Color'.format(thing)])
 
                 # If the bar color is the same as the background color, alert the user.
                 if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
@@ -3604,7 +3751,7 @@ class MakeChart(object):
                     bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
                     # Get the data and grab the header.
-                    dc = u'{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'].encode("utf-8"),
+                    dc = u'{0}{1}'.format(plug_dict['prefs']['dataPath'].encode("utf-8"),
                                           p_dict['bar{0}Source'.format(thing)]
                                           )
                     data_column, log = self.get_data(dc, log)
@@ -3754,10 +3901,10 @@ class MakeChart(object):
                                color=p_dict['bar{0}Color'.format(thing)],
                                **k_dict['k_max']
                                )
-                if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                if plug_dict['prefs'].get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.format_custom_line_segments(ax, p_dict, k_dict, log)
+            self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_y_ticks(p_dict, k_dict, log)
@@ -3765,7 +3912,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
@@ -3773,7 +3920,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.\n{1}".format(sub_error, p_dict),
@@ -3781,13 +3928,14 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_battery_health(self, dev, device_list, p_dict, k_dict, return_queue):
+    def chart_battery_health(self, plug_dict, dev, device_list, p_dict, k_dict, return_queue):
         """
         Creates the battery health charts
         The chart_battery_health method creates battery health charts. These chart
         types are dynamic and are created "on the fly" rather than through direct
         user input.
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev:device props
         :param dict device_list: dictionary of battery device names and battery levels
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -3799,15 +3947,15 @@ class MakeChart(object):
 
         try:
             bar_colors    = []
-            caution_color = self.host_plugin.fix_rgb(p_dict['cautionColor'])
+            caution_color = self.fix_rgb(p_dict['cautionColor'])
             caution_level = int(p_dict['cautionLevel'])
             chart_data    = {}
             font_size     = plt.rcParams['ytick.labelsize']
-            healthy_color = self.host_plugin.fix_rgb(p_dict['healthyColor'])
+            healthy_color = self.fix_rgb(p_dict['healthyColor'])
             level_box     = p_dict['showBatteryLevelBackground']
             show_level    = p_dict['showBatteryLevel']
             dead_ones     = p_dict.get('showDeadBattery', False)
-            warning_color = self.host_plugin.fix_rgb(p_dict['warningColor'])
+            warning_color = self.fix_rgb(p_dict['warningColor'])
             warning_level = int(p_dict['warningLevel'])
             x_values      = []
             y_text        = []
@@ -3891,7 +4039,7 @@ class MakeChart(object):
                 for _ in (20, 40, 60, 80):
                     ax.axvline(x=_,
                                color=p_dict['gridColor'],
-                               linestyle=self.host_plugin.pluginPrefs.get('gridStyle', ':')
+                               linestyle=plug_dict['prefs'].get('gridStyle', ':')
                                )
 
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -3948,7 +4096,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -3956,7 +4104,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -3964,17 +4112,19 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_calendar(self, dev, p_dict, k_dict, return_queue):
+    def chart_calendar(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the calendar charts
         Given the unique nature of calendar charts, we use a separate method to
         construct them.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: return queue
         """
+        logging.info(u'chart_calendar() called.')
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
@@ -3988,7 +4138,6 @@ class MakeChart(object):
                 -----
                 :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
                 """
-                logging.info(u'chart_calendar() called.')
 
                 ax_props = ax_obj.properties()
                 ax_cells = ax_props['child_artists']
@@ -4054,8 +4203,6 @@ class MakeChart(object):
                                  bbox=[0, -0.5, 1, 1.25])
             format_axis(days_rows)
 
-            logging.info(u"About to save fig. \n{0}".format(dev['props']))
-
             self.save_chart_image(plt,
                                   p_dict,
                                   k_dict,
@@ -4073,25 +4220,26 @@ class MakeChart(object):
 
             self.process_log(dev, log, return_queue)
 
-        # except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-        #     self.host_plugin.pluginErrorHandler(traceback.format_exc())
-        #     return_queue.put({'Error': True,
-        #                       'Log': log,
-        #                       'Message': u"{0}. See plugin log for more information.".format(sub_error),
-        #                       'Name': dev['name']
-        #                       }
-        #                      )
-        #
+        except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+            self.pluginErrorHandler(traceback.format_exc())
+            return_queue.put({'Error': True,
+                              'Log': log,
+                              'Message': u"{0}. See plugin log for more information.".format(sub_error),
+                              'Name': dev['name']
+                              }
+                             )
+
         except Exception as err:
             logging.critical(u"{0}".format(err))
 
     # =============================================================================
-    def chart_line(self, dev, p_dict, k_dict, return_queue):
+    def chart_line(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the line charts
         All steps required to generate line charts.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -4101,8 +4249,8 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
             line_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
@@ -4115,13 +4263,13 @@ class MakeChart(object):
                 suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
                 lc_index = 'line{0}Color'.format(line)
-                p_dict[lc_index] = self.host_plugin.fix_rgb(p_dict[lc_index])
+                p_dict[lc_index] = self.fix_rgb(p_dict[lc_index])
 
                 lmc_index = 'line{0}MarkerColor'.format(line)
-                p_dict[lmc_index]  = self.host_plugin.fix_rgb(p_dict[lmc_index])
+                p_dict[lmc_index]  = self.fix_rgb(p_dict[lmc_index])
 
                 lbf_index = 'line{0}BestFitColor'.format(line)
-                p_dict[lbf_index] = self.host_plugin.fix_rgb(p_dict[lbf_index])
+                p_dict[lbf_index] = self.fix_rgb(p_dict[lbf_index])
 
                 # If line color is the same as the background color, alert the user.
                 if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
@@ -4140,7 +4288,7 @@ class MakeChart(object):
                     # Add line color to list for later use
                     line_colors.append(p_dict['line{0}Color'.format(line)])
 
-                    data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
+                    data_path = plug_dict['prefs']['dataPath'].encode("utf-8")
                     line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
                     data_column, log = self.get_data('{0}{1}'.format(data_path, line_source), log)
 
@@ -4162,7 +4310,7 @@ class MakeChart(object):
                         temp_list = []
                         for obs in p_dict['y_obs{0}'.format(line)]:
                             expr = u'{0}{1}'.format(obs, dev['props']['line{0}adjuster'.format(line)])
-                            temp_list.append(self.host_plugin.evalExpr.eval_expr(expr))
+                            temp_list.append(self.eval_expr(expr))
                         p_dict['y_obs{0}'.format(line)] = temp_list
 
                     # ================================ Prune Data =================================
@@ -4306,10 +4454,10 @@ class MakeChart(object):
                                    color=p_dict['line{0}Color'.format(line)],
                                    **k_dict['k_max']
                                    )
-                    if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                    if plug_dict['prefs'].get('forceOriginLines', True):
                         ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.format_custom_line_segments(ax, p_dict, k_dict, log)
+            self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -4319,7 +4467,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4327,7 +4475,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4335,13 +4483,14 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_multiline_text(self, dev, p_dict, k_dict, text_to_plot, return_queue):
+    def chart_multiline_text(self, plug_dict, dev, p_dict, k_dict, text_to_plot, return_queue):
         """
         Creates the multiline text charts
         Given the unique nature of multiline text charts, we use a separate method
         to construct them.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param unicode text_to_plot: the text to be plotted
@@ -4354,9 +4503,9 @@ class MakeChart(object):
 
             import textwrap
 
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
-            p_dict['textColor']       = self.host_plugin.fix_rgb(p_dict['textColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
+            p_dict['textColor']       = self.fix_rgb(p_dict['textColor'])
             p_dict['figureWidth']     = float(dev['props']['figureWidth'])
             p_dict['figureHeight']    = float(dev['props']['figureHeight'])
 
@@ -4411,7 +4560,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4420,7 +4569,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4429,7 +4578,7 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_polar(self, dev, p_dict, k_dict, return_queue):
+    def chart_polar(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the polar charts
         Note that the polar chart device can be used for other things, but it is coded
@@ -4440,7 +4589,8 @@ class MakeChart(object):
         device. Better to make it the responsibility of the user to convert their data
         to degrees.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -4451,17 +4601,17 @@ class MakeChart(object):
         try:
 
             num_obs                    = p_dict['numObs']
-            p_dict['backgroundColor']  = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']        = self.host_plugin.fix_rgb(p_dict['faceColor'])
-            p_dict['currentWindColor'] = self.host_plugin.fix_rgb(p_dict['currentWindColor'])
-            p_dict['maxWindColor']     = self.host_plugin.fix_rgb(p_dict['maxWindColor'])
+            p_dict['backgroundColor']  = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']        = self.fix_rgb(p_dict['faceColor'])
+            p_dict['currentWindColor'] = self.fix_rgb(p_dict['currentWindColor'])
+            p_dict['maxWindColor']     = self.fix_rgb(p_dict['maxWindColor'])
 
             # ============================== Column Headings ==============================
             # Pull the column headings for the labels, then delete the row from
             # self.final_data.
-            theta_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'],
+            theta_path = '{0}{1}'.format(plug_dict['prefs']['dataPath'],
                                          p_dict['thetaValue'].encode('utf-8'))
-            radii_path = '{0}{1}'.format(self.host_plugin.pluginPrefs['dataPath'],
+            radii_path = '{0}{1}'.format(plug_dict['prefs']['dataPath'],
                                          p_dict['radiiValue'].encode('utf-8'))
 
             if theta_path != 'None' and radii_path != 'None':
@@ -4670,7 +4820,7 @@ class MakeChart(object):
                 self.process_log(dev, log, return_queue)
 
         except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4679,7 +4829,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4688,12 +4838,13 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_scatter(self, dev, p_dict, k_dict, return_queue):
+    def chart_scatter(self, plug_dict, dev, p_dict, k_dict, return_queue):
         """
         Creates the scatter charts
         All steps required to generate scatter charts.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
@@ -4703,8 +4854,8 @@ class MakeChart(object):
 
         try:
 
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
             group_colors = []
 
             ax = self.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
@@ -4715,12 +4866,12 @@ class MakeChart(object):
 
                 suppress_group = p_dict.get('suppressGroup{0}'.format(thing), False)
 
-                p_dict['group{0}Color'.format(thing)] = self.host_plugin.fix_rgb(p_dict['group{0}Color'.format(thing)])
+                p_dict['group{0}Color'.format(thing)] = self.fix_rgb(p_dict['group{0}Color'.format(thing)])
 
-                gmc2 = self.host_plugin.fix_rgb(p_dict['group{0}MarkerColor'.format(thing)])
+                gmc2 = self.fix_rgb(p_dict['group{0}MarkerColor'.format(thing)])
                 p_dict['group{0}MarkerColor'.format(thing)] = gmc2
 
-                best_fit = self.host_plugin.fix_rgb(p_dict['line{0}BestFitColor'.format(thing)])
+                best_fit = self.fix_rgb(p_dict['line{0}BestFitColor'.format(thing)])
                 p_dict['line{0}BestFitColor'.format(thing)] = best_fit
 
                 # If dot color is the same as the background color, alert the user.
@@ -4746,7 +4897,7 @@ class MakeChart(object):
                         p_dict['group{0}Marker'.format(thing)] = '.'
                         p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
-                    data_path = self.host_plugin.pluginPrefs['dataPath'].encode("utf-8")
+                    data_path = plug_dict['prefs']['dataPath'].encode("utf-8")
                     group_source = p_dict['group{0}Source'.format(thing)].encode("utf-8")
                     data_column, log = self.get_data('{0}{1}'.format(data_path, group_source), log)
                     log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
@@ -4871,10 +5022,10 @@ class MakeChart(object):
                                color=p_dict['group{0}Color'.format(thing)],
                                **k_dict['k_max']
                                )
-                if self.host_plugin.pluginPrefs.get('forceOriginLines', True):
+                if plug_dict['prefs'].get('forceOriginLines', True):
                     ax.axhline(y=0, color=p_dict['spineColor'])
 
-            self.format_custom_line_segments(ax, p_dict, k_dict, log)
+            self.format_custom_line_segments(ax, plug_dict, p_dict, k_dict, log)
             self.format_grids(p_dict, k_dict, log)
             self.format_title(p_dict, k_dict, log, loc=(0.5, 0.98))
             self.format_axis_x_label(dev, p_dict, k_dict, log)
@@ -4884,7 +5035,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4893,7 +5044,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -4902,7 +5053,7 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_weather_composite(self, dev, dev_type, p_dict, k_dict, state_list, return_queue):
+    def chart_weather_composite(self, plug_dict, dev, dev_type, p_dict, k_dict, state_list, return_queue):
         """
         Creates a composite weather chart
         The composite weather chart is a dynamic chart that allows users to add or
@@ -4911,7 +5062,15 @@ class MakeChart(object):
         Using the chart configuration dialog, the user would be able to add or
         remove elements and the chart would adjust accordingly (additional sublplots
         will be added or removed as needed.)
-        -----
+                -----
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
+        :param dev_type:
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        :param state_list:
+        :param class 'multiprocessing.queues.Queue' return_queue: logging queue
+
         """
         dpi             = int(plt.rcParams['savefig.dpi'])
         forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
@@ -4940,10 +5099,10 @@ class MakeChart(object):
                 plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
         try:
-            p_dict['backgroundColor'] = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']       = self.host_plugin.fix_rgb(p_dict['faceColor'])
-            p_dict['lineColor']       = self.host_plugin.fix_rgb(p_dict['lineColor'])
-            p_dict['lineMarkerColor'] = self.host_plugin.fix_rgb(p_dict['lineMarkerColor'])
+            p_dict['backgroundColor'] = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']       = self.fix_rgb(p_dict['faceColor'])
+            p_dict['lineColor']       = self.fix_rgb(p_dict['lineColor'])
+            p_dict['lineMarkerColor'] = self.fix_rgb(p_dict['lineMarkerColor'])
 
             # ================================ Set Up Axes ================================
             axes     = dev['props']['component_list']
@@ -5155,7 +5314,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
                                   u"WUnderground forecast devices.")
             return_queue.put({'Error': True,
@@ -5166,7 +5325,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5175,7 +5334,7 @@ class MakeChart(object):
                              )
 
     # =============================================================================
-    def chart_weather_forecast(self, dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue):
+    def chart_weather_forecast(self, plug_dict, dev, dev_type, p_dict, k_dict, state_list, sun_rise_set, return_queue):
         """
         Creates the weather charts
         Given the unique nature of weather chart construction, we have a separate
@@ -5183,11 +5342,12 @@ class MakeChart(object):
         multiprocessing framework used to query the indigo server, so we need to
         send everything we need through the method call.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict plug_dict: plugin prefs
+        :param dict dev: device props
         :param unicode dev_type: device type name
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param class 'indigo.Dict' state_list: the data to plot
+        :param dict state_list: dict of device states
         :param list sun_rise_set: tuple of sunrise/sunset times
         :param class 'multiprocessing.queues.Queue' return_queue: logging queue
         """
@@ -5195,13 +5355,13 @@ class MakeChart(object):
         log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
         try:
-            p_dict['backgroundColor']  = self.host_plugin.fix_rgb(p_dict['backgroundColor'])
-            p_dict['faceColor']        = self.host_plugin.fix_rgb(p_dict['faceColor'])
-            p_dict['line1Color']       = self.host_plugin.fix_rgb(p_dict['line1Color'])
-            p_dict['line2Color']       = self.host_plugin.fix_rgb(p_dict['line2Color'])
-            p_dict['line3Color']       = self.host_plugin.fix_rgb(p_dict['line3Color'])
-            p_dict['line1MarkerColor'] = self.host_plugin.fix_rgb(p_dict['line1MarkerColor'])
-            p_dict['line2MarkerColor'] = self.host_plugin.fix_rgb(p_dict['line2MarkerColor'])
+            p_dict['backgroundColor']  = self.fix_rgb(p_dict['backgroundColor'])
+            p_dict['faceColor']        = self.fix_rgb(p_dict['faceColor'])
+            p_dict['line1Color']       = self.fix_rgb(p_dict['line1Color'])
+            p_dict['line2Color']       = self.fix_rgb(p_dict['line2Color'])
+            p_dict['line3Color']       = self.fix_rgb(p_dict['line3Color'])
+            p_dict['line1MarkerColor'] = self.fix_rgb(p_dict['line1MarkerColor'])
+            p_dict['line2MarkerColor'] = self.fix_rgb(p_dict['line2MarkerColor'])
 
             dates_to_plot = p_dict['dates_to_plot']
 
@@ -5237,7 +5397,7 @@ class MakeChart(object):
                     p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
                     # that Matplotlib interprets the legend as a tuple.
                     p_dict['headers_2']    = ('Precipitation',)
-                    p_dict['daytimeColor'] = self.host_plugin.fix_rgb(p_dict['daytimeColor'])
+                    p_dict['daytimeColor'] = self.fix_rgb(p_dict['daytimeColor'])
 
             # ======================== WUnderground Hourly Device =========================
             elif dev_type == 'wundergroundHourly':
@@ -5260,7 +5420,7 @@ class MakeChart(object):
                     p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
                     # that Matplotlib interprets the legend as a tuple.
                     p_dict['headers_2']    = ('Precipitation',)
-                    p_dict['daytimeColor'] = self.host_plugin.fix_rgb(p_dict['daytimeColor'])
+                    p_dict['daytimeColor'] = self.fix_rgb(p_dict['daytimeColor'])
 
             # ========================== Fantastic Daily Device ===========================
             elif dev_type == 'Daily':
@@ -5486,7 +5646,7 @@ class MakeChart(object):
 
             self.format_axis_x_ticks(ax2, p_dict, k_dict, log)
             self.format_axis_y(ax2, p_dict, k_dict, log)
-            self.format_custom_line_segments(ax2, p_dict, k_dict, log)
+            self.format_custom_line_segments(ax2, plug_dict, p_dict, k_dict, log)
 
             plt.autoscale(enable=True, axis='x', tight=None)
 
@@ -5562,7 +5722,7 @@ class MakeChart(object):
             self.process_log(dev, log, return_queue)
 
         except (KeyError, ValueError) as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
                                   u"WUnderground forecast devices.")
             return_queue.put({'Error': True,
@@ -5573,7 +5733,7 @@ class MakeChart(object):
                              )
 
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             return_queue.put({'Error': True,
                               'Log': log,
                               'Message': u"{0}. See plugin log for more information.".format(sub_error),
@@ -5694,13 +5854,36 @@ class MakeChart(object):
         return final_data, log
 
     # =============================================================================
+    def eval_expr(self, expr):
+        return self.eval_(ast.parse(expr, mode='eval').body)
+
+    # =============================================================================
+    def eval_(self, node):
+        operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
+                     ast.BitXor: op.xor, ast.USub: op.neg}
+
+        if isinstance(node, ast.Num):  # <number>
+            return node.n
+        elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
+            return operators[type(node.op)](self.eval_(node.left), self.eval_(node.right))
+        elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+            return operators[type(node.op)](self.eval_(node.operand))
+        else:
+            raise TypeError(node)
+
+    # =============================================================================
+    def fix_rgb(self, c):
+
+        return r"#{0}".format(c.replace(' ', '').replace('#', ''))
+
+    # =============================================================================
     def format_axis_x_label(self, dev, p_dict, k_dict, log):
         """
         Format X axis label visibility and properties
         If the user chooses to display a legend, we don't want an axis label because
         they will fight with each other for space.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
+        :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
         :param dict log: logging dict
@@ -5717,7 +5900,7 @@ class MakeChart(object):
                                     u"legend.".format(dev['name']))
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X labels: showLegend = "
                                       u"{0}".format(p_dict['showLegend']))
             log['Threaddebug'].append(u"Problem formatting X labels: customAxisLabelX = "
@@ -5772,7 +5955,7 @@ class MakeChart(object):
                 plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X axis scale: x_axis_bins = {0}".format(x_axis_bins))
 
     # =============================================================================
@@ -5800,7 +5983,7 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting X ticks: k_major_x = "
                                       u"{0}".format(k_dict['k_major_x']))
             log['Threaddebug'].append(u"Problem formatting X ticks: k_minor_x = "
@@ -5854,7 +6037,7 @@ class MakeChart(object):
             return ax
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_major_y = "
                                       u"{0}".format(k_dict['k_major_y']))
             log['Threaddebug'].append(u"Problem formatting Y ticks: k_minor_x = "
@@ -5916,7 +6099,7 @@ class MakeChart(object):
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = "
                                       u"{0}".format(p_dict['yAxisMax']))
             log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMin = "
@@ -5940,7 +6123,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
         except (ValueError, TypeError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = "
                                       u"{0}".format(p_dict['customAxisLabelY']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
@@ -5990,7 +6173,7 @@ class MakeChart(object):
                                       u"{0}".format(k_dict['k_y_axis_font']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: customTicksY = "
                                       u"{0}".format(p_dict['customTicksY']))
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
 
     # =============================================================================
     # TODO: this is currently unused.
@@ -6008,7 +6191,7 @@ class MakeChart(object):
             plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "
                                       u"{0}".format(p_dict['customAxisLabelY2']))
             log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
@@ -6042,19 +6225,20 @@ class MakeChart(object):
             return ax
 
         except TypeError as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"p_dict: {0}.".format(p_dict))
             log['Threaddebug'].append(u"dates_to_plot: {0}.".format(dates_to_plot))
             log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. "
                                   u"See plugin log for more information.".format(sub_error))
 
     # =============================================================================
-    def format_custom_line_segments(self, ax, p_dict, k_dict, log):
+    def format_custom_line_segments(self, ax, plug_dict, p_dict, k_dict, log):
         """
         Chart custom line segments handler
         Process any custom line segments and add them to the
         matplotlib axes object.
         -----
+        :param dict plug_dict: 
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
@@ -6069,7 +6253,7 @@ class MakeChart(object):
                 p_dict['customLineSegments'] not in ("", "None"):
 
             try:
-                constants_to_plot = literal_eval(p_dict['customLineSegments'])
+                constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
 
                 cls = ax
 
@@ -6084,7 +6268,7 @@ class MakeChart(object):
 
                         # If we want to promote custom line segments, we need to add them to the list that's used to
                         # calculate the Y axis limits.
-                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
+                        if plug_dict['prefs'].get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(element[0])
                     else:
                         cls = ax.axhline(y=constants_to_plot[0],
@@ -6094,13 +6278,13 @@ class MakeChart(object):
                                          **k_dict['k_custom']
                                          )
 
-                        if self.host_plugin.pluginPrefs.get('promoteCustomLineSegments', False):
+                        if plug_dict['prefs'].get('promoteCustomLineSegments', False):
                             p_dict['data_array'].append(constants_to_plot[0])
 
                 return cls
 
             except Exception as sub_error:
-                self.host_plugin.pluginErrorHandler(traceback.format_exc())
+                self.pluginErrorHandler(traceback.format_exc())
                 log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin "
                                       u"log for more information.".format(sub_error))
 
@@ -6127,7 +6311,7 @@ class MakeChart(object):
             return dates_to_plot_m
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting dates: list_of_dates = {0}".format(list_of_dates))
             log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = {0}".format(dates_to_plot))
             log['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = {0}".format(dates_to_plot_m))
@@ -6151,7 +6335,7 @@ class MakeChart(object):
                 plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
         except (KeyError, ValueError):
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {0}".format(p_dict['showxAxisGrid']))
             log['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {0}".format(k_dict['k_grid_fig']))
 
@@ -6204,7 +6388,7 @@ class MakeChart(object):
         # If we can't find the target CSV file, we create a phony proxy which the plugin
         # can process without dying.
         except Exception as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
             log['Warning'].append(u"Error downloading CSV data: {0}. See plugin log for more "
                                   u"information.".format(sub_error))
@@ -6233,6 +6417,25 @@ class MakeChart(object):
         [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
         return ax
+
+    def pluginErrorHandler(self, sub_error):
+        """
+        Centralized handling of traceback messages
+        Centralized handling of traceback messages formatted for pretty display in the
+        plugin log file. If sent here, they will not be displayed in the Indigo Events
+        log. Use the following syntax to send exceptions here::
+            self.pluginErrorHandler(traceback.format_exc())
+        -----
+        :param traceback object sub_error:
+        """
+
+        sub_error = sub_error.splitlines()
+        logging.critical(u"{0:!^80}".format(" TRACEBACK "))
+
+        for line in sub_error:
+            logging.critical(u"!!! {0}".format(line))
+
+        logging.critical(u"!" * 80)
 
     # =============================================================================
     def process_log(self, dev, log, return_queue):
@@ -6352,13 +6555,15 @@ class MakeChart(object):
 
             if p_dict['chartPath'] != '' and p_dict['fileName'] != '':
 
+                logging.critical(u"About to save fig: {0}".format(k_dict['k_plot_fig']))
                 plot.savefig(u'{0}{1}'.format(p_dict['chartPath'], p_dict['fileName']), **k_dict['k_plot_fig'])
+                logging.critical(u"Done saving fig.")
 
-                plot.clf()
-                plot.close('all')
+            plot.clf()
+            plot.close('all')
 
         except RuntimeError as sub_error:
-            self.host_plugin.pluginErrorHandler(traceback.format_exc())
+            self.pluginErrorHandler(traceback.format_exc())
             log['Warning'].append(u"Matplotlib encountered a problem trying to save the image. Error: {0}. See "
                                   u"plugin log for more information.".format(sub_error))
 

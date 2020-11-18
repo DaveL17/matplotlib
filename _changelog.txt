@@ -1,3 +1,10 @@
+v0.9.02
+- Converts calendar charting code from multiprocessing to subprocess.Popen.
+
+v0.9.01
+- Converts all usages of Indigo objects used in multiprocessing processes
+  to standard pickleable objects.
+
 v0.8.39
 - Fixes plugin configuration validation bug for new installs.
 
