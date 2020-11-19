@@ -1,4 +1,7 @@
 v0.9.05
+- Converts polar charting code from multiprocessing to subprocess.Popen.
+
+v0.9.05
 - Converts battery health charting code from multiprocessing to subprocess.Popen.
 
 v0.9.04

@@ -135,11 +135,7 @@ try:
                              )
 
     # ================================ Chart Title ================================
-    plt.suptitle(payload['p_dict']['chartTitle'],
-                 position=(0.5, 0.98),
-                 ha='center',
-                 **payload['k_dict']['k_title_font']
-                 )
+    chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.05, 0.98), align='center')
 
     # =============================== Format Grids ================================
     if payload['props'].get('showxAxisGrid', False):
