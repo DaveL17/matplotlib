@@ -31,14 +31,7 @@ import matplotlib.ticker as mtick
 import chart_tools
 # import DLFramework as Dave
 
-# Collection of logging messages.
-# TODO: consider looking at Matt's logging handler and see if that's better.
-log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-# Unpickle the payload data. The first element of the payload is the name
-# of this script and we don't need that. As long as size isn't a limitation
-# we will always send the entire payload as element 1.
-payload = pickle.loads(sys.argv[1])
-log['Debug'].append(u'payload unpickled successfully.')
+payload = chart_tools.payload
 
 try:
 
@@ -97,13 +90,13 @@ try:
         # Adds header and one observation. Length of CSV file goes from zero to two.
         if len(final_data) < 1:
             final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
-            log['Warning'].append(u'CSV file is empty. File: {0}'.format(data_source))
+            chart_tools.log['Warning'].append(u'CSV file is empty. File: {0}'.format(data_source))
 
         # ===================== CSV File has Headers but no Data ======================
         # Adds one observation. Length of CSV file goes from one to two.
         if len(final_data) < 2:
             final_data.append((now_text, 0))
-            log['Warning'].append(u'CSV file does not have sufficient information to make a useful plot. '
+            chart_tools.log['Warning'].append(u'CSV file does not have sufficient information to make a useful plot. '
                                   u'File: {0}'.format(data_source))
 
         # =============================== Malformed CSV ===============================
@@ -238,7 +231,7 @@ try:
             plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
         except (ValueError, TypeError):
-            log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax.")
+            chart_tools.log['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax.")
 
     # =============================================================================
     def format_axis_y_ticks(p_dict):
@@ -276,7 +269,7 @@ try:
             plt.yticks(marks, labels)
 
         except (KeyError, ValueError):
-            log['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY.")
+            chart_tools.log['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY.")
 
     # =============================================================================
     def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict):
@@ -305,7 +298,7 @@ try:
             return ax
 
         except TypeError as sub_error:
-            log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. "
+            chart_tools.log['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {0}. "
                                   u"See plugin log for more information.".format(sub_error))
 
     # =============================================================================
@@ -360,7 +353,7 @@ try:
                 return cls
 
             except Exception as sub_error:
-                log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin "
+                chart_tools.log['Warning'].append(u"There is a problem with the custom line segments settings. {0}. See plugin "
                                       u"log for more information.".format(sub_error))
 
                 return ax
@@ -382,7 +375,7 @@ try:
             return dates_to_plot_m
 
         except (KeyError, ValueError):
-            log['Threaddebug'].append(u"Problem formatting dates.")
+            chart_tools.log['Threaddebug'].append(u"Problem formatting dates.")
 
     # =============================================================================
     def prune_data(x_data, y_data, day_limit):
@@ -400,7 +393,7 @@ try:
 
         now   = dt.datetime.now()
         delta = now - dt.timedelta(days=day_limit)
-        log['Debug'].append(u"Pruning chart data: {0} through {1}.".format(delta, now))
+        chart_tools.log['Debug'].append(u"Pruning chart data: {0} through {1}.".format(delta, now))
 
         # Convert dates from string to datetime for filters
         for _, x in enumerate(x_data):
@@ -420,7 +413,7 @@ try:
         # If final_x is of length zero, no observations fit the requested time
         # mask. We return empty lists so that there's something to chart.
         if len(final_x) == 0:
-            log['Warning'].append(u"All data outside time series limits. No observations to return.")
+            chart_tools.log['Warning'].append(u"All data outside time series limits. No observations to return.")
             final_x = [dt.datetime.now()]
             final_y = [0]
 
@@ -461,7 +454,7 @@ try:
         # If we can't find the target CSV file, we create a phony proxy which the plugin
         # can process without dying.
         except IOError as err:
-            log['Critical'].append(u'{0}}'.format(err))
+            chart_tools.log['Critical'].append(u'{0}}'.format(err))
 
             return final_data
 
@@ -521,12 +514,12 @@ try:
 
         # If line color is the same as the background color, alert the user.
         if payload['p_dict']['line{0}Color'.format(line)] == payload['p_dict']['backgroundColor'] and not suppress_line:
-            log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
+            chart_tools.log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
                                   u"not be able to see it).".format(payload['props']['name'], line))
 
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
-            log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
+            chart_tools.log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
                                u"device configuration menu.".format(payload['props']['name'], line))
 
         # ============================== Plot the Lines ===============================
@@ -540,7 +533,7 @@ try:
             line_source = payload['p_dict']['line{0}Source'.format(line)].encode("utf-8")
             data_column = get_data('{0}{1}'.format(data_path, line_source))
 
-            log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
+            chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
 
             # Pull the headers
             payload['p_dict']['headers'].append(data_column[0][1])
@@ -675,7 +668,7 @@ try:
             # affect the legend.
 
             # We need to reload the dates to ensure that they match the line being plotted
-            # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)], log)
+            # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
 
             # =============================== Best Fit Line ===============================
             if payload['props'].get('line{0}BestFit'.format(line), False):
@@ -728,10 +721,10 @@ try:
     # ============================ Format X Axis Label ============================
     if not payload['p_dict']['showLegend']:
         plt.xlabel(payload['p_dict']['customAxisLabelX'], **payload['k_dict']['k_x_axis_font'])
-        log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
+        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
 
     if payload['p_dict']['showLegend'] and payload['p_dict']['customAxisLabelX'].strip(' ') not in ('', 'null'):
-        log['Debug'].append(u"[{0}] X axis label is suppressed to make room "
+        chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room "
                             u"for the chart legend.".format(payload['props']['name']))
 
     # ============================ Format Y1 Axis Label ============================
@@ -750,8 +743,6 @@ try:
                         )
 
     chart_tools.save()
-
-    pickle.dump(log, sys.stdout)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass

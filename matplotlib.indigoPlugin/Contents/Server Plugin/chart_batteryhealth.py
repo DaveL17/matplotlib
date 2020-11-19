@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the calendar charts
+Creates the battery health charts
 
-Given the unique nature of calendar charts, we use a separate method to
-construct them.
 -----
 """
 
@@ -28,19 +26,8 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-# Collection of logging messages.
-# TODO: consider looking at Matt's logging handler and see if that's better.
-log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-# Unpickle the payload data. The first element of the payload is the name
-# of this script and we don't need that. As long as size isn't a limitation
-# we will always send the entire payload as element 1.
-payload = pickle.loads(sys.argv[1])
-log['Debug'].append(u'payload unpickled successfully.')
-
-
+payload = chart_tools.payload
 # =============================================================================
-log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
 try:
     bar_colors    = []
@@ -80,6 +67,7 @@ try:
         bar_colors.append(chart_data[thing[0]]['color'])
         x_values.append(chart_data[thing[0]]['batteryLevel'])
         y_text.append(unicode(thing[0]))
+
 
     # Create a range of values to plot on the Y axis, since we can't plot on device names.
     y_values = np.arange(len(y_text))
@@ -164,10 +152,10 @@ try:
     # ============================ Format X Axis Label ============================
     if not payload['p_dict']['showLegend']:
         plt.xlabel(payload['p_dict']['customAxisLabelX'], **payload['k_dict']['k_x_axis_font'])
-        log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
+        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
 
     if payload['p_dict']['showLegend'] and payload['p_dict']['customAxisLabelX'].strip(' ') not in ('', 'null'):
-        log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
+        chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
                             u"legend.".format(payload['name']))
 
     ax.xaxis.set_ticks_position('bottom')
@@ -225,8 +213,6 @@ try:
 
     # plt.tight_layout()
     chart_tools.save()
-
-    pickle.dump(log, sys.stdout)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass

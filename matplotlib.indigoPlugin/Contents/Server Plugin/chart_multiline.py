@@ -27,15 +27,7 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-# Collection of logging messages.
-# TODO: consider looking at Matt's logging handler and see if that's better.
-log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
-
-# Unpickle the payload data. The first element of the payload is the name
-# of this script and we don't need that. As long as size isn't a limitation
-# we will always send the entire payload as element 1.
-payload = pickle.loads(sys.argv[1])
-log['Debug'].append(u'payload unpickled successfully.')
+payload = chart_tools.payload
 
 try:
 
@@ -107,7 +99,7 @@ try:
             if payload['p_dict']['cleanTheText']:
                 text_to_plot = clean_string(text_to_plot)
 
-        log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
+        chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
         # Wrap the text and prepare it for plotting.
         text_to_plot = textwrap.fill(text_to_plot,
@@ -163,8 +155,6 @@ try:
                         )
 
     chart_tools.save()
-
-    pickle.dump(log, sys.stdout)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass
