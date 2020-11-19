@@ -11,6 +11,7 @@ construct them.
 
 # import calendar
 # import datetime as dt
+import numpy as np
 import sys
 import pickle
 
@@ -58,7 +59,7 @@ try:
 
     # ============================ Create Device Dict =============================
     # 'thing' here is a tuple ('name', 'battery level')
-    for thing in sorted(device_list.iteritems(), reverse=True):
+    for thing in sorted(payload['data'].iteritems(), reverse=True):
         chart_data[thing[0]] = {}
 
         # Add the battery level for each device
@@ -84,12 +85,30 @@ try:
     y_values = np.arange(len(y_text))
 
     # Create the chart figure
-    ax = self.make_chart_figure(payload['p_dict']['chart_width'], payload['p_dict']['chart_height'], payload['p_dict'])
+    try:
+        height = int(payload['props'].get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+    except ValueError:
+        height = 3
+
+    try:
+        width = int(payload['props'].get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+    except ValueError:
+        width = 5
+
+    fig = plt.figure(figsize=(width, height))
+    ax = fig.add_subplot(111)
+    ax.axis('off')
 
     # =============================== Plot the Bars ===============================
     # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
     # it off the origin.
-    rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **payload['k_dict']['k_bar'])
+    rects = ax.barh((y_values + 1),
+                    x_values,
+                    color=bar_colors,
+                    align='center',
+                    linewidth=0,
+                    **payload['k_dict']['k_bar']
+                    )
 
     # ================================ Data Labels ================================
     # Plot data labels inside or outside depending on bar length
@@ -128,17 +147,29 @@ try:
                              )
 
     # ================================ Chart Title ================================
-    self.format_title(payload['p_dict'], payload['k_dict'], log, loc=(0.5, 0.98))
+    plt.suptitle(payload['p_dict']['chartTitle'],
+                 position=(0.5, 0.98),
+                 ha='center',
+                 **payload['k_dict']['k_title_font']
+                 )
 
     # =============================== Format Grids ================================
-    if dev['props'].get('showxAxisGrid', False):
+    if payload['props'].get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
             ax.axvline(x=_,
                        color=payload['p_dict']['gridColor'],
-                       linestyle=plug_dict['prefs'].get('gridStyle', ':')
+                       linestyle=payload['prefs'].get('gridStyle', ':')
                        )
 
-    self.format_axis_x_label(dev, payload['p_dict'], payload['k_dict'], log)
+    # ============================ Format X Axis Label ============================
+    if not payload['p_dict']['showLegend']:
+        plt.xlabel(payload['p_dict']['customAxisLabelX'], **payload['k_dict']['k_x_axis_font'])
+        log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
+
+    if payload['p_dict']['showLegend'] and payload['p_dict']['customAxisLabelX'].strip(' ') not in ('', 'null'):
+        log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
+                            u"legend.".format(payload['name']))
+
     ax.xaxis.set_ticks_position('bottom')
 
     # ============================== X Axis Min/Max ===============================
@@ -161,7 +192,7 @@ try:
     # using the same warning color that is used for the bar.
     if dead_ones:
         counter = 0
-        for key, value in sorted(device_list.iteritems(), reverse=True):
+        for key, value in sorted(payload['data'].iteritems(), reverse=True):
             if int(value) == 0:
                 ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
             counter += 1
@@ -184,12 +215,21 @@ try:
                                        )
                      )
 
-    plt.tight_layout()
+    plt.subplots_adjust(top=0.98,
+                        bottom=0.05,
+                        left=0.02,
+                        right=0.98,
+                        hspace=None,
+                        wspace=None
+                        )
+
+    # plt.tight_layout()
     chart_tools.save()
+
+    pickle.dump(log, sys.stdout)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass
 
 except Exception as sub_error:
     pass
-

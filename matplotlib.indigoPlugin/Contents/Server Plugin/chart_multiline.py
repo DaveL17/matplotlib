@@ -164,5 +164,7 @@ try:
 
     chart_tools.save()
 
+    pickle.dump(log, sys.stdout)
+
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     pass

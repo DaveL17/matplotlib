@@ -540,7 +540,6 @@ class Plugin(indigo.PluginBase):
                 # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
                 self.charts_refresh()
-                # self.test_chart()
                 self.sleep(15)
 
     # =============================================================================
@@ -3202,6 +3201,8 @@ class Plugin(indigo.PluginBase):
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
 
+                            self.logger.debug(u"chart_batteryhealth.py called.")
+
                             device_dict  = {}
                             exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
 
@@ -3212,11 +3213,11 @@ class Plugin(indigo.PluginBase):
 
                                     # The following line is used for testing the battery health code; it isn't
                                     # needed in production.
-                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
-                                    #                'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
-                                    #                'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
-                                    #                'Device 10': '47'
-                                    #                }
+                                    device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
+                                                   'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
+                                                   'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
+                                                   'Device 10': '47'
+                                                   }
 
                                 except Exception as sub_error:
                                     self.pluginErrorHandler(traceback.format_exc())
@@ -3226,18 +3227,42 @@ class Plugin(indigo.PluginBase):
                             if device_dict == {}:
                                 device_dict['No Battery Devices'] = 0
 
-                            if __name__ == '__main__':
-                                p_battery = multiprocessing.Process(name='p_battery',
-                                                                    target=MakeChart().chart_battery_health,
-                                                                    args=(plug_dict,
-                                                                          dev_dict,
-                                                                          device_dict,
-                                                                          p_dict,
-                                                                          k_dict,
-                                                                          return_queue,
-                                                                          )
-                                                                    )
-                                p_battery.start()
+                            dev_dict['excludedDevices'] = convert_to_native(dev_dict['excludedDevices'])
+                            p_dict['excludedDevices'] = convert_to_native(p_dict['excludedDevices'])
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': device_dict,
+                                           }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_batteryhealth.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            reply = pickle.loads(reply)
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.warning(err)
+
+                            self.logger.warning(u'Battery Health charting function complete.')
 
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
@@ -3276,7 +3301,7 @@ class Plugin(indigo.PluginBase):
                             if len(err) > 0:
                                 self.logger.warning(err)
 
-                        self.logger.warning(u'Calendar charting function complete.')
+                            self.logger.warning(u'Calendar charting function complete.')
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
@@ -3315,7 +3340,7 @@ class Plugin(indigo.PluginBase):
                             if len(err) > 0:
                                 self.logger.warning(err)
 
-                        self.logger.warning(u'Line charting function complete.')
+                            self.logger.warning(u'Line charting function complete.')
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
@@ -3369,7 +3394,7 @@ class Plugin(indigo.PluginBase):
                             if len(err) > 0:
                                 self.logger.warning(err)
 
-                        self.logger.warning(u'Multiline text charting function complete.')
+                            self.logger.warning(u'Multiline text charting function complete.')
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
