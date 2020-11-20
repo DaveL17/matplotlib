@@ -3255,12 +3255,15 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            reply = pickle.loads(reply)
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
 
                             # Process any output.
                             self.logger.debug(reply)
                             if len(err) > 0:
-                                self.logger.warning(err)
+                                self.logger.critical(err)
 
                             self.logger.warning(u'Battery Health charting function complete.')
 
@@ -3294,12 +3297,15 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            reply = pickle.loads(reply)
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
 
                             # Process any output.
                             self.logger.debug(reply)
                             if len(err) > 0:
-                                self.logger.warning(err)
+                                self.logger.critical(err)
 
                             self.logger.warning(u'Calendar charting function complete.')
 
@@ -3333,12 +3339,15 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            reply = pickle.loads(reply)
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
 
                             # Process any output.
                             self.logger.debug(reply)
                             if len(err) > 0:
-                                self.logger.warning(err)
+                                self.logger.critical(err)
 
                             self.logger.warning(u'Line charting function complete.')
 
@@ -3387,29 +3396,60 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            reply = pickle.loads(reply)
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
 
                             # Process any output.
                             self.logger.debug(reply)
                             if len(err) > 0:
-                                self.logger.warning(err)
+                                self.logger.critical(err)
 
                             self.logger.warning(u'Multiline text charting function complete.')
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
 
-                            if __name__ == '__main__':
-                                p_polar = multiprocessing.Process(name='p_polar',
-                                                                  target=MakeChart().chart_polar,
-                                                                  args=(plug_dict,
-                                                                        dev_dict,
-                                                                        p_dict,
-                                                                        k_dict,
-                                                                        return_queue,
-                                                                        )
-                                                                  )
-                                p_polar.start()
+                            self.logger.debug(u"chart_polar.py called.")
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_polar.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
+                            self.logger.debug(reply)
+
+                            # Process any output.
+                            if len(err) > 0:
+                                self.logger.critical(err)
+
+                            self.logger.warning(u'Polar charting function complete.')
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
