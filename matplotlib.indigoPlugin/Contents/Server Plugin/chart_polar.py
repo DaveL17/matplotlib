@@ -4,32 +4,34 @@
 """
 Creates the polar charts
 
-TODO: Note that there is a fatal error with later versions of numpy (specificaly 1.16.6) that causes
-  polar charts to fail spectacularly during the savefig operation. There is apparently no way to code
-  around this.  CONSIDER GNUPLOT?
+Note: there is a fatal error with later versions of numpy (specificaly 1.16.6)
+that causes polar charts to fail spectacularly during the savefig operation.
+There is apparently no way to code around this.
+TODO: CONSIDER GNUPLOT?
+
 -----
 """
 
-import ast
-import csv
-import datetime as dt
-from dateutil.parser import parse as date_parse
-import itertools
+# import ast
+# import csv
+# import datetime as dt
+# from dateutil.parser import parse as date_parse
+# import itertools
 import numpy as np
-import operator as op
-import sys
-import pickle
-import unicodedata
+# import operator as op
+# import sys
+# import pickle
+# import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-from matplotlib import rcParams
+# from matplotlib import rcParams
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.dates as mdate
-import matplotlib.ticker as mtick
-import matplotlib.font_manager as mfont
+# import matplotlib.patches as patches
+# import matplotlib.dates as mdate
+# import matplotlib.ticker as mtick
+# import matplotlib.font_manager as mfont
 
 import chart_tools
 # import DLFramework as Dave
@@ -115,7 +117,7 @@ try:
         # ============================== Customizations ===============================
         size = float(payload['p_dict']['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
-        ax = plt.subplot(111)  # Create subplot
+        ax = plt.subplot(111, polar=True)  # Create subplot
         plt.grid(color=plt.rcParams['grid.color'])                        # Color the grid
         ax.set_theta_zero_location('N')                                   # Set zero to North
         ax.set_theta_direction(-1)                                        # Reverse the rotation
