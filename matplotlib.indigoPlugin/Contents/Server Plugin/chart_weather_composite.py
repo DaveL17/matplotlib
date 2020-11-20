@@ -37,14 +37,17 @@ import matplotlib.ticker as mtick
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+payload    = chart_tools.payload
+p_dict     = payload['p_dict']
+k_dict     = payload['k_dict']
+state_list = payload['state_list']
+dev_type   = payload['dev_type']
+props      = payload['props']
 
 dpi             = int(plt.rcParams['savefig.dpi'])
 forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
-height          = int(payload['props']['props']['height'])
-width           = int(payload['props']['props']['width'])
+height          = int(props['props']['height'])
+width           = int(props['props']['width'])
 
 dates_to_plot = ()
 precipitation = ()
@@ -86,40 +89,40 @@ try:
     [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
     # ================================ Set Up Axes ================================
-    axes     = payload['props']['component_list']
+    axes     = props['component_list']
     num_axes = len(axes)
 
     # ============================ X Axis Observations ============================
     # Daily
-    if payload['dev_type'] in ('Daily', 'wundergroundTenDay'):
-        for _ in range(1, forecast_length[payload['dev_type']] + 1):
-            dates_to_plot    += (payload['state_list'][u'd0{0}_date'.format(_)],)
-            humidity         += (payload['state_list'][u'd0{0}_humidity'.format(_)],)
-            precipitation    += (payload['state_list'][u'd0{0}_precipTotal'.format(_)],)
-            pressure         += (payload['state_list'][u'd0{0}_pressure'.format(_)],)
-            temperature_high += (payload['state_list'][u'd0{0}_temperatureHigh'.format(_)],)
-            temperature_low  += (payload['state_list'][u'd0{0}_temperatureLow'.format(_)],)
-            wind_speed       += (payload['state_list'][u'd0{0}_windSpeed'.format(_)],)
-            wind_bearing     += (payload['state_list'][u'd0{0}_windBearing'.format(_)],)
+    if dev_type in ('Daily', 'wundergroundTenDay'):
+        for _ in range(1, forecast_length[dev_type] + 1):
+            dates_to_plot    += (state_list[u'd0{0}_date'.format(_)],)
+            humidity         += (state_list[u'd0{0}_humidity'.format(_)],)
+            precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
+            pressure         += (state_list[u'd0{0}_pressure'.format(_)],)
+            temperature_high += (state_list[u'd0{0}_temperatureHigh'.format(_)],)
+            temperature_low  += (state_list[u'd0{0}_temperatureLow'.format(_)],)
+            wind_speed       += (state_list[u'd0{0}_windSpeed'.format(_)],)
+            wind_bearing     += (state_list[u'd0{0}_windBearing'.format(_)],)
 
         x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=6)
 
     # Hourly
     else:
-        for _ in range(1, forecast_length[payload['dev_type']] + 1):
+        for _ in range(1, forecast_length[dev_type] + 1):
 
             if _ <= 9:
                 _ = '0{0}'.format(_)
 
-            dates_to_plot    += (payload['state_list'][u'h{0}_epoch'.format(_)],)
-            humidity         += (payload['state_list'][u'h{0}_humidity'.format(_)],)
-            precipitation    += (payload['state_list'][u'h{0}_precipIntensity'.format(_)],)
-            pressure         += (payload['state_list'][u'h{0}_pressure'.format(_)],)
-            temperature_high += (payload['state_list'][u'h{0}_temperature'.format(_)],)
-            temperature_low  += (payload['state_list'][u'h{0}_temperature'.format(_)],)
-            wind_speed       += (payload['state_list'][u'h{0}_windSpeed'.format(_)],)
-            wind_bearing     += (payload['state_list'][u'h{0}_windBearing'.format(_)],)
+            dates_to_plot    += (state_list[u'h{0}_epoch'.format(_)],)
+            humidity         += (state_list[u'h{0}_humidity'.format(_)],)
+            precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
+            pressure         += (state_list[u'h{0}_pressure'.format(_)],)
+            temperature_high += (state_list[u'h{0}_temperature'.format(_)],)
+            temperature_low  += (state_list[u'h{0}_temperature'.format(_)],)
+            wind_speed       += (state_list[u'h{0}_windSpeed'.format(_)],)
+            wind_bearing     += (state_list[u'h{0}_windBearing'.format(_)],)
 
         x1 = [dt.datetime.fromtimestamp(_) for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=1)
@@ -232,7 +235,7 @@ try:
                             )
 
         subplot[0].set_xlim(min(x1) - x_offset, max(x1) + x_offset)
-        my_fmt = mdate.DateFormatter(payload['props']['xAxisLabelFormat'])
+        my_fmt = mdate.DateFormatter(props['xAxisLabelFormat'])
         subplot[0].xaxis.set_major_formatter(my_fmt)
         subplot[0].set_xticks(x1)
         format_subplot(subplot[0])

@@ -35,9 +35,12 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+payload    = chart_tools.payload
+p_dict     = payload['p_dict']
+k_dict     = payload['k_dict']
+state_list = payload['state_list']
+dev_type   = payload['dev_type']
+props      = payload['props']
 
 try:
 
@@ -67,22 +70,22 @@ try:
 
         if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
             chart_tools.log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not "
-                                            u"be able to see it).".format(payload['props']['name']))
+                                            u"be able to see it).".format(props['name']))
 
     # ========================== Fantastic Hourly Device ==========================
-    if payload['dev_type'] == 'Hourly':
+    if dev_type == 'Hourly':
 
         for counter in range(1, 25, 1):
             if counter < 10:
                 counter = '0{0}'.format(counter)
 
-            epoch = payload['state_list']['h{0}_epoch'.format(counter)]
+            epoch = state_list['h{0}_epoch'.format(counter)]
             time_stamp = dt.datetime.fromtimestamp(epoch)
             time_stamp = dt.datetime.strftime(time_stamp, "%Y-%m-%d %H:%M")
             p_dict['x_obs1'].append(time_stamp)
 
-            p_dict['y_obs1'].append(payload['state_list']['h{0}_temperature'.format(counter)])
-            p_dict['y_obs3'].append(payload['state_list']['h{0}_precipChance'.format(counter)])
+            p_dict['y_obs1'].append(state_list['h{0}_temperature'.format(counter)])
+            p_dict['y_obs3'].append(state_list['h{0}_precipChance'.format(counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
@@ -98,14 +101,14 @@ try:
             p_dict['daytimeColor'] = chart_tools.fix_rgb(p_dict['daytimeColor'])
 
     # ======================== WUnderground Hourly Device =========================
-    elif payload['dev_type'] == 'wundergroundHourly':
+    elif dev_type == 'wundergroundHourly':
 
         for counter in range(1, 25, 1):
             if counter < 10:
                 counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(payload['state_list']['h{0}_timeLong'.format(counter)])
-            p_dict['y_obs1'].append(payload['state_list']['h{0}_temp'.format(counter)])
-            p_dict['y_obs3'].append(payload['state_list']['h{0}_precip'.format(counter)])
+            p_dict['x_obs1'].append(state_list['h{0}_timeLong'.format(counter)])
+            p_dict['y_obs1'].append(state_list['h{0}_temp'.format(counter)])
+            p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
@@ -116,20 +119,20 @@ try:
                 p_dict['y_obs3'][0] = 1.0
 
             p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
-            # that Matplotlib interprets the legend as a tuple.
+                                                       # that Matplotlib interprets the legend as a tuple.
             p_dict['headers_2']    = ('Precipitation',)
             p_dict['daytimeColor'] = chart_tools.fix_rgb(p_dict['daytimeColor'])
 
     # ========================== Fantastic Daily Device ===========================
-    elif payload['dev_type'] == 'Daily':
+    elif dev_type == 'Daily':
 
         for counter in range(1, 9, 1):
             if counter < 10:
                 counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(payload['state_list']['d{0}_date'.format(counter)])
-            p_dict['y_obs1'].append(payload['state_list']['d{0}_temperatureHigh'.format(counter)])
-            p_dict['y_obs2'].append(payload['state_list']['d{0}_temperatureLow'.format(counter)])
-            p_dict['y_obs3'].append(payload['state_list']['d{0}_precipChance'.format(counter)])
+            p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
+            p_dict['y_obs1'].append(state_list['d{0}_temperatureHigh'.format(counter)])
+            p_dict['y_obs2'].append(state_list['d{0}_temperatureLow'.format(counter)])
+            p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
@@ -143,15 +146,15 @@ try:
             p_dict['headers_2']    = ('Precipitation',)
 
     # ======================== WUnderground Ten Day Device ========================
-    elif payload['dev_type'] == 'wundergroundTenDay':
+    elif dev_type == 'wundergroundTenDay':
 
         for counter in range(1, 11, 1):
             if counter < 10:
                 counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(payload['state_list']['d{0}_date'.format(counter)])
-            p_dict['y_obs1'].append(payload['state_list']['d{0}_high'.format(counter)])
-            p_dict['y_obs2'].append(payload['state_list']['d{0}_low'.format(counter)])
-            p_dict['y_obs3'].append(payload['state_list']['d{0}_pop'.format(counter)])
+            p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
+            p_dict['y_obs1'].append(state_list['d{0}_high'.format(counter)])
+            p_dict['y_obs2'].append(state_list['d{0}_low'.format(counter)])
+            p_dict['y_obs3'].append(state_list['d{0}_pop'.format(counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
@@ -248,7 +251,7 @@ try:
     plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
     # =============================== X1 Axis Label ===============================
-    chart_tools.format_axis_x_label(payload['props'], p_dict, k_dict)
+    chart_tools.format_axis_x_label(props, p_dict, k_dict)
 
     # =============================== Y1 Axis Label ===============================
     # Note we're plotting Y2 label on ax1. We do this because we want the
@@ -290,9 +293,9 @@ try:
     # ============================= Sunrise / Sunset ==============================
     # Note that this highlights daytime hours on the chart.
 
-    daylight = payload['props'].get('showDaytime', True)
+    daylight = props.get('showDaytime', True)
 
-    if daylight and payload['dev_type'] in ('Hourly', 'wundergroundHourly'):
+    if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
         sun_rise, sun_set = chart_tools.format_dates(payload['sun_rise_set'])
 
