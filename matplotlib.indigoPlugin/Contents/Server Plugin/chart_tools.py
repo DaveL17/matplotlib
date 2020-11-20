@@ -657,6 +657,29 @@ try:
             return final_data
 
     # =============================================================================
+    def make_chart_figure(width, height, p_dict):
+        """
+        Create the matplotlib figure object and create the main axes element.
+        Create the figure object for charting and include one axes object. The method
+        also add a few customizations when defining the objects.
+        -----
+        :param float width:
+        :param float height:
+        :param dict p_dict: plotting parameters
+        """
+
+        dpi = plt.rcParams['savefig.dpi']
+        height = float(height)
+        width = float(width)
+
+        fig = plt.figure(1, figsize=(width / dpi, height / dpi))
+        ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
+        ax.margins(0.04, 0.05)
+        [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+
+        return ax
+
+    # =============================================================================
     def prune_data(x_data, y_data, limit, new_old):
         """
         Prune data to display subset of available data
