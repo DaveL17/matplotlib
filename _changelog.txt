@@ -1,3 +1,6 @@
+v0.9.08
+- Converts area charting code from multiprocessing to subprocess.Popen.
+
 v0.9.07
 - Converts area charting code from multiprocessing to subprocess.Popen.
 

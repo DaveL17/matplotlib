@@ -109,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.07"
+__version__   = u"0.9.08"
 
 # =============================================================================
 
@@ -3174,32 +3174,86 @@ class Plugin(indigo.PluginBase):
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
 
-                            if __name__ == '__main__':
-                                p_area = multiprocessing.Process(name='p_area',
-                                                                 target=MakeChart().chart_area,
-                                                                 args=(plug_dict,
-                                                                       dev_dict,
-                                                                       p_dict,
-                                                                       k_dict,
-                                                                       return_queue,
-                                                                       )
-                                                                 )
-                                p_area.start()
+                            self.logger.debug(u"chart_line.py called.")
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_area.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.critical(err)
+
+                            self.logger.warning(u'Line charting function complete.')
 
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
 
-                            if __name__ == '__main__':
-                                p_bar = multiprocessing.Process(name='p_bar',
-                                                                target=MakeChart().chart_bar,
-                                                                args=(plug_dict,
-                                                                      dev_dict,
-                                                                      p_dict,
-                                                                      k_dict,
-                                                                      return_queue,
-                                                                      )
-                                                                )
-                                p_bar.start()
+                            self.logger.debug(u"chart_line.py called.")
+
+                            # Payload sent to the subprocess script
+                            raw_payload = {'prefs': plug_dict,
+                                           'props': dev_dict,
+                                           'p_dict': p_dict,
+                                           'k_dict': k_dict,
+                                           'data': None,
+                                           }
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_bar.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            try:
+                                reply = pickle.loads(reply)
+                            except EOFError:
+                                reply = 'Empty reply.'
+
+                            # Process any output.
+                            self.logger.debug(reply)
+                            if len(err) > 0:
+                                self.logger.critical(err)
+
+                            self.logger.warning(u'Line charting function complete.')
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
