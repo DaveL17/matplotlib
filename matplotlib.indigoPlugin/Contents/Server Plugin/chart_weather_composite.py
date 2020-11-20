@@ -2,9 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the bar charts
-
+Creates a composite weather chart
+The composite weather chart is a dynamic chart that allows users to add or
+remove weather charts at will.  For example, the user could create one
+chart that contains subplots for high temperature, wind, and precipitation.
+Using the chart configuration dialog, the user would be able to add or
+remove elements and the chart would adjust accordingly (additional sublplots
+will be added or removed as needed.)
 -----
+
 """
 
 # import ast

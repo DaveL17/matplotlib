@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the bar charts
-
+Creates the scatter charts
+All steps required to generate scatter charts.
 -----
+
 """
 
 # import ast

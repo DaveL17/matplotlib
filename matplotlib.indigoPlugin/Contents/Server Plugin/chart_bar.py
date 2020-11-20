@@ -3,8 +3,9 @@
 
 """
 Creates the bar charts
-
+All steps required to generate bar charts.
 -----
+
 """
 
 # import ast

@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the weather forecast charts
-
+Creates the weather charts
+Given the unique nature of weather chart construction, we have a separate
+method for these charts. Note that it is not currently possible within the
+multiprocessing framework used to query the indigo server, so we need to
+send everything we need through the method call.
 -----
+
 """
 
 # import ast

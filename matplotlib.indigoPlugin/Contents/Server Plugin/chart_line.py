@@ -3,8 +3,9 @@
 
 """
 Creates the line charts
-
+All steps required to generate line charts.
 -----
+
 """
 
 import ast

@@ -3,8 +3,11 @@
 
 """
 Creates the battery health charts
-
+The chart_battery_health method creates battery health charts. These chart
+types are dynamic and are created "on the fly" rather than through direct
+user input.
 -----
+
 """
 
 # import calendar

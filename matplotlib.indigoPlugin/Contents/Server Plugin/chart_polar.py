@@ -3,14 +3,22 @@
 
 """
 Creates the polar charts
+Note that the polar chart device can be used for other things, but it is coded
+like a wind rose which makes it easier to understand what's happening. Note
+that it would be possible to convert wind direction names (north-northeast) to
+an ordinal degree value, however, it would be very difficult to contend with
+all of the possible international Unicode values that could be passed to the
+device. Better to make it the responsibility of the user to convert their data
+to degrees.
 
 Note: there is a fatal error with later versions of numpy (specificaly 1.16.6)
 that causes polar charts to fail spectacularly during the savefig operation.
 There is apparently no way to code around this.
-TODO: CONSIDER GNUPLOT?
 
 -----
+
 """
+# TODO: CONSIDER GNUPLOT?
 
 # import ast
 # import csv

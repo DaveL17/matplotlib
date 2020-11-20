@@ -3,10 +3,10 @@
 
 """
 Creates the calendar charts
-
 Given the unique nature of calendar charts, we use a separate method to
 construct them.
 -----
+
 """
 
 import calendar

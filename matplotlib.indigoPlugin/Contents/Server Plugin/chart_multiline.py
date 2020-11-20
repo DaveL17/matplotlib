@@ -3,8 +3,10 @@
 
 """
 Creates the multiline text charts
-
+Given the unique nature of multiline text charts, we use a separate method
+to construct them.
 -----
+
 """
 
 # import calendar

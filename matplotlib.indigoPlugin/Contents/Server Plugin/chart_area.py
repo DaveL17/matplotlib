@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the area charts
-
+Creates the Area charts
+All steps required to generate area charts.
 -----
+
 """
 
 # import ast
