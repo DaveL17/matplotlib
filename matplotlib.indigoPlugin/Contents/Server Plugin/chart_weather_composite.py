@@ -38,6 +38,8 @@ import chart_tools
 # import DLFramework as Dave
 
 payload = chart_tools.payload
+p_dict = payload['p_dict']
+k_dict = payload['k_dict']
 
 dpi             = int(plt.rcParams['savefig.dpi'])
 forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
@@ -60,28 +62,28 @@ try:
         pass
 
     def format_subplot(s_plot):
-        chart_tools.format_axis_x_ticks(s_plot, payload['p_dict'], payload['k_dict'])
-        chart_tools.format_axis_y(s_plot, payload['p_dict'], payload['k_dict'])
+        chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict)
+        chart_tools.format_axis_y(s_plot, p_dict, k_dict)
 
-        if payload['p_dict']['showxAxisGrid']:
-            plot.xaxis.grid(True, **payload['k_dict']['k_grid_fig'])
+        if p_dict['showxAxisGrid']:
+            plot.xaxis.grid(True, **k_dict['k_grid_fig'])
 
-        if payload['p_dict']['showyAxisGrid']:
-            plot.yaxis.grid(True, **payload['k_dict']['k_grid_fig'])
+        if p_dict['showyAxisGrid']:
+            plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
-    payload['p_dict']['backgroundColor'] = chart_tools.fix_rgb(payload['p_dict']['backgroundColor'])
-    payload['p_dict']['faceColor']       = chart_tools.fix_rgb(payload['p_dict']['faceColor'])
-    payload['p_dict']['lineColor']       = chart_tools.fix_rgb(payload['p_dict']['lineColor'])
-    payload['p_dict']['lineMarkerColor'] = chart_tools.fix_rgb(payload['p_dict']['lineMarkerColor'])
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
+    p_dict['faceColor']       = chart_tools.fix_rgb(p_dict['faceColor'])
+    p_dict['lineColor']       = chart_tools.fix_rgb(p_dict['lineColor'])
+    p_dict['lineMarkerColor'] = chart_tools.fix_rgb(p_dict['lineMarkerColor'])
 
     dpi = plt.rcParams['savefig.dpi']
-    height = float(payload['p_dict']['chart_height'])
-    width = float(payload['p_dict']['chart_width'])
+    height = float(p_dict['chart_height'])
+    width = float(p_dict['chart_width'])
 
     fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-    ax = fig.add_subplot(111, axisbg=payload['p_dict']['faceColor'])
+    ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
     ax.margins(0.04, 0.05)
-    [ax.spines[spine].set_color(payload['p_dict']['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+    [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
     # ================================ Set Up Axes ================================
     axes     = payload['props']['component_list']
@@ -125,88 +127,88 @@ try:
     # ================================ Set Up Plot ================================
     fig, subplot = plt.subplots(nrows=num_axes, sharex=True, figsize=(width / dpi, height * num_axes / dpi))
 
-    chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.5, 0.99))
+    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.99))
 
     try:
         for plot in subplot:
-            plot.set_axis_bgcolor(payload['p_dict']['backgroundColor'])
-            [plot.spines[spine].set_color(payload['p_dict']['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+            plot.set_axis_bgcolor(p_dict['backgroundColor'])
+            [plot.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
     except IndexError:
-        subplot.set_axis_bgcolor(payload['p_dict']['backgroundColor'])
-        [subplot.spines[spine].set_color(payload['p_dict']['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+        subplot.set_axis_bgcolor(p_dict['backgroundColor'])
+        [subplot.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
     # ============================= Temperature High ==============================
     if 'show_high_temperature' in axes:
-        subplot[0].set_title('high temperature', **payload['k_dict']['k_title_font'])  # The subplot title
-        subplot[0].plot(x1, temperature_high, color=payload['p_dict']['lineColor'])    # Plot it
+        subplot[0].set_title('high temperature', **k_dict['k_title_font'])  # The subplot title
+        subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])    # Plot it
         format_subplot(subplot[0])                                          # Format the subplot
 
-        if payload['p_dict']['temperature_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['temperature_min']))
-        if payload['p_dict']['temperature_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['temperature_max']))
+        if p_dict['temperature_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
+        if p_dict['temperature_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['temperature_max']))
 
         subplot = np.delete(subplot, 0)  # Delete the subplot for the next plot
 
     # ============================== Temperature Low ==============================
     if 'show_low_temperature' in axes:
-        subplot[0].set_title('low temperature', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, temperature_low, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('low temperature', **k_dict['k_title_font'])
+        subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
-        if payload['p_dict']['temperature_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['temperature_min']))
-        if payload['p_dict']['temperature_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['temperature_max']))
+        if p_dict['temperature_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
+        if p_dict['temperature_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['temperature_max']))
 
         subplot = np.delete(subplot, 0)
 
     # =========================== Temperature High/Low ============================
     if 'show_high_low_temperature' in axes:
-        subplot[0].set_title('high/low temperature', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, temperature_high, color=payload['p_dict']['lineColor'])
-        subplot[0].plot(x1, temperature_low, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('high/low temperature', **k_dict['k_title_font'])
+        subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])
+        subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
-        if payload['p_dict']['temperature_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['temperature_min']))
-        if payload['p_dict']['temperature_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['temperature_max']))
+        if p_dict['temperature_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
+        if p_dict['temperature_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['temperature_max']))
 
         subplot = np.delete(subplot, 0)
 
     # ================================= Humidity ==================================
     if 'show_humidity' in axes:
-        subplot[0].set_title('humidity', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, humidity, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('humidity', **k_dict['k_title_font'])
+        subplot[0].plot(x1, humidity, color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
-        if payload['p_dict']['humidity_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['humidity_min']))
-        if payload['p_dict']['humidity_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['humidity_max']))
+        if p_dict['humidity_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['humidity_min']))
+        if p_dict['humidity_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['humidity_max']))
 
         subplot = np.delete(subplot, 0)
 
     # ============================ Barometric Pressure ============================
     if 'show_barometric_pressure' in axes:
-        subplot[0].set_title('barometric pressure', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, pressure, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('barometric pressure', **k_dict['k_title_font'])
+        subplot[0].plot(x1, pressure, color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
-        if payload['p_dict']['pressure_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['pressure_min']))
-        if payload['p_dict']['pressure_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['pressure_max']))
+        if p_dict['pressure_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['pressure_min']))
+        if p_dict['pressure_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['pressure_max']))
 
         subplot = np.delete(subplot, 0)
 
     # ========================== Wind Speed and Bearing ===========================
     if 'show_wind' in axes:
         data = zip(x1, wind_speed, wind_bearing)
-        subplot[0].set_title('wind', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, wind_speed, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('wind', **k_dict['k_title_font'])
+        subplot[0].plot(x1, wind_speed, color=p_dict['lineColor'])
         subplot[0].set_ylim(0, max(wind_speed) + 1)
 
         for _ in data:
@@ -221,9 +223,9 @@ try:
                             va="center",
                             ha="center",
                             rotation=(_[2] * -1) + 90,
-                            color=payload['p_dict']['lineMarkerColor'],
+                            color=p_dict['lineMarkerColor'],
                             bbox=dict(boxstyle="larrow, pad=0.3",
-                                      fc=payload['p_dict']['lineMarkerColor'],
+                                      fc=p_dict['lineMarkerColor'],
                                       ec="none",
                                       alpha=0.75
                                       )
@@ -235,44 +237,44 @@ try:
         subplot[0].set_xticks(x1)
         format_subplot(subplot[0])
 
-        if payload['p_dict']['wind_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['wind_min']))
-        if payload['p_dict']['wind_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['wind_max']))
+        if p_dict['wind_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['wind_min']))
+        if p_dict['wind_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['wind_max']))
 
         subplot = np.delete(subplot, 0)
 
     # ============================ Precipitation Line =============================
     # Precip intensity is in inches of liquid rain per hour. using a line chart.
     if 'show_precipitation' in axes:
-        subplot[0].set_title('total precipitation', **payload['k_dict']['k_title_font'])
-        subplot[0].plot(x1, precipitation, color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
+        subplot[0].plot(x1, precipitation, color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
 
-        if payload['p_dict']['precipitation_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['precipitation_min']))
-        if payload['p_dict']['precipitation_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['precipitation_max']))
+        if p_dict['precipitation_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['precipitation_min']))
+        if p_dict['precipitation_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
 
         subplot = np.delete(subplot, 0)
 
     # ============================= Precipitation Bar =============================
     # Precip intensity is in inches of liquid rain per hour using a bar chart.
     if 'show_precipitation_bar' in axes:
-        subplot[0].set_title('total precipitation', **payload['k_dict']['k_title_font'])
-        subplot[0].bar(x1, precipitation, width=0.4, align='center', color=payload['p_dict']['lineColor'])
+        subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
+        subplot[0].bar(x1, precipitation, width=0.4, align='center', color=p_dict['lineColor'])
         format_subplot(subplot[0])
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
 
-        if payload['p_dict']['precipitation_min'] not in ("", "None"):
-            subplot[0].set_ylim(bottom=float(payload['p_dict']['precipitation_min']))
-        if payload['p_dict']['precipitation_max'] not in ("", "None"):
-            subplot[0].set_ylim(top=float(payload['p_dict']['precipitation_max']))
+        if p_dict['precipitation_min'] not in ("", "None"):
+            subplot[0].set_ylim(bottom=float(p_dict['precipitation_min']))
+        if p_dict['precipitation_max'] not in ("", "None"):
+            subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
 
         # We don't use the subplot variable after this; but this command
         # will be important if we add more subplots.

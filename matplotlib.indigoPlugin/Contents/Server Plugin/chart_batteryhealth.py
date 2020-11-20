@@ -30,20 +30,26 @@ import chart_tools
 # import DLFramework as Dave
 
 payload = chart_tools.payload
-# =============================================================================
+p_dict = payload['p_dict']
+k_dict = payload['k_dict']
 
 try:
+
+    def __init__():
+        pass
+
+
     bar_colors    = []
-    caution_color = chart_tools.fix_rgb(c=payload['p_dict']['cautionColor'])
-    caution_level = int(payload['p_dict']['cautionLevel'])
+    caution_color = chart_tools.fix_rgb(c=p_dict['cautionColor'])
+    caution_level = int(p_dict['cautionLevel'])
     chart_data    = {}
     font_size     = plt.rcParams['ytick.labelsize']
-    healthy_color = chart_tools.fix_rgb(c=payload['p_dict']['healthyColor'])
-    level_box     = payload['p_dict']['showBatteryLevelBackground']
-    show_level    = payload['p_dict']['showBatteryLevel']
-    dead_ones     = payload['p_dict'].get('showDeadBattery', False)
-    warning_color = chart_tools.fix_rgb(c=payload['p_dict']['warningColor'])
-    warning_level = int(payload['p_dict']['warningLevel'])
+    healthy_color = chart_tools.fix_rgb(c=p_dict['healthyColor'])
+    level_box     = p_dict['showBatteryLevelBackground']
+    show_level    = p_dict['showBatteryLevel']
+    dead_ones     = p_dict.get('showDeadBattery', False)
+    warning_color = chart_tools.fix_rgb(c=p_dict['warningColor'])
+    warning_level = int(p_dict['warningLevel'])
     x_values      = []
     y_text        = []
 
@@ -98,7 +104,7 @@ try:
                     color=bar_colors,
                     align='center',
                     linewidth=0,
-                    **payload['k_dict']['k_bar']
+                    **k_dict['k_bar']
                     )
 
     # ================================ Data Labels ================================
@@ -114,12 +120,12 @@ try:
             if width >= caution_level:
                 plt.annotate(u"{0:.0f}".format(width),
                              xy=(width - 3, y + height / 2),
-                             fontsize=font_size, **payload['k_dict']['k_annotation_battery']
+                             fontsize=font_size, **k_dict['k_annotation_battery']
                              )
             else:
                 plt.annotate(u"{0:.0f}".format(width),
                              xy=(width + 3, y + height / 2),
-                             fontsize=font_size, **payload['k_dict']['k_annotation_battery']
+                             fontsize=font_size, **k_dict['k_annotation_battery']
                              )
 
         # Without bbox.
@@ -128,34 +134,34 @@ try:
                 plt.annotate(u"{0:.0f}".format(width),
                              xy=(width - 2, y + height / 2),
                              fontsize=font_size,
-                             **payload['k_dict']['k_battery']
+                             **k_dict['k_battery']
                              )
             else:
                 plt.annotate(u"{0:.0f}".format(width),
                              xy=(width + 2, y + height / 2),
                              fontsize=font_size,
-                             **payload['k_dict']['k_battery']
+                             **k_dict['k_battery']
                              )
 
     # ================================ Chart Title ================================
-    chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.05, 0.98), align='center')
+    chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
 
     # =============================== Format Grids ================================
     if payload['props'].get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
             ax.axvline(x=_,
-                       color=payload['p_dict']['gridColor'],
+                       color=p_dict['gridColor'],
                        linestyle=payload['prefs'].get('gridStyle', ':')
                        )
 
     # ============================ Format X Axis Label ============================
-    if not payload['p_dict']['showLegend']:
-        plt.xlabel(payload['p_dict']['customAxisLabelX'], **payload['k_dict']['k_x_axis_font'])
+    if not p_dict['showLegend']:
+        plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
         chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
 
-    if payload['p_dict']['showLegend'] and payload['p_dict']['customAxisLabelX'].strip(' ') not in ('', 'null'):
+    if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
         chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
-                            u"legend.".format(payload['name']))
+                                        u"legend.".format(payload['name']))
 
     ax.xaxis.set_ticks_position('bottom')
 
@@ -172,7 +178,7 @@ try:
     ax.set_yticks([n for n in range(1, len(y_values) + 1)], minor=True)
 
     # Assign device names to the minor ticks if wanted
-    if payload['p_dict'].get('showDeviceName', True):
+    if p_dict.get('showDeviceName', True):
         ax.set_yticklabels(y_text, minor=True)
 
     # Mark devices that have a battery level of zero by coloring their y axis label
@@ -194,10 +200,10 @@ try:
         ax.spines[spine].set_visible(False)
 
     # Add a patch so that we can have transparent charts but a filled plot area.
-    if payload['p_dict']['transparent_charts'] and payload['p_dict']['transparent_filled']:
+    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
         ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                        transform=ax.transAxes,
-                                       facecolor=payload['p_dict']['faceColor'],
+                                       facecolor=p_dict['faceColor'],
                                        zorder=1
                                        )
                      )

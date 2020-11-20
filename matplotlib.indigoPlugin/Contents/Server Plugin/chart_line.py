@@ -33,6 +33,8 @@ import chart_tools
 # import DLFramework as Dave
 
 payload = chart_tools.payload
+p_dict = payload['p_dict']
+k_dict = payload['k_dict']
 
 try:
 
@@ -460,41 +462,41 @@ try:
             return final_data
 
 
-    payload['p_dict']['backgroundColor'] = chart_tools.fix_rgb(c=payload['p_dict']['backgroundColor'])
-    payload['p_dict']['faceColor'] = chart_tools.fix_rgb(c=payload['p_dict']['faceColor'])
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
     line_colors = []
 
     dpi = plt.rcParams['savefig.dpi']
-    height = float(payload['p_dict']['chart_height'])
-    width = float(payload['p_dict']['chart_width'])
+    height = float(p_dict['chart_height'])
+    width = float(p_dict['chart_width'])
 
     fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-    ax = fig.add_subplot(111, axisbg=payload['p_dict']['faceColor'])
+    ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
     ax.margins(0.04, 0.05)
-    [ax.spines[spine].set_color(payload['p_dict']['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+    [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
     # ============================== Format X Ticks ===============================
-    ax.tick_params(axis='x', **payload['k_dict']['k_major_x'])
-    ax.tick_params(axis='x', **payload['k_dict']['k_minor_x'])
-    ax.xaxis.set_major_formatter(mdate.DateFormatter(payload['p_dict']['xAxisLabelFormat']))
-    format_axis_x_scale(payload['p_dict']['xAxisBins'])  # Set the scale for the X axis. We assume a date.
+    ax.tick_params(axis='x', **k_dict['k_major_x'])
+    ax.tick_params(axis='x', **k_dict['k_minor_x'])
+    ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
+    format_axis_x_scale(p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
 
     # If the x axis format has been set to None, let's hide the labels.
-    if payload['p_dict']['xAxisLabelFormat'] == "None":
+    if p_dict['xAxisLabelFormat'] == "None":
         ax.axes.xaxis.set_ticklabels([])
 
     # =============================== Format Y Axis ===============================
-    ax.tick_params(axis='y', **payload['k_dict']['k_major_y'])
-    ax.tick_params(axis='y', **payload['k_dict']['k_minor_y'])
-    ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(payload['p_dict']['yAxisPrecision']))))
+    ax.tick_params(axis='y', **k_dict['k_major_y'])
+    ax.tick_params(axis='y', **k_dict['k_minor_y'])
+    ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision']))))
 
     # Mirror Y axis values on Y2. Not all charts will support this option.
     try:
-        if payload['p_dict']['yMirrorValues']:
+        if p_dict['yMirrorValues']:
             ax.tick_params(labelright=True)
 
             # A user may want tick labels only on Y2.
-            if not payload['p_dict']['yMirrorValuesAlsoY1']:
+            if not p_dict['yMirrorValuesAlsoY1']:
                 ax.tick_params(labelleft=False)
 
     except KeyError:
@@ -502,19 +504,19 @@ try:
 
     for line in range(1, 9, 1):
 
-        suppress_line = payload['p_dict'].get('suppressLine{0}'.format(line), False)
+        suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
         lc_index = 'line{0}Color'.format(line)
-        payload['p_dict'][lc_index] = chart_tools.fix_rgb(c=payload['p_dict'][lc_index])
+        p_dict[lc_index] = chart_tools.fix_rgb(c=p_dict[lc_index])
 
         lmc_index = 'line{0}MarkerColor'.format(line)
-        payload['p_dict'][lmc_index] = chart_tools.fix_rgb(c=payload['p_dict'][lmc_index])
+        p_dict[lmc_index] = chart_tools.fix_rgb(c=p_dict[lmc_index])
 
         lbf_index = 'line{0}BestFitColor'.format(line)
-        payload['p_dict'][lbf_index] = chart_tools.fix_rgb(c=payload['p_dict'][lbf_index])
+        p_dict[lbf_index] = chart_tools.fix_rgb(c=p_dict[lbf_index])
 
         # If line color is the same as the background color, alert the user.
-        if payload['p_dict']['line{0}Color'.format(line)] == payload['p_dict']['backgroundColor'] and not suppress_line:
+        if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
             chart_tools.log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
                                   u"not be able to see it).".format(payload['props']['name'], line))
 
@@ -525,39 +527,39 @@ try:
 
         # ============================== Plot the Lines ===============================
         # Plot the lines. If suppress_line is True, we skip it.
-        if payload['p_dict']['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+        if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
 
             # Add line color to list for later use
-            line_colors.append(payload['p_dict']['line{0}Color'.format(line)])
+            line_colors.append(p_dict['line{0}Color'.format(line)])
 
             data_path = payload['prefs']['dataPath'].encode("utf-8")
-            line_source = payload['p_dict']['line{0}Source'.format(line)].encode("utf-8")
+            line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
             data_column = get_data('{0}{1}'.format(data_path, line_source))
 
             chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
 
             # Pull the headers
-            payload['p_dict']['headers'].append(data_column[0][1])
+            p_dict['headers'].append(data_column[0][1])
             del data_column[0]
 
             # Pull the observations into distinct lists for charting.
             for element in data_column:
-                payload['p_dict']['x_obs{0}'.format(line)].append(element[0])
-                payload['p_dict']['y_obs{0}'.format(line)].append(float(element[1]))
+                p_dict['x_obs{0}'.format(line)].append(element[0])
+                p_dict['y_obs{0}'.format(line)].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple
             # binary sources on the same chart.)
             if payload['props']['line{0}adjuster'.format(line)] != "":
                 temp_list = []
-                for obs in payload['p_dict']['y_obs{0}'.format(line)]:
+                for obs in p_dict['y_obs{0}'.format(line)]:
                     expr = u'{0}{1}'.format(obs, payload['props']['line{0}adjuster'.format(line)])
                     temp_list.append(eval_expr(expr_to_eval=expr))
-                payload['p_dict']['y_obs{0}'.format(line)] = temp_list
+                p_dict['y_obs{0}'.format(line)] = temp_list
 
             # ================================ Prune Data =================================
             # Prune the data if warranted
-            dates_to_plot = payload['p_dict']['x_obs{0}'.format(line)]
+            dates_to_plot = p_dict['x_obs{0}'.format(line)]
 
             try:
                 limit = float(payload['props']['limitDataRangeLength'])
@@ -565,78 +567,78 @@ try:
                 limit = 0
 
             if limit > 0:
-                y_obs = payload['p_dict']['y_obs{0}'.format(line)]
+                y_obs = p_dict['y_obs{0}'.format(line)]
                 new_old = payload['props']['limitDataRange']
 
                 prune = prune_data(dates_to_plot, y_obs, limit)
-                payload['p_dict']['x_obs{0}'.format(line)], payload['p_dict']['y_obs{0}'.format(line)] = prune
+                p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
 
             # ======================== Convert Dates for Charting =========================
-            payload['p_dict']['x_obs{0}'.format(line)] = format_dates(payload['p_dict']['x_obs{0}'.format(line)])
+            p_dict['x_obs{0}'.format(line)] = format_dates(p_dict['x_obs{0}'.format(line)])
 
-            ax.plot_date(payload['p_dict']['x_obs{0}'.format(line)],
-                         payload['p_dict']['y_obs{0}'.format(line)],
-                         color=payload['p_dict']['line{0}Color'.format(line)],
-                         linestyle=payload['p_dict']['line{0}Style'.format(line)],
-                         marker=payload['p_dict']['line{0}Marker'.format(line)],
-                         markeredgecolor=payload['p_dict']['line{0}MarkerColor'.format(line)],
-                         markerfacecolor=payload['p_dict']['line{0}MarkerColor'.format(line)],
+            ax.plot_date(p_dict['x_obs{0}'.format(line)],
+                         p_dict['y_obs{0}'.format(line)],
+                         color=p_dict['line{0}Color'.format(line)],
+                         linestyle=p_dict['line{0}Style'.format(line)],
+                         marker=p_dict['line{0}Marker'.format(line)],
+                         markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
+                         markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
                          zorder=10,
-                         **payload['k_dict']['k_line']
+                         **k_dict['k_line']
                          )
 
-            [payload['p_dict']['data_array'].append(node) for node in payload['p_dict']['y_obs{0}'.format(line)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
-            if payload['p_dict']['line{0}Fill'.format(line)]:
-                ax.fill_between(payload['p_dict']['x_obs{0}'.format(line)],
+            if p_dict['line{0}Fill'.format(line)]:
+                ax.fill_between(p_dict['x_obs{0}'.format(line)],
                                 0,
-                                payload['p_dict']['y_obs{0}'.format(line)],
-                                color=payload['p_dict']['line{0}Color'.format(line)],
-                                **payload['k_dict']['k_fill']
+                                p_dict['y_obs{0}'.format(line)],
+                                color=p_dict['line{0}Color'.format(line)],
+                                **k_dict['k_fill']
                                 )
 
             # ================================ Annotations ================================
-            if payload['p_dict']['line{0}Annotate'.format(line)]:
-                for xy in zip(payload['p_dict']['x_obs{0}'.format(line)], payload['p_dict']['y_obs{0}'.format(line)]):
+            if p_dict['line{0}Annotate'.format(line)]:
+                for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
                     ax.annotate(u"{0}".format(xy[1]),
                                 xy=xy,
                                 xytext=(0, 0),
                                 zorder=10,
-                                **payload['k_dict']['k_annotation']
+                                **k_dict['k_annotation']
                                 )
 
     # ============================== Y1 Axis Min/Max ==============================
     # Min and Max are not 'None'.
-    format_axis_y1_min_max(payload['p_dict'])
+    format_axis_y1_min_max(p_dict)
 
     # Transparent Chart Fill
-    if payload['p_dict']['transparent_charts'] and payload['p_dict']['transparent_filled']:
+    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
         ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                        transform=ax.transAxes,
-                                       facecolor=payload['p_dict']['faceColor'],
+                                       facecolor=p_dict['faceColor'],
                                        zorder=1
                                        )
                      )
 
     # ================================== Legend ===================================
-    if payload['p_dict']['showLegend']:
+    if p_dict['showLegend']:
 
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
 
-        headers = [_.decode('utf-8') for _ in payload['p_dict']['headers']]
+        headers = [_.decode('utf-8') for _ in p_dict['headers']]
 
         for header in headers:
-            if payload['p_dict']['line{0}Legend'.format(counter)] == "":
+            if p_dict['line{0}Legend'.format(counter)] == "":
                 final_headers.append(header)
             else:
-                final_headers.append(payload['p_dict']['line{0}Legend'.format(counter)])
+                final_headers.append(p_dict['line{0}Legend'.format(counter)])
             counter += 1
 
         # Set the legend
         # Reorder the headers and colors so that they fill by row instead of by column
-        num_col = int(payload['p_dict']['legendColumns'])
+        num_col = int(p_dict['legendColumns'])
         iter_headers = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
         final_headers = [_ for _ in iter_headers]
 
@@ -647,11 +649,11 @@ try:
                            loc='upper center',
                            bbox_to_anchor=(0.5, -0.1),
                            ncol=num_col,
-                           prop={'size': float(payload['p_dict']['legendFontSize'])}
+                           prop={'size': float(p_dict['legendFontSize'])}
                            )
 
         # Set legend font color
-        [text.set_color(payload['p_dict']['fontColor']) for text in legend.get_texts()]
+        [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
 
         # Set legend line color
         num_handles = len(legend.legendHandles)
@@ -662,9 +664,9 @@ try:
 
     for line in range(1, 9, 1):
 
-        suppress_line = payload['p_dict'].get('suppressLine{0}'.format(line), False)
+        suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
-        if payload['p_dict']['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+        if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
             # Note that we do these after the legend is drawn so that these lines don't
             # affect the legend.
 
@@ -674,60 +676,60 @@ try:
             # =============================== Best Fit Line ===============================
             if payload['props'].get('line{0}BestFit'.format(line), False):
                 format_best_fit_line_segments(ax,
-                                              payload['p_dict']['x_obs{0}'.format(line)],
+                                              p_dict['x_obs{0}'.format(line)],
                                               line,
-                                              payload['p_dict'],
+                                              p_dict,
                                               )
 
-            [payload['p_dict']['data_array'].append(node) for node in payload['p_dict']['y_obs{0}'.format(line)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
             # =============================== Fill Between ================================
-            if payload['p_dict']['line{0}Fill'.format(line)]:
-                ax.fill_between(payload['p_dict']['x_obs{0}'.format(line)],
+            if p_dict['line{0}Fill'.format(line)]:
+                ax.fill_between(p_dict['x_obs{0}'.format(line)],
                                 0,
-                                payload['p_dict']['y_obs{0}'.format(line)],
-                                color=payload['p_dict']['line{0}Color'.format(line)],
-                                **payload['k_dict']['k_fill']
+                                p_dict['y_obs{0}'.format(line)],
+                                color=p_dict['line{0}Color'.format(line)],
+                                **k_dict['k_fill']
                                 )
 
             # =============================== Min/Max Lines ===============================
-            if payload['p_dict']['plotLine{0}Min'.format(line)]:
-                ax.axhline(y=min(payload['p_dict']['y_obs{0}'.format(line)]),
-                           color=payload['p_dict']['line{0}Color'.format(line)],
-                           **payload['k_dict']['k_min'])
-            if payload['p_dict']['plotLine{0}Max'.format(line)]:
-                ax.axhline(y=max(payload['p_dict']['y_obs{0}'.format(line)]),
-                           color=payload['p_dict']['line{0}Color'.format(line)],
-                           **payload['k_dict']['k_max']
+            if p_dict['plotLine{0}Min'.format(line)]:
+                ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
+                           color=p_dict['line{0}Color'.format(line)],
+                           **k_dict['k_min'])
+            if p_dict['plotLine{0}Max'.format(line)]:
+                ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
+                           color=p_dict['line{0}Color'.format(line)],
+                           **k_dict['k_max']
                            )
             if payload['prefs'].get('forceOriginLines', True):
-                ax.axhline(y=0, color=payload['p_dict']['spineColor'])
+                ax.axhline(y=0, color=p_dict['spineColor'])
 
-    format_custom_line_segments(ax, payload['prefs'], payload['p_dict'], payload['k_dict'])
+    format_custom_line_segments(ax, payload['prefs'], p_dict, k_dict)
 
     # =============================== Format Grids ================================
-    if payload['p_dict']['showxAxisGrid']:
-        plt.gca().xaxis.grid(True, **payload['k_dict']['k_grid_fig'])
+    if p_dict['showxAxisGrid']:
+        plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
 
-    if payload['p_dict']['showyAxisGrid']:
-        plt.gca().yaxis.grid(True, **payload['k_dict']['k_grid_fig'])
+    if p_dict['showyAxisGrid']:
+        plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
     # =============================== Format Title ================================
-    chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.05, 0.98), align='center')
+    chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
 
     # ============================ Format X Axis Label ============================
-    if not payload['p_dict']['showLegend']:
-        plt.xlabel(payload['p_dict']['customAxisLabelX'], **payload['k_dict']['k_x_axis_font'])
+    if not p_dict['showLegend']:
+        plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
         chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
 
-    if payload['p_dict']['showLegend'] and payload['p_dict']['customAxisLabelX'].strip(' ') not in ('', 'null'):
+    if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
         chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room "
                             u"for the chart legend.".format(payload['props']['name']))
 
     # ============================ Format Y1 Axis Label ============================
-    plt.ylabel(payload['p_dict']['customAxisLabelY'], **payload['k_dict']['k_y_axis_font'])
+    plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
-    format_axis_y_ticks(payload['p_dict'])
+    format_axis_y_ticks(p_dict)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

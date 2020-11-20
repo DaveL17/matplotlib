@@ -30,6 +30,8 @@ import chart_tools
 # import DLFramework as Dave
 
 payload = chart_tools.payload
+p_dict = payload['p_dict']
+k_dict = payload['k_dict']
 
 try:
 
@@ -67,11 +69,11 @@ try:
 
         return val
 
-    payload['p_dict']['backgroundColor'] = chart_tools.fix_rgb(c=payload['p_dict']['backgroundColor'])
-    payload['p_dict']['faceColor'] = chart_tools.fix_rgb(c=payload['p_dict']['faceColor'])
-    payload['p_dict']['textColor'] = chart_tools.fix_rgb(c=payload['p_dict']['textColor'])
-    payload['p_dict']['figureWidth'] = float(payload['props']['figureWidth'])
-    payload['p_dict']['figureHeight'] = float(payload['props']['figureHeight'])
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
+    p_dict['textColor'] = chart_tools.fix_rgb(c=p_dict['textColor'])
+    p_dict['figureWidth'] = float(payload['props']['figureWidth'])
+    p_dict['figureHeight'] = float(payload['props']['figureHeight'])
 
     try:
         height = int(payload['props'].get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
@@ -92,49 +94,49 @@ try:
         # configuration.
         text_to_plot = payload['data']
         if len(text_to_plot) <= 1:
-            text_to_plot = unicode(payload['p_dict']['defaultText'])
+            text_to_plot = unicode(p_dict['defaultText'])
 
         else:
             # The clean_string method tries to remove some potential ugliness from the text
             # to be plotted. It's optional--defaulted to on. No need to call this if the
             # default text is used.
-            if payload['p_dict']['cleanTheText']:
+            if p_dict['cleanTheText']:
                 text_to_plot = clean_string(text_to_plot)
 
         chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
         # Wrap the text and prepare it for plotting.
         text_to_plot = textwrap.fill(text_to_plot,
-                                     int(payload['p_dict']['numberOfCharacters']),
-                                     replace_whitespace=payload['p_dict']['cleanTheText']
+                                     int(p_dict['numberOfCharacters']),
+                                     replace_whitespace=p_dict['cleanTheText']
                                      )
 
         ax.text(0.01, 0.95,
                 text_to_plot,
                 transform=ax.transAxes,
-                color=payload['p_dict']['textColor'],
-                fontname=payload['p_dict']['fontMain'],
-                fontsize=payload['p_dict']['multilineFontSize'],
+                color=p_dict['textColor'],
+                fontname=p_dict['fontMain'],
+                fontsize=p_dict['multilineFontSize'],
                 verticalalignment='top'
                 )
 
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
 
-        if not payload['p_dict']['textAreaBorder']:
+        if not p_dict['textAreaBorder']:
             [s.set_visible(False) for s in ax.spines.values()]
 
         # Transparent Charts Fill
-        if payload['p_dict']['transparent_charts'] and payload['p_dict']['transparent_filled']:
+        if p_dict['transparent_charts'] and p_dict['transparent_filled']:
             ax.add_patch(patches.Rectangle((0, 0), 1, 1,
                                            transform=ax.transAxes,
-                                           facecolor=payload['p_dict']['faceColor'],
+                                           facecolor=p_dict['faceColor'],
                                            zorder=1
                                            )
                          )
 
         # =============================== Format Title ================================
-        chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.05, 0.98), align='center')
+        chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
 
     except (KeyError, IndexError, ValueError, UnicodeEncodeError):
         pass

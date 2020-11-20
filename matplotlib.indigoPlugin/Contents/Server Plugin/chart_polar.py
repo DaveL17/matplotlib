@@ -47,24 +47,26 @@ import chart_tools
 
 final_data = []
 payload = chart_tools.payload
+p_dict = payload['p_dict']
+k_dict = payload['k_dict']
 
 try:
     def __init__():
         pass
 
-    num_obs                               = payload['p_dict']['numObs']
-    payload['p_dict']['backgroundColor']  = chart_tools.fix_rgb(payload['p_dict']['backgroundColor'])
-    payload['p_dict']['faceColor']        = chart_tools.fix_rgb(payload['p_dict']['faceColor'])
-    payload['p_dict']['currentWindColor'] = chart_tools.fix_rgb(payload['p_dict']['currentWindColor'])
-    payload['p_dict']['maxWindColor']     = chart_tools.fix_rgb(payload['p_dict']['maxWindColor'])
+    num_obs                               = p_dict['numObs']
+    p_dict['backgroundColor']  = chart_tools.fix_rgb(p_dict['backgroundColor'])
+    p_dict['faceColor']        = chart_tools.fix_rgb(p_dict['faceColor'])
+    p_dict['currentWindColor'] = chart_tools.fix_rgb(p_dict['currentWindColor'])
+    p_dict['maxWindColor']     = chart_tools.fix_rgb(p_dict['maxWindColor'])
 
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from
     # self.final_data.
     theta_path = '{0}{1}'.format(payload['prefs']['dataPath'],
-                                 payload['p_dict']['thetaValue'].encode('utf-8'))
+                                 p_dict['thetaValue'].encode('utf-8'))
     radii_path = '{0}{1}'.format(payload['prefs']['dataPath'],
-                                 payload['p_dict']['radiiValue'].encode('utf-8'))
+                                 p_dict['radiiValue'].encode('utf-8'))
 
     if theta_path != 'None' and radii_path != 'None':
 
@@ -81,24 +83,24 @@ try:
         del final_data[1][0]
 
         # Create lists of data to plot (string -> float).
-        [payload['p_dict']['wind_direction'].append(float(item[1])) for item in final_data[0]]
-        [payload['p_dict']['wind_speed'].append(float(item[1])) for item in final_data[1]]
+        [p_dict['wind_direction'].append(float(item[1])) for item in final_data[0]]
+        [p_dict['wind_speed'].append(float(item[1])) for item in final_data[1]]
 
         # Get the length of the lists
-        len_wind_dir = len(payload['p_dict']['wind_direction'])
-        len_wind_spd = len(payload['p_dict']['wind_speed'])
+        len_wind_dir = len(p_dict['wind_direction'])
+        len_wind_spd = len(p_dict['wind_speed'])
 
         # If the number of observations we have is greater than the number we want, we
         # need to slice the lists to use the last n observations.
         if len_wind_dir > num_obs:
-            payload['p_dict']['wind_direction'] = payload['p_dict']['wind_direction'][num_obs * -1:]
+            p_dict['wind_direction'] = p_dict['wind_direction'][num_obs * -1:]
 
         if len_wind_spd > num_obs:
-            payload['p_dict']['wind_speed'] = payload['p_dict']['wind_speed'][num_obs * -1:]
+            p_dict['wind_speed'] = p_dict['wind_speed'][num_obs * -1:]
 
         # If at this point we still don't have an equal number of observations for both
         # theta and radii, we shouldn't plot the chart.
-        if len(payload['p_dict']['wind_direction']) != len(payload['p_dict']['wind_speed']):
+        if len(p_dict['wind_direction']) != len(p_dict['wind_speed']):
             chart_tools.log['Warning'].append(u"[{0}] Insufficient number of observations "
                                               u"to plot.".format(payload['props']['name']))
             chart_tools.log['Warning'].append(u"Skipped. {0}".format(payload['props']['name']))
@@ -110,20 +112,20 @@ try:
         color_increment = 1.0 / num_obs
         color = color_increment
         for item in range(0, num_obs, 1):
-            payload['p_dict']['bar_colors'].append("%0.3f" % color)
+            p_dict['bar_colors'].append("%0.3f" % color)
             color += color_increment
-        payload['p_dict']['bar_colors'][num_obs - 1] = payload['p_dict']['currentWindColor']
+        p_dict['bar_colors'][num_obs - 1] = p_dict['currentWindColor']
 
         # Change the default bar color for the max to user preference.
-        max_wind_speed = max(payload['p_dict']['wind_speed'])
-        payload['p_dict']['bar_colors'][payload['p_dict']['wind_speed'].index(max_wind_speed)] = payload['p_dict']['maxWindColor']
+        max_wind_speed = max(p_dict['wind_speed'])
+        p_dict['bar_colors'][p_dict['wind_speed'].index(max_wind_speed)] = p_dict['maxWindColor']
 
         # Polar plots are in radians (not degrees.)
-        payload['p_dict']['wind_direction'] = np.radians(payload['p_dict']['wind_direction'])
-        wind = zip(payload['p_dict']['wind_direction'], payload['p_dict']['wind_speed'], payload['p_dict']['bar_colors'])
+        p_dict['wind_direction'] = np.radians(p_dict['wind_direction'])
+        wind = zip(p_dict['wind_direction'], p_dict['wind_speed'], p_dict['bar_colors'])
 
         # ============================== Customizations ===============================
-        size = float(payload['p_dict']['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
+        size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
         ax = plt.subplot(111, polar=True)  # Create subplot
         plt.grid(color=plt.rcParams['grid.color'])                        # Color the grid
@@ -131,7 +133,7 @@ try:
         ax.set_theta_direction(-1)                                        # Reverse the rotation
         ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])  # Customize the xtick labels
         ax.spines['polar'].set_visible(False)                             # Show or hide the plot spine
-        ax.set_axis_bgcolor(payload['p_dict']['faceColor'])               # Background color of the plot area.
+        ax.set_axis_bgcolor(p_dict['faceColor'])               # Background color of the plot area.
 
         # ============================== Create the Plot ==============================
         # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the
@@ -179,12 +181,12 @@ try:
                      )
 
         ax.yaxis.set_ticks(ticks)
-        ax.set_rgrids(grids, **payload['k_dict']['k_rgrids'])
+        ax.set_rgrids(grids, **k_dict['k_rgrids'])
 
         # If the user wants to hide tick labels, lets do that.
-        if payload['p_dict']['xHideLabels']:
+        if p_dict['xHideLabels']:
             ax.axes.xaxis.set_ticklabels([])
-        if payload['p_dict']['yHideLabels']:
+        if p_dict['yHideLabels']:
             ax.axes.yaxis.set_ticklabels([])
 
         # ========================== Current Obs / Max Wind ===========================
@@ -194,20 +196,20 @@ try:
         # "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
         fig = plt.gcf()
         max_wind_circle = plt.Circle((0, 0),
-                                     (max(payload['p_dict']['wind_speed']) * 0.99),
+                                     (max(p_dict['wind_speed']) * 0.99),
                                      transform=ax.transProjectionAffine + ax.transAxes,
                                      fill=False,
-                                     edgecolor=payload['p_dict']['maxWindColor'],
+                                     edgecolor=p_dict['maxWindColor'],
                                      linewidth=2,
                                      alpha=1,
                                      zorder=9
                                      )
         fig.gca().add_artist(max_wind_circle)
 
-        last_wind_circle = plt.Circle((0, 0), (payload['p_dict']['wind_speed'][-1] * 0.99),
+        last_wind_circle = plt.Circle((0, 0), (p_dict['wind_speed'][-1] * 0.99),
                                       transform=ax.transProjectionAffine + ax.transAxes,
                                       fill=False,
-                                      edgecolor=payload['p_dict']['currentWindColor'],
+                                      edgecolor=p_dict['currentWindColor'],
                                       linewidth=2,
                                       alpha=1,
                                       zorder=10
@@ -216,12 +218,12 @@ try:
 
         # ================================== No Wind ==================================
         # If latest obs is a speed of zero, plot something that we can see.
-        if payload['p_dict']['wind_speed'][-1] == 0:
+        if p_dict['wind_speed'][-1] == 0:
             zero_wind_circle = plt.Circle((0, 0), 0.15,
                                           transform=ax.transProjectionAffine + ax.transAxes,
                                           fill=True,
-                                          facecolor=payload['p_dict']['currentWindColor'],
-                                          edgecolor=payload['p_dict']['currentWindColor'],
+                                          facecolor=p_dict['currentWindColor'],
+                                          edgecolor=p_dict['currentWindColor'],
                                           linewidth=2,
                                           alpha=1,
                                           zorder=12
@@ -229,13 +231,13 @@ try:
             fig.gca().add_artist(zero_wind_circle)
 
         # ========================== Transparent Chart Fill ===========================
-        if payload['p_dict']['transparent_charts'] and payload['p_dict']['transparent_filled']:
+        if p_dict['transparent_charts'] and p_dict['transparent_filled']:
             ylim = ax.get_ylim()
             patch = plt.Circle((0, 0),
                                ylim[1],
                                transform=ax.transProjectionAffine + ax.transAxes,
                                fill=True,
-                               facecolor=payload['p_dict']['faceColor'],
+                               facecolor=p_dict['faceColor'],
                                linewidth=1,
                                alpha=1,
                                zorder=1
@@ -246,20 +248,20 @@ try:
         # Legend should be plotted before any other lines are plotted (like averages or
         # custom line segments).
 
-        if payload['p_dict']['showLegend']:
+        if p_dict['showLegend']:
             legend = ax.legend(([u"Current", u"Maximum"]),
                                loc='upper center',
                                bbox_to_anchor=(0.5, -0.05),
                                ncol=2,
-                               prop={'size': float(payload['p_dict']['legendFontSize'])}
+                               prop={'size': float(p_dict['legendFontSize'])}
                                )
-            legend.legendHandles[0].set_color(payload['p_dict']['currentWindColor'])
-            legend.legendHandles[1].set_color(payload['p_dict']['maxWindColor'])
-            [text.set_color(payload['p_dict']['fontColor']) for text in legend.get_texts()]
+            legend.legendHandles[0].set_color(p_dict['currentWindColor'])
+            legend.legendHandles[1].set_color(p_dict['maxWindColor'])
+            [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
             frame = legend.get_frame()
             frame.set_alpha(0)
 
-        chart_tools.format_title(payload['p_dict'], payload['k_dict'], loc=(0.025, 0.98), align='left')
+        chart_tools.format_title(p_dict, k_dict, loc=(0.025, 0.98), align='left')
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

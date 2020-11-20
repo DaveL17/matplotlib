@@ -1,3 +1,6 @@
+v0.9.12
+- Code refinement and bug fixes as a result of subprocess.Popen refactoring.
+
 v0.9.11
 - Converts weather composite charting code from multiprocessing to subprocess.Popen.
 
