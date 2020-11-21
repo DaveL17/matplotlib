@@ -35,14 +35,13 @@ import chart_tools
 payload = chart_tools.payload
 p_dict = payload['p_dict']
 k_dict = payload['k_dict']
+bar_colors = []
 
 try:
 
     def __init__():
         pass
 
-
-    bar_colors = []
     num_obs = p_dict['numObs']
 
     p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])

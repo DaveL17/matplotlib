@@ -42,13 +42,13 @@ try:
                     6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
            }
 
-    first_day = int(payload['props'].get('firstDayOfWeek', 6))
-    day_format = payload['props'].get('dayOfWeekFormat', 'mid')
+    first_day   = int(payload['props'].get('firstDayOfWeek', 6))
+    day_format  = payload['props'].get('dayOfWeekFormat', 'mid')
     days_labels = fmt[day_format][first_day]
 
     my_cal = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
-    today = dt.datetime.today()
-    cal = my_cal.monthdatescalendar(today.year, today.month)
+    today  = dt.datetime.today()
+    cal    = my_cal.monthdatescalendar(today.year, today.month)
 
     try:
         height = int(payload['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])

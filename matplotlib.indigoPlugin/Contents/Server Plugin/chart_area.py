@@ -32,22 +32,21 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+payload         = chart_tools.payload
+p_dict          = payload['p_dict']
+k_dict          = payload['k_dict']
+x_obs           = ''
+y_obs_tuple     = ()  # Y values
+y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
+y_colors_tuple  = ()  # Y area colors
 
 try:
 
     def __init__():
         pass
 
-
     p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
     p_dict['faceColor']       = chart_tools.fix_rgb(p_dict['faceColor'])
-    x_obs           = ''
-    y_obs_tuple     = ()  # Y values
-    y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
-    y_colors_tuple  = ()  # Y area colors
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])

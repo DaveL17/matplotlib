@@ -49,14 +49,14 @@ forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergr
 height          = int(props['props']['height'])
 width           = int(props['props']['width'])
 
-dates_to_plot = ()
-precipitation = ()
-humidity = ()
+dates_to_plot    = ()
+precipitation    = ()
+humidity         = ()
 temperature_high = ()
-temperature_low = ()
-pressure = ()
-wind_speed = ()
-wind_bearing = ()
+temperature_low  = ()
+pressure         = ()
+wind_speed       = ()
+wind_bearing     = ()
 
 
 try:

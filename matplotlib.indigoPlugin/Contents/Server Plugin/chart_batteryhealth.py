@@ -29,20 +29,21 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+payload       = chart_tools.payload
+p_dict        = payload['p_dict']
+k_dict        = payload['k_dict']
+bar_colors    = []
+chart_data    = {}
+x_values      = []
+y_text        = []
 
 try:
 
     def __init__():
         pass
 
-
-    bar_colors    = []
     caution_color = chart_tools.fix_rgb(c=p_dict['cautionColor'])
     caution_level = int(p_dict['cautionLevel'])
-    chart_data    = {}
     font_size     = plt.rcParams['ytick.labelsize']
     healthy_color = chart_tools.fix_rgb(c=p_dict['healthyColor'])
     level_box     = p_dict['showBatteryLevelBackground']
@@ -50,8 +51,6 @@ try:
     dead_ones     = p_dict.get('showDeadBattery', False)
     warning_color = chart_tools.fix_rgb(c=p_dict['warningColor'])
     warning_level = int(p_dict['warningLevel'])
-    x_values      = []
-    y_text        = []
 
     # ============================ Create Device Dict =============================
     # 'thing' here is a tuple ('name', 'battery level')
