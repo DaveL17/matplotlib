@@ -32,9 +32,12 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
+
 payload         = chart_tools.payload
 p_dict          = payload['p_dict']
 k_dict          = payload['k_dict']
+plug_dict       = payload['prefs']
+props           = payload['props']
 x_obs           = ''
 y_obs_tuple     = ()  # Y values
 y_obs_tuple_rel = {}  # Y values relative to chart (cumulative value)
@@ -45,8 +48,9 @@ try:
     def __init__():
         pass
 
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
-    p_dict['faceColor']       = chart_tools.fix_rgb(p_dict['faceColor'])
+
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor']       = chart_tools.fix_rgb(c=p_dict['faceColor'])
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])
@@ -57,8 +61,8 @@ try:
     ax.margins(0.04, 0.05)
     [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
-    chart_tools.format_axis_x_ticks(ax, p_dict, k_dict)
-    chart_tools.format_axis_y(ax, p_dict, k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict)
 
     for area in range(1, 9, 1):
 
@@ -71,20 +75,20 @@ try:
         # If area color is the same as the background color, alert the user.
         if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
             chart_tools.log['Warning'].append(u"[{0}] Area {1} color is the same as the background color (so you may "
-                                              u"not be able to see it).".format(payload['props']['name'], area))
+                                              u"not be able to see it).".format(props['name'], area))
 
         # If the area is suppressed, remind the user they suppressed it.
         if suppress_area:
             chart_tools.log['Info'].append(u"[{0}] Area {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(payload['props']['name'], area))
+                                           u"device configuration menu.".format(props['name'], area))
 
         # ============================== Plot the Areas ===============================
         # Plot the areas. If suppress_area is True, we skip it.
         if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
 
-            data_path   = payload['prefs']['dataPath'].encode("utf-8")
+            data_path   = plug_dict['dataPath'].encode("utf-8")
             area_source = p_dict['area{0}Source'.format(area)].encode("utf-8")
-            data_column = chart_tools.get_data('{0}{1}'.format(data_path, area_source))
+            data_column = chart_tools.get_data(data_source='{0}{1}'.format(data_path, area_source))
             chart_tools.log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
 
             # Pull the headers
@@ -99,10 +103,10 @@ try:
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple
             # binary sources on the same chart.)
-            if payload['props']['area{0}adjuster'.format(area)] != "":
+            if props['area{0}adjuster'.format(area)] != "":
                 temp_list = []
                 for obs in p_dict['y_obs{0}'.format(area)]:
-                    expr = u'{0}{1}'.format(obs, payload['props']['area{0}adjuster'.format(area)])
+                    expr = u'{0}{1}'.format(obs, props['area{0}adjuster'.format(area)])
                     temp_list.append(chart_tools.eval_expr(expr))
                 p_dict['y_obs{0}'.format(area)] = temp_list
 
@@ -111,17 +115,21 @@ try:
             dates_to_plot = p_dict['x_obs{0}'.format(area)]
 
             try:
-                limit = float(payload['props']['limitDataRangeLength'])
+                limit = float(props['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
             if limit > 0:
                 y_obs = p_dict['y_obs{0}'.format(area)]
-                new_old = payload['props']['limitDataRange']
+                new_old = props['limitDataRange']
 
                 x_index = 'x_obs{0}'.format(area)
                 y_index = 'y_obs{0}'.format(area)
-                p_dict[x_index], p_dict[y_index] = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old)
+                p_dict[x_index], p_dict[y_index] = chart_tools.prune_data(x_data=dates_to_plot,
+                                                                          y_data=y_obs,
+                                                                          limit=limit,
+                                                                          new_old=new_old
+                                                                          )
 
             # ======================== Convert Dates for Charting =========================
             p_dict['x_obs{0}'.format(area)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(area)])
@@ -174,7 +182,7 @@ try:
     # scaling values from the plot and then use those for min/max.
     [p_dict['data_array'].append(node) for node in ax.get_ylim()]
 
-    chart_tools.format_axis_y1_min_max(p_dict)
+    chart_tools.format_axis_y1_min_max(p_dict=p_dict)
 
     # Transparent Chart Fill
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -245,8 +253,12 @@ try:
             # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(area)])
 
             # =============================== Best Fit Line ===============================
-            if payload['props'].get('line{0}BestFit'.format(area), False):
-                chart_tools.format_best_fit_line_segments(ax, p_dict['x_obs{0}'.format(area)], area, p_dict)
+            if props.get('line{0}BestFit'.format(area), False):
+                chart_tools.format_best_fit_line_segments(ax=ax,
+                                                          dates_to_plot=p_dict['x_obs{0}'.format(area)],
+                                                          line=area,
+                                                          p_dict=p_dict
+                                                          )
 
             [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
 
@@ -261,7 +273,7 @@ try:
                            color=p_dict['area{0}Color'.format(area)],
                            **k_dict['k_max']
                            )
-            if payload['prefs'].get('forceOriginLines', True):
+            if plug_dict.get('forceOriginLines', True):
                 ax.axhline(y=0,
                            color=p_dict['spineColor']
                            )
@@ -287,12 +299,12 @@ try:
                              color=p_dict['line{0}Color'.format(area)]
                              )
 
-    chart_tools.format_custom_line_segments(ax, payload['prefs'], p_dict, k_dict)
-    chart_tools.format_grids(p_dict, k_dict)
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_x_label(payload['props'], p_dict, k_dict)
-    chart_tools.format_axis_y1_label(p_dict, k_dict)
-    chart_tools.format_axis_y_ticks(p_dict, k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

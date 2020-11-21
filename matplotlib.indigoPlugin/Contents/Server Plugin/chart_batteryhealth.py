@@ -13,8 +13,8 @@ user input.
 # import calendar
 # import datetime as dt
 import numpy as np
-import sys
-import pickle
+# import sys
+# import pickle
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -32,6 +32,8 @@ import chart_tools
 payload       = chart_tools.payload
 p_dict        = payload['p_dict']
 k_dict        = payload['k_dict']
+prefs         = payload['prefs']
+props         = payload['props']
 bar_colors    = []
 chart_data    = {}
 x_values      = []
@@ -76,18 +78,17 @@ try:
         x_values.append(chart_data[thing[0]]['batteryLevel'])
         y_text.append(unicode(thing[0]))
 
-
     # Create a range of values to plot on the Y axis, since we can't plot on device names.
     y_values = np.arange(len(y_text))
 
     # Create the chart figure
     try:
-        height = int(payload['props'].get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+        height = int(props.get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         height = 3
 
     try:
-        width = int(payload['props'].get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+        width = int(props.get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         width = 5
 
@@ -146,17 +147,18 @@ try:
     chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
 
     # =============================== Format Grids ================================
-    if payload['props'].get('showxAxisGrid', False):
+    if props.get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
             ax.axvline(x=_,
                        color=p_dict['gridColor'],
-                       linestyle=payload['prefs'].get('gridStyle', ':')
+                       linestyle=prefs.get('gridStyle', ':')
                        )
 
     # ============================ Format X Axis Label ============================
     if not p_dict['showLegend']:
         plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
+        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting "
+                                              u"X label.".format(props['name']))
 
     if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
         chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "

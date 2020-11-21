@@ -37,32 +37,31 @@ import matplotlib.ticker as mtick
 import chart_tools
 # import DLFramework as Dave
 
-payload    = chart_tools.payload
-p_dict     = payload['p_dict']
-k_dict     = payload['k_dict']
-state_list = payload['state_list']
-dev_type   = payload['dev_type']
-props      = payload['props']
-
-dpi             = int(plt.rcParams['savefig.dpi'])
-forecast_length = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
-height          = int(props['props']['height'])
-width           = int(props['props']['width'])
-
+payload          = chart_tools.payload
+p_dict           = payload['p_dict']
+k_dict           = payload['k_dict']
+state_list       = payload['state_list']
+dev_type         = payload['dev_type']
+props            = payload['props']
 dates_to_plot    = ()
-precipitation    = ()
+dpi              = int(plt.rcParams['savefig.dpi'])
+forecast_length  = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
+height           = int(props['props']['height'])
 humidity         = ()
+precipitation    = ()
+pressure         = ()
 temperature_high = ()
 temperature_low  = ()
-pressure         = ()
-wind_speed       = ()
+width            = int(props['props']['width'])
 wind_bearing     = ()
+wind_speed       = ()
 
 
 try:
 
     def __init__():
         pass
+
 
     def format_subplot(s_plot):
         chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict)
@@ -74,10 +73,10 @@ try:
         if p_dict['showyAxisGrid']:
             plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
-    p_dict['faceColor']       = chart_tools.fix_rgb(p_dict['faceColor'])
-    p_dict['lineColor']       = chart_tools.fix_rgb(p_dict['lineColor'])
-    p_dict['lineMarkerColor'] = chart_tools.fix_rgb(p_dict['lineMarkerColor'])
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor']       = chart_tools.fix_rgb(c=p_dict['faceColor'])
+    p_dict['lineColor']       = chart_tools.fix_rgb(c=p_dict['lineColor'])
+    p_dict['lineMarkerColor'] = chart_tools.fix_rgb(c=p_dict['lineMarkerColor'])
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])
@@ -130,7 +129,7 @@ try:
     # ================================ Set Up Plot ================================
     fig, subplot = plt.subplots(nrows=num_axes, sharex=True, figsize=(width / dpi, height * num_axes / dpi))
 
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.99))
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.99))
 
     try:
         for plot in subplot:

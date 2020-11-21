@@ -3,7 +3,7 @@
 
     <Field id="debugHeaderSpace" type="label" fontSize="mini"/>
     
-    <Field id="debugLabel" type="label" fontColor="black" alignText="right">
+    <Field id="debugLabel" type="label" alignText="right">
         <Label>Debugging (optional)</Label>
     </Field>
 

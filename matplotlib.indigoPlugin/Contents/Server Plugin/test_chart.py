@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 
-import DLFramework as Dave
+# import DLFramework as Dave
 
 # Collection of logging messages.
 # TODO: consider looking at Matt's logging handler and see if that's better.
@@ -18,6 +18,7 @@ log = []
 
 def __init__():
     pass
+
 
 # Unpickle the payload data. The first element of the payload is the name
 # of this script and we don't need that. As long as size isn't a limitation

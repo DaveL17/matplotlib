@@ -11,10 +11,9 @@ to construct them.
 
 # import calendar
 # import datetime as dt
-import sys
+# import pickle
+# import sys
 import textwrap
-
-import pickle
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -32,6 +31,7 @@ import chart_tools
 payload = chart_tools.payload
 p_dict = payload['p_dict']
 k_dict = payload['k_dict']
+props = payload['props']
 
 try:
 
@@ -72,16 +72,16 @@ try:
     p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
     p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
     p_dict['textColor'] = chart_tools.fix_rgb(c=p_dict['textColor'])
-    p_dict['figureWidth'] = float(payload['props']['figureWidth'])
-    p_dict['figureHeight'] = float(payload['props']['figureHeight'])
+    p_dict['figureWidth'] = float(props['figureWidth'])
+    p_dict['figureHeight'] = float(props['figureHeight'])
 
     try:
-        height = int(payload['props'].get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+        height = int(props.get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         height = 3
 
     try:
-        width = int(payload['props'].get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+        width = int(props.get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         width = 5
 
@@ -101,13 +101,13 @@ try:
             # to be plotted. It's optional--defaulted to on. No need to call this if the
             # default text is used.
             if p_dict['cleanTheText']:
-                text_to_plot = clean_string(text_to_plot)
+                text_to_plot = clean_string(val=text_to_plot)
 
         chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
         # Wrap the text and prepare it for plotting.
-        text_to_plot = textwrap.fill(text_to_plot,
-                                     int(p_dict['numberOfCharacters']),
+        text_to_plot = textwrap.fill(text=text_to_plot,
+                                     width=int(p_dict['numberOfCharacters']),
                                      replace_whitespace=p_dict['cleanTheText']
                                      )
 
@@ -136,7 +136,7 @@ try:
                          )
 
         # =============================== Format Title ================================
-        chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
+        chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
 
     except (KeyError, IndexError, ValueError, UnicodeEncodeError):
         pass

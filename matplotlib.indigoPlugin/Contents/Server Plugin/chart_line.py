@@ -8,16 +8,16 @@ All steps required to generate line charts.
 
 """
 
-import ast
-import csv
-import datetime as dt
-from dateutil.parser import parse as date_parse
+# import ast
+# import csv
+# import datetime as dt
+# from dateutil.parser import parse as date_parse
 import itertools
-import numpy as np
-import operator as op
-import sys
-import pickle
-import unicodedata
+# import numpy as np
+# import operator as op
+# import sys
+# import pickle
+# import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -32,15 +32,20 @@ import matplotlib.ticker as mtick
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+
+payload     = chart_tools.payload
+p_dict      = payload['p_dict']
+k_dict      = payload['k_dict']
+prefs       = payload['prefs']
+props       = payload['props']
 line_colors = []
+
 
 try:
 
     def __init__():
         pass
+
 
     p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
     p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
@@ -58,7 +63,7 @@ try:
     ax.tick_params(axis='x', **k_dict['k_major_x'])
     ax.tick_params(axis='x', **k_dict['k_minor_x'])
     ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
-    chart_tools.format_axis_x_scale(p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
+    chart_tools.format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
 
     # If the x axis format has been set to None, let's hide the labels.
     if p_dict['xAxisLabelFormat'] == "None":
@@ -97,12 +102,12 @@ try:
         # If line color is the same as the background color, alert the user.
         if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
             chart_tools.log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
-                                              u"not be able to see it).".format(payload['props']['name'], line))
+                                              u"not be able to see it).".format(props['name'], line))
 
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
             chart_tools.log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(payload['props']['name'], line))
+                                           u"device configuration menu.".format(props['name'], line))
 
         # ============================== Plot the Lines ===============================
         # Plot the lines. If suppress_line is True, we skip it.
@@ -111,7 +116,7 @@ try:
             # Add line color to list for later use
             line_colors.append(p_dict['line{0}Color'.format(line)])
 
-            data_path = payload['prefs']['dataPath'].encode("utf-8")
+            data_path = prefs['dataPath'].encode("utf-8")
             line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
             data_column = chart_tools.get_data('{0}{1}'.format(data_path, line_source))
 
@@ -129,10 +134,10 @@ try:
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple
             # binary sources on the same chart.)
-            if payload['props']['line{0}adjuster'.format(line)] != "":
+            if props['line{0}adjuster'.format(line)] != "":
                 temp_list = []
                 for obs in p_dict['y_obs{0}'.format(line)]:
-                    expr = u'{0}{1}'.format(obs, payload['props']['line{0}adjuster'.format(line)])
+                    expr = u'{0}{1}'.format(obs, props['line{0}adjuster'.format(line)])
                     temp_list.append(chart_tools.eval_expr(chart_tools.eval_expr(expr)))
                 p_dict['y_obs{0}'.format(line)] = temp_list
 
@@ -141,15 +146,15 @@ try:
             dates_to_plot = p_dict['x_obs{0}'.format(line)]
 
             try:
-                limit = float(payload['props']['limitDataRangeLength'])
+                limit = float(props['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
             if limit > 0:
                 y_obs = p_dict['y_obs{0}'.format(line)]
-                new_old = payload['props']['limitDataRange']
+                new_old = props['limitDataRange']
 
-                prune = chart_tools.prune_data(dates_to_plot, y_obs, limit)
+                prune = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old='None')
                 p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
 
             # ======================== Convert Dates for Charting =========================
@@ -188,7 +193,7 @@ try:
 
     # ============================== Y1 Axis Min/Max ==============================
     # Min and Max are not 'None'.
-    chart_tools.format_axis_y1_min_max(p_dict)
+    chart_tools.format_axis_y1_min_max(p_dict=p_dict)
 
     # Transparent Chart Fill
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -253,11 +258,11 @@ try:
             # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
 
             # =============================== Best Fit Line ===============================
-            if payload['props'].get('line{0}BestFit'.format(line), False):
-                chart_tools.format_best_fit_line_segments(ax,
-                                                          p_dict['x_obs{0}'.format(line)],
-                                                          line,
-                                                          p_dict,
+            if props.get('line{0}BestFit'.format(line), False):
+                chart_tools.format_best_fit_line_segments(ax=ax,
+                                                          dates_to_plot=p_dict['x_obs{0}'.format(line)],
+                                                          line=line,
+                                                          p_dict=p_dict,
                                                           )
 
             [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
@@ -281,10 +286,10 @@ try:
                            color=p_dict['line{0}Color'.format(line)],
                            **k_dict['k_max']
                            )
-            if payload['prefs'].get('forceOriginLines', True):
+            if prefs.get('forceOriginLines', True):
                 ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax, payload['prefs'], p_dict, k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict)
 
     # =============================== Format Grids ================================
     if p_dict['showxAxisGrid']:
@@ -294,21 +299,22 @@ try:
         plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
     # =============================== Format Title ================================
-    chart_tools.format_title(p_dict, k_dict, loc=(0.05, 0.98), align='center')
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
 
     # ============================ Format X Axis Label ============================
     if not p_dict['showLegend']:
         plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(payload['props']['name']))
+        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting "
+                                              u"X label.".format(props['name']))
 
     if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
         chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room "
-                                        u"for the chart legend.".format(payload['props']['name']))
+                                        u"for the chart legend.".format(props['name']))
 
     # ============================ Format Y1 Axis Label ============================
     plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
-    chart_tools.format_axis_y_ticks(p_dict)
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

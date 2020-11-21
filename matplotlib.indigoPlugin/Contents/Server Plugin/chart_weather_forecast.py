@@ -111,16 +111,18 @@ try:
             p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'])
 
-            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly
-            # if that's the case.
+            # Note that bar plots behave strangely if all the y obs are zero.  We need to
+            # adjust slightly if that's the case.
             if set(p_dict['y_obs3']) == {0.0}:
                 p_dict['y_obs3'][0] = 1.0
 
-            p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
-                                                       # that Matplotlib interprets the legend as a tuple.
+            # Note that the trailing comma is required to ensure that Matplotlib interprets
+            # the legend as a tuple.
+            p_dict['headers_1']    = ('Temperature',)
             p_dict['headers_2']    = ('Precipitation',)
+
             p_dict['daytimeColor'] = chart_tools.fix_rgb(p_dict['daytimeColor'])
 
     # ========================== Fantastic Daily Device ===========================
@@ -135,7 +137,7 @@ try:
             p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'])
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
             # that's the case.
@@ -173,12 +175,12 @@ try:
 
     chart_tools.log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
 
-    ax1 = chart_tools.make_chart_figure(p_dict['chart_width'],
-                                        p_dict['chart_height'],
-                                        p_dict
+    ax1 = chart_tools.make_chart_figure(width=p_dict['chart_width'],
+                                        height=p_dict['chart_height'],
+                                        p_dict=p_dict
                                         )
-    chart_tools.format_axis_x_ticks(ax1, p_dict, k_dict)
-    chart_tools.format_axis_y(ax1, p_dict, k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax1, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y(ax=ax1, p_dict=p_dict, k_dict=k_dict)
 
     # ============================ Precipitation Bars =============================
     # The width of the bars is a percentage of a day, so we need to account for
@@ -251,13 +253,13 @@ try:
     plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
     # =============================== X1 Axis Label ===============================
-    chart_tools.format_axis_x_label(props, p_dict, k_dict)
+    chart_tools.format_axis_x_label(ccprops, p_dict=p_dict, k_dict=k_dict)
 
     # =============================== Y1 Axis Label ===============================
     # Note we're plotting Y2 label on ax1. We do this because we want the
     # precipitation bars to be under the temperature plot but we want the
     # precipitation scale to be on the right side.
-    plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
+    plt.ylabel(p_dict['customAxisLabelY2'""], **k_dict['k_y_axis_font'])
     ax1.yaxis.set_label_position('right')
 
     # ============================= Legend Properties =============================
@@ -348,9 +350,9 @@ try:
                                  **k_dict['k_annotation']
                                  )
 
-    chart_tools.format_axis_x_ticks(ax2, p_dict, k_dict)
-    chart_tools.format_axis_y(ax2, p_dict, k_dict)
-    chart_tools.format_custom_line_segments(ax2, payload['prefs'], p_dict, k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax2, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y(ax=ax2, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_custom_line_segments(ax=ax2, plug_dict=payload['prefs'], p_dict=p_dict, k_dict=k_dict)
 
     plt.autoscale(enable=True, axis='x', tight=None)
 
@@ -419,8 +421,8 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)
 
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
-    chart_tools.format_grids(p_dict, k_dict)
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
     plt.tight_layout(pad=1)
 
     # Note that subplots_adjust affects the space surrounding the subplots and

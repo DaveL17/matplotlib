@@ -1,6 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+The scripting module is used as a plugin API for creating simple charts on
+demand.
+-----
 
+"""
 try:
     import indigo
 except ImportError:
@@ -14,7 +19,8 @@ payload = {'x_values': [1, 2, 3],
                       'color': 'b',
                       'marker': 'd',
                       'markerfacecolor': 'r'},
-           'path': '/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/images/controls/static/',
+           'path': '/Library/Application Support/Perceptive Automation/Indigo 7/'
+                   'IndigoWebServer/images/controls/static/',
            'filename': 'chart_filename.png'
            }
 try:

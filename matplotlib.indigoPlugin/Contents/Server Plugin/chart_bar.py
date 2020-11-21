@@ -35,6 +35,8 @@ import chart_tools
 payload = chart_tools.payload
 p_dict = payload['p_dict']
 k_dict = payload['k_dict']
+props = payload['props']
+prefs = payload['prefs']
 bar_colors = []
 
 try:
@@ -44,8 +46,8 @@ try:
 
     num_obs = p_dict['numObs']
 
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
-    p_dict['faceColor'] = chart_tools.fix_rgb(p_dict['faceColor'])
+    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])
@@ -67,13 +69,13 @@ try:
 
         # If the bar color is the same as the background color, alert the user.
         if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
-            chart_tools.log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not be "
-                                           u"able to see it).".format(payload['props']['name'], thing))
+            chart_tools.log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not "
+                                           u"be able to see it).".format(props['name'], thing))
 
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             chart_tools.log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(payload['props']['name'], thing))
+                                           u"device configuration menu.".format(props['name'], thing))
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
@@ -82,7 +84,7 @@ try:
             bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
             # Get the data and grab the header.
-            dc = u'{0}{1}'.format(payload['prefs']['dataPath'].encode("utf-8"),
+            dc = u'{0}{1}'.format(prefs['dataPath'].encode("utf-8"),
                                   p_dict['bar{0}Source'.format(thing)]
                                   )
             data_column = chart_tools.get_data(dc)
@@ -102,13 +104,13 @@ try:
             dates_to_plot = p_dict['x_obs{0}'.format(thing)]
 
             try:
-                limit = float(payload['props']['limitDataRangeLength'])
+                limit = float(props['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
             if limit > 0:
                 y_obs   = p_dict['y_obs{0}'.format(thing)]
-                new_old = payload['props']['limitDataRange']
+                new_old = props['limitDataRange']
                 dtp = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old)
                 p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = dtp
 
@@ -155,9 +157,9 @@ try:
                                 **k_dict['k_annotation']
                                 )
 
-    chart_tools.format_axis_y1_min_max(p_dict)
-    chart_tools.format_axis_x_label(payload['props'], p_dict, k_dict)
-    chart_tools.format_axis_y1_label(p_dict, k_dict)
+    chart_tools.format_axis_y1_min_max(p_dict=p_dict)
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict)
 
     # Add a patch so that we can have transparent charts but a filled plot area.
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -226,13 +228,13 @@ try:
                        color=p_dict['bar{0}Color'.format(thing)],
                        **k_dict['k_max']
                        )
-        if payload['prefs'].get('forceOriginLines', True):
+        if prefs.get('forceOriginLines', True):
             ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax, payload['prefs'], p_dict, k_dict)
-    chart_tools.format_grids(p_dict, k_dict)
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_y_ticks(p_dict, k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

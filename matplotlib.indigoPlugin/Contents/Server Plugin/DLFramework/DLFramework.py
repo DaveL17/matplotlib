@@ -13,7 +13,7 @@ import operator as op
 import os
 import platform
 import sys
-import traceback
+# import traceback
 
 try:
     import indigo

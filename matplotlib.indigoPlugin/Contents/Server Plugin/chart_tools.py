@@ -15,12 +15,12 @@ import unicodedata
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-from matplotlib import rcParams
+# from matplotlib import rcParams
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+# import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
-import matplotlib.font_manager as mfont
+# import matplotlib.font_manager as mfont
 
 # import DLFramework as Dave
 
@@ -53,7 +53,6 @@ try:
         able to deliver a rational value. Therefore, we convert '-99.0' to NaN values.
         -----
         :param list final_data: the data to be charted.
-        :param dict log: plugin log dict
         :param unicode data_source:
         """
 
@@ -182,7 +181,6 @@ try:
         :param dict dev: device props
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
         :return unicode result:
         """
 
@@ -211,7 +209,6 @@ try:
         assume a date-based X axis.
         -----
         :param list x_axis_bins:
-        :param dict log: logging dict
         """
 
         try:
@@ -261,7 +258,6 @@ try:
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: Logging dict
         """
 
         try:
@@ -294,7 +290,6 @@ try:
         -----
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
         """
 
         custom_ticks_marks  = p_dict['customTicksY'].strip()
@@ -340,7 +335,6 @@ try:
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: Logging dict
         """
         # TODO: Balance the axis methods.  We should have:
         #       x_label
@@ -395,7 +389,6 @@ try:
         -----
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
         """
 
         try:
@@ -416,7 +409,6 @@ try:
         overcome that weirdness for something more desirable.
         -----
         :param dict p_dict: plotting parameters
-        :param dict log: Logging dict
         """
 
         try:
@@ -465,6 +457,27 @@ try:
             log['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
 
     # =============================================================================
+    # TODO: this is currently unused.
+    def format_axis_y2_label(p_dict, k_dict):
+        """
+        Format Y2 axis properties
+        Controls the format and placement of labels for the Y2 axis.
+        -----
+        :param dict p_dict: plotting parameters
+        :param dict k_dict: plotting kwargs
+        :param dict log: logging dict
+        """
+
+        try:
+            plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
+
+        except (KeyError, ValueError):
+            log['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "
+                                      u"{0}".format(p_dict['customAxisLabelY2']))
+            log['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
+                                      u"{0}".format(k_dict['k_y_axis_font']))
+
+    # =============================================================================
     def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict):
         """
         Adds best fit line segments to plots
@@ -476,7 +489,6 @@ try:
         :param 'numpy.ndarray' dates_to_plot:
         :param int line:
         :param dict p_dict: plotting parameters
-        :param dict log: logging dict
         :return ax:
         """
 
@@ -508,7 +520,6 @@ try:
         :param class 'matplotlib.axes.AxesSubplot' ax:
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
         """
 
         # Plot the custom lines if needed.  Note that these need to be plotted after
@@ -563,7 +574,6 @@ try:
         charting.
         -----
         :param list list_of_dates:
-        :param dict log: logging dict
         """
 
         dates_to_plot   = []
@@ -588,7 +598,6 @@ try:
         -----
         :param dict p_dict: plotting parameters
         :param dict k_dict: plotting kwargs
-        :param dict log: logging dict
         """
 
         try:
@@ -609,7 +618,6 @@ try:
         -----
         :param p_dict:
         :param k_dict:
-        :param log:
         :param loc:
         :param str align:
         :return:
@@ -687,10 +695,10 @@ try:
         enter a number of days into a device config dialog, the method then drops
         any observations that are outside that window.
         -----
+        :rtype: object
         :param list x_data:
         :param list y_data:
         :param int limit:
-        :param dict log:
         :param unicode new_old:
         :return:
         """

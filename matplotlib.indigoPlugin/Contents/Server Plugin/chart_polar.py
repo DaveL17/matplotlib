@@ -45,35 +45,35 @@ import chart_tools
 # import DLFramework as Dave
 
 
+payload    = chart_tools.payload
+p_dict     = payload['p_dict']
+k_dict     = payload['k_dict']
+prefs      = payload['prefs']
+props      = payload['props']
 final_data = []
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
 
 try:
     def __init__():
         pass
 
-    num_obs                               = p_dict['numObs']
-    p_dict['backgroundColor']  = chart_tools.fix_rgb(p_dict['backgroundColor'])
-    p_dict['faceColor']        = chart_tools.fix_rgb(p_dict['faceColor'])
-    p_dict['currentWindColor'] = chart_tools.fix_rgb(p_dict['currentWindColor'])
-    p_dict['maxWindColor']     = chart_tools.fix_rgb(p_dict['maxWindColor'])
+    num_obs                    = p_dict['numObs']
+    p_dict['backgroundColor']  = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
+    p_dict['faceColor']        = chart_tools.fix_rgb(c=p_dict['faceColor'])
+    p_dict['currentWindColor'] = chart_tools.fix_rgb(c=p_dict['currentWindColor'])
+    p_dict['maxWindColor']     = chart_tools.fix_rgb(c=p_dict['maxWindColor'])
 
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from
     # self.final_data.
-    theta_path = '{0}{1}'.format(payload['prefs']['dataPath'],
-                                 p_dict['thetaValue'].encode('utf-8'))
-    radii_path = '{0}{1}'.format(payload['prefs']['dataPath'],
-                                 p_dict['radiiValue'].encode('utf-8'))
+    theta_path = '{0}{1}'.format(prefs['dataPath'], p_dict['thetaValue'].encode('utf-8'))
+    radii_path = '{0}{1}'.format(prefs['dataPath'], p_dict['radiiValue'].encode('utf-8'))
 
     if theta_path != 'None' and radii_path != 'None':
 
         # Get the data.
-        theta = chart_tools.get_data(theta_path)
+        theta = chart_tools.get_data(data_source=theta_path)
         final_data.append(theta)
-        radii = chart_tools.get_data(radii_path)
+        radii = chart_tools.get_data(data_source=radii_path)
         final_data.append(radii)
 
         chart_tools.log['Threaddebug'].append(u"Data: {0}".format(final_data))
@@ -102,8 +102,8 @@ try:
         # theta and radii, we shouldn't plot the chart.
         if len(p_dict['wind_direction']) != len(p_dict['wind_speed']):
             chart_tools.log['Warning'].append(u"[{0}] Insufficient number of observations "
-                                              u"to plot.".format(payload['props']['name']))
-            chart_tools.log['Warning'].append(u"Skipped. {0}".format(payload['props']['name']))
+                                              u"to plot.".format(props['name']))
+            chart_tools.log['Warning'].append(u"Skipped. {0}".format(props['name']))
             exit()
 
         # Create the array of grey scale for the intermediate lines and set the last

@@ -996,7 +996,7 @@
                 <Label>Enable Custom Line Segments</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+            <Field id="additionalLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" 
                    alignText="right">
                 <Label>Custom Line Segments</Label>
             </Field>
@@ -1391,7 +1391,7 @@
                 <Label>Enable Custom Line Segments</Label>
             </Field>
 
-            <Field id="additionalBarSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+            <Field id="additionalBarSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" 
                    alignText="right">
                 <Label>Custom Line Segments</Label>
             </Field>
@@ -2739,7 +2739,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom Line Segments</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+            <Field id="additionalLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" 
                    alignText="right">
                 <Label>Custom Line Segments</Label>
             </Field>
@@ -2927,7 +2927,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="thetaValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+            <Field id="thetaValueText" type="label" fontSize="small" alignWithControl="true">
                 <Label>Direction observations are in degrees (0-360). Fractional degrees (123.4) are okay.</Label>
             </Field>
 
@@ -2936,7 +2936,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
-            <Field id="radiiValueText" type="label" fontColor="black" fontSize="small" alignWithControl="true">
+            <Field id="radiiValueText" type="label" fontSize="small" alignWithControl="true">
                 <Label>Magnitude observations are any real number greater than zero. Fractional numbers are okay.</Label>
             </Field>
 
@@ -3535,7 +3535,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom group Segments</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+            <Field id="additionalLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" 
                    alignText="right">
                 <Label>Custom Group Segments</Label>
             </Field>
@@ -3762,7 +3762,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>High Temperature</Label>
             </Field>
 
-            <Field id="highTemperatureText" type="label" fontColor="black" visibleBindingId="lineLabel1" visibleBindingValue="true" alignWithControl="true" fontSize="small">
+            <Field id="highTemperatureText" type="label" visibleBindingId="lineLabel1" visibleBindingValue="true" alignWithControl="true" fontSize="small">
                 <Label>High Temperature settings are used when generating both 10-day and 24-hour charts.</Label>
             </Field>
 
@@ -3835,7 +3835,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Low Temperature</Label>
             </Field>
 
-            <Field id="lowTemperatureText" type="label" fontColor="black" visibleBindingId="lineLabel2" visibleBindingValue="true" alignWithControl="true"
+            <Field id="lowTemperatureText" type="label" visibleBindingId="lineLabel2" visibleBindingValue="true" alignWithControl="true"
                    fontSize="small">
                 <Label>Low Temperature settings are only used when generating 10-day charts (24-hour forecasts do not include a low temperature forecast).</Label>
             </Field>
@@ -3923,7 +3923,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Enable Custom Line Segments?</Label>
             </Field>
 
-            <Field id="additionalLineSegmentsLabel" type="label" fontColor="black" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" fontSize="regular"
+            <Field id="additionalLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true" 
                    alignText="right">
                     <Label>Custom Line Segments</Label>
             </Field>
@@ -4163,7 +4163,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
 
-            <Field id="csvEngineDeviceText" type="label" fontColor="black" fontSize="small" alignWithControl="false">
+            <Field id="csvEngineDeviceText" type="label" fontSize="small" alignWithControl="false">
                 <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
             </Field>
 
@@ -4204,7 +4204,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sep2" type="separator"/>
 
-            <Field id="label5" type="label" fontColor="black" fontSize="small">
+            <Field id="label5" type="label" fontSize="small">
                 <Label>Use this section to add a new item. Enter a title and select a device or variable and its companion value then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
             </Field>
 
@@ -4250,7 +4250,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sep1" type="separator"/>
 
-            <Field id="label0.5" type="label" fontColor="black" fontSize="small">
+            <Field id="label0.5" type="label" fontSize="small">
                 <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
             </Field>
 

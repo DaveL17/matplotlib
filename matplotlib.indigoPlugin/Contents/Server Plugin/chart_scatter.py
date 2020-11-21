@@ -32,18 +32,22 @@ import matplotlib.pyplot as plt
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
+payload      = chart_tools.payload
+p_dict       = payload['p_dict']
+k_dict       = payload['k_dict']
+props        = payload['props']
+prefs        = payload['prefs']
+group_colors = []
+
 
 try:
 
     def __init__():
         pass
 
+
     p_dict['backgroundColor'] = chart_tools.fix_rgb(p_dict['backgroundColor'])
     p_dict['faceColor']       = chart_tools.fix_rgb(p_dict['faceColor'])
-    group_colors = []
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])
@@ -54,8 +58,8 @@ try:
     ax.margins(0.04, 0.05)
     [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
-    chart_tools.format_axis_x_ticks(ax, p_dict, k_dict)
-    chart_tools.format_axis_y(ax, p_dict, k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict)
 
     for thing in range(1, 5, 1):
 
@@ -73,12 +77,12 @@ try:
         if p_dict['group{0}Color'.format(thing)] == p_dict['backgroundColor'] and not \
                 suppress_group:
             chart_tools.log['Debug'].append(u"[{0}] Group {1} color is the same as the background color (so you "
-                                            u"may not be able to see it).".format(payload['props']['name'], thing))
+                                            u"may not be able to see it).".format(props['name'], thing))
 
         # If the group is suppressed, remind the user they suppressed it.
         if suppress_group:
             chart_tools.log['Info'].append(u"[{0}] Group {1} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(payload['props']['name'], thing))
+                                           u"the device configuration menu.".format(props['name'], thing))
 
         # ============================== Plot the Points ==============================
         # Plot the groups. If suppress_group is True, we skip it.
@@ -93,7 +97,7 @@ try:
                 p_dict['group{0}Marker'.format(thing)] = '.'
                 p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
-            data_path = payload['prefs']['dataPath'].encode("utf-8")
+            data_path = prefs['dataPath'].encode("utf-8")
             group_source = p_dict['group{0}Source'.format(thing)].encode("utf-8")
             data_column = chart_tools.get_data('{0}{1}'.format(data_path, group_source))
             chart_tools.log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
@@ -112,13 +116,13 @@ try:
             dates_to_plot = p_dict['x_obs{0}'.format(thing)]
 
             try:
-                limit = float(payload['props']['limitDataRangeLength'])
+                limit = float(props['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
             if limit > 0:
                 y_obs   = p_dict['y_obs{0}'.format(thing)]
-                new_old = payload['props']['limitDataRange']
+                new_old = props['limitDataRange']
 
                 prune = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old)
                 p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = prune
@@ -138,11 +142,11 @@ try:
                        )
 
             # =============================== Best Fit Line ===============================
-            if payload['props'].get('line{0}BestFit'.format(thing), False):
-                chart_tools.format_best_fit_line_segments(ax,
-                                                          p_dict['x_obs{0}'.format(thing)],
-                                                          thing,
-                                                          p_dict
+            if props.get('line{0}BestFit'.format(thing), False):
+                chart_tools.format_best_fit_line_segments(ax=ax,
+                                                          dates_to_plot=p_dict['x_obs{0}'.format(thing)],
+                                                          line=thing,
+                                                          p_dict=p_dict
                                                           )
 
             [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)]]
@@ -222,15 +226,15 @@ try:
                        color=p_dict['group{0}Color'.format(thing)],
                        **k_dict['k_max']
                        )
-        if payload['prefs'].get('forceOriginLines', True):
+        if prefs.get('forceOriginLines', True):
             ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax, payload['prefs'], p_dict, k_dict)
-    chart_tools.format_grids(p_dict, k_dict)
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_x_label(payload['props'], p_dict, k_dict)
-    chart_tools.format_axis_y1_label(p_dict, k_dict)
-    chart_tools.format_axis_y_ticks(p_dict, k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.

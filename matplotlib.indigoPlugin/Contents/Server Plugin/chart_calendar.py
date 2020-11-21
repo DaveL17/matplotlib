@@ -11,8 +11,8 @@ construct them.
 
 import calendar
 import datetime as dt
-import sys
-import pickle
+# import sys
+# import pickle
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -28,6 +28,7 @@ import chart_tools
 # import DLFramework as Dave
 
 payload = chart_tools.payload
+props   = payload['props']
 
 try:
 
@@ -42,8 +43,8 @@ try:
                     6: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
            }
 
-    first_day   = int(payload['props'].get('firstDayOfWeek', 6))
-    day_format  = payload['props'].get('dayOfWeekFormat', 'mid')
+    first_day   = int(props.get('firstDayOfWeek', 6))
+    day_format  = props.get('dayOfWeekFormat', 'mid')
     days_labels = fmt[day_format][first_day]
 
     my_cal = calendar.Calendar(first_day)  # first day is Sunday = 6, Monday = 0
@@ -51,12 +52,12 @@ try:
     cal    = my_cal.monthdatescalendar(today.year, today.month)
 
     try:
-        height = int(payload['props'].get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+        height = int(props.get('customSizeHeight', 300)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         height = 3
 
     try:
-        width = int(payload['props'].get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+        width = int(props.get('customSizeWidth', 500)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
         width = 5
 
@@ -72,17 +73,15 @@ try:
                          loc='top',
                          bbox=[0, 0.5, 1, .5]  # bbox = [left, bottom, width, height]
                          )
-    # format_axis(month_row)
-    chart_tools.format_axis(month_row)
+    chart_tools.format_axis(ax_obj=month_row)
 
     days_rows = ax.table(cellText=final_cal,
                          colLabels=days_labels,
                          loc='top',
-                         cellLoc=payload['props'].get('dayOfWeekAlignment', 'right'),
+                         cellLoc=props.get('dayOfWeekAlignment', 'right'),
                          bbox=[0, -0.5, 1, 1.25]
                          )
-    # format_axis(days_rows)
-    chart_tools.format_axis(days_rows)
+    chart_tools.format_axis(ax_obj=days_rows)
 
     # Note that subplots_adjust affects the space surrounding the subplots and not
     # the fig.
