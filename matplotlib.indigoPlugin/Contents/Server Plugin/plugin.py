@@ -76,7 +76,7 @@ import re
 import shutil
 import subprocess
 import traceback
-import unicodedata
+# import unicodedata
 
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
@@ -87,8 +87,8 @@ except ImportError:
     indigo.server.log(u"There was an error importing necessary Matplotlib components. Please reboot your server and "
                       u"try to re-enable the plugin.", isError=True)
 # import matplotlib.patches as patches
-import matplotlib.dates as mdate
-import matplotlib.ticker as mtick
+# import matplotlib.dates as mdate
+# import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
 # Third-party modules
@@ -109,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.11"
+__version__   = u"0.9.12"
 
 # =============================================================================
 
@@ -1796,6 +1796,7 @@ class Plugin(indigo.PluginBase):
             target_lines = int(dev.pluginProps.get('numLinesToKeep', '300'))
             delta        = dev.pluginProps.get('numLinesToKeepTime', '72')
             cycle_time   = dt.datetime.now()
+            column_names = []
             data = []
 
             # If delta isn't a valid float, set it to zero.

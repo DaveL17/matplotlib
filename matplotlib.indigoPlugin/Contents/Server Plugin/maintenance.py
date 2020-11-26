@@ -359,6 +359,14 @@ class Maintain(object):
 
         props = dev.pluginProps
 
+        def string_props_to_bool(bool_item):
+
+            if not isinstance(props[bool_item], bool):
+                if props[bool_item].strip() in ('False', 'false', ''):
+                    props[bool_item] = False
+                elif props[bool_item] in ('True', 'true'):
+                    props[bool_item] = True
+
         # ================================ All Devices ================================
         # Set whether it's a chart device or not
         is_chart_dict = {'areaChartingDevice': True,
@@ -430,11 +438,7 @@ class Maintain(object):
                                  ):
 
                         if item in dev.ownerProps.keys():
-                            if not isinstance(props[item], bool):
-                                if props[item].strip() in ('False', 'false', ''):
-                                    props[item] = False
-                                elif props[item] in ('True', 'true'):
-                                    props[item] = True
+                            string_props_to_bool(bool_item=item)
 
             # =============================== Fix Bar Props ===============================
             if dev.deviceTypeId == 'barChartingDevice':
@@ -488,11 +492,7 @@ class Maintain(object):
                                  ):
 
                         if item in dev.ownerProps.keys():
-                            if not isinstance(props[item], bool):
-                                if props[item].strip() in ('False', 'false', ''):
-                                    props[item] = False
-                                elif props[item] in ('True', 'true'):
-                                    props[item] = True
+                            string_props_to_bool(bool_item=item)
 
             # ========================= Fix Multiline Text Props ==========================
             if dev.deviceTypeId == 'multiLineText':
@@ -529,11 +529,7 @@ class Maintain(object):
                                  ):
 
                         if item in dev.ownerProps.keys():
-                            if not isinstance(props[item], bool):
-                                if props[item].strip() in ('False', 'false', ''):
-                                    props[item] = False
-                                elif props[item] in ('True', 'true'):
-                                    props[item] = True
+                            string_props_to_bool(bool_item=item)
                         else:
                             props[item] = False
 

@@ -32,11 +32,12 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
-payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
-props = payload['props']
-prefs = payload['prefs']
+log        = chart_tools.log
+payload    = chart_tools.payload
+p_dict     = payload['p_dict']
+k_dict     = payload['k_dict']
+props      = payload['props']
+prefs      = payload['prefs']
 bar_colors = []
 
 try:
@@ -58,8 +59,8 @@ try:
     ax.margins(0.04, 0.05)
     [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
 
-    chart_tools.format_axis_x_ticks(ax, p_dict, k_dict)
-    chart_tools.format_axis_y(ax, p_dict, k_dict)
+    chart_tools.format_axis_x_ticks(ax, p_dict, k_dict, logger=log)
+    chart_tools.format_axis_y(ax, p_dict, k_dict, logger=log)
 
     for thing in range(1, 5, 1):
 
@@ -87,7 +88,7 @@ try:
             dc = u'{0}{1}'.format(prefs['dataPath'].encode("utf-8"),
                                   p_dict['bar{0}Source'.format(thing)]
                                   )
-            data_column = chart_tools.get_data(dc)
+            data_column = chart_tools.get_data(dc, logger=log)
             chart_tools.log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
 
             # Pull the headers
@@ -111,11 +112,11 @@ try:
             if limit > 0:
                 y_obs   = p_dict['y_obs{0}'.format(thing)]
                 new_old = props['limitDataRange']
-                dtp = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old)
+                dtp = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old, logger=log)
                 p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = dtp
 
             # Convert the date strings for charting.
-            p_dict['x_obs{0}'.format(thing)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(thing)])
+            p_dict['x_obs{0}'.format(thing)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(thing)], logger=log)
 
             # If the user sets the width to 0, this will perform an introspection of the
             # dates to plot and get the minimum of the difference between the dates.
@@ -132,7 +133,8 @@ try:
             # (0 becomes 1e-06). We get a slice of the original data for annotations.
             annotation_values = p_dict['y_obs{0}'.format(thing)][:]
             if p_dict.get('showZeroBars', False):
-                p_dict['y_obs{0}'.format(thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
+                p_dict['y_obs{0}'.format(thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in
+                                                                   p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
 
             # Plot the bar. Note: hatching is not supported in the PNG backend.
             ax.bar(p_dict['x_obs{0}'.format(thing)][num_obs * -1:],
@@ -157,9 +159,9 @@ try:
                                 **k_dict['k_annotation']
                                 )
 
-    chart_tools.format_axis_y1_min_max(p_dict=p_dict)
-    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict)
-    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # Add a patch so that we can have transparent charts but a filled plot area.
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -231,10 +233,10 @@ try:
         if prefs.get('forceOriginLines', True):
             ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict)
-    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.
@@ -246,7 +248,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

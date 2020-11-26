@@ -26,13 +26,14 @@ matplotlib.use('AGG')  # Note: this statement must be run before any other matpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.dates as mdate
-import matplotlib.ticker as mtick
+# import matplotlib.ticker as mtick
 # import matplotlib.font_manager as mfont
 
 import chart_tools
 # import DLFramework as Dave
 
 
+log         = chart_tools.log
 payload     = chart_tools.payload
 p_dict      = payload['p_dict']
 k_dict      = payload['k_dict']
@@ -63,28 +64,14 @@ try:
     ax.tick_params(axis='x', **k_dict['k_major_x'])
     ax.tick_params(axis='x', **k_dict['k_minor_x'])
     ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
-    chart_tools.format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'])  # Set the scale for the X axis. We assume a date.
+    chart_tools.format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'], logger=log)
 
     # If the x axis format has been set to None, let's hide the labels.
     if p_dict['xAxisLabelFormat'] == "None":
         ax.axes.xaxis.set_ticklabels([])
 
     # =============================== Format Y Axis ===============================
-    ax.tick_params(axis='y', **k_dict['k_major_y'])
-    ax.tick_params(axis='y', **k_dict['k_minor_y'])
-    ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{0}f".format(int(p_dict['yAxisPrecision']))))
-
-    # Mirror Y axis values on Y2. Not all charts will support this option.
-    try:
-        if p_dict['yMirrorValues']:
-            ax.tick_params(labelright=True)
-
-            # A user may want tick labels only on Y2.
-            if not p_dict['yMirrorValuesAlsoY1']:
-                ax.tick_params(labelleft=False)
-
-    except KeyError:
-        pass
+    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     for line in range(1, 9, 1):
 
@@ -118,7 +105,7 @@ try:
 
             data_path = prefs['dataPath'].encode("utf-8")
             line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
-            data_column = chart_tools.get_data('{0}{1}'.format(data_path, line_source))
+            data_column = chart_tools.get_data('{0}{1}'.format(data_path, line_source), logger=log)
 
             chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
 
@@ -154,11 +141,11 @@ try:
                 y_obs = p_dict['y_obs{0}'.format(line)]
                 new_old = props['limitDataRange']
 
-                prune = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old='None')
+                prune = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old='None', logger=log)
                 p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
 
             # ======================== Convert Dates for Charting =========================
-            p_dict['x_obs{0}'.format(line)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(line)])
+            p_dict['x_obs{0}'.format(line)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(line)], logger=log)
 
             ax.plot_date(p_dict['x_obs{0}'.format(line)],
                          p_dict['y_obs{0}'.format(line)],
@@ -193,7 +180,7 @@ try:
 
     # ============================== Y1 Axis Min/Max ==============================
     # Min and Max are not 'None'.
-    chart_tools.format_axis_y1_min_max(p_dict=p_dict)
+    chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
 
     # Transparent Chart Fill
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -263,7 +250,7 @@ try:
                                                           dates_to_plot=p_dict['x_obs{0}'.format(line)],
                                                           line=line,
                                                           p_dict=p_dict,
-                                                          )
+                                                          logger=log)
 
             [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
 
@@ -289,7 +276,7 @@ try:
             if prefs.get('forceOriginLines', True):
                 ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # =============================== Format Grids ================================
     if p_dict['showxAxisGrid']:
@@ -314,7 +301,7 @@ try:
     # ============================ Format Y1 Axis Label ============================
     plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
-    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.
@@ -326,7 +313,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

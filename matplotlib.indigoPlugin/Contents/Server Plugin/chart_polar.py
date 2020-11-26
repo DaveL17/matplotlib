@@ -27,8 +27,8 @@ There is apparently no way to code around this.
 # import itertools
 import numpy as np
 # import operator as op
-# import sys
-# import pickle
+import sys
+import pickle
 # import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 import chart_tools
 # import DLFramework as Dave
 
-
+log        = chart_tools.log
 payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
@@ -71,9 +71,9 @@ try:
     if theta_path != 'None' and radii_path != 'None':
 
         # Get the data.
-        theta = chart_tools.get_data(data_source=theta_path)
+        theta = chart_tools.get_data(data_source=theta_path, logger=log)
         final_data.append(theta)
-        radii = chart_tools.get_data(data_source=radii_path)
+        radii = chart_tools.get_data(data_source=radii_path, logger=log)
         final_data.append(radii)
 
         chart_tools.log['Threaddebug'].append(u"Data: {0}".format(final_data))
@@ -127,13 +127,13 @@ try:
         # ============================== Customizations ===============================
         size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
-        ax = plt.subplot(111, polar=True)  # Create subplot
+        ax = plt.subplot(111, polar=True)                                 # Create subplot
         plt.grid(color=plt.rcParams['grid.color'])                        # Color the grid
         ax.set_theta_zero_location('N')                                   # Set zero to North
         ax.set_theta_direction(-1)                                        # Reverse the rotation
         ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])  # Customize the xtick labels
         ax.spines['polar'].set_visible(False)                             # Show or hide the plot spine
-        ax.set_axis_bgcolor(p_dict['faceColor'])               # Background color of the plot area.
+        ax.set_axis_bgcolor(p_dict['faceColor'])                          # Background color of the plot area.
 
         # ============================== Create the Plot ==============================
         # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the
@@ -261,7 +261,7 @@ try:
             frame = legend.get_frame()
             frame.set_alpha(0)
 
-        chart_tools.format_title(p_dict, k_dict, loc=(0.025, 0.98), align='left')
+        chart_tools.format_title(p_dict, k_dict, loc=(0.025, 0.98), align='left', logger=log)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.
@@ -273,10 +273,9 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
+
+    pickle.dump(chart_tools.log, sys.stdout)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(sub_error)
-
-except EOFError as err:
-    chart_tools.log['Critical'].append(err)
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

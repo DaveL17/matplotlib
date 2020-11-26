@@ -28,10 +28,11 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
+log     = chart_tools.log
 payload = chart_tools.payload
-p_dict = payload['p_dict']
-k_dict = payload['k_dict']
-props = payload['props']
+p_dict  = payload['p_dict']
+k_dict  = payload['k_dict']
+props   = payload['props']
 
 try:
 
@@ -85,64 +86,57 @@ try:
     except ValueError:
         width = 5
 
-    try:
-        fig = plt.figure(figsize=(width, height))
-        ax = fig.add_subplot(111)
-        ax.axis('off')
+    fig = plt.figure(figsize=(width, height))
+    ax = fig.add_subplot(111)
+    ax.axis('off')
 
-        # If the value to be plotted is empty, use the default text from the device
-        # configuration.
-        text_to_plot = payload['data']
-        if len(text_to_plot) <= 1:
-            text_to_plot = unicode(p_dict['defaultText'])
+    # If the value to be plotted is empty, use the default text from the device
+    # configuration.
+    text_to_plot = payload['data']
+    if len(text_to_plot) <= 1:
+        text_to_plot = unicode(p_dict['defaultText'])
 
-        else:
-            # The clean_string method tries to remove some potential ugliness from the text
-            # to be plotted. It's optional--defaulted to on. No need to call this if the
-            # default text is used.
-            if p_dict['cleanTheText']:
-                text_to_plot = clean_string(val=text_to_plot)
+    else:
+        # The clean_string method tries to remove some potential ugliness from the text
+        # to be plotted. It's optional--defaulted to on. No need to call this if the
+        # default text is used.
+        if p_dict['cleanTheText']:
+            text_to_plot = clean_string(val=text_to_plot)
 
-        chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
+    chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
-        # Wrap the text and prepare it for plotting.
-        text_to_plot = textwrap.fill(text=text_to_plot,
-                                     width=int(p_dict['numberOfCharacters']),
-                                     replace_whitespace=p_dict['cleanTheText']
-                                     )
+    # Wrap the text and prepare it for plotting.
+    text_to_plot = textwrap.fill(text=text_to_plot,
+                                 width=int(p_dict['numberOfCharacters']),
+                                 replace_whitespace=p_dict['cleanTheText']
+                                 )
 
-        ax.text(0.01, 0.95,
-                text_to_plot,
-                transform=ax.transAxes,
-                color=p_dict['textColor'],
-                fontname=p_dict['fontMain'],
-                fontsize=p_dict['multilineFontSize'],
-                verticalalignment='top'
-                )
+    ax.text(0.01, 0.95,
+            text_to_plot,
+            transform=ax.transAxes,
+            color=p_dict['textColor'],
+            fontname=p_dict['fontMain'],
+            fontsize=p_dict['multilineFontSize'],
+            verticalalignment='top'
+            )
 
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
 
-        if not p_dict['textAreaBorder']:
-            [s.set_visible(False) for s in ax.spines.values()]
+    if not p_dict['textAreaBorder']:
+        [s.set_visible(False) for s in ax.spines.values()]
 
-        # Transparent Charts Fill
-        if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-            ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                           transform=ax.transAxes,
-                                           facecolor=p_dict['faceColor'],
-                                           zorder=1
-                                           )
-                         )
+    # Transparent Charts Fill
+    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+        ax.add_patch(patches.Rectangle((0, 0), 1, 1,
+                                       transform=ax.transAxes,
+                                       facecolor=p_dict['faceColor'],
+                                       zorder=1
+                                       )
+                     )
 
-        # =============================== Format Title ================================
-        chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
-
-    except (KeyError, IndexError, ValueError, UnicodeEncodeError):
-        pass
-
-    except Exception as sub_error:
-        pass
+    # =============================== Format Title ================================
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
 
     # Note that subplots_adjust affects the space surrounding the subplots and not
     # the fig.
@@ -154,7 +148,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

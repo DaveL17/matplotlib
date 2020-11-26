@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 import chart_tools
 # import DLFramework as Dave
 
+log     = chart_tools.log
 payload = chart_tools.payload
 props   = payload['props']
 
@@ -93,7 +94,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

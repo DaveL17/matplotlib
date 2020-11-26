@@ -37,6 +37,7 @@ import matplotlib.ticker as mtick
 import chart_tools
 # import DLFramework as Dave
 
+log              = chart_tools.log
 payload          = chart_tools.payload
 p_dict           = payload['p_dict']
 k_dict           = payload['k_dict']
@@ -64,8 +65,8 @@ try:
 
 
     def format_subplot(s_plot):
-        chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict)
-        chart_tools.format_axis_y(s_plot, p_dict, k_dict)
+        chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict, logger=log)
+        chart_tools.format_axis_y(s_plot, p_dict, k_dict, logger=log)
 
         if p_dict['showxAxisGrid']:
             plot.xaxis.grid(True, **k_dict['k_grid_fig'])
@@ -295,7 +296,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))

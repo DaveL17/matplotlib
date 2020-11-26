@@ -35,6 +35,7 @@ import matplotlib.patches as patches
 import chart_tools
 # import DLFramework as Dave
 
+log        = chart_tools.log
 payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
@@ -88,7 +89,7 @@ try:
             p_dict['y_obs3'].append(state_list['h{0}_precipChance'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly
             # if that's the case.
@@ -111,7 +112,7 @@ try:
             p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to
             # adjust slightly if that's the case.
@@ -137,7 +138,7 @@ try:
             p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
             # that's the case.
@@ -159,7 +160,7 @@ try:
             p_dict['y_obs3'].append(state_list['d{0}_pop'.format(counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'])
+            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
             # that's the case.
@@ -179,8 +180,8 @@ try:
                                         height=p_dict['chart_height'],
                                         p_dict=p_dict
                                         )
-    chart_tools.format_axis_x_ticks(ax=ax1, p_dict=p_dict, k_dict=k_dict)
-    chart_tools.format_axis_y(ax=ax1, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax1, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y(ax=ax1, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # ============================ Precipitation Bars =============================
     # The width of the bars is a percentage of a day, so we need to account for
@@ -253,7 +254,7 @@ try:
     plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
 
     # =============================== X1 Axis Label ===============================
-    chart_tools.format_axis_x_label(ccprops, p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # =============================== Y1 Axis Label ===============================
     # Note we're plotting Y2 label on ax1. We do this because we want the
@@ -279,7 +280,7 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)  # Note: frame alpha should be an int and not a string.
 
-    chart_tools.format_grids(p_dict, k_dict)
+    chart_tools.format_grids(p_dict, k_dict, logger=log)
 
     # ========================== Transparent Charts Fill ==========================
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -299,7 +300,7 @@ try:
 
     if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
-        sun_rise, sun_set = chart_tools.format_dates(payload['sun_rise_set'])
+        sun_rise, sun_set = chart_tools.format_dates(payload['sun_rise_set'], logger=log)
 
         min_dates_to_plot = np.amin(dates_to_plot)
         max_dates_to_plot = np.amax(dates_to_plot)
@@ -350,9 +351,14 @@ try:
                                  **k_dict['k_annotation']
                                  )
 
-    chart_tools.format_axis_x_ticks(ax=ax2, p_dict=p_dict, k_dict=k_dict)
-    chart_tools.format_axis_y(ax=ax2, p_dict=p_dict, k_dict=k_dict)
-    chart_tools.format_custom_line_segments(ax=ax2, plug_dict=payload['prefs'], p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_axis_x_ticks(ax=ax2, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y(ax=ax2, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_custom_line_segments(ax=ax2,
+                                            plug_dict=payload['prefs'],
+                                            p_dict=p_dict,
+                                            k_dict=k_dict,
+                                            logger=log
+                                            )
 
     plt.autoscale(enable=True, axis='x', tight=None)
 
@@ -422,7 +428,7 @@ try:
         frame.set_alpha(0)
 
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
-    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
     plt.tight_layout(pad=1)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
@@ -435,7 +441,7 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save()
+    chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    pass
+    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
