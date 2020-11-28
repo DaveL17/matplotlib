@@ -2632,42 +2632,46 @@ class Plugin(indigo.PluginBase):
         self.logger.critical(u"!" * 80)
 
     # =============================================================================
-    def processLogQueue(self, dev, return_queue):
+    def processLogQueue(self, dev, reply, err):
         """
         Process output of multiprocessing queue messages
         The processLogQueue() method accepts a multiprocessing queue that contains log
-        messages. The method parses those messages across the various self.logger.x
+        messages. The method parses those messages across the various self.logger.
         calls.
         -----
-        :param class 'indigo.Device' dev: indigo device instance
-        :param class 'multiprocessing.queues.Queue' return_queue:
+        :param indigo.Device dev:
+        :param str reply:
+        :param unicode err:
         """
 
         # ======================= Process Output Queue ========================
-        if dev.deviceTypeId != 'rcParamsDevice' and not return_queue.empty():
-            result = return_queue.get()
+        try:
+            reply = pickle.loads(reply)
 
-            for event in result['Log']:
-                for thing in result['Log'][event]:
-                    if event == 'Threaddebug':
-                        self.logger.threaddebug(u"[{0}] {1}".format(dev.name, thing))
+            for msg in reply['Threaddebug']:
+                self.logger.debug(msg)
+            for msg in reply['Debug']:
+                self.logger.debug(msg)
+            for msg in reply['Info']:
+                self.logger.info(msg)
+            for msg in reply['Warning']:
+                self.logger.warning(msg)
+            for msg in reply['Critical']:
+                self.logger.critical(msg)
 
-                    elif event == 'Debug':
-                        self.logger.debug(u"[{0}] {1}".format(dev.name, thing))
+        except EOFError:
+            pass
 
-                    elif event == 'Info':
-                        self.logger.info(u"[{0}] {1}".format(dev.name, thing))
-
-                    elif event == 'Warning':
-                        self.logger.warning(u"[{0}] {1}".format(dev.name, thing))
-
-                    else:
-                        self.logger.critical(u"[{0}] {1}".format(dev.name, thing))
-
-            if result['Error']:
-                self.logger.warning(u"[{0}] {1}".format(dev.name, result['Message']))
+        # Process any output.
+        if len(err) > 0:
+            if "FutureWarning: " in err:
+                self.logger.threaddebug(err)
+            elif "'numpy.float64' object cannot be interpreted as an index" in err:
+                self.logger.critical(u"Unfortunately, your version of Matplotlib does not support "
+                                     u"Polar chart plotting. Disabling device.")
+                indigo.device.enable(dev, False)
             else:
-                self.logger.info(u"[{0}] {1}".format(dev.name, result['Message']))
+                self.logger.critical(err)
 
         else:
             self.logger.info(u'Chart refresh completed. There were no messages.')
@@ -2755,8 +2759,6 @@ class Plugin(indigo.PluginBase):
                 return obj
 
         if not self.pluginIsShuttingDown:
-
-            return_queue = multiprocessing.Queue()
 
             k_dict  = {}  # A dict of kwarg dicts
             # A dict of plugin preferences (we set defaults and override with pluginPrefs).
@@ -3219,20 +3221,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                if "FutureWarning: " in err:
-                                    self.logger.threaddebug(err)
-                                else:
-                                    self.logger.critical(err)
-
-                            self.logger.info(u'Area charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
@@ -3264,17 +3253,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Bar charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
@@ -3333,17 +3312,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Battery Health charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
@@ -3375,17 +3344,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Calendar charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
@@ -3417,17 +3376,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Line charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
@@ -3474,17 +3423,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-
-                            # Process any output.
-                            self.logger.debug(reply)
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Multiline text charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
@@ -3516,23 +3455,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-                            self.logger.debug(reply)
-
-                            # Process any output.
-                            if len(err) > 0:
-                                if "'numpy.float64' object cannot be interpreted as an index" in err:
-                                    self.logger.critical(u"Unfortunately, your version of Matplotlib does not support "
-                                                         u"Polar chart plotting. Disabling device.")
-                                    indigo.device.enable(dev, False)
-                                else:
-                                    self.logger.critical(err)
-
-                            self.logger.info(u'Polar charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
@@ -3564,21 +3487,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-                            self.logger.debug(reply)
-
-                            # Process any output.
-                            if len(err) > 0:
-                                if "FutureWarning: " in err:
-                                    self.logger.threaddebug(err)
-                                else:
-                                    self.logger.critical(err)
-
-                            self.logger.warning(u'Scatter charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ========================== Weather Forecast Charts ==========================
                         if dev.deviceTypeId == "forecastChartingDevice":
@@ -3617,18 +3526,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-                            self.logger.debug(reply)
-
-                            # Process any output.
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Weather Forecast charting function complete.')
+                            self.processLogQueue(dev, reply, err)
 
                         # ========================== Weather Composite Charts =========================
                         if dev.deviceTypeId == "compositeForecastDevice":
@@ -3665,21 +3563,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-
-                            try:
-                                reply = pickle.loads(reply)
-                            except EOFError:
-                                reply = 'Empty reply.'
-                            self.logger.debug(reply)
-
-                            # Process any output.
-                            if len(err) > 0:
-                                self.logger.critical(err)
-
-                            self.logger.warning(u'Composite Weather charting function complete.')
-
-                        # ========================= Process the output queue ==========================
-                        self.processLogQueue(dev, return_queue)
+                            self.processLogQueue(dev, reply, err)
 
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 

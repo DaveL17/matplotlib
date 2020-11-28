@@ -800,7 +800,3 @@ def save(logger):
     # Note that this garbage collection may be unneeded since the process will end.
     plt.clf()
     plt.close('all')
-
-# Process any standard output. For now, we can only do this once, so we should
-# combine any messages we want to send.
-# pickle.dump("FOO!", sys.stdout)
