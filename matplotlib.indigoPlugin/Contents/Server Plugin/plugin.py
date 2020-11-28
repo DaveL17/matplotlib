@@ -109,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.13"
+__version__   = u"0.9.14"
 
 # =============================================================================
 
@@ -3115,20 +3115,20 @@ class Plugin(indigo.PluginBase):
                         # For the time being, we're running each device through its
                         # own process synchronously; parallel processing may come later.
                         #
-                        # NOTE: elements passed to a multiprocessing process have to be pickleable.
-                        # Indigo device and plugin objets are not pickleable, so we create a proxy to
-                        # send to the process. Therefore, devices can't be changed in the processes.
+                        # NOTE: elements passed to a subprocess have to be pickleable. Indigo device
+                        # and plugin objets are not pickleable, so we create a proxy to send to the
+                        # process. Therefore, devices can't be changed in the processes.
 
+                        # Instantiate basic payload sent to the subprocess scripts. Additional
+                        # key/value pairs may be added below before payload is sent.
+                        raw_payload = {'prefs': plug_dict,
+                                       'props': dev_dict,
+                                       'p_dict': p_dict,
+                                       'k_dict': k_dict,
+                                       'data': None,
+                                       }
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
-
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
@@ -3151,14 +3151,6 @@ class Plugin(indigo.PluginBase):
 
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
-
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
@@ -3210,12 +3202,7 @@ class Plugin(indigo.PluginBase):
                             p_dict['excludedDevices'] = convert_to_native(p_dict['excludedDevices'])
 
                             # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': device_dict,
-                                           }
+                            raw_payload['data'] = device_dict
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
@@ -3239,14 +3226,6 @@ class Plugin(indigo.PluginBase):
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
 
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
-
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
                             # additional device-specific data.
@@ -3269,14 +3248,6 @@ class Plugin(indigo.PluginBase):
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
 
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
-
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
                             # additional device-specific data.
@@ -3298,14 +3269,6 @@ class Plugin(indigo.PluginBase):
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
-
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
 
                             # Get the text to plot. We do this here so we don't need to send all the
                             # devices and variables to the method (the process does not have access to the
@@ -3344,14 +3307,6 @@ class Plugin(indigo.PluginBase):
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
 
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
-
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
                             # additional device-specific data.
@@ -3373,14 +3328,6 @@ class Plugin(indigo.PluginBase):
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
-
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           }
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
@@ -3408,16 +3355,9 @@ class Plugin(indigo.PluginBase):
                             state_list = dict(indigo.devices[int(p_dict['forecastSourceDevice'])].states)
                             sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
 
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           'dev_type': dev_type,
-                                           'state_list': state_list,
-                                           'sun_rise_set': sun_rise_set
-                                           }
+                            raw_payload['dev_type']     = dev_type
+                            raw_payload['state_list']   = state_list
+                            raw_payload['sun_rise_set'] = sun_rise_set
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
@@ -3444,15 +3384,8 @@ class Plugin(indigo.PluginBase):
                             dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
                             state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
 
-                            # Payload sent to the subprocess script
-                            raw_payload = {'prefs': plug_dict,
-                                           'props': dev_dict,
-                                           'p_dict': p_dict,
-                                           'k_dict': k_dict,
-                                           'data': None,
-                                           'dev_type': dev_type,
-                                           'state_list': dict(state_list)
-                                           }
+                            raw_payload['dev_type']   = dev_type
+                            raw_payload['state_list'] = state_list
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add

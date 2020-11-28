@@ -90,7 +90,9 @@ try:
             data_path = prefs['dataPath'].encode("utf-8")
             group_source = p_dict['group{0}Source'.format(thing)].encode("utf-8")
             data_column = chart_tools.get_data('{0}{1}'.format(data_path, group_source), logger=log)
-            chart_tools.log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
+
+            if plug_dict['verboseLogging']:
+                chart_tools.log['Threaddebug'].append(u"Data for group {0}: {1}".format(thing, data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])

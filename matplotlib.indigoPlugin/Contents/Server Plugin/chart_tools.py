@@ -587,7 +587,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
 
                     # If we want to promote custom line segments, we need to add them to the list that's used to
                     # calculate the Y axis limits.
-                    if plug_dict['prefs'].get('promoteCustomLineSegments', False):
+                    if plug_dict.get('promoteCustomLineSegments', False):
                         p_dict['data_array'].append(element[0])
                 else:
                     cls = ax.axhline(y=constants_to_plot[0],
@@ -597,7 +597,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
                                      **k_dict['k_custom']
                                      )
 
-                    if plug_dict['prefs'].get('promoteCustomLineSegments', False):
+                    if plug_dict.get('promoteCustomLineSegments', False):
                         p_dict['data_array'].append(constants_to_plot[0])
 
             return cls
@@ -792,12 +792,17 @@ def prune_data(x_data, y_data, limit, new_old, logger):
 
 # =============================================================================
 def save(logger):
-    if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
-        plt.savefig(u'{0}{1}'.format(payload['p_dict']['chartPath'], payload['p_dict']['fileName']),
-                    **payload['k_dict']['k_plot_fig']
-                    )
-        logger['Debug'].append(u"Chart {0} saved.".format(payload['p_dict']['fileName']))
+    try:
+        if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
+            plt.savefig(u'{0}{1}'.format(payload['p_dict']['chartPath'], payload['p_dict']['fileName']),
+                        **payload['k_dict']['k_plot_fig']
+                        )
+            logger['Debug'].append(u"Chart {0} saved.".format(payload['p_dict']['fileName']))
 
-    # Note that this garbage collection may be unneeded since the process will end.
-    plt.clf()
-    plt.close('all')
+        # Note that this garbage collection may be unneeded since the process will end.
+        plt.clf()
+        plt.close('all')
+
+    except RuntimeError as err:
+        if "exceeds Locator.MAXTICKS" in err:
+            logger['critical'].append(u"Chart not saved (too many observations to plot. Check source data.")

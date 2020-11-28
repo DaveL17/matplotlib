@@ -26,7 +26,7 @@ log         = chart_tools.log
 payload     = chart_tools.payload
 p_dict      = payload['p_dict']
 k_dict      = payload['k_dict']
-prefs       = payload['prefs']
+plug_dict       = payload['prefs']
 props       = payload['props']
 line_colors = []
 
@@ -93,11 +93,12 @@ try:
             # Add line color to list for later use
             line_colors.append(p_dict['line{0}Color'.format(line)])
 
-            data_path = prefs['dataPath'].encode("utf-8")
+            data_path = plug_dict['dataPath'].encode("utf-8")
             line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
             data_column = chart_tools.get_data('{0}{1}'.format(data_path, line_source), logger=log)
 
-            chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
+            if plug_dict['verboseLogging']:
+                chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -115,7 +116,7 @@ try:
                 temp_list = []
                 for obs in p_dict['y_obs{0}'.format(line)]:
                     expr = u'{0}{1}'.format(obs, props['line{0}adjuster'.format(line)])
-                    temp_list.append(chart_tools.eval_expr(chart_tools.eval_expr(expr)))
+                    temp_list.append(chart_tools.eval_expr(expr))
                 p_dict['y_obs{0}'.format(line)] = temp_list
 
             # ================================ Prune Data =================================
@@ -263,34 +264,14 @@ try:
                            color=p_dict['line{0}Color'.format(line)],
                            **k_dict['k_max']
                            )
-            if prefs.get('forceOriginLines', True):
+            if plug_dict.get('forceOriginLines', True):
                 ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict, logger=log)
-
-    # =============================== Format Grids ================================
-    if p_dict['showxAxisGrid']:
-        plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
-
-    if p_dict['showyAxisGrid']:
-        plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
-
-    # =============================== Format Title ================================
-    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
-
-    # ============================ Format X Axis Label ============================
-    if not p_dict['showLegend']:
-        plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting "
-                                              u"X label.".format(props['name']))
-
-    if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
-        chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room "
-                                        u"for the chart legend.".format(props['name']))
-
-    # ============================ Format Y1 Axis Label ============================
-    plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
-
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # Note that subplots_adjust affects the space surrounding the subplots and

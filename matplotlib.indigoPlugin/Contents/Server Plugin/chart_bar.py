@@ -26,7 +26,7 @@ payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
 props      = payload['props']
-prefs      = payload['prefs']
+plug_dict      = payload['prefs']
 bar_colors = []
 
 log['Threaddebug'].append(u"chart_bar.py called.")
@@ -75,11 +75,14 @@ try:
             bar_colors.append(p_dict['bar{0}Color'.format(thing)])
 
             # Get the data and grab the header.
-            dc = u'{0}{1}'.format(prefs['dataPath'].encode("utf-8"),
+            dc = u'{0}{1}'.format(plug_dict['dataPath'].encode("utf-8"),
                                   p_dict['bar{0}Source'.format(thing)]
                                   )
+
             data_column = chart_tools.get_data(dc, logger=log)
-            chart_tools.log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
+
+            if plug_dict['verboseLogging']:
+                chart_tools.log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -220,10 +223,10 @@ try:
                        color=p_dict['bar{0}Color'.format(thing)],
                        **k_dict['k_max']
                        )
-        if prefs.get('forceOriginLines', True):
+        if plug_dict.get('forceOriginLines', True):
             ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
     chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
