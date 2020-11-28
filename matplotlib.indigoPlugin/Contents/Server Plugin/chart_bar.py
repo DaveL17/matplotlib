@@ -246,5 +246,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Bar charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

@@ -24,7 +24,7 @@ payload      = chart_tools.payload
 p_dict       = payload['p_dict']
 k_dict       = payload['k_dict']
 props        = payload['props']
-prefs        = payload['prefs']
+plug_dict        = payload['prefs']
 group_colors = []
 
 
@@ -87,7 +87,7 @@ try:
                 p_dict['group{0}Marker'.format(thing)] = '.'
                 p_dict['group{0}MarkerColor'.format(thing)] = p_dict['group{0}Color'.format(thing)]
 
-            data_path = prefs['dataPath'].encode("utf-8")
+            data_path = plug_dict['dataPath'].encode("utf-8")
             group_source = p_dict['group{0}Source'.format(thing)].encode("utf-8")
             data_column = chart_tools.get_data('{0}{1}'.format(data_path, group_source), logger=log)
 
@@ -219,10 +219,10 @@ try:
                        color=p_dict['group{0}Color'.format(thing)],
                        **k_dict['k_max']
                        )
-        if prefs.get('forceOriginLines', True):
+        if plug_dict.get('forceOriginLines', True):
             ax.axhline(y=0, color=p_dict['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=prefs, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
@@ -244,5 +244,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Scatter charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

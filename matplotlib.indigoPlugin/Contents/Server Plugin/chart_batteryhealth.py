@@ -63,11 +63,11 @@ try:
 
         # Determine the appropriate bar color
         if chart_data[thing[0]]['batteryLevel'] > caution_level:
-            chart_data[thing[0]]['color'] = p_dict['healthy_color']
+            chart_data[thing[0]]['color'] = p_dict['healthyColor']
         elif caution_level >= chart_data[thing[0]]['batteryLevel'] > warning_level:
-            chart_data[thing[0]]['color'] = p_dict['caution_color']
+            chart_data[thing[0]]['color'] = p_dict['cautionColor']
         else:
-            chart_data[thing[0]]['color'] = p_dict['warning_color']
+            chart_data[thing[0]]['color'] = p_dict['warningColor']
 
         # =========================== Create Chart Elements ===========================
         bar_colors.append(chart_data[thing[0]]['color'])
@@ -153,8 +153,6 @@ try:
     # ============================ Format X Axis Label ============================
     if not p_dict['showLegend']:
         plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-        chart_tools.log['Threaddebug'].append(u"[{0}] No call for legend. Formatting "
-                                              u"X label.".format(props['name']))
 
     if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
         chart_tools.log['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
@@ -184,7 +182,7 @@ try:
         counter = 0
         for key, value in sorted(payload['data'].iteritems(), reverse=True):
             if int(value) == 0:
-                ax.yaxis.get_minorticklabels()[counter].set_color(p_dict['warning_color'])
+                ax.yaxis.get_minorticklabels()[counter].set_color(p_dict['warningColor'])
             counter += 1
 
     # ============================== Y Axis Min/Max ===============================
@@ -219,5 +217,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Battery charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

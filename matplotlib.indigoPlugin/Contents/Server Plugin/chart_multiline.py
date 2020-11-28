@@ -21,11 +21,12 @@ import matplotlib.patches as patches
 
 import chart_tools
 
-log     = chart_tools.log
-payload = chart_tools.payload
-p_dict  = payload['p_dict']
-k_dict  = payload['k_dict']
-props   = payload['props']
+log       = chart_tools.log
+payload   = chart_tools.payload
+p_dict    = payload['p_dict']
+k_dict    = payload['k_dict']
+props     = payload['props']
+plug_dict = payload['prefs']
 
 log['Threaddebug'].append(u"chart_multiline.py called.")
 
@@ -98,7 +99,8 @@ try:
         if p_dict['cleanTheText']:
             text_to_plot = clean_string(val=text_to_plot)
 
-    chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
+    if plug_dict['verboseLogging']:
+        chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
     # Wrap the text and prepare it for plotting.
     text_to_plot = textwrap.fill(text=text_to_plot,
@@ -148,5 +150,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Line charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

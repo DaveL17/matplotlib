@@ -88,12 +88,15 @@ try:
         for _ in range(1, forecast_length[dev_type] + 1):
             dates_to_plot    += (state_list[u'd0{0}_date'.format(_)],)
             humidity         += (state_list[u'd0{0}_humidity'.format(_)],)
-            precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
             pressure         += (state_list[u'd0{0}_pressure'.format(_)],)
             temperature_high += (state_list[u'd0{0}_temperatureHigh'.format(_)],)
             temperature_low  += (state_list[u'd0{0}_temperatureLow'.format(_)],)
             wind_speed       += (state_list[u'd0{0}_windSpeed'.format(_)],)
             wind_bearing     += (state_list[u'd0{0}_windBearing'.format(_)],)
+            try:
+                precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
+            except:
+                precipitation    += (state_list[u'd0{0}_pop'.format(_)],)
 
         x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=6)
@@ -107,12 +110,16 @@ try:
 
             dates_to_plot    += (state_list[u'h{0}_epoch'.format(_)],)
             humidity         += (state_list[u'h{0}_humidity'.format(_)],)
-            precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
             pressure         += (state_list[u'h{0}_pressure'.format(_)],)
             temperature_high += (state_list[u'h{0}_temperature'.format(_)],)
             temperature_low  += (state_list[u'h{0}_temperature'.format(_)],)
             wind_speed       += (state_list[u'h{0}_windSpeed'.format(_)],)
             wind_bearing     += (state_list[u'h{0}_windBearing'.format(_)],)
+
+            try:
+                precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
+            except:
+                precipitation    += (state_list[u'h{0}_precip'.format(_)],)
 
         x1 = [dt.datetime.fromtimestamp(_) for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=1)
@@ -291,5 +298,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Composite weather charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

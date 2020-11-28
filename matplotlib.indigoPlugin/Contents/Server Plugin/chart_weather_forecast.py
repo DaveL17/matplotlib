@@ -31,6 +31,7 @@ k_dict     = payload['k_dict']
 state_list = payload['state_list']
 dev_type   = payload['dev_type']
 props      = payload['props']
+plug_dict  = payload['prefs']
 
 log['Threaddebug'].append(u"chart_weather_forecast.py called.")
 
@@ -165,7 +166,8 @@ try:
         chart_tools.log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
                                           u"WUnderground forecast devices.")
 
-    chart_tools.log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
+    if plug_dict['verboseLogging']:
+        chart_tools.log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
 
     ax1 = chart_tools.make_chart_figure(width=p_dict['chart_width'],
                                         height=p_dict['chart_height'],
@@ -437,5 +439,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
 
-chart_tools.log['Info'].append(u'Weather forecast charting function complete.')
+chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

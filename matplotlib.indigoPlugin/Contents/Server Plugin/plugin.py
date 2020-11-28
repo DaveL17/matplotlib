@@ -109,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.14"
+__version__   = u"0.9.15"
 
 # =============================================================================
 
@@ -2601,9 +2601,6 @@ class Plugin(indigo.PluginBase):
             else:
                 self.logger.critical(errors)
 
-        else:
-            self.logger.info(u'Chart refresh completed. There were no messages.')
-
     # =============================================================================
     def rcParamsDeviceUpdate(self, dev):
         """
@@ -3385,12 +3382,13 @@ class Plugin(indigo.PluginBase):
                             state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
 
                             raw_payload['dev_type']   = dev_type
-                            raw_payload['state_list'] = state_list
+                            raw_payload['state_list'] = dict(state_list)
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
                             # We wait until this point to convert and pickle it because some devices add
                             # additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
+
 
                             # Serialize the payload
                             payload = pickle.dumps(raw_payload)

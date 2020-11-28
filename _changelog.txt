@@ -1,3 +1,8 @@
+v0.9.15
+- Fixes plug_dict bug in scatter chart.
+- Fixes Dict error in weather composite chart.
+- Fixes color bug in battery health chart.
+
 v0.9.14
 - Fixes bug in line chart title.
 - Fixes bug in line chart adjustment factor.
