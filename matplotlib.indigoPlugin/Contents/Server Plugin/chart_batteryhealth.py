@@ -10,8 +10,6 @@ user input.
 
 """
 
-# import calendar
-# import datetime as dt
 import numpy as np
 import sys
 import pickle
@@ -19,15 +17,10 @@ import pickle
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-# from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-# import matplotlib.dates as mdate
-# import matplotlib.ticker as mtick
-# import matplotlib.font_manager as mfont
 
 import chart_tools
-# import DLFramework as Dave
 
 log           = chart_tools.log
 payload       = chart_tools.payload
@@ -39,6 +32,8 @@ bar_colors    = []
 chart_data    = {}
 x_values      = []
 y_text        = []
+
+log['Threaddebug'].append(u"chart_batteryhealth.py called.")
 
 try:
 

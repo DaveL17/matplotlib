@@ -9,8 +9,6 @@ to construct them.
 
 """
 
-# import calendar
-# import datetime as dt
 import pickle
 import sys
 import textwrap
@@ -18,21 +16,18 @@ import textwrap
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-# from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-# import matplotlib.dates as mdate
-# import matplotlib.ticker as mtick
-# import matplotlib.font_manager as mfont
 
 import chart_tools
-# import DLFramework as Dave
 
 log     = chart_tools.log
 payload = chart_tools.payload
 p_dict  = payload['p_dict']
 k_dict  = payload['k_dict']
 props   = payload['props']
+
+log['Threaddebug'].append(u"chart_multiline.py called.")
 
 try:
 

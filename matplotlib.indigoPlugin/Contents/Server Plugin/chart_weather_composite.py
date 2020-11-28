@@ -13,29 +13,19 @@ will be added or removed as needed.)
 
 """
 
-# import ast
-# import csv
 import datetime as dt
-# from dateutil.parser import parse as date_parse
-# import itertools
 import numpy as np
-# import operator as op
 import sys
 import pickle
-# import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-# from matplotlib import rcParams
 import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
-# import matplotlib.font_manager as mfont
 
 import chart_tools
-# import DLFramework as Dave
 
 log              = chart_tools.log
 payload          = chart_tools.payload
@@ -57,6 +47,8 @@ width            = int(props['width'])
 wind_bearing     = ()
 wind_speed       = ()
 
+
+log['Threaddebug'].append(u"chart_weather_composite.py called.")
 
 try:
 

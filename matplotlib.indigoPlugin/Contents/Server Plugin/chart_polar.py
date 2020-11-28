@@ -36,6 +36,8 @@ prefs      = payload['prefs']
 props      = payload['props']
 final_data = []
 
+log['Threaddebug'].append(u"chart_polar.py called.")
+
 try:
     def __init__():
         pass

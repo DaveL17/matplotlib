@@ -195,7 +195,8 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
     try:
         if not p_dict['showLegend']:
             plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
-            logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
+            if p_dict['verboseLogging']:
+                logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
 
             if p_dict['customSizeFont']:
                 plt.xticks(fontsize=int(p_dict['customTickFontSize']))

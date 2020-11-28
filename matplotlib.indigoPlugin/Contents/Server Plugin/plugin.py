@@ -454,7 +454,7 @@ class Plugin(indigo.PluginBase):
             return values_dict
 
         except KeyError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.warning(u"[{0}] Error: {1}. See plugin log for more information.".format(dev.name, sub_error))
 
         return True, values_dict
@@ -544,78 +544,6 @@ class Plugin(indigo.PluginBase):
                 self.csv_refresh()
                 self.charts_refresh()
                 self.sleep(15)
-
-    # =============================================================================
-    # TODO: this can go away after refactoring for subprocess.Popen()
-    # def test_chart(self):
-    #
-    #     def convert_to_native(obj):
-    #         """
-    #         Convert any indigo.Dict and indigo.List objects to native formats.
-    #
-    #         credit: Jay Martin
-    #                 https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
-    #         -----
-    #         :param obj:
-    #         :return:
-    #         """
-    #         if isinstance(obj, indigo.List):
-    #             native_list = list()
-    #             for item in obj:
-    #                 native_list.append(convert_to_native(item))
-    #             return native_list
-    #         elif isinstance(obj, indigo.Dict):
-    #             native_dict = dict()
-    #             for key, value in obj.items():
-    #                 native_dict[key] = convert_to_native(value)
-    #             return native_dict
-    #         else:
-    #             return obj
-    #
-    #     self.logger.debug(u"test_chart called.")
-    #
-    #     # Payload sent to the subprocess script
-    #     dave = {'prefs': dict(self.pluginPrefs),
-    #             'props': None,
-    #             'p_dict': None,
-    #             'k_dict': None,
-    #             'data': {'x_obs': [0.3, 2.7],
-    #                      'y_obs': [0.5, 1.5]
-    #                      },
-    #             'kwargs': {'bbox_extra_artists': None,
-    #                        'orientation': None,
-    #                        'facecolor': '#FFFFFF',
-    #                        'papertype': None,
-    #                        'bbox_inches': None,
-    #                        'edgecolor': '#000000',
-    #                        'pad_inches': None,
-    #                        'format': None,
-    #                        'transparent': False,
-    #                        'frameon': None
-    #                        }
-    #             }
-    #
-    #     # Convert any nested indigo.Dict and indigo.List objects to native formats.
-    #     dave = convert_to_native(dave)
-    #
-    #     # Serialize the payload
-    #     payload = pickle.dumps(dave)
-    #
-    #     # Run the plot
-    #     path_to_file = 'test_chart.py'
-    #     proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-    #                             stdout=subprocess.PIPE,
-    #                             stderr=subprocess.PIPE,
-    #                             )
-    #
-    #     # Reply is a pickle, err is a string
-    #     reply, err = proc.communicate()
-    #     reply = pickle.loads(reply)
-    #
-    #     # Process any output.
-    #     self.logger.warning(reply)
-    #     if len(err) > 0:
-    #         self.logger.warning(err)
 
     def sendDevicePing(self, dev_id=0, suppress_logging=False):
 
@@ -1229,13 +1157,13 @@ class Plugin(indigo.PluginBase):
                             self.logger.warning(u"Target data folder does not exist. Creating it.")
 
                         except IOError:
-                            self.pluginErrorHandler(traceback.format_exc())
+                            self.plugin_error_handler(traceback.format_exc())
                             self.logger.critical(u"[{0}] Target data folder does not exist and the plugin is "
                                                  u"unable to create it. See plugin log for more "
                                                  u"information.".format(dev.name))
 
                         except OSError:
-                            self.pluginErrorHandler(traceback.format_exc())
+                            self.plugin_error_handler(traceback.format_exc())
                             self.logger.critical(u"[{0}] The plugin is unable to access the data storage location. "
                                                  u"See plugin log for more information.".format(dev.name))
 
@@ -1339,18 +1267,18 @@ class Plugin(indigo.PluginBase):
         # Colors are stored in values_dict as "XX XX XX", and we need to convert them to "#XXXXXX".
         for k in p_dict.keys():
             if 'color' in k:
-                p_dict[k] = self.fix_rgb(p_dict[k])
+                p_dict[k] = self.fix_rgb(color=p_dict[k])
 
         # # Format color values
-        plt.rcParams['grid.color']    = self.fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        plt.rcParams['xtick.color']   = self.fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        plt.rcParams['ytick.color']   = self.fix_rgb(self.pluginPrefs.get('tickColor', '88 88 88'))
-        p_dict['faceColor']           = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
-        p_dict['fontColor']           = self.fix_rgb(self.pluginPrefs.get('fontColor', 'FF FF FF'))
-        p_dict['fontColorAnnotation'] = self.fix_rgb(self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
-        p_dict['gridColor']           = self.fix_rgb(self.pluginPrefs.get('gridColor', '88 88 88'))
-        p_dict['spineColor']          = self.fix_rgb(self.pluginPrefs.get('spineColor', '88 88 88'))
-        p_dict['backgroundColor']     = self.fix_rgb(self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
+        plt.rcParams['grid.color']    = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
+        plt.rcParams['xtick.color']   = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+        plt.rcParams['ytick.color']   = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+        p_dict['faceColor']           = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
+        p_dict['fontColor']           = self.fix_rgb(color=self.pluginPrefs.get('fontColor', 'FF FF FF'))
+        p_dict['fontColorAnnotation'] = self.fix_rgb(color=self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
+        p_dict['gridColor']           = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
+        p_dict['spineColor']          = self.fix_rgb(color=self.pluginPrefs.get('spineColor', '88 88 88'))
+        p_dict['backgroundColor']     = self.fix_rgb(color=self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
 
         return p_dict
 
@@ -1378,7 +1306,7 @@ class Plugin(indigo.PluginBase):
                     self.logger.warning(u"Target folder does not exist. Creating path:{0}".format(path_name))
 
                 except (IOError, OSError):
-                    self.pluginErrorHandler(traceback.format_exc())
+                    self.plugin_error_handler(traceback.format_exc())
                     self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See "
                                          u"plugin log for more information.")
 
@@ -1413,7 +1341,7 @@ class Plugin(indigo.PluginBase):
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 indigo.device.enable(dev, value=False)
             except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
+                self.plugin_error_handler(traceback.format_exc())
                 self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more "
                                   u"information.".format(sub_error))
 
@@ -1431,7 +1359,7 @@ class Plugin(indigo.PluginBase):
             try:
                 indigo.device.enable(dev, value=True)
             except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
+                self.plugin_error_handler(traceback.format_exc())
                 self.logger.error(u"Exception when trying to kill all comms. Error: {0}. See plugin log for more "
                                   u"information.".format(sub_error))
 
@@ -1556,7 +1484,7 @@ class Plugin(indigo.PluginBase):
             values_dict['columnDict'] = str(new_dict)
 
         except AttributeError, sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"[{0}] Error adding CSV item: {1}. See plugin log for more "
                               u"information.".format(dev.name, sub_error))
 
@@ -1601,7 +1529,7 @@ class Plugin(indigo.PluginBase):
             del column_dict[values_dict['editKey']]
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"[{0}] Error deleting CSV item: {1}. See plugin log for more "
                               u"information.".format(dev.name, sub_error))
 
@@ -1639,7 +1567,7 @@ class Plugin(indigo.PluginBase):
             prop_list   = [(key, "{0}".format(value[0].encode("utf-8"))) for key, value in column_dict.items()]
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"[{0}] Error generating CSV item list: {0}. See plugin log for more "
                               u"information.".format(dev.name, sub_error))
             prop_list = []
@@ -1692,7 +1620,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['previousKey'] = key
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"[{0}] Error updating CSV item: {1}. See plugin log for more "
                               u"information.".format(dev.name, sub_error))
 
@@ -1736,7 +1664,7 @@ class Plugin(indigo.PluginBase):
             values_dict['previousKey']      = values_dict['csv_item_list']
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"[{0}] There was an error establishing a connection with the item you chose: {1}. "
                               u"See plugin log for more information.".format(dev.name, sub_error))
         return values_dict
@@ -1845,7 +1773,7 @@ class Plugin(indigo.PluginBase):
                     self.logger.error(u"[{0}] Unable to backup CSV file: {1}.".format(dev.name, sub_error))
 
                 except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
+                    self.plugin_error_handler(traceback.format_exc())
                     self.logger.error(u"[{0}] Unable to backup CSV file: {1}. See plugin log for more "
                                       u"information.".format(dev.name, sub_error))
 
@@ -1908,12 +1836,12 @@ class Plugin(indigo.PluginBase):
                     data.append([now, state_to_write])
 
                 except ValueError as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
+                    self.plugin_error_handler(traceback.format_exc())
                     self.logger.error(u"[{0}] Invalid Indigo ID: {1}. See plugin log for more "
                                       u"information.".format(dev.name, sub_error))
 
                 except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
+                    self.plugin_error_handler(traceback.format_exc())
                     self.logger.error(u"[{0}] Invalid CSV definition: {1}".format(dev.name, sub_error))
 
                 # ============================= Limit for Length ==============================
@@ -1936,7 +1864,7 @@ class Plugin(indigo.PluginBase):
                     os.remove(backup)
 
                 except Exception as sub_error:
-                    self.pluginErrorHandler(traceback.format_exc())
+                    self.plugin_error_handler(traceback.format_exc())
                     self.logger.error(u"[{0}] Unable to delete backup file. {1}".format(dev.name, sub_error))
 
             dev.updateStatesOnServer([{'key': 'csvLastUpdated', 'value': u"{0}".format(dt.datetime.now())},
@@ -1950,11 +1878,11 @@ class Plugin(indigo.PluginBase):
                                  u"permissions.".format(dev.name))
 
         except ValueError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.critical(u"[{0}] Error: {1}".format(dev.name, sub_error))
 
     # =============================================================================
@@ -2223,15 +2151,15 @@ class Plugin(indigo.PluginBase):
             return [('None', u'Please select a data source first')]
 
     # =============================================================================
-    def fix_rgb(self, c):
+    def fix_rgb(self, color):
 
-        return r"#{0}".format(c.replace(' ', '').replace('#', ''))
+        return r"#{0}".format(color.replace(' ', '').replace('#', ''))
 
     # =============================================================================
-    def formatMarkers(self, p_dict):
+    def format_markers(self, p_dict):
         """
         Format matplotlib markers
-        The devices.xml file cannot contain '<' or '>' as a value, as this conflicts
+        The Devices.xml file cannot contain '<' or '>' as a value, as this conflicts
         with the construction of the XML code. Matplotlib needs these values for
         select built-in marker styles, so we need to change them to what MPL is
         expecting.
@@ -2425,7 +2353,7 @@ class Plugin(indigo.PluginBase):
             file_name_list_menu = file_name_list_menu + [(u"-5", u"%%separator%%"), (u"None", u"None")]
 
         except IOError as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"Error generating file list: {0}. See plugin log for more "
                               u"information.".format(sub_error))
 
@@ -2457,7 +2385,7 @@ class Plugin(indigo.PluginBase):
                     font_menu.append(font_name)
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"Error building font list.  Returning generic list. {0}. See plugin log for more "
                               u"information.".format(sub_error))
 
@@ -2521,7 +2449,7 @@ class Plugin(indigo.PluginBase):
                     forecast_source_menu.append((dev.id, dev.name))
 
         except Exception as sub_error:
-            self.pluginErrorHandler(traceback.format_exc())
+            self.plugin_error_handler(traceback.format_exc())
             self.logger.error(u"Error getting list of forecast devices: {0}. See plugin log for more "
                               u"information.".format(sub_error))
 
@@ -2557,8 +2485,8 @@ class Plugin(indigo.PluginBase):
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))
         width        = float(self.pluginPrefs.get('rectChartWidth', 600))
-        face_color   = self.fix_rgb(self.pluginPrefs.get('faceColor', '00 00 00'))
-        bk_color     = self.fix_rgb(self.pluginPrefs.get('backgroundColor', '00 00 00'))
+        face_color   = self.fix_rgb(color=self.pluginPrefs.get('faceColor', '00 00 00'))
+        bk_color     = self.fix_rgb(color=self.pluginPrefs.get('backgroundColor', '00 00 00'))
 
         try:
             fig = plt.figure(1, figsize=(width / dpi, height / dpi))
@@ -2569,7 +2497,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as sub_error:
             if caller_waiting_for_result:
-                self.pluginErrorHandler(traceback.format_exc())
+                self.plugin_error_handler(traceback.format_exc())
                 self.logger.error(u"[{0}] Error: {0}. See plugin log for more information.".format(dev.name, sub_error))
                 return {'success': False, 'message': u"{0}".format(sub_error)}
 
@@ -2612,7 +2540,7 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:{1}^135}".format("", "="))
 
     # =============================================================================
-    def pluginErrorHandler(self, sub_error):
+    def plugin_error_handler(self, sub_error):
         """
         Centralized handling of traceback messages
         Centralized handling of traceback messages formatted for pretty display in the
@@ -2632,46 +2560,46 @@ class Plugin(indigo.PluginBase):
         self.logger.critical(u"!" * 80)
 
     # =============================================================================
-    def processLogQueue(self, dev, reply, err):
+    def process_plotting_log(self, device, replies, errors):
         """
         Process output of multiprocessing queue messages
         The processLogQueue() method accepts a multiprocessing queue that contains log
         messages. The method parses those messages across the various self.logger.
         calls.
         -----
-        :param indigo.Device dev:
-        :param str reply:
-        :param unicode err:
+        :param indigo.Device device:
+        :param str replies:
+        :param unicode errors:
         """
 
         # ======================= Process Output Queue ========================
         try:
-            reply = pickle.loads(reply)
+            replies = pickle.loads(replies)
 
-            for msg in reply['Threaddebug']:
+            for msg in replies['Threaddebug']:
                 self.logger.debug(msg)
-            for msg in reply['Debug']:
+            for msg in replies['Debug']:
                 self.logger.debug(msg)
-            for msg in reply['Info']:
+            for msg in replies['Info']:
                 self.logger.info(msg)
-            for msg in reply['Warning']:
+            for msg in replies['Warning']:
                 self.logger.warning(msg)
-            for msg in reply['Critical']:
+            for msg in replies['Critical']:
                 self.logger.critical(msg)
 
         except EOFError:
             pass
 
         # Process any output.
-        if len(err) > 0:
-            if "FutureWarning: " in err:
-                self.logger.threaddebug(err)
-            elif "'numpy.float64' object cannot be interpreted as an index" in err:
+        if len(errors) > 0:
+            if "FutureWarning: " in errors:
+                self.logger.threaddebug(errors)
+            elif "'numpy.float64' object cannot be interpreted as an index" in errors:
                 self.logger.critical(u"Unfortunately, your version of Matplotlib does not support "
                                      u"Polar chart plotting. Disabling device.")
-                indigo.device.enable(dev, False)
+                indigo.device.enable(device, False)
             else:
-                self.logger.critical(err)
+                self.logger.critical(errors)
 
         else:
             self.logger.info(u'Chart refresh completed. There were no messages.')
@@ -2799,10 +2727,10 @@ class Plugin(indigo.PluginBase):
                 # ============================== Plot Area color ==============================
                 if not self.pluginPrefs.get('faceColorOther', 'false'):
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor'] = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
+                    p_dict['faceColor'] = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
                 elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor'] = self.fix_rgb(self.pluginPrefs.get('faceColor', 'FF FF FF'))
+                    p_dict['faceColor'] = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
                 else:
                     p_dict['transparent_filled'] = False
                     p_dict['faceColor'] = '#000000'
@@ -3030,7 +2958,7 @@ class Plugin(indigo.PluginBase):
                             pass
 
                         except ValueError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
+                            self.plugin_error_handler(traceback.format_exc())
                             self.logger.warning(u"[{0}] The number of observations must be a positive number: {1}. "
                                                 u"See plugin log for more information.".format(dev.name, sub_error))
 
@@ -3043,7 +2971,7 @@ class Plugin(indigo.PluginBase):
                                 p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
 
                         except ValueError as sub_error:
-                            self.pluginErrorHandler(traceback.format_exc())
+                            self.plugin_error_handler(traceback.format_exc())
                             self.logger.warning(u"[{0}] Custom size must be a positive number or None: "
                                                 u"{1}".format(dev.name, sub_error))
 
@@ -3083,7 +3011,7 @@ class Plugin(indigo.PluginBase):
                         # Set the defaults for best fit lines in p_dict.
                         for _ in range(1, 9, 1):
 
-                            lbfc1 = self.fix_rgb(dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00'))
+                            lbfc1 = self.fix_rgb(color=dev.pluginProps.get('line{0}BestFitColor'.format(_), 'FF 00 00'))
                             p_dict['line{0}BestFitColor'.format(_)] = lbfc1
 
                         # ============================== Phantom Labels ===============================
@@ -3155,7 +3083,7 @@ class Plugin(indigo.PluginBase):
                         # example, matplotlib uses '<', '>' and '.' as markers but storing these values
                         # will blow up the XML.  So we need to convert them. (See self.formatMarkers()
                         # method.)
-                        p_dict = self.formatMarkers(p_dict)
+                        p_dict = self.format_markers(p_dict)
 
                         # Note that the logging of p_dict and k_dict are handled within the thread.
                         self.logger.threaddebug(u"{0:*^80}".format(u" Generating Chart: {0} ".format(dev.name)))
@@ -3194,8 +3122,6 @@ class Plugin(indigo.PluginBase):
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
 
-                            self.logger.debug(u"chart_area.py called.")
-
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
                                            'props': dev_dict,
@@ -3221,12 +3147,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
-
-                            self.logger.debug(u"chart_bar.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3253,12 +3177,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
-
-                            self.logger.debug(u"chart_batteryhealth.py called.")
 
                             device_dict  = {}
                             exclude_list = [int(_) for _ in dev.pluginProps.get('excludedDevices', [])]
@@ -3277,7 +3199,7 @@ class Plugin(indigo.PluginBase):
                                                    }
 
                                 except Exception as sub_error:
-                                    self.pluginErrorHandler(traceback.format_exc())
+                                    self.plugin_error_handler(traceback.format_exc())
                                     self.logger.error(u"[{0}] Error reading battery devices: "
                                                       u"{1}".format(batt_dev.name, sub_error))
 
@@ -3312,12 +3234,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
-
-                            self.logger.debug(u"chart_calendar.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3344,12 +3264,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
-
-                            self.logger.debug(u"chart_line.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3376,12 +3294,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
-
-                            self.logger.debug(u"chart_multiline.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3423,12 +3339,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":
-
-                            self.logger.debug(u"chart_polar.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3455,12 +3369,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
-
-                            self.logger.debug(u"chart_scatter.py called.")
 
                             # Payload sent to the subprocess script
                             raw_payload = {'prefs': plug_dict,
@@ -3487,12 +3399,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ========================== Weather Forecast Charts ==========================
                         if dev.deviceTypeId == "forecastChartingDevice":
-
-                            self.logger.debug(u"chart_weather_forecast.py called.")
 
                             dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
                             state_list = dict(indigo.devices[int(p_dict['forecastSourceDevice'])].states)
@@ -3526,12 +3436,10 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ========================== Weather Composite Charts =========================
                         if dev.deviceTypeId == "compositeForecastDevice":
-
-                            self.logger.debug(u"chart_weather_composite.py called.")
 
                             dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
                             state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
@@ -3563,7 +3471,7 @@ class Plugin(indigo.PluginBase):
 
                             # Reply is a pickle, err is a string
                             reply, err = proc.communicate()
-                            self.processLogQueue(dev, reply, err)
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
 
@@ -3576,7 +3484,7 @@ class Plugin(indigo.PluginBase):
                         dev.updateStatesOnServer(kv_list)
 
                     except RuntimeError as sub_error:
-                        self.pluginErrorHandler(traceback.format_exc())
+                        self.plugin_error_handler(traceback.format_exc())
                         self.logger.critical(u"[{0}] Critical Error: {1}. See plugin log for more "
                                              u"information.".format(dev.name, sub_error))
                         self.logger.critical(u"Skipping device.")
@@ -3586,7 +3494,7 @@ class Plugin(indigo.PluginBase):
                 self.skipRefreshDateUpdate = False
 
             except Exception as sub_error:
-                self.pluginErrorHandler(traceback.format_exc())
+                self.plugin_error_handler(traceback.format_exc())
                 self.logger.critical(u"[{0}] Error: {0}. See plugin log for more "
                                      u"information.".format(unicode(sub_error)))
 

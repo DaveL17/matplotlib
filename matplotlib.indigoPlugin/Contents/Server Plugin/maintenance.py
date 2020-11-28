@@ -561,4 +561,5 @@ class Maintain(object):
         # ============================= Update the Server =============================
         dev.replacePluginPropsOnServer(props)
 
-        self.plugin.logger.debug(u"[{0}] prefs cleaned.".format(dev.name))
+        if self.plugin.pluginPrefs['verboseLogging']:
+            self.plugin.logger.threaddebug(u"[{0}] prefs cleaned.".format(dev.name))
