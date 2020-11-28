@@ -11,8 +11,8 @@ construct them.
 
 import calendar
 import datetime as dt
-# import sys
-# import pickle
+import sys
+import pickle
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -98,3 +98,5 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+
+pickle.dump(chart_tools.log, sys.stdout)

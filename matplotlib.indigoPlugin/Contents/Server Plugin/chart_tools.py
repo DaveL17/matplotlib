@@ -801,7 +801,6 @@ def save(logger):
     plt.clf()
     plt.close('all')
 
-
 # Process any standard output. For now, we can only do this once, so we should
 # combine any messages we want to send.
-# pickle.dump(log, sys.stdout)
+# pickle.dump("FOO!", sys.stdout)

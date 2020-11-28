@@ -15,8 +15,8 @@ All steps required to generate area charts.
 import itertools
 # import numpy as np
 # import operator as op
-# import sys
-# import pickle
+import sys
+import pickle
 # import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
@@ -88,7 +88,9 @@ try:
             data_path   = plug_dict['dataPath'].encode("utf-8")
             area_source = p_dict['area{0}Source'.format(area)].encode("utf-8")
             data_column = chart_tools.get_data(data_source='{0}{1}'.format(data_path, area_source), logger=log)
-            chart_tools.log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
+
+            if plug_dict['verboseLogging']:
+                chart_tools.log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -319,3 +321,5 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+
+pickle.dump(chart_tools.log, sys.stdout)

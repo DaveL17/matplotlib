@@ -15,8 +15,8 @@ All steps required to generate line charts.
 import itertools
 # import numpy as np
 # import operator as op
-# import sys
-# import pickle
+import sys
+import pickle
 # import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
@@ -317,3 +317,5 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+
+pickle.dump(chart_tools.log, sys.stdout)

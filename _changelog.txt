@@ -1,3 +1,6 @@
+v0.9.13
+- Refines logging across processes.
+
 v0.9.12
 - Code refinement and bug fixes as a result of subprocess.Popen refactoring.
 
