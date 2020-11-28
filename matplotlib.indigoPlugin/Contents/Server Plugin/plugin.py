@@ -3163,6 +3163,21 @@ class Plugin(indigo.PluginBase):
                         dev_dict = dict(dev.ownerProps)
                         dev_dict['name'] = dev.name
 
+                        # =================================================
+                        # TODO: convert all indigo.List(s) to Python lists.
+                        for key in plug_dict.iterkeys():
+                            if isinstance(plug_dict[key], indigo.List):
+                                plug_dict[key] = list(plug_dict[key])
+
+                        for key in dev_dict.iterkeys():
+                            if isinstance(dev_dict[key], indigo.List):
+                                dev_dict[key] = list(dev_dict[key])
+
+                        for key in p_dict.iterkeys():
+                            if isinstance(p_dict[key], indigo.List):
+                                p_dict[key] = list(p_dict[key])
+                        # =================================================
+
                         # ============================== rcParams Device ==============================
                         if dev.deviceTypeId == 'rcParamsDevice':
                             self.rcParamsDeviceUpdate(dev)
@@ -3212,9 +3227,12 @@ class Plugin(indigo.PluginBase):
                             # Process any output.
                             self.logger.debug(reply)
                             if len(err) > 0:
-                                self.logger.critical(err)
+                                if "FutureWarning: " in err:
+                                    self.logger.threaddebug(err)
+                                else:
+                                    self.logger.critical(err)
 
-                            self.logger.warning(u'Area charting function complete.')
+                            self.logger.info(u'Area charting function complete.')
 
                         # ================================ Bar Charts =================================
                         if dev.deviceTypeId == 'barChartingDevice':
@@ -3507,9 +3525,14 @@ class Plugin(indigo.PluginBase):
 
                             # Process any output.
                             if len(err) > 0:
-                                self.logger.critical(err)
+                                if "'numpy.float64' object cannot be interpreted as an index" in err:
+                                    self.logger.critical(u"Unfortunately, your version of Matplotlib does not support "
+                                                         u"Polar chart plotting. Disabling device.")
+                                    indigo.device.enable(dev, False)
+                                else:
+                                    self.logger.critical(err)
 
-                            self.logger.warning(u'Polar charting function complete.')
+                            self.logger.info(u'Polar charting function complete.')
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
@@ -3550,7 +3573,10 @@ class Plugin(indigo.PluginBase):
 
                             # Process any output.
                             if len(err) > 0:
-                                self.logger.critical(err)
+                                if "FutureWarning: " in err:
+                                    self.logger.threaddebug(err)
+                                else:
+                                    self.logger.critical(err)
 
                             self.logger.warning(u'Scatter charting function complete.')
 
@@ -3619,7 +3645,7 @@ class Plugin(indigo.PluginBase):
                                            'k_dict': k_dict,
                                            'data': None,
                                            'dev_type': dev_type,
-                                           'state_list': state_list
+                                           'state_list': dict(state_list)
                                            }
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
@@ -3650,7 +3676,7 @@ class Plugin(indigo.PluginBase):
                             if len(err) > 0:
                                 self.logger.critical(err)
 
-                            self.logger.warning(u'Scatter charting function complete.')
+                            self.logger.warning(u'Composite Weather charting function complete.')
 
                         # ========================= Process the output queue ==========================
                         self.processLogQueue(dev, return_queue)

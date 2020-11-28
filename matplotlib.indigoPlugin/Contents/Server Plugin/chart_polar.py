@@ -20,29 +20,13 @@ There is apparently no way to code around this.
 """
 # TODO: CONSIDER GNUPLOT?
 
-# import ast
-# import csv
-# import datetime as dt
-# from dateutil.parser import parse as date_parse
-# import itertools
+import chart_tools
 import numpy as np
-# import operator as op
-import sys
 import pickle
-# import unicodedata
-
-# Note the order and structure of matplotlib imports is intentional.
+import sys
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-# from matplotlib import rcParams
 import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
-# import matplotlib.dates as mdate
-# import matplotlib.ticker as mtick
-# import matplotlib.font_manager as mfont
-
-import chart_tools
-# import DLFramework as Dave
 
 log        = chart_tools.log
 payload    = chart_tools.payload
@@ -56,11 +40,9 @@ try:
     def __init__():
         pass
 
-    num_obs                    = p_dict['numObs']
-    p_dict['backgroundColor']  = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
-    p_dict['faceColor']        = chart_tools.fix_rgb(c=p_dict['faceColor'])
-    p_dict['currentWindColor'] = chart_tools.fix_rgb(c=p_dict['currentWindColor'])
-    p_dict['maxWindColor']     = chart_tools.fix_rgb(c=p_dict['maxWindColor'])
+    num_obs = p_dict['numObs']
+    for color in ['backgroundColor', 'faceColor', 'currentWindColor', 'maxWindColor']:
+        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from

@@ -48,8 +48,8 @@ try:
         pass
 
 
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
-    p_dict['faceColor'] = chart_tools.fix_rgb(c=p_dict['faceColor'])
+    for color in ['backgroundColor', 'faceColor']:
+        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     dpi    = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])
@@ -78,13 +78,13 @@ try:
         suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
 
         lc_index = 'line{0}Color'.format(line)
-        p_dict[lc_index] = chart_tools.fix_rgb(c=p_dict[lc_index])
+        p_dict[lc_index] = chart_tools.fix_rgb(color=p_dict[lc_index])
 
         lmc_index = 'line{0}MarkerColor'.format(line)
-        p_dict[lmc_index] = chart_tools.fix_rgb(c=p_dict[lmc_index])
+        p_dict[lmc_index] = chart_tools.fix_rgb(color=p_dict[lmc_index])
 
         lbf_index = 'line{0}BestFitColor'.format(line)
-        p_dict[lbf_index] = chart_tools.fix_rgb(c=p_dict[lbf_index])
+        p_dict[lbf_index] = chart_tools.fix_rgb(color=p_dict[lbf_index])
 
         # If line color is the same as the background color, alert the user.
         if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:

@@ -48,9 +48,8 @@ try:
     def __init__():
         pass
 
-
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
-    p_dict['faceColor']       = chart_tools.fix_rgb(c=p_dict['faceColor'])
+    for color in ['backgroundColor', 'faceColor']:
+        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])

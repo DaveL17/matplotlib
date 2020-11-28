@@ -47,13 +47,13 @@ props            = payload['props']
 dates_to_plot    = ()
 dpi              = int(plt.rcParams['savefig.dpi'])
 forecast_length  = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
-height           = int(props['props']['height'])
+height           = int(props['height'])
 humidity         = ()
 precipitation    = ()
 pressure         = ()
 temperature_high = ()
 temperature_low  = ()
-width            = int(props['props']['width'])
+width            = int(props['width'])
 wind_bearing     = ()
 wind_speed       = ()
 
@@ -74,10 +74,8 @@ try:
         if p_dict['showyAxisGrid']:
             plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
-    p_dict['backgroundColor'] = chart_tools.fix_rgb(c=p_dict['backgroundColor'])
-    p_dict['faceColor']       = chart_tools.fix_rgb(c=p_dict['faceColor'])
-    p_dict['lineColor']       = chart_tools.fix_rgb(c=p_dict['lineColor'])
-    p_dict['lineMarkerColor'] = chart_tools.fix_rgb(c=p_dict['lineMarkerColor'])
+    for color in ['backgroundColor', 'faceColor', 'lineColor', 'lineMarkerColor']:
+        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     dpi = plt.rcParams['savefig.dpi']
     height = float(p_dict['chart_height'])

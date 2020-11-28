@@ -45,15 +45,15 @@ try:
     def __init__():
         pass
 
-    caution_color = chart_tools.fix_rgb(c=p_dict['cautionColor'])
     caution_level = int(p_dict['cautionLevel'])
     font_size     = plt.rcParams['ytick.labelsize']
-    healthy_color = chart_tools.fix_rgb(c=p_dict['healthyColor'])
     level_box     = p_dict['showBatteryLevelBackground']
     show_level    = p_dict['showBatteryLevel']
     dead_ones     = p_dict.get('showDeadBattery', False)
-    warning_color = chart_tools.fix_rgb(c=p_dict['warningColor'])
     warning_level = int(p_dict['warningLevel'])
+
+    for color in ['cautionColor', 'healthyColor', 'warningColor']:
+        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     # ============================ Create Device Dict =============================
     # 'thing' here is a tuple ('name', 'battery level')
@@ -68,11 +68,11 @@ try:
 
         # Determine the appropriate bar color
         if chart_data[thing[0]]['batteryLevel'] > caution_level:
-            chart_data[thing[0]]['color'] = healthy_color
+            chart_data[thing[0]]['color'] = p_dict['healthy_color']
         elif caution_level >= chart_data[thing[0]]['batteryLevel'] > warning_level:
-            chart_data[thing[0]]['color'] = caution_color
+            chart_data[thing[0]]['color'] = p_dict['caution_color']
         else:
-            chart_data[thing[0]]['color'] = warning_color
+            chart_data[thing[0]]['color'] = p_dict['warning_color']
 
         # =========================== Create Chart Elements ===========================
         bar_colors.append(chart_data[thing[0]]['color'])
@@ -189,7 +189,7 @@ try:
         counter = 0
         for key, value in sorted(payload['data'].iteritems(), reverse=True):
             if int(value) == 0:
-                ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
+                ax.yaxis.get_minorticklabels()[counter].set_color(p_dict['warning_color'])
             counter += 1
 
     # ============================== Y Axis Min/Max ===============================

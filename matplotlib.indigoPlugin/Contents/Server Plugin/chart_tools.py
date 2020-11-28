@@ -146,8 +146,8 @@ def eval_(mode):
 
 
 # =============================================================================
-def fix_rgb(c):
-    return r"#{0}".format(c.replace(' ', '').replace('#', ''))
+def fix_rgb(color):
+    return r"#{0}".format(color.replace(' ', '').replace('#', ''))
 
 
 # =============================================================================
@@ -197,9 +197,15 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
             plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
             logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
 
+            if p_dict['customSizeFont']:
+                plt.xticks(fontsize=int(p_dict['customTickFontSize']))
+            else:
+                plt.xticks(fontsize=int(p_dict['tickFontSize']))
+
         if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
             logger['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
                                    u"legend.".format(dev['name']))
+            plt.xticks([])
 
     except (ValueError, TypeError):
         logger['Threaddebug'].append(u"Problem formatting X labels: showLegend = "
@@ -412,6 +418,11 @@ def format_axis_y1_label(p_dict, k_dict, logger):
     try:
         plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
 
+        if p_dict['customSizeFont']:
+            plt.yticks(fontsize=int(p_dict['customTickFontSize']))
+        else:
+            plt.yticks(fontsize=int(p_dict['tickFontSize']))
+
     except (ValueError, TypeError):
         logger['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = "
                                      u"{0}".format(p_dict['customAxisLabelY']))
@@ -491,6 +502,11 @@ def format_axis_y2_label(p_dict, k_dict, logger):
 
     try:
         plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
+
+        if p_dict['customSizeFont']:
+            plt.yticks(fontsize=int(p_dict['customTickFontSize']))
+        else:
+            plt.yticks(fontsize=int(p_dict['tickFontSize']))
 
     except (KeyError, ValueError):
         logger['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "
