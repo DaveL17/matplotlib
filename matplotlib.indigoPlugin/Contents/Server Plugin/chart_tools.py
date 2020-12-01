@@ -191,22 +191,23 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
     :param dict k_dict: plotting kwargs
     :return unicode result:
     """
-
     try:
+        # The label of the X axis ticks (not the axis label)
+        if p_dict['customSizeFont']:
+            plt.xticks(fontsize=int(p_dict['customTickFontSize']))
+        else:
+            plt.xticks(fontsize=int(p_dict['tickFontSize']))
+
         if not p_dict['showLegend']:
+            # The label of the X axis (not the tick labels)
             plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
+
             if p_dict['verboseLogging']:
                 logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
-
-            if p_dict['customSizeFont']:
-                plt.xticks(fontsize=int(p_dict['customTickFontSize']))
-            else:
-                plt.xticks(fontsize=int(p_dict['tickFontSize']))
 
         if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
             logger['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
                                    u"legend.".format(dev['name']))
-            plt.xticks([])
 
     except (ValueError, TypeError):
         logger['Threaddebug'].append(u"Problem formatting X labels: showLegend = "
@@ -215,7 +216,6 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
                                      u"{0}".format(p_dict['customAxisLabelX']))
         logger['Threaddebug'].append(u"Problem formatting X labels: k_x_axis_font = "
                                      u"{0}".format(k_dict['k_x_axis_font']))
-
 
 # =============================================================================
 def format_axis_x_scale(x_axis_bins, logger):

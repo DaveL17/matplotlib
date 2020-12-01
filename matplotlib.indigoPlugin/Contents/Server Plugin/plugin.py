@@ -53,6 +53,8 @@ the proper Fantastic Weather devices.
 
 # TODO: Clean up all 'payload['p_dict']' type statements to something like
 #   something = payload['p_dict']
+# TODO: When writing CSV data -- how to handle data elements that are orders of magnitude out of
+#   scale?  For example, there was a dining room temperature value of 0.00634 (s/b 63.4).
 # ================================== IMPORTS ==================================
 
 try:
@@ -109,7 +111,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.15"
+__version__   = u"0.9.16"
 
 # =============================================================================
 

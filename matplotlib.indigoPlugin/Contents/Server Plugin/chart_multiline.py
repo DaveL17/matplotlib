@@ -74,11 +74,17 @@ try:
 
     try:
         height = int(props.get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
+        if height < 1:
+            height = 1
+            chart_tools.log['Warning'].append(u"Height: Pixels / DPI can not be less than one. Coercing to one.")
     except ValueError:
         height = 3
 
     try:
         width = int(props.get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
+        if width < 1:
+            width = 1
+            chart_tools.log['Warning'].append(u"Width: Pixels / DPI can not be less than one. Coercing to one.")
     except ValueError:
         width = 5
 
@@ -103,6 +109,7 @@ try:
         chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
 
     # Wrap the text and prepare it for plotting.
+
     text_to_plot = textwrap.fill(text=text_to_plot,
                                  width=int(p_dict['numberOfCharacters']),
                                  replace_whitespace=p_dict['cleanTheText']

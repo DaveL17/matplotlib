@@ -1,3 +1,7 @@
+v0.9.16
+- Fixes Invalid IHDR data error for multiline charts (size / DPI less than one).
+- Fixes font size bug in formatting of title and X axis tick labels.
+
 v0.9.15
 - Fixes plug_dict bug in scatter chart.
 - Fixes Dict error in weather composite chart.
