@@ -1,3 +1,8 @@
+v0.9.17
+- Fixes font size bug in formatting of title and X axis tick labels for polar
+  charts.
+- Fixes bug in coloring of polar chart grid and tick labels.
+
 v0.9.16
 - Fixes Invalid IHDR data error for multiline charts (size / DPI less than one).
 - Fixes font size bug in formatting of title and X axis tick labels.

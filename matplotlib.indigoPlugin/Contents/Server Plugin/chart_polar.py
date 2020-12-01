@@ -112,7 +112,7 @@ try:
         size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
         ax = plt.subplot(111, polar=True)                                 # Create subplot
-        plt.grid(color=plt.rcParams['grid.color'])                        # Color the grid
+        plt.grid(color=chart_tools.fix_rgb(prefs['gridColor']))           # Color the grid
         ax.set_theta_zero_location('N')                                   # Set zero to North
         ax.set_theta_direction(-1)                                        # Reverse the rotation
         ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])  # Customize the xtick labels
@@ -256,6 +256,15 @@ try:
                         hspace=None,
                         wspace=None
                         )
+
+    # Set the tick label size
+    font_color = chart_tools.fix_rgb(prefs['fontColor'])
+    if p_dict['customSizeFont']:
+        plt.xticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)
+        plt.yticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)
+    else:
+        plt.xticks(fontsize=int(p_dict['tickFontSize']), color=font_color)
+        plt.yticks(fontsize=int(p_dict['tickFontSize']), color=font_color)
 
     chart_tools.save(logger=log)
 

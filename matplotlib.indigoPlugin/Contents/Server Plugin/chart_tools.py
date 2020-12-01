@@ -794,7 +794,8 @@ def prune_data(x_data, y_data, limit, new_old, logger):
 def save(logger):
     try:
         if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
-            plt.savefig(u'{0}{1}'.format(payload['p_dict']['chartPath'], payload['p_dict']['fileName']),
+            plt.savefig(u'{0}{1}'.format(payload['p_dict']['chartPath'],
+                                         payload['p_dict']['fileName']),
                         **payload['k_dict']['k_plot_fig']
                         )
             logger['Debug'].append(u"Chart {0} saved.".format(payload['p_dict']['fileName']))
