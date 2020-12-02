@@ -193,12 +193,12 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
     """
     try:
         # The label of the X axis ticks (not the axis label)
-        if p_dict['customSizeFont']:
+        if p_dict.get('customSizeFont', False):
             plt.xticks(fontsize=int(p_dict['customTickFontSize']))
         else:
             plt.xticks(fontsize=int(p_dict['tickFontSize']))
 
-        if not p_dict['showLegend']:
+        if not p_dict.get('showLegend', False):
             # The label of the X axis (not the tick labels)
             plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
 

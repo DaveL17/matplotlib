@@ -1,3 +1,6 @@
+v0.9.18
+- Refactors battery health chart to address several rendering bugs.
+
 v0.9.17
 - Fixes font size bug in formatting of title and X axis tick labels for polar
   charts.
