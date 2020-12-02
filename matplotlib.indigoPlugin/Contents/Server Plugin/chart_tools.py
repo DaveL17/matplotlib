@@ -200,7 +200,7 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
 
         if not p_dict.get('showLegend', False):
             # The label of the X axis (not the tick labels)
-            plt.xlabel(p_dict['customAxisLabelX'], **k_dict['k_x_axis_font'])
+            plt.xlabel(p_dict.get('customAxisLabelX', ''), **k_dict['k_x_axis_font'])
 
             if p_dict['verboseLogging']:
                 logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
@@ -417,7 +417,7 @@ def format_axis_y1_label(p_dict, k_dict, logger):
     """
 
     try:
-        plt.ylabel(p_dict['customAxisLabelY'], **k_dict['k_y_axis_font'])
+        plt.ylabel(p_dict.get('customAxisLabelY', ''), **k_dict['k_y_axis_font'])
 
         if p_dict['customSizeFont']:
             plt.yticks(fontsize=int(p_dict['customTickFontSize']))

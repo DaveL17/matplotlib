@@ -28,6 +28,7 @@ p_dict        = payload['p_dict']
 k_dict        = payload['k_dict']
 prefs         = payload['prefs']
 props         = payload['props']
+data          = payload['data']
 bar_colors    = []
 chart_data    = {}
 x_values      = []
@@ -53,7 +54,7 @@ try:
 
     # ============================ Create Device Dict =============================
     # 'thing' here is a tuple ('name', 'battery level')
-    for thing in sorted(payload['data'].iteritems(), reverse=True):
+    for thing in sorted(data.iteritems(), reverse=True):
         chart_data[thing[0]] = {}
 
         # Add the battery level for each device
@@ -144,7 +145,7 @@ try:
     # using the same warning color that is used for the bar.
     if dead_ones:
         counter = 0
-        for key, value in sorted(payload['data'].iteritems(), reverse=True):
+        for key, value in sorted(data.iteritems(), reverse=True):
             if int(value) == 0:
                 ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
             counter += 1

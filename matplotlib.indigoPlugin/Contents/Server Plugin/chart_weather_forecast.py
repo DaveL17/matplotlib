@@ -24,14 +24,15 @@ import matplotlib.patches as patches
 
 import chart_tools
 
-log        = chart_tools.log
-payload    = chart_tools.payload
-p_dict     = payload['p_dict']
-k_dict     = payload['k_dict']
-state_list = payload['state_list']
-dev_type   = payload['dev_type']
-props      = payload['props']
-plug_dict  = payload['prefs']
+log          = chart_tools.log
+payload      = chart_tools.payload
+p_dict       = payload['p_dict']
+k_dict       = payload['k_dict']
+state_list   = payload['state_list']
+dev_type     = payload['dev_type']
+props        = payload['props']
+plug_dict    = payload['prefs']
+sun_rise_set = payload['sun_rise_set']
 
 log['Threaddebug'].append(u"chart_weather_forecast.py called.")
 
@@ -48,14 +49,7 @@ try:
     p_dict['line1MarkerColor'] = chart_tools.fix_rgb(p_dict['line1MarkerColor'])
     p_dict['line2MarkerColor'] = chart_tools.fix_rgb(p_dict['line2MarkerColor'])
 
-    dpi = plt.rcParams['savefig.dpi']
-    height = float(p_dict['chart_height'])
-    width = float(p_dict['chart_width'])
-
-    fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-    ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
-    ax.margins(0.04, 0.05)
-    [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
     dates_to_plot = p_dict['dates_to_plot']
 
@@ -253,7 +247,7 @@ try:
     # Note we're plotting Y2 label on ax1. We do this because we want the
     # precipitation bars to be under the temperature plot but we want the
     # precipitation scale to be on the right side.
-    plt.ylabel(p_dict['customAxisLabelY2'""], **k_dict['k_y_axis_font'])
+    plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
     ax1.yaxis.set_label_position('right')
 
     # ============================= Legend Properties =============================
@@ -293,7 +287,7 @@ try:
 
     if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
-        sun_rise, sun_set = chart_tools.format_dates(payload['sun_rise_set'], logger=log)
+        sun_rise, sun_set = chart_tools.format_dates(sun_rise_set, logger=log)
 
         min_dates_to_plot = np.amin(dates_to_plot)
         max_dates_to_plot = np.amax(dates_to_plot)
@@ -347,7 +341,7 @@ try:
     chart_tools.format_axis_x_ticks(ax=ax2, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y(ax=ax2, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_custom_line_segments(ax=ax2,
-                                            plug_dict=payload['prefs'],
+                                            plug_dict=plug_dict,
                                             p_dict=p_dict,
                                             k_dict=k_dict,
                                             logger=log
@@ -419,6 +413,15 @@ try:
         [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
         frame = legend.get_frame()
         frame.set_alpha(0)
+
+    # TODO: The tick label size is wrong by the time we get here, so we're forcing the issue.
+    #   I think it has something to do with twinx.
+    for tick in ax1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(plug_dict['tickFontSize'])
+        tick.label2.set_fontsize(plug_dict['tickFontSize'])
+    for tick in ax2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(plug_dict['tickFontSize'])
+        tick.label2.set_fontsize(plug_dict['tickFontSize'])
 
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
     chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)

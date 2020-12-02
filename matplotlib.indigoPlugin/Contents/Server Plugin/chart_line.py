@@ -26,7 +26,7 @@ log         = chart_tools.log
 payload     = chart_tools.payload
 p_dict      = payload['p_dict']
 k_dict      = payload['k_dict']
-plug_dict       = payload['prefs']
+plug_dict   = payload['prefs']
 props       = payload['props']
 line_colors = []
 
@@ -41,14 +41,7 @@ try:
     for color in ['backgroundColor', 'faceColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    dpi    = plt.rcParams['savefig.dpi']
-    height = float(p_dict['chart_height'])
-    width  = float(p_dict['chart_width'])
-
-    fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-    ax  = fig.add_subplot(111, axisbg=p_dict['faceColor'])
-    ax.margins(0.04, 0.05)
-    [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
     # ============================== Format X Ticks ===============================
     ax.tick_params(axis='x', **k_dict['k_major_x'])

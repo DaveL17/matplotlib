@@ -34,6 +34,7 @@ k_dict           = payload['k_dict']
 state_list       = payload['state_list']
 dev_type         = payload['dev_type']
 props            = payload['props']
+plug_dict        = payload['prefs']
 dates_to_plot    = ()
 dpi              = int(plt.rcParams['savefig.dpi'])
 forecast_length  = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
@@ -47,7 +48,6 @@ width            = int(props['width'])
 wind_bearing     = ()
 wind_speed       = ()
 
-
 log['Threaddebug'].append(u"chart_weather_composite.py called.")
 
 try:
@@ -56,27 +56,30 @@ try:
         pass
 
 
-    def format_subplot(s_plot):
+    def format_subplot(s_plot, title="Title"):
+        """Note that we have to set these for each subplot as it's rendered or else
+        the settings will only be applied to the last subplot rendered."""
+        subplot[0].set_title(title, **k_dict['k_title_font'])  # The subplot title
         chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict, logger=log)
         chart_tools.format_axis_y(s_plot, p_dict, k_dict, logger=log)
 
+        # =================================== Grids ===================================
         if p_dict['showxAxisGrid']:
             plot.xaxis.grid(True, **k_dict['k_grid_fig'])
 
         if p_dict['showyAxisGrid']:
             plot.yaxis.grid(True, **k_dict['k_grid_fig'])
 
+        # ================================ Tick Labels ================================
+        if props['customSizeFont']:
+            s_plot.tick_params(axis='both', labelsize=int(props['customTickFontSize']))
+        else:
+            s_plot.tick_params(axis='both', labelsize=int(plug_dict['tickFontSize']))
+
     for color in ['backgroundColor', 'faceColor', 'lineColor', 'lineMarkerColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    dpi = plt.rcParams['savefig.dpi']
-    height = float(p_dict['chart_height'])
-    width = float(p_dict['chart_width'])
-
-    fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-    ax = fig.add_subplot(111, axisbg=p_dict['faceColor'])
-    ax.margins(0.04, 0.05)
-    [ax.spines[spine].set_color(p_dict['spineColor']) for spine in ('top', 'bottom', 'left', 'right')]
+    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
 
     # ================================ Set Up Axes ================================
     axes     = props['component_list']
@@ -95,7 +98,7 @@ try:
             wind_bearing     += (state_list[u'd0{0}_windBearing'.format(_)],)
             try:
                 precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
-            except:
+            except KeyError:
                 precipitation    += (state_list[u'd0{0}_pop'.format(_)],)
 
         x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in dates_to_plot]
@@ -118,7 +121,7 @@ try:
 
             try:
                 precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
-            except:
+            except KeyError:
                 precipitation    += (state_list[u'h{0}_precip'.format(_)],)
 
         x1 = [dt.datetime.fromtimestamp(_) for _ in dates_to_plot]
@@ -140,9 +143,8 @@ try:
 
     # ============================= Temperature High ==============================
     if 'show_high_temperature' in axes:
-        subplot[0].set_title('high temperature', **k_dict['k_title_font'])  # The subplot title
         subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])    # Plot it
-        format_subplot(subplot[0])                                          # Format the subplot
+        format_subplot(subplot[0], title="high temperature")   # Format the subplot
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -153,9 +155,8 @@ try:
 
     # ============================== Temperature Low ==============================
     if 'show_low_temperature' in axes:
-        subplot[0].set_title('low temperature', **k_dict['k_title_font'])
         subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='low temperature')
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -166,10 +167,9 @@ try:
 
     # =========================== Temperature High/Low ============================
     if 'show_high_low_temperature' in axes:
-        subplot[0].set_title('high/low temperature', **k_dict['k_title_font'])
         subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])
         subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='high/low temperature')
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -180,9 +180,8 @@ try:
 
     # ================================= Humidity ==================================
     if 'show_humidity' in axes:
-        subplot[0].set_title('humidity', **k_dict['k_title_font'])
         subplot[0].plot(x1, humidity, color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='humidity')
 
         if p_dict['humidity_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['humidity_min']))
@@ -193,9 +192,8 @@ try:
 
     # ============================ Barometric Pressure ============================
     if 'show_barometric_pressure' in axes:
-        subplot[0].set_title('barometric pressure', **k_dict['k_title_font'])
         subplot[0].plot(x1, pressure, color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='barometric pressure')
 
         if p_dict['pressure_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['pressure_min']))
@@ -207,7 +205,6 @@ try:
     # ========================== Wind Speed and Bearing ===========================
     if 'show_wind' in axes:
         data = zip(x1, wind_speed, wind_bearing)
-        subplot[0].set_title('wind', **k_dict['k_title_font'])
         subplot[0].plot(x1, wind_speed, color=p_dict['lineColor'])
         subplot[0].set_ylim(0, max(wind_speed) + 1)
 
@@ -235,7 +232,7 @@ try:
         my_fmt = mdate.DateFormatter(props['xAxisLabelFormat'])
         subplot[0].xaxis.set_major_formatter(my_fmt)
         subplot[0].set_xticks(x1)
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='wind')
 
         if p_dict['wind_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['wind_min']))
@@ -247,9 +244,8 @@ try:
     # ============================ Precipitation Line =============================
     # Precip intensity is in inches of liquid rain per hour. using a line chart.
     if 'show_precipitation' in axes:
-        subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
         subplot[0].plot(x1, precipitation, color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='total precipitation')
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
@@ -264,9 +260,8 @@ try:
     # ============================= Precipitation Bar =============================
     # Precip intensity is in inches of liquid rain per hour using a bar chart.
     if 'show_precipitation_bar' in axes:
-        subplot[0].set_title('total precipitation', **k_dict['k_title_font'])
         subplot[0].bar(x1, precipitation, width=0.4, align='center', color=p_dict['lineColor'])
-        format_subplot(subplot[0])
+        format_subplot(subplot[0], title='total precipitation')
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))

@@ -21,12 +21,13 @@ import matplotlib.patches as patches
 
 import chart_tools
 
-log       = chart_tools.log
-payload   = chart_tools.payload
-p_dict    = payload['p_dict']
-k_dict    = payload['k_dict']
-props     = payload['props']
-plug_dict = payload['prefs']
+log          = chart_tools.log
+payload      = chart_tools.payload
+p_dict       = payload['p_dict']
+k_dict       = payload['k_dict']
+props        = payload['props']
+plug_dict    = payload['prefs']
+text_to_plot = payload['data']
 
 log['Threaddebug'].append(u"chart_multiline.py called.")
 
@@ -94,7 +95,6 @@ try:
 
     # If the value to be plotted is empty, use the default text from the device
     # configuration.
-    text_to_plot = payload['data']
     if len(text_to_plot) <= 1:
         text_to_plot = unicode(p_dict['defaultText'])
 
