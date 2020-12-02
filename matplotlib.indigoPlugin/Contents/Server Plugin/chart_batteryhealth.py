@@ -99,19 +99,19 @@ try:
         if show_level in ('true', 'True', True) and level_box:
             if width >= caution_level:
                 plt.annotate(u"{0:.0f}".format(width), xy=(width - 3, y + height / 2), fontsize=font_size,
-                             **k_dict['k_annotation_battery'])
+                             fontname=p_dict['fontMain'], **k_dict['k_annotation_battery'])
             else:
                 plt.annotate(u"{0:.0f}".format(width), xy=(width + 3, y + height / 2), fontsize=font_size,
-                             **k_dict['k_annotation_battery'])
+                             fontname=p_dict['fontMain'], **k_dict['k_annotation_battery'])
 
         # Without bbox.
         elif show_level in ('true', 'True', True):
             if width >= caution_level:
                 plt.annotate(u"{0:.0f}".format(width), xy=(width - 2, y + height / 2), fontsize=font_size,
-                             **k_dict['k_battery'])
+                             fontname=p_dict['fontMain'], **k_dict['k_battery'])
             else:
                 plt.annotate(u"{0:.0f}".format(width), xy=(width + 2, y + height / 2), fontsize=font_size,
-                             **k_dict['k_battery'])
+                             fontname=p_dict['fontMain'], **k_dict['k_battery'])
 
     # ================================ Chart Title ================================
     chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
@@ -139,7 +139,7 @@ try:
 
     # Assign device names to the minor ticks if wanted
     if p_dict.get('showDeviceName', True):
-        ax.set_yticklabels(y_text, color=chart_tools.fix_rgb(prefs['fontColor']), fontsize=prefs['tickFontSize'], minor=True)
+        ax.set_yticklabels(y_text, fontname=p_dict['fontMain'], color=chart_tools.fix_rgb(prefs['fontColor']), fontsize=prefs['tickFontSize'], minor=True)
 
     # Mark devices that have a battery level of zero by coloring their y axis label
     # using the same warning color that is used for the bar.

@@ -414,12 +414,16 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)
 
-    # TODO: The tick label size is wrong by the time we get here, so we're forcing the issue.
-    #   I think it has something to do with twinx.
+    # We are setting these values here in a special way because it's apparently
+    # the only way to overcome twinx.
     for tick in ax1.yaxis.get_major_ticks():
+        tick.label1.set_fontname(plug_dict['fontMain'])
+        tick.label2.set_fontname(plug_dict['fontMain'])
         tick.label1.set_fontsize(plug_dict['tickFontSize'])
         tick.label2.set_fontsize(plug_dict['tickFontSize'])
     for tick in ax2.yaxis.get_major_ticks():
+        tick.label1.set_fontname(plug_dict['fontMain'])
+        tick.label2.set_fontname(plug_dict['fontMain'])
         tick.label1.set_fontsize(plug_dict['tickFontSize'])
         tick.label2.set_fontsize(plug_dict['tickFontSize'])
 

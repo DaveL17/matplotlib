@@ -192,20 +192,27 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
     :return unicode result:
     """
     try:
-        # The label of the X axis ticks (not the axis label)
-        if p_dict.get('customSizeFont', False):
-            plt.xticks(fontsize=int(p_dict['customTickFontSize']))
-        else:
-            plt.xticks(fontsize=int(p_dict['tickFontSize']))
+        font_main           = p_dict.get('fontMain', 'Arial')  # Main font style
+        font_size           = int(p_dict.get('tickFontSize', '8'))  # Main font size
+        custom_size_font    = p_dict.get('customSizeFont', False)  # Use custom font sizes?  Bool
+        custom_axis_label_x = p_dict.get('customAxisLabelX', '')
+        custom_font_size    = int(p_dict.get('customTickFontSize', '8'))
+        show_legend         = p_dict.get('showLegend', False)  # Show legend?  Bool
 
-        if not p_dict.get('showLegend', False):
+        # The label of the X axis ticks (not the axis label)
+        if custom_size_font:
+            plt.xticks(fontname=font_main, fontsize=custom_font_size)
+        else:
+            plt.xticks(fontname=font_main, fontsize=font_size)
+
+        if not show_legend:
             # The label of the X axis (not the tick labels)
-            plt.xlabel(p_dict.get('customAxisLabelX', ''), **k_dict['k_x_axis_font'])
+            plt.xlabel(custom_axis_label_x, **k_dict['k_x_axis_font'])
 
             if p_dict['verboseLogging']:
                 logger['Threaddebug'].append(u"[{0}] No call for legend. Formatting X label.".format(dev['name']))
 
-        if p_dict['showLegend'] and p_dict['customAxisLabelX'].strip(' ') not in ('', 'null'):
+        if show_legend and custom_axis_label_x.strip(' ') not in ('', 'null'):
             logger['Debug'].append(u"[{0}] X axis label is suppressed to make room for the chart "
                                    u"legend.".format(dev['name']))
 
@@ -416,13 +423,15 @@ def format_axis_y1_label(p_dict, k_dict, logger):
     :param dict logger:
     """
 
+    font_main = p_dict.get('fontMain', 'Arial')  # Main font style
+
     try:
         plt.ylabel(p_dict.get('customAxisLabelY', ''), **k_dict['k_y_axis_font'])
 
         if p_dict['customSizeFont']:
-            plt.yticks(fontsize=int(p_dict['customTickFontSize']))
+            plt.yticks(fontname=font_main, fontsize=int(p_dict['customTickFontSize']))
         else:
-            plt.yticks(fontsize=int(p_dict['tickFontSize']))
+            plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
 
     except (ValueError, TypeError):
         logger['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = "
@@ -501,13 +510,15 @@ def format_axis_y2_label(p_dict, k_dict, logger):
     :param dict logger:
     """
 
+    font_main = p_dict.get('fontMain', 'Arial')  # Main font style
+
     try:
         plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
 
         if p_dict['customSizeFont']:
-            plt.yticks(fontsize=int(p_dict['customTickFontSize']))
+            plt.yticks(fontname=font_main, fontsize=int(p_dict['customTickFontSize']))
         else:
-            plt.yticks(fontsize=int(p_dict['tickFontSize']))
+            plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
 
     except (KeyError, ValueError):
         logger['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "

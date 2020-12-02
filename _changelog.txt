@@ -1,3 +1,6 @@
+v0.9.20
+- Fixes setting of tick font styles across chart types.
+
 v0.9.19
 - Fixes bug in setting tick label size for forecast charts.
 - Fixes bug in setting tick label size for composite weather charts.

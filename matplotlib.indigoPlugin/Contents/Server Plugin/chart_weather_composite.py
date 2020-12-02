@@ -151,6 +151,11 @@ try:
         if p_dict['temperature_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['temperature_max']))
 
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
+
         subplot = np.delete(subplot, 0)  # Delete the subplot for the next plot
 
     # ============================== Temperature Low ==============================
@@ -162,6 +167,11 @@ try:
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
         if p_dict['temperature_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['temperature_max']))
+
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
 
         subplot = np.delete(subplot, 0)
 
@@ -176,6 +186,11 @@ try:
         if p_dict['temperature_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['temperature_max']))
 
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
+
         subplot = np.delete(subplot, 0)
 
     # ================================= Humidity ==================================
@@ -188,6 +203,11 @@ try:
         if p_dict['humidity_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['humidity_max']))
 
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
+
         subplot = np.delete(subplot, 0)
 
     # ============================ Barometric Pressure ============================
@@ -199,6 +219,11 @@ try:
             subplot[0].set_ylim(bottom=float(p_dict['pressure_min']))
         if p_dict['pressure_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['pressure_max']))
+
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
 
         subplot = np.delete(subplot, 0)
 
@@ -239,6 +264,11 @@ try:
         if p_dict['wind_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['wind_max']))
 
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
+
         subplot = np.delete(subplot, 0)
 
     # ============================ Precipitation Line =============================
@@ -255,6 +285,11 @@ try:
         if p_dict['precipitation_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
 
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
+
         subplot = np.delete(subplot, 0)
 
     # ============================= Precipitation Bar =============================
@@ -270,6 +305,11 @@ try:
             subplot[0].set_ylim(bottom=float(p_dict['precipitation_min']))
         if p_dict['precipitation_max'] not in ("", "None"):
             subplot[0].set_ylim(top=float(p_dict['precipitation_max']))
+
+        # We apparently have to set this on a plot by plot basis or only the last
+        # plot is set.
+        labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
+        [label.set_fontname(p_dict['fontMain']) for label in labels]
 
         # We don't use the subplot variable after this; but this command
         # will be important if we add more subplots.
