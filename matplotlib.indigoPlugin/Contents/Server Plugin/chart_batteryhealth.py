@@ -39,15 +39,15 @@ log['Threaddebug'].append(u"chart_batteryhealth.py called.")
 try:
 
     bar_colors = []
-    caution_color = r"#{0}".format(p_dict['cautionColor'].replace(' ', '').replace('#', ''))
+    caution_color = r"#{rgb}".format(rgb=p_dict['cautionColor'].replace(' ', '').replace('#', ''))
     caution_level = int(p_dict['cautionLevel'])
     chart_data = {}
     font_size = plt.rcParams['ytick.labelsize']
-    healthy_color = r"#{0}".format(p_dict['healthyColor'].replace(' ', '').replace('#', ''))
+    healthy_color = r"#{rgb}".format(rgb=p_dict['healthyColor'].replace(' ', '').replace('#', ''))
     level_box = p_dict['showBatteryLevelBackground']
     show_level = p_dict['showBatteryLevel']
     dead_ones = p_dict.get('showDeadBattery', False)
-    warning_color = r"#{0}".format(p_dict['warningColor'].replace(' ', '').replace('#', ''))
+    warning_color = r"#{rgb}".format(rgb=p_dict['warningColor'].replace(' ', '').replace('#', ''))
     warning_level = int(p_dict['warningLevel'])
     x_values = []
     y_text = []
@@ -80,7 +80,7 @@ try:
     y_values = np.arange(len(y_text))
 
     # Create the chart figure
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     # =============================== Plot the Bars ===============================
     # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
@@ -114,14 +114,14 @@ try:
                              fontname=p_dict['fontMain'], **k_dict['k_battery'])
 
     # ================================ Chart Title ================================
-    chart_tools.format_title(p_dict, k_dict, loc=(0.5, 0.98))
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
 
     # =============================== Format Grids ================================
     if prefs.get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
             ax.axvline(x=_, color=p_dict['gridColor'], linestyle=prefs.get('gridStyle', ':'))
 
-    chart_tools.format_axis_x_label(props, p_dict, k_dict, log)
+    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
     ax.xaxis.set_ticks_position('bottom')
     ax.tick_params(axis='x', colors=chart_tools.fix_rgb(prefs['fontColor']))
 
@@ -139,7 +139,12 @@ try:
 
     # Assign device names to the minor ticks if wanted
     if p_dict.get('showDeviceName', True):
-        ax.set_yticklabels(y_text, fontname=p_dict['fontMain'], color=chart_tools.fix_rgb(prefs['fontColor']), fontsize=prefs['tickFontSize'], minor=True)
+        ax.set_yticklabels(y_text,
+                           fontname=p_dict['fontMain'],
+                           color=chart_tools.fix_rgb(prefs['fontColor']),
+                           fontsize=prefs['tickFontSize'],
+                           minor=True
+                           )
 
     # Mark devices that have a battery level of zero by coloring their y axis label
     # using the same warning color that is used for the bar.
@@ -176,7 +181,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

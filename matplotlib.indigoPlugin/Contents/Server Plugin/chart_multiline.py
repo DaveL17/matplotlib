@@ -106,7 +106,7 @@ try:
             text_to_plot = clean_string(val=text_to_plot)
 
     if plug_dict['verboseLogging']:
-        chart_tools.log['Threaddebug'].append(u"Data: {0}".format(text_to_plot))
+        chart_tools.log['Threaddebug'].append(u"Data: {t}".format(t=text_to_plot))
 
     # Wrap the text and prepare it for plotting.
 
@@ -155,7 +155,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

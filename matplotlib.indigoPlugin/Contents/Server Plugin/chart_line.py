@@ -41,7 +41,7 @@ try:
     for color in ['backgroundColor', 'faceColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     # ============================== Format X Ticks ===============================
     ax.tick_params(axis='x', **k_dict['k_major_x'])
@@ -58,40 +58,43 @@ try:
 
     for line in range(1, 9, 1):
 
-        suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
+        suppress_line = p_dict.get('suppressLine{i}'.format(i=line), False)
 
-        lc_index = 'line{0}Color'.format(line)
+        lc_index = 'line{i}Color'.format(i=line)
         p_dict[lc_index] = chart_tools.fix_rgb(color=p_dict[lc_index])
 
-        lmc_index = 'line{0}MarkerColor'.format(line)
+        lmc_index = 'line{i}MarkerColor'.format(i=line)
         p_dict[lmc_index] = chart_tools.fix_rgb(color=p_dict[lmc_index])
 
-        lbf_index = 'line{0}BestFitColor'.format(line)
+        lbf_index = 'line{i}BestFitColor'.format(i=line)
         p_dict[lbf_index] = chart_tools.fix_rgb(color=p_dict[lbf_index])
 
         # If line color is the same as the background color, alert the user.
-        if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor'] and not suppress_line:
-            chart_tools.log['Warning'].append(u"[{0}] Line {1} color is the same as the background color (so you may "
-                                              u"not be able to see it).".format(props['name'], line))
+        if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor'] and not suppress_line:
+            chart_tools.log['Warning'].append(u"[{name}] Line {i} color is the same as the background color (so you "
+                                              u"may not be able to see it).".format(name=props['name'], i=line))
 
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
-            chart_tools.log['Info'].append(u"[{0}] Line {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(props['name'], line))
+            chart_tools.log['Info'].append(u"[{name}] Line {i} is suppressed by user setting. You can re-enable it in "
+                                           u"the device configuration menu.".format(name=props['name'], i=line))
 
         # ============================== Plot the Lines ===============================
         # Plot the lines. If suppress_line is True, we skip it.
-        if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+        if p_dict['line{i}Source'.format(i=line)] not in (u"", u"None") and not suppress_line:
 
             # Add line color to list for later use
-            line_colors.append(p_dict['line{0}Color'.format(line)])
+            line_colors.append(p_dict['line{i}Color'.format(i=line)])
 
             data_path = plug_dict['dataPath'].encode("utf-8")
-            line_source = p_dict['line{0}Source'.format(line)].encode("utf-8")
-            data_column = chart_tools.get_data('{0}{1}'.format(data_path, line_source), logger=log)
+            line_source = p_dict['line{i}Source'.format(i=line)].encode("utf-8")
+            data_column = chart_tools.get_data(data_source='{path}{source}'.format(path=data_path,
+                                                                                   source=line_source),
+                                               logger=log
+                                               )
 
             if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"Data for Line {0}: {1}".format(line, data_column))
+                chart_tools.log['Threaddebug'].append(u"Data for Line {i}: {c}".format(i=line, c=data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -99,22 +102,22 @@ try:
 
             # Pull the observations into distinct lists for charting.
             for element in data_column:
-                p_dict['x_obs{0}'.format(line)].append(element[0])
-                p_dict['y_obs{0}'.format(line)].append(float(element[1]))
+                p_dict['x_obs{i}'.format(i=line)].append(element[0])
+                p_dict['y_obs{i}'.format(i=line)].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple
             # binary sources on the same chart.)
-            if props['line{0}adjuster'.format(line)] != "":
+            if props['line{i}adjuster'.format(i=line)] != "":
                 temp_list = []
-                for obs in p_dict['y_obs{0}'.format(line)]:
-                    expr = u'{0}{1}'.format(obs, props['line{0}adjuster'.format(line)])
-                    temp_list.append(chart_tools.eval_expr(expr))
-                p_dict['y_obs{0}'.format(line)] = temp_list
+                for obs in p_dict['y_obs{i}'.format(i=line)]:
+                    expr = u'{o}{p}'.format(o=obs, p=props['line{i}adjuster'.format(i=line)])
+                    temp_list.append(chart_tools.eval_expr(expr=expr))
+                p_dict['y_obs{i}'.format(i=line)] = temp_list
 
             # ================================ Prune Data =================================
             # Prune the data if warranted
-            dates_to_plot = p_dict['x_obs{0}'.format(line)]
+            dates_to_plot = p_dict['x_obs{i}'.format(i=line)]
 
             try:
                 limit = float(props['limitDataRangeLength'])
@@ -122,40 +125,48 @@ try:
                 limit = 0
 
             if limit > 0:
-                y_obs = p_dict['y_obs{0}'.format(line)]
+                y_obs = p_dict['y_obs{i}'.format(i=line)]
                 new_old = props['limitDataRange']
 
-                prune = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old='None', logger=log)
-                p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)] = prune
+                prune = chart_tools.prune_data(x_data=dates_to_plot,
+                                               y_data=y_obs,
+                                               limit=limit,
+                                               new_old='None',
+                                               logger=log
+                                               )
+                p_dict['x_obs{i}'.format(i=line)], p_dict['y_obs{i}'.format(i=line)] = prune
 
             # ======================== Convert Dates for Charting =========================
-            p_dict['x_obs{0}'.format(line)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(line)], logger=log)
+            p_dict['x_obs{i}'.format(i=line)] = \
+                chart_tools.format_dates(list_of_dates=p_dict['x_obs{i}'.format(i=line)],
+                                         logger=log
+                                         )
 
-            ax.plot_date(p_dict['x_obs{0}'.format(line)],
-                         p_dict['y_obs{0}'.format(line)],
-                         color=p_dict['line{0}Color'.format(line)],
-                         linestyle=p_dict['line{0}Style'.format(line)],
-                         marker=p_dict['line{0}Marker'.format(line)],
-                         markeredgecolor=p_dict['line{0}MarkerColor'.format(line)],
-                         markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
+            ax.plot_date(p_dict['x_obs{i}'.format(i=line)],
+                         p_dict['y_obs{i}'.format(i=line)],
+                         color=p_dict['line{i}Color'.format(i=line)],
+                         linestyle=p_dict['line{i}Style'.format(i=line)],
+                         marker=p_dict['line{i}Marker'.format(i=line)],
+                         markeredgecolor=p_dict['line{i}MarkerColor'.format(i=line)],
+                         markerfacecolor=p_dict['line{i}MarkerColor'.format(i=line)],
                          zorder=10,
                          **k_dict['k_line']
                          )
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=line)]]
 
-            if p_dict['line{0}Fill'.format(line)]:
-                ax.fill_between(p_dict['x_obs{0}'.format(line)],
+            if p_dict['line{i}Fill'.format(i=line)]:
+                ax.fill_between(p_dict['x_obs{i}'.format(i=line)],
                                 0,
-                                p_dict['y_obs{0}'.format(line)],
-                                color=p_dict['line{0}Color'.format(line)],
+                                p_dict['y_obs{i}'.format(i=line)],
+                                color=p_dict['line{i}Color'.format(i=line)],
                                 **k_dict['k_fill']
                                 )
 
             # ================================ Annotations ================================
-            if p_dict['line{0}Annotate'.format(line)]:
-                for xy in zip(p_dict['x_obs{0}'.format(line)], p_dict['y_obs{0}'.format(line)]):
-                    ax.annotate(u"{0}".format(xy[1]),
+            if p_dict['line{i}Annotate'.format(i=line)]:
+                for xy in zip(p_dict['x_obs{i}'.format(i=line)], p_dict['y_obs{i}'.format(i=line)]):
+                    ax.annotate(u"{a}".format(a=xy[1]),
                                 xy=xy,
                                 xytext=(0, 0),
                                 zorder=10,
@@ -185,10 +196,10 @@ try:
         headers = [_.decode('utf-8') for _ in p_dict['headers']]
 
         for header in headers:
-            if p_dict['line{0}Legend'.format(counter)] == "":
+            if p_dict['line{c}Legend'.format(c=counter)] == "":
                 final_headers.append(header)
             else:
-                final_headers.append(p_dict['line{0}Legend'.format(counter)])
+                final_headers.append(p_dict['line{c}Legend'.format(c=counter)])
             counter += 1
 
         # Set the legend
@@ -219,42 +230,40 @@ try:
 
     for line in range(1, 9, 1):
 
-        suppress_line = p_dict.get('suppressLine{0}'.format(line), False)
+        suppress_line = p_dict.get('suppressLine{i}'.format(i=line), False)
 
-        if p_dict['line{0}Source'.format(line)] not in (u"", u"None") and not suppress_line:
+        if p_dict['line{i}Source'.format(i=line)] not in (u"", u"None") and not suppress_line:
+
             # Note that we do these after the legend is drawn so that these lines don't
             # affect the legend.
 
-            # We need to reload the dates to ensure that they match the line being plotted
-            # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(line)])
-
             # =============================== Best Fit Line ===============================
-            if props.get('line{0}BestFit'.format(line), False):
+            if props.get('line{i}BestFit'.format(i=line), False):
                 chart_tools.format_best_fit_line_segments(ax=ax,
-                                                          dates_to_plot=p_dict['x_obs{0}'.format(line)],
+                                                          dates_to_plot=p_dict['x_obs{i}'.format(i=line)],
                                                           line=line,
                                                           p_dict=p_dict,
                                                           logger=log)
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=line)]]
 
             # =============================== Fill Between ================================
-            if p_dict['line{0}Fill'.format(line)]:
-                ax.fill_between(p_dict['x_obs{0}'.format(line)],
+            if p_dict['line{i}Fill'.format(i=line)]:
+                ax.fill_between(p_dict['x_obs{i}'.format(i=line)],
                                 0,
-                                p_dict['y_obs{0}'.format(line)],
-                                color=p_dict['line{0}Color'.format(line)],
+                                p_dict['y_obs{i}'.format(i=line)],
+                                color=p_dict['line{i}Color'.format(i=line)],
                                 **k_dict['k_fill']
                                 )
 
             # =============================== Min/Max Lines ===============================
-            if p_dict['plotLine{0}Min'.format(line)]:
-                ax.axhline(y=min(p_dict['y_obs{0}'.format(line)]),
-                           color=p_dict['line{0}Color'.format(line)],
+            if p_dict['plotLine{i}Min'.format(i=line)]:
+                ax.axhline(y=min(p_dict['y_obs{i}'.format(i=line)]),
+                           color=p_dict['line{i}Color'.format(i=line)],
                            **k_dict['k_min'])
-            if p_dict['plotLine{0}Max'.format(line)]:
-                ax.axhline(y=max(p_dict['y_obs{0}'.format(line)]),
-                           color=p_dict['line{0}Color'.format(line)],
+            if p_dict['plotLine{i}Max'.format(i=line)]:
+                ax.axhline(y=max(p_dict['y_obs{i}'.format(i=line)]),
+                           color=p_dict['line{i}Color'.format(i=line)],
                            **k_dict['k_max']
                            )
             if plug_dict.get('forceOriginLines', True):
@@ -280,7 +289,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

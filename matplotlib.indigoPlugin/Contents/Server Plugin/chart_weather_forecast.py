@@ -49,33 +49,33 @@ try:
     p_dict['line1MarkerColor'] = chart_tools.fix_rgb(p_dict['line1MarkerColor'])
     p_dict['line2MarkerColor'] = chart_tools.fix_rgb(p_dict['line2MarkerColor'])
 
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     dates_to_plot = p_dict['dates_to_plot']
 
     for line in range(1, 4, 1):
 
-        if p_dict['line{0}Color'.format(line)] == p_dict['backgroundColor']:
-            chart_tools.log['Debug'].append(u"[{0}] A line color is the same as the background color (so you will not "
-                                            u"be able to see it).".format(props['name']))
+        if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor']:
+            chart_tools.log['Debug'].append(u"[{name}] A line color is the same as the background color (so you will "
+                                            u"not be able to see it).".format(name=props['name']))
 
     # ========================== Fantastic Hourly Device ==========================
     if dev_type == 'Hourly':
 
         for counter in range(1, 25, 1):
             if counter < 10:
-                counter = '0{0}'.format(counter)
+                counter = '0{c}'.format(c=counter)
 
-            epoch = state_list['h{0}_epoch'.format(counter)]
+            epoch = state_list['h{c}_epoch'.format(c=counter)]
             time_stamp = dt.datetime.fromtimestamp(epoch)
             time_stamp = dt.datetime.strftime(time_stamp, "%Y-%m-%d %H:%M")
             p_dict['x_obs1'].append(time_stamp)
 
-            p_dict['y_obs1'].append(state_list['h{0}_temperature'.format(counter)])
-            p_dict['y_obs3'].append(state_list['h{0}_precipChance'.format(counter)])
+            p_dict['y_obs1'].append(state_list['h{c}_temperature'.format(c=counter)])
+            p_dict['y_obs3'].append(state_list['h{c}_precipChance'.format(c=counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'], logger=log)
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly
             # if that's the case.
@@ -92,10 +92,10 @@ try:
 
         for counter in range(1, 25, 1):
             if counter < 10:
-                counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(state_list['h{0}_timeLong'.format(counter)])
-            p_dict['y_obs1'].append(state_list['h{0}_temp'.format(counter)])
-            p_dict['y_obs3'].append(state_list['h{0}_precip'.format(counter)])
+                counter = '0{c}'.format(c=counter)
+            p_dict['x_obs1'].append(state_list['h{c}_timeLong'.format(c=counter)])
+            p_dict['y_obs1'].append(state_list['h{t}_temp'.format(t=counter)])
+            p_dict['y_obs3'].append(state_list['h{pr}_precip'.format(pr=counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
@@ -117,11 +117,11 @@ try:
 
         for counter in range(1, 9, 1):
             if counter < 10:
-                counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
-            p_dict['y_obs1'].append(state_list['d{0}_temperatureHigh'.format(counter)])
-            p_dict['y_obs2'].append(state_list['d{0}_temperatureLow'.format(counter)])
-            p_dict['y_obs3'].append(state_list['d{0}_precipChance'.format(counter)])
+                counter = '0{c}'.format(c=counter)
+            p_dict['x_obs1'].append(state_list['d{c}_date'.format(c=counter)])
+            p_dict['y_obs1'].append(state_list['d{c}_temperatureHigh'.format(c=counter)])
+            p_dict['y_obs2'].append(state_list['d{c}_temperatureLow'.format(c=counter)])
+            p_dict['y_obs3'].append(state_list['d{c}_precipChance'.format(c=counter)])
 
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
@@ -139,14 +139,14 @@ try:
 
         for counter in range(1, 11, 1):
             if counter < 10:
-                counter = '0{0}'.format(counter)
-            p_dict['x_obs1'].append(state_list['d{0}_date'.format(counter)])
-            p_dict['y_obs1'].append(state_list['d{0}_high'.format(counter)])
-            p_dict['y_obs2'].append(state_list['d{0}_low'.format(counter)])
-            p_dict['y_obs3'].append(state_list['d{0}_pop'.format(counter)])
+                counter = '0{c}'.format(c=counter)
+            p_dict['x_obs1'].append(state_list['d{c}_date'.format(c=counter)])
+            p_dict['y_obs1'].append(state_list['d{c}_high'.format(c=counter)])
+            p_dict['y_obs2'].append(state_list['d{c}_low'.format(c=counter)])
+            p_dict['y_obs3'].append(state_list['d{c}_pop'.format(c=counter)])
 
             # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(p_dict['x_obs1'], logger=log)
+            dates_to_plot = chart_tools.format_dates(list_of_dates=p_dict['x_obs1'], logger=log)
 
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if
             # that's the case.
@@ -161,7 +161,7 @@ try:
                                           u"WUnderground forecast devices.")
 
     if plug_dict['verboseLogging']:
-        chart_tools.log['Threaddebug'].append(u"p_dict: {0}".format(p_dict))
+        chart_tools.log['Threaddebug'].append(u"p_dict: {p}".format(p=p_dict))
 
     ax1 = chart_tools.make_chart_figure(width=p_dict['chart_width'],
                                         height=p_dict['chart_height'],
@@ -267,7 +267,7 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)  # Note: frame alpha should be an int and not a string.
 
-    chart_tools.format_grids(p_dict, k_dict, logger=log)
+    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # ========================== Transparent Charts Fill ==========================
     if p_dict['transparent_charts'] and p_dict['transparent_filled']:
@@ -287,7 +287,7 @@ try:
 
     if daylight and dev_type in ('Hourly', 'wundergroundHourly'):
 
-        sun_rise, sun_set = chart_tools.format_dates(sun_rise_set, logger=log)
+        sun_rise, sun_set = chart_tools.format_dates(list_of_dates=sun_rise_set, logger=log)
 
         min_dates_to_plot = np.amin(dates_to_plot)
         max_dates_to_plot = np.amax(dates_to_plot)
@@ -316,21 +316,21 @@ try:
     ax2.margins(0.04, 0.05)  # This needs to remain or the margins get screwy (they don't carry over from ax1).
 
     for line in range(1, 3, 1):
-        if p_dict['y_obs{0}'.format(line)]:
+        if p_dict['y_obs{i}'.format(i=line)]:
             ax2.plot(dates_to_plot,
-                     p_dict['y_obs{0}'.format(line)],
-                     color=p_dict['line{0}Color'.format(line)],
-                     linestyle=p_dict['line{0}Style'.format(line)],
-                     marker=p_dict['line{0}Marker'.format(line)],
-                     markerfacecolor=p_dict['line{0}MarkerColor'.format(line)],
+                     p_dict['y_obs{i}'.format(i=line)],
+                     color=p_dict['line{i}Color'.format(i=line)],
+                     linestyle=p_dict['line{i}Style'.format(i=line)],
+                     marker=p_dict['line{i}Marker'.format(i=line)],
+                     markerfacecolor=p_dict['line{i}MarkerColor'.format(i=line)],
                      zorder=(10 - line),
                      **k_dict['k_line']
                      )
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(line)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=line)]]
 
-            if p_dict['line{0}Annotate'.format(line)]:
-                for xy in zip(dates_to_plot, p_dict['y_obs{0}'.format(line)]):
+            if p_dict['line{i}Annotate'.format(i=line)]:
+                for xy in zip(dates_to_plot, p_dict['y_obs{i}'.format(i=line)]):
                     ax2.annotate('%.0f' % xy[1],
                                  xy=xy,
                                  xytext=(0, 0),
@@ -444,7 +444,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

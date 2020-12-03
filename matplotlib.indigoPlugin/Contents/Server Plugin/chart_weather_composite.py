@@ -60,8 +60,8 @@ try:
         """Note that we have to set these for each subplot as it's rendered or else
         the settings will only be applied to the last subplot rendered."""
         subplot[0].set_title(title, **k_dict['k_title_font'])  # The subplot title
-        chart_tools.format_axis_x_ticks(s_plot, p_dict, k_dict, logger=log)
-        chart_tools.format_axis_y(s_plot, p_dict, k_dict, logger=log)
+        chart_tools.format_axis_x_ticks(ax=s_plot, p_dict=p_dict, k_dict=k_dict, logger=log)
+        chart_tools.format_axis_y(ax=s_plot, p_dict=p_dict, k_dict=k_dict, logger=log)
 
         # =================================== Grids ===================================
         if p_dict['showxAxisGrid']:
@@ -79,7 +79,7 @@ try:
     for color in ['backgroundColor', 'faceColor', 'lineColor', 'lineMarkerColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     # ================================ Set Up Axes ================================
     axes     = props['component_list']
@@ -89,17 +89,17 @@ try:
     # Daily
     if dev_type in ('Daily', 'wundergroundTenDay'):
         for _ in range(1, forecast_length[dev_type] + 1):
-            dates_to_plot    += (state_list[u'd0{0}_date'.format(_)],)
-            humidity         += (state_list[u'd0{0}_humidity'.format(_)],)
-            pressure         += (state_list[u'd0{0}_pressure'.format(_)],)
-            temperature_high += (state_list[u'd0{0}_temperatureHigh'.format(_)],)
-            temperature_low  += (state_list[u'd0{0}_temperatureLow'.format(_)],)
-            wind_speed       += (state_list[u'd0{0}_windSpeed'.format(_)],)
-            wind_bearing     += (state_list[u'd0{0}_windBearing'.format(_)],)
+            dates_to_plot    += (state_list[u'd0{d}_date'.format(d=_)],)
+            humidity         += (state_list[u'd0{h}_humidity'.format(h=_)],)
+            pressure         += (state_list[u'd0{p}_pressure'.format(p=_)],)
+            temperature_high += (state_list[u'd0{th}_temperatureHigh'.format(th=_)],)
+            temperature_low  += (state_list[u'd0{tl}_temperatureLow'.format(tl=_)],)
+            wind_speed       += (state_list[u'd0{ws}_windSpeed'.format(ws=_)],)
+            wind_bearing     += (state_list[u'd0{wb}_windBearing'.format(wb=_)],)
             try:
-                precipitation    += (state_list[u'd0{0}_precipTotal'.format(_)],)
+                precipitation    += (state_list[u'd0{pt}_precipTotal'.format(pt=_)],)
             except KeyError:
-                precipitation    += (state_list[u'd0{0}_pop'.format(_)],)
+                precipitation    += (state_list[u'd0{pr}_pop'.format(pr=_)],)
 
         x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=6)
@@ -109,20 +109,20 @@ try:
         for _ in range(1, forecast_length[dev_type] + 1):
 
             if _ <= 9:
-                _ = '0{0}'.format(_)
+                _ = '0{dx}'.format(dx=_)
 
-            dates_to_plot    += (state_list[u'h{0}_epoch'.format(_)],)
-            humidity         += (state_list[u'h{0}_humidity'.format(_)],)
-            pressure         += (state_list[u'h{0}_pressure'.format(_)],)
-            temperature_high += (state_list[u'h{0}_temperature'.format(_)],)
-            temperature_low  += (state_list[u'h{0}_temperature'.format(_)],)
-            wind_speed       += (state_list[u'h{0}_windSpeed'.format(_)],)
-            wind_bearing     += (state_list[u'h{0}_windBearing'.format(_)],)
+            dates_to_plot    += (state_list[u'h{e}_epoch'.format(e=_)],)
+            humidity         += (state_list[u'h{h}_humidity'.format(h=_)],)
+            pressure         += (state_list[u'h{p}_pressure'.format(p=_)],)
+            temperature_high += (state_list[u'h{th}_temperature'.format(th=_)],)
+            temperature_low  += (state_list[u'h{tl}_temperature'.format(tl=_)],)
+            wind_speed       += (state_list[u'h{ws}_windSpeed'.format(ws=_)],)
+            wind_bearing     += (state_list[u'h{wb}_windBearing'.format(wb=_)],)
 
             try:
-                precipitation    += (state_list[u'h{0}_precipIntensity'.format(_)],)
+                precipitation    += (state_list[u'h{pi}_precipIntensity'.format(pi=_)],)
             except KeyError:
-                precipitation    += (state_list[u'h{0}_precip'.format(_)],)
+                precipitation    += (state_list[u'h{pr}_precip'.format(pr=_)],)
 
         x1 = [dt.datetime.fromtimestamp(_) for _ in dates_to_plot]
         x_offset = dt.timedelta(hours=1)
@@ -331,7 +331,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

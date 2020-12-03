@@ -19,7 +19,7 @@ simultaneously. You can add additional customizations to each individual
 chart if you like, such as overriding the default chart size or displaying a 
 chart legend only on selected charts. The overriding emphasis in designing the 
 plugin is simplicity. The instructions below seem like a lot, but almost all 
-of the settings can be left at their default when you begin. It's probably 
+the settings can be left at their default when you begin. It's probably 
 best to read through all these instructions before getting started.
 
 Note: The Matplotlib plugin does not require Internet access in order to 

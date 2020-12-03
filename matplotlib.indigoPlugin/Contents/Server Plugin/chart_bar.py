@@ -40,42 +40,42 @@ try:
     for color in ['backgroundColor', 'faceColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
-    chart_tools.format_axis_x_ticks(ax, p_dict, k_dict, logger=log)
-    chart_tools.format_axis_y(ax, p_dict, k_dict, logger=log)
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     for thing in range(1, 5, 1):
 
-        suppress_bar = p_dict.get('suppressBar{0}'.format(thing), False)
+        suppress_bar = p_dict.get('suppressBar{i}'.format(i=thing), False)
 
-        p_dict['bar{0}Color'.format(thing)] = chart_tools.fix_rgb(p_dict['bar{0}Color'.format(thing)])
+        p_dict['bar{i}Color'.format(i=thing)] = chart_tools.fix_rgb(p_dict['bar{i}Color'.format(i=thing)])
 
         # If the bar color is the same as the background color, alert the user.
-        if p_dict['bar{0}Color'.format(thing)] == p_dict['backgroundColor'] and not suppress_bar:
-            chart_tools.log['Info'].append(u"[{0}] Bar {1} color is the same as the background color (so you may not "
-                                           u"be able to see it).".format(props['name'], thing))
+        if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:
+            chart_tools.log['Info'].append(u"[{name}] Bar {i} color is the same as the background color (so you may "
+                                           u"not be able to see it).".format(name=props['name'], i=thing))
 
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
-            chart_tools.log['Info'].append(u"[{0}] Bar {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(props['name'], thing))
+            chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in the "
+                                           u"device configuration menu.".format(name=props['name'], i=thing))
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
-        if p_dict['bar{0}Source'.format(thing)] not in ("", "None") and not suppress_bar:
+        if p_dict['bar{i}Source'.format(i=thing)] not in ("", "None") and not suppress_bar:
 
             # Add bar color to list for later use
-            bar_colors.append(p_dict['bar{0}Color'.format(thing)])
+            bar_colors.append(p_dict['bar{i}Color'.format(i=thing)])
 
             # Get the data and grab the header.
-            dc = u'{0}{1}'.format(plug_dict['dataPath'].encode("utf-8"),
-                                  p_dict['bar{0}Source'.format(thing)]
-                                  )
+            dc = u'{path}{source}'.format(path=plug_dict['dataPath'].encode("utf-8"),
+                                          source=p_dict['bar{i}Source'.format(i=thing)]
+                                          )
 
-            data_column = chart_tools.get_data(dc, logger=log)
+            data_column = chart_tools.get_data(data_source=dc, logger=log)
 
             if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"Data for bar {0}: {1}".format(thing, data_column))
+                chart_tools.log['Threaddebug'].append(u"Data for bar {i}: {c}".format(i=thing, c=data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -83,12 +83,12 @@ try:
 
             # Pull the observations into distinct lists for charting.
             for element in data_column:
-                p_dict['x_obs{0}'.format(thing)].append(element[0])
-                p_dict['y_obs{0}'.format(thing)].append(float(element[1]))
+                p_dict['x_obs{i}'.format(i=thing)].append(element[0])
+                p_dict['y_obs{i}'.format(i=thing)].append(float(element[1]))
 
             # ================================ Prune Data =================================
             # Prune the data if warranted
-            dates_to_plot = p_dict['x_obs{0}'.format(thing)]
+            dates_to_plot = p_dict['x_obs{i}'.format(i=thing)]
 
             try:
                 limit = float(props['limitDataRangeLength'])
@@ -96,19 +96,27 @@ try:
                 limit = 0
 
             if limit > 0:
-                y_obs   = p_dict['y_obs{0}'.format(thing)]
+                y_obs   = p_dict['y_obs{i}'.format(i=thing)]
                 new_old = props['limitDataRange']
-                dtp = chart_tools.prune_data(dates_to_plot, y_obs, limit, new_old, logger=log)
-                p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)] = dtp
+                dtp = chart_tools.prune_data(x_data=dates_to_plot,
+                                             y_data=y_obs,
+                                             limit=limit,
+                                             new_old=new_old,
+                                             logger=log
+                                             )
+                p_dict['x_obs{i}'.format(i=thing)], p_dict['y_obs{i}'.format(i=thing)] = dtp
 
             # Convert the date strings for charting.
-            p_dict['x_obs{0}'.format(thing)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(thing)], logger=log)
+            p_dict['x_obs{i}'.format(i=thing)] = \
+                chart_tools.format_dates(list_of_dates=p_dict['x_obs{i}'.format(i=thing)],
+                                         logger=log
+                                         )
 
             # If the user sets the width to 0, this will perform an introspection of the
             # dates to plot and get the minimum of the difference between the dates.
             try:
                 if float(p_dict['barWidth']) == 0.0:
-                    width = np.min(np.diff(p_dict['x_obs{0}'.format(thing)])) * 0.8
+                    width = np.min(np.diff(p_dict['x_obs{i}'.format(i=thing)])) * 0.8
                 else:
                     width = float(p_dict['barWidth'])
             except ValueError as sub_error:
@@ -117,28 +125,27 @@ try:
             # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
             # With this setting, we replace the Y values of zero with a very small positive value
             # (0 becomes 1e-06). We get a slice of the original data for annotations.
-            annotation_values = p_dict['y_obs{0}'.format(thing)][:]
+            annotation_values = p_dict['y_obs{i}'.format(i=thing)][:]
             if p_dict.get('showZeroBars', False):
-                p_dict['y_obs{0}'.format(thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in
-                                                                   p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
+                p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in
+                                                                     p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]]
 
             # Plot the bar. Note: hatching is not supported in the PNG backend.
-            ax.bar(p_dict['x_obs{0}'.format(thing)][num_obs * -1:],
-                   p_dict['y_obs{0}'.format(thing)][num_obs * -1:],
+            ax.bar(p_dict['x_obs{i}'.format(i=thing)][num_obs * -1:],
+                   p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:],
                    align='center',
                    width=width,
-                   color=p_dict['bar{0}Color'.format(thing)],
-                   edgecolor=p_dict['bar{0}Color'.format(thing)],
+                   color=p_dict['bar{i}Color'.format(i=thing)],
+                   edgecolor=p_dict['bar{i}Color'.format(i=thing)],
                    **k_dict['k_bar']
                    )
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(thing)][num_obs * -1:]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]]
 
             # If annotations desired, plot those too.
-            if p_dict['bar{0}Annotate'.format(thing)]:
-                # for xy in zip(p_dict['x_obs{0}'.format(thing)], p_dict['y_obs{0}'.format(thing)]):
-                for xy in zip(p_dict['x_obs{0}'.format(thing)], annotation_values):
-                    ax.annotate(u"{0}".format(xy[1]),
+            if p_dict['bar{i}Annotate'.format(i=thing)]:
+                for xy in zip(p_dict['x_obs{i}'.format(i=thing)], annotation_values):
+                    ax.annotate(u"{i}".format(i=xy[1]),
                                 xy=xy,
                                 xytext=(0, 0),
                                 zorder=10,
@@ -169,10 +176,10 @@ try:
         final_headers = []
         headers = [_.decode('utf-8') for _ in p_dict['headers']]
         for header in headers:
-            if p_dict['bar{0}Legend'.format(counter)] == "":
+            if p_dict['bar{c}Legend'.format(c=counter)] == "":
                 final_headers.append(header)
             else:
-                final_headers.append(p_dict['bar{0}Legend'.format(counter)])
+                final_headers.append(p_dict['bar{c}Legend'.format(c=counter)])
             counter += 1
 
         # Set the legend
@@ -206,14 +213,14 @@ try:
     # some of the characteristics of the min/max lines will take over the legend
     # props.
     for thing in range(1, 5, 1):
-        if p_dict['plotBar{0}Min'.format(thing)]:
-            ax.axhline(y=min(p_dict['y_obs{0}'.format(thing)][num_obs * -1:]),
-                       color=p_dict['bar{0}Color'.format(thing)],
+        if p_dict['plotBar{i}Min'.format(i=thing)]:
+            ax.axhline(y=min(p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]),
+                       color=p_dict['bar{i}Color'.format(i=thing)],
                        **k_dict['k_min']
                        )
-        if p_dict['plotBar{0}Max'.format(thing)]:
-            ax.axhline(y=max(p_dict['y_obs{0}'.format(thing)][num_obs * -1:]),
-                       color=p_dict['bar{0}Color'.format(thing)],
+        if p_dict['plotBar{i}Max'.format(i=thing)]:
+            ax.axhline(y=max(p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]),
+                       color=p_dict['bar{i}Color'.format(i=thing)],
                        **k_dict['k_max']
                        )
         if plug_dict.get('forceOriginLines', True):
@@ -237,7 +244,7 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

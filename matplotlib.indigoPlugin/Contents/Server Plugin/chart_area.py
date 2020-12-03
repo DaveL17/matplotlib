@@ -41,39 +41,41 @@ try:
     for color in ['backgroundColor', 'faceColor']:
         p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
-    ax = chart_tools.make_chart_figure(p_dict['chart_width'], p_dict['chart_height'], p_dict)
+    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     for area in range(1, 9, 1):
 
-        suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
+        suppress_area = p_dict.get('suppressArea{i}'.format(i=area), False)
 
-        p_dict['area{0}Color'.format(area)] = chart_tools.fix_rgb(p_dict['area{0}Color'.format(area)])
-        p_dict['line{0}Color'.format(area)] = chart_tools.fix_rgb(p_dict['line{0}Color'.format(area)])
-        p_dict['area{0}MarkerColor'.format(area)] = chart_tools.fix_rgb(p_dict['area{0}MarkerColor'.format(area)])
+        p_dict['area{i}Color'.format(i=area)] = chart_tools.fix_rgb(p_dict['area{i}Color'.format(i=area)])
+        p_dict['line{i}Color'.format(i=area)] = chart_tools.fix_rgb(p_dict['line{i}Color'.format(i=area)])
+        p_dict['area{i}MarkerColor'.format(i=area)] = chart_tools.fix_rgb(p_dict['area{i}MarkerColor'.format(i=area)])
 
         # If area color is the same as the background color, alert the user.
-        if p_dict['area{0}Color'.format(area)] == p_dict['backgroundColor'] and not suppress_area:
-            chart_tools.log['Warning'].append(u"[{0}] Area {1} color is the same as the background color (so you may "
-                                              u"not be able to see it).".format(props['name'], area))
+        if p_dict['area{i}Color'.format(i=area)] == p_dict['backgroundColor'] and not suppress_area:
+            chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so you "
+                                              u"may not be able to see it).".format(name=props['name'], i=area))
 
         # If the area is suppressed, remind the user they suppressed it.
         if suppress_area:
-            chart_tools.log['Info'].append(u"[{0}] Area {1} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(props['name'], area))
+            chart_tools.log['Info'].append(u"[{name}] Area {i} is suppressed by user setting. You can re-enable it in "
+                                           u"the device configuration menu.".format(name=props['name'], i=area))
 
         # ============================== Plot the Areas ===============================
         # Plot the areas. If suppress_area is True, we skip it.
-        if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
+        if p_dict['area{i}Source'.format(i=area)] not in (u"", u"None") and not suppress_area:
 
             data_path   = plug_dict['dataPath'].encode("utf-8")
-            area_source = p_dict['area{0}Source'.format(area)].encode("utf-8")
-            data_column = chart_tools.get_data(data_source='{0}{1}'.format(data_path, area_source), logger=log)
+            area_source = p_dict['area{i}Source'.format(i=area)].encode("utf-8")
+            data_column = chart_tools.get_data(data_source='{path}{source}'.format(path=data_path, source=area_source),
+                                               logger=log
+                                               )
 
             if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"Data for Area {0}: {1}".format(area, data_column))
+                chart_tools.log['Threaddebug'].append(u"Data for Area {a}: {c}".format(a=area, c=data_column))
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -81,22 +83,22 @@ try:
 
             # Pull the observations into distinct lists for charting.
             for element in data_column:
-                p_dict['x_obs{0}'.format(area)].append(element[0])
-                p_dict['y_obs{0}'.format(area)].append(float(element[1]))
+                p_dict['x_obs{i}'.format(i=area)].append(element[0])
+                p_dict['y_obs{i}'.format(i=area)].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple
             # binary sources on the same chart.)
-            if props['area{0}adjuster'.format(area)] != "":
+            if props['area{i}adjuster'.format(i=area)] != "":
                 temp_list = []
-                for obs in p_dict['y_obs{0}'.format(area)]:
-                    expr = u'{0}{1}'.format(obs, props['area{0}adjuster'.format(area)])
-                    temp_list.append(chart_tools.eval_expr(expr))
-                p_dict['y_obs{0}'.format(area)] = temp_list
+                for obs in p_dict['y_obs{i}'.format(i=area)]:
+                    expr = u'{o}{p}'.format(o=obs, p=props['area{i}adjuster'.format(i=area)])
+                    temp_list.append(chart_tools.eval_expr(expr=expr))
+                p_dict['y_obs{i}'.format(i=area)] = temp_list
 
             # ================================ Prune Data =================================
             # Prune the data if warranted
-            dates_to_plot = p_dict['x_obs{0}'.format(area)]
+            dates_to_plot = p_dict['x_obs{i}'.format(i=area)]
 
             try:
                 limit = float(props['limitDataRangeLength'])
@@ -104,11 +106,11 @@ try:
                 limit = 0
 
             if limit > 0:
-                y_obs = p_dict['y_obs{0}'.format(area)]
+                y_obs = p_dict['y_obs{i}'.format(i=area)]
                 new_old = props['limitDataRange']
 
-                x_index = 'x_obs{0}'.format(area)
-                y_index = 'y_obs{0}'.format(area)
+                x_index = 'x_obs{i}'.format(i=area)
+                y_index = 'y_obs{i}'.format(i=area)
                 p_dict[x_index], p_dict[y_index] = chart_tools.prune_data(x_data=dates_to_plot,
                                                                           y_data=y_obs,
                                                                           limit=limit,
@@ -116,14 +118,15 @@ try:
                                                                           logger=log)
 
             # ======================== Convert Dates for Charting =========================
-            p_dict['x_obs{0}'.format(area)] = chart_tools.format_dates(p_dict['x_obs{0}'.format(area)], logger=log)
+            p_dict['x_obs{i}'.format(i=area)] = \
+                chart_tools.format_dates(list_of_dates=p_dict['x_obs{i}'.format(i=area)], logger=log)
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=area)]]
 
             # We need to plot all the stacks at once, so we create some tuples to hold the data we need later.
-            y_obs_tuple += (p_dict['y_obs{0}'.format(area)],)
-            y_colors_tuple += (p_dict['area{0}Color'.format(area)],)
-            x_obs = p_dict['x_obs{0}'.format(area)]
+            y_obs_tuple += (p_dict['y_obs{i}'.format(i=area)],)
+            y_colors_tuple += (p_dict['area{i}Color'.format(i=area)],)
+            x_obs = p_dict['x_obs{i}'.format(i=area)]
 
             # ================================ Annotations ================================
 
@@ -135,15 +138,15 @@ try:
                 # We start with the ordinal list and create a tuple to hold all the lists that come before it.
                 for k in range(_, 0, -1):
 
-                    tup += (p_dict['y_obs{0}'.format(k)],)
+                    tup += (p_dict['y_obs{i}'.format(i=k)],)
 
                 # The relative value is the sum of each list element plus the ones that come before it
                 # (i.e., tup[n][0] + tup[n-1][0] + tup[n-2][0]
-                y_obs_tuple_rel['y_obs{0}'.format(area)] = [sum(t) for t in zip(*tup)]
+                y_obs_tuple_rel['y_obs{i}'.format(i=area)] = [sum(t) for t in zip(*tup)]
 
-            if p_dict['area{0}Annotate'.format(area)]:
-                for xy in zip(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)]):
-                    ax.annotate(u"{0}".format(xy[1]),
+            if p_dict['area{i}Annotate'.format(i=area)]:
+                for xy in zip(p_dict['x_obs{i}'.format(i=area)], y_obs_tuple_rel['y_obs{i}'.format(i=area)]):
+                    ax.annotate(u"{i}".format(i=xy[1]),
                                 xy=xy,
                                 xytext=(0, 0),
                                 zorder=10,
@@ -187,10 +190,10 @@ try:
         headers = [_.decode('utf-8') for _ in p_dict['headers']]
 
         for header in headers:
-            if p_dict['area{0}Legend'.format(counter)] == "":
+            if p_dict['area{i}Legend'.format(i=counter)] == "":
                 final_headers.append(header)
             else:
-                final_headers.append(p_dict['area{0}Legend'.format(counter)])
+                final_headers.append(p_dict['area{i}Legend'.format(i=counter)])
             counter += 1
 
         # Set the legend
@@ -227,34 +230,34 @@ try:
 
     for area in range(1, 9, 1):
 
-        suppress_area = p_dict.get('suppressArea{0}'.format(area), False)
+        suppress_area = p_dict.get('suppressArea{i}'.format(i=area), False)
 
-        if p_dict['area{0}Source'.format(area)] not in (u"", u"None") and not suppress_area:
+        if p_dict['area{i}Source'.format(i=area)] not in (u"", u"None") and not suppress_area:
             # Note that we do these after the legend is drawn so that these areas don't
             # affect the legend.
 
             # We need to reload the dates to ensure that they match the area being plotted
-            # dates_to_plot = self.format_dates(p_dict['x_obs{0}'.format(area)])
+            # dates_to_plot = self.format_dates(p_dict['x_obs{i}'.format(i=area)])
 
             # =============================== Best Fit Line ===============================
-            if props.get('line{0}BestFit'.format(area), False):
+            if props.get('line{i}BestFit'.format(i=area), False):
                 chart_tools.format_best_fit_line_segments(ax=ax,
-                                                          dates_to_plot=p_dict['x_obs{0}'.format(area)],
+                                                          dates_to_plot=p_dict['x_obs{i}'.format(i=area)],
                                                           line=area,
                                                           p_dict=p_dict,
                                                           logger=log)
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{0}'.format(area)]]
+            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=area)]]
 
             # =============================== Min/Max Lines ===============================
-            if p_dict['plotArea{0}Min'.format(area)]:
-                ax.axhline(y=min(y_obs_tuple_rel['y_obs{0}'.format(area)]),
-                           color=p_dict['area{0}Color'.format(area)],
+            if p_dict['plotArea{i}Min'.format(i=area)]:
+                ax.axhline(y=min(y_obs_tuple_rel['y_obs{i}'.format(i=area)]),
+                           color=p_dict['area{i}Color'.format(i=area)],
                            **k_dict['k_min']
                            )
-            if p_dict['plotArea{0}Max'.format(area)]:
-                ax.axhline(y=max(y_obs_tuple_rel['y_obs{0}'.format(area)]),
-                           color=p_dict['area{0}Color'.format(area)],
+            if p_dict['plotArea{i}Max'.format(i=area)]:
+                ax.axhline(y=max(y_obs_tuple_rel['y_obs{i}'.format(i=area)]),
+                           color=p_dict['area{i}Color'.format(i=area)],
                            **k_dict['k_max']
                            )
             if plug_dict.get('forceOriginLines', True):
@@ -265,22 +268,22 @@ try:
             # ================================== Markers ==================================
             # Note that stackplots don't support markers, so we need to plot a line (with
             # no width) on the plot to receive the markers.
-            if p_dict['area{0}Marker'.format(area)] != 'None':
-                ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)],
-                             marker=p_dict['area{0}Marker'.format(area)],
-                             markeredgecolor=p_dict['area{0}MarkerColor'.format(area)],
-                             markerfacecolor=p_dict['area{0}MarkerColor'.format(area)],
+            if p_dict['area{i}Marker'.format(i=area)] != 'None':
+                ax.plot_date(p_dict['x_obs{i}'.format(i=area)], y_obs_tuple_rel['y_obs{i}'.format(i=area)],
+                             marker=p_dict['area{i}Marker'.format(i=area)],
+                             markeredgecolor=p_dict['area{i}MarkerColor'.format(i=area)],
+                             markerfacecolor=p_dict['area{i}MarkerColor'.format(i=area)],
                              zorder=11,
                              lw=0
                              )
 
-            if p_dict['line{0}Style'.format(area)] != 'None':
-                ax.plot_date(p_dict['x_obs{0}'.format(area)], y_obs_tuple_rel['y_obs{0}'.format(area)],
+            if p_dict['line{i}Style'.format(i=area)] != 'None':
+                ax.plot_date(p_dict['x_obs{i}'.format(i=area)], y_obs_tuple_rel['y_obs{i}'.format(i=area)],
                              zorder=10,
                              lw=1,
                              ls='-',
                              marker=None,
-                             color=p_dict['line{0}Color'.format(area)]
+                             color=p_dict['line{i}Color'.format(i=area)]
                              )
 
     chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log)

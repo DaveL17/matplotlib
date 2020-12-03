@@ -342,8 +342,8 @@ class Maintain(object):
 
         # Log list of removed keys
         if list_of_removed_keys:
-            self.plugin.logger.debug(u"[{0}] Performing maintenance - removing unneeded keys: "
-                                     u"{1}".format(dev_name, list_of_removed_keys))
+            self.plugin.logger.debug(u"[{d}] Performing maintenance - removing unneeded keys: "
+                                     u"{k}".format(d=dev_name, k=list_of_removed_keys))
 
         return prefs
 
@@ -393,13 +393,22 @@ class Maintain(object):
         # =============================== Chart Devices ===============================
         elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
 
+            try:
+                # Ensure that these values are not empty.
+                if props['customTitleFontSize'] == "":
+                    props['customTitleFontSize'] = '12'
+                if props['customTickFontSize'] == "":
+                    props['customTickFontSize'] = '8'
+            except KeyError:
+                pass
+
             # ============================= Fix Custom Colors =============================
             # For all chart device types
             # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
             for prop in props:
                 if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(props[prop])):
-                    self.plugin.logger.debug(u"[{0}] Refactoring color property: ({1})".format(dev.name, prop))
-                    props[prop] = u'{0} {1} {2}'.format(prop[0:3], prop[3:5], prop[5:7]).replace('#', '')
+                    self.plugin.logger.debug(u"[{d}] Refactoring color property: ({p})".format(d=dev.name, p=prop))
+                    props[prop] = u'{r} {g} {b}'.format(r=prop[0:3], g=prop[3:5], b=prop[5:7]).replace('#', '')
 
             # ======================== Reset Legacy Color Settings ========================
             # Initially, the plugin was constructed with a standard set of colors that
@@ -416,7 +425,7 @@ class Maintain(object):
                             self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to new "
                                                      u"color picker.")
 
-                            if props[u'{0}Other'.format(prop)]:
+                            if props[u'{p}Other'.format(p=prop)]:
                                 props[prop] = props[u'{0}Other'.format(prop)]
 
                             else:
@@ -428,13 +437,13 @@ class Maintain(object):
                 for _ in range(1, 9, 1):
 
                     # Coerce these props to bool if needed.
-                    for item in ('area{0}Annotate'.format(_),
-                                 'line{0}BestFit'.format(_),
-                                 'area{0}Fill'.format(_),
-                                 'areaLabel{0}'.format(_),
-                                 'plotArea{0}Max'.format(_),
-                                 'plotArea{0}Min'.format(_),
-                                 'suppressArea{0}'.format(_),
+                    for item in ('area{i}Annotate'.format(i=_),
+                                 'line{i}BestFit'.format(i=_),
+                                 'area{i}Fill'.format(i=_),
+                                 'areaLabel{i}'.format(i=_),
+                                 'plotArea{i}Max'.format(i=_),
+                                 'plotArea{i}Min'.format(i=_),
+                                 'suppressArea{i}'.format(i=_),
                                  ):
 
                         if item in dev.ownerProps.keys():
@@ -446,11 +455,11 @@ class Maintain(object):
                 for _ in range(1, 5, 1):
 
                     # Coerce these props to bool if needed.
-                    for item in ('bar{0}Annotate'.format(_),
-                                 'barLabel{0}'.format(_),
-                                 'plotBar{0}Max'.format(_),
-                                 'plotBar{0}Min'.format(_),
-                                 'suppressBar{0}'.format(_),
+                    for item in ('bar{i}Annotate'.format(i=_),
+                                 'barLabel{i}'.format(i=_),
+                                 'plotBar{i}Max'.format(i=_),
+                                 'plotBar{i}Min'.format(i=_),
+                                 'suppressBar{i}'.format(i=_),
                                  ):
 
                         if item in dev.ownerProps.keys():
@@ -482,13 +491,13 @@ class Maintain(object):
                 for _ in range(1, 9, 1):
 
                     # Coerce these props to bool if needed.
-                    for item in ('line{0}Annotate'.format(_),
-                                 'line{0}BestFit'.format(_),
-                                 'line{0}Fill'.format(_),
-                                 'lineLabel{0}'.format(_),
-                                 'plotLine{0}Max'.format(_),
-                                 'plotLine{0}Min'.format(_),
-                                 'suppressLine{0}'.format(_),
+                    for item in ('line{i}Annotate'.format(i=_),
+                                 'line{i}BestFit'.format(i=_),
+                                 'line{i}Fill'.format(i=_),
+                                 'lineLabel{i}'.format(i=_),
+                                 'plotLine{i}Max'.format(i=_),
+                                 'plotLine{i}Min'.format(i=_),
+                                 'suppressLine{i}'.format(i=_),
                                  ):
 
                         if item in dev.ownerProps.keys():
@@ -520,12 +529,12 @@ class Maintain(object):
                 # Coerce these props to bool if needed.
                 for _ in range(1, 4, 1):
 
-                    for item in ('line{0}BestFit'.format(_),
-                                 'groupLabel{0}'.format(_),
-                                 'line{0}BestFit'.format(_),
-                                 'plotGroup{0}Min'.format(_),
-                                 'plotGroup{0}Max'.format(_),
-                                 'suppressGroup{0}'.format(_),
+                    for item in ('line{i}BestFit'.format(i=_),
+                                 'groupLabel{i}'.format(i=_),
+                                 'line{i}BestFit'.format(i=_),
+                                 'plotGroup{i}Min'.format(i=_),
+                                 'plotGroup{i}Max'.format(i=_),
+                                 'suppressGroup{i}'.format(i=_),
                                  ):
 
                         if item in dev.ownerProps.keys():
@@ -540,8 +549,8 @@ class Maintain(object):
 
                     # Coerce these props to bool if needed.
                     for item in (
-                                 'lineLabel{0}'.format(_),
-                                 'line{0}Annotate'.format(_),
+                                 'lineLabel{i}'.format(i=_),
+                                 'line{i}Annotate'.format(i=_),
                                  ):
 
                         if 'item' in dev.ownerProps.keys():
@@ -562,4 +571,4 @@ class Maintain(object):
         dev.replacePluginPropsOnServer(props)
 
         if self.plugin.pluginPrefs['verboseLogging']:
-            self.plugin.logger.threaddebug(u"[{0}] prefs cleaned.".format(dev.name))
+            self.plugin.logger.threaddebug(u"[{name}] prefs cleaned.".format(name=dev.name))

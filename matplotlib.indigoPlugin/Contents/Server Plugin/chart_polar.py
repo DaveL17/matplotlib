@@ -49,8 +49,8 @@ try:
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from
     # self.final_data.
-    theta_path = '{0}{1}'.format(prefs['dataPath'], p_dict['thetaValue'].encode('utf-8'))
-    radii_path = '{0}{1}'.format(prefs['dataPath'], p_dict['radiiValue'].encode('utf-8'))
+    theta_path = '{d}{t}'.format(d=prefs['dataPath'], t=p_dict['thetaValue'].encode('utf-8'))
+    radii_path = '{d}{r}'.format(d=prefs['dataPath'], r=p_dict['radiiValue'].encode('utf-8'))
 
     if theta_path != 'None' and radii_path != 'None':
 
@@ -85,9 +85,8 @@ try:
         # If at this point we still don't have an equal number of observations for both
         # theta and radii, we shouldn't plot the chart.
         if len(p_dict['wind_direction']) != len(p_dict['wind_speed']):
-            chart_tools.log['Warning'].append(u"[{0}] Insufficient number of observations "
-                                              u"to plot.".format(props['name']))
-            chart_tools.log['Warning'].append(u"Skipped. {0}".format(props['name']))
+            chart_tools.log['Warning'].append(u"[{name}] Insufficient number of observations "
+                                              u"to plot. Skipped.".format(name=props['name']))
             exit()
 
         # Create the array of grey scale for the intermediate lines and set the last
@@ -245,7 +244,7 @@ try:
             frame = legend.get_frame()
             frame.set_alpha(0)
 
-        chart_tools.format_title(p_dict, k_dict, loc=(0.025, 0.98), align='left', logger=log)
+        chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.025, 0.98), align='left', logger=log)
 
     # Note that subplots_adjust affects the space surrounding the subplots and
     # not the fig.
@@ -270,7 +269,7 @@ try:
 
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{0}".format(sub_error))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{0}] chart refreshed.".format(props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)
