@@ -9,8 +9,9 @@ All steps required to generate area charts.
 """
 
 import itertools
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -153,6 +154,7 @@ try:
                                 **k_dict['k_annotation']
                                 )
 
+    y_data = chart_tools.hide_anomalies(data=y_obs_tuple[0], props=props, logger=log)
     ax.stackplot(x_obs,
                  y_obs_tuple,
                  edgecolor=None,
@@ -306,7 +308,9 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
-    chart_tools.log['Critical'].append(u"{err}".format(err=sub_error))
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
+    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

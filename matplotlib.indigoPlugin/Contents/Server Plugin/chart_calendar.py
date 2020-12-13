@@ -11,8 +11,9 @@ construct them.
 
 import calendar
 import datetime as dt
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -59,19 +60,21 @@ try:
     except ValueError:
         width = 5
 
-    # final_cal contains just the date value from the date object
-    final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
-
     fig = plt.figure(figsize=(width, height))
     ax = fig.add_subplot(111)
     ax.axis('off')
 
+    # =============================  Plot Months Row  =============================
     month_row = ax.table(cellText=[" "],
                          colLabels=[dt.datetime.strftime(today, "%B")],
                          loc='top',
                          bbox=[0, 0.5, 1, .5]  # bbox = [left, bottom, width, height]
                          )
     chart_tools.format_axis(ax_obj=month_row)
+
+    # =============================  Plot Days Rows  ==============================
+    # final_cal contains just the date value from the date object
+    final_cal = [[_.day if _.month == today.month else "" for _ in thing] for thing in cal]
 
     days_rows = ax.table(cellText=final_cal,
                          colLabels=days_labels,
@@ -81,6 +84,18 @@ try:
                          )
     chart_tools.format_axis(ax_obj=days_rows)
 
+    # =========================  Highlight Today's Date  ==========================
+    t = dt.datetime.now().day  # today's date
+    all_cal = [days_labels] + final_cal  # days rows plus dates rows
+
+    # Find the index of today's date (t) in all_cal
+    highlight_date = [(i, all_cal.index(t)) for i, all_cal in enumerate(all_cal) if t in all_cal][0]
+
+    # Set the cell facecolor
+    highlight_color = chart_tools.fix_rgb(props.get('todayHighlight', '55 55 55'))
+    days_rows.get_celld()[highlight_date].set_facecolor(highlight_color)
+
+    # =============================  Plot the Chart  ==============================
     # Note that subplots_adjust affects the space surrounding the subplots and not
     # the fig.
     plt.subplots_adjust(top=0.97,
@@ -94,7 +109,10 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
+# ==============================  Housekeeping  ===============================
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
 pickle.dump(chart_tools.log, sys.stdout)

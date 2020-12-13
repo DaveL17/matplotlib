@@ -9,8 +9,9 @@ All steps required to generate scatter charts.
 """
 
 import itertools
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -123,9 +124,11 @@ try:
                                          logger=log
                                          )
 
+            y_data = chart_tools.hide_anomalies(data=p_dict['y_obs{i}'.format(i=thing)], props=props, logger=log)
+
             # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
             ax.scatter(p_dict['x_obs{i}'.format(i=thing)],
-                       p_dict['y_obs{i}'.format(i=thing)],
+                       y_data,
                        c=p_dict['group{i}Color'.format(i=thing)],
                        marker=p_dict['group{i}Marker'.format(i=thing)],
                        edgecolor=p_dict['group{i}MarkerColor'.format(i=thing)],
@@ -243,6 +246,8 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))

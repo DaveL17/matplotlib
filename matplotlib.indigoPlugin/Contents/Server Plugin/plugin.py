@@ -49,10 +49,6 @@ the proper Fantastic Weather devices.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Improve RGB handling.
-# TODO: Import / Export is unfinished
-
-# TODO: When writing CSV data -- how to handle data elements that are orders of magnitude out of
-#   scale?  For example, there was a dining room temperature value of 0.00634 (s/b 63.4).
 # ================================== IMPORTS ==================================
 
 try:
@@ -65,9 +61,8 @@ import ast
 import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
-# import itertools
+import xml.etree.ElementTree as eTree
 import logging
-import multiprocessing
 import numpy as np
 import operator as op
 import os
@@ -76,7 +71,6 @@ import re
 import shutil
 import subprocess
 import traceback
-# import unicodedata
 
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
@@ -101,6 +95,7 @@ import matplotlib.font_manager as mfont
 # import chart_tools
 import DLFramework.DLFramework as Dave
 import maintenance
+import chart_tools
 
 # =================================== HEADER ==================================
 
@@ -109,7 +104,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.21"
+__version__   = u"0.9.22"
 
 # =============================================================================
 
@@ -165,7 +160,6 @@ class Plugin(indigo.PluginBase):
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
-        # self.evalExpr = Dave.evalExpr(self)  # Formula evaluation framework
 
         # Log pluginEnvironment information when plugin is first started
         self.Fogbert.pluginEnvironmentLogger()
@@ -355,6 +349,7 @@ class Plugin(indigo.PluginBase):
                 # ========================== Calendar Charting Device =========================
                 if type_id == "calendarChartingDevice":
                     values_dict['fontSize'] = 12
+                    values_dict['todayHighlight'] = "55 55 55"
 
                 # ============================ Line Charting Device ===========================
                 if type_id == "lineChartingDevice":
@@ -455,7 +450,8 @@ class Plugin(indigo.PluginBase):
 
         except KeyError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.warning(u"[{n}] Error: {s}. See plugin log for more information.".format(n=ndev.name, s=sub_error))
+            self.logger.warning(u"[{n}] Error: {s}. See plugin log for more "
+                                u"information.".format(n=dev.name, s=sub_error))
 
         return True, values_dict
 
@@ -498,7 +494,7 @@ class Plugin(indigo.PluginBase):
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
         plugin_prefs = self.pluginPrefs
-        self.logger.threaddebug(u"Getting plugin Prefs: {pp}".format(dict(pp=plugin_prefs)))
+        self.logger.threaddebug(u"Getting plugin Prefs: {pp}".format(pp=dict(plugin_prefs)))
 
         # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically
         # need to be set here (the others can be set directly by the XML.)
@@ -532,16 +528,6 @@ class Plugin(indigo.PluginBase):
         while True:
             if not self.pluginIsShuttingDown:
 
-                # ========================== Clean Up Old Processes ===========================
-                # If all goes according to plan, this will join() all completed processes. Any
-                # processes that are still running (if any) will be listed to the log.
-                # TODO: with conversion to subprocess, the multiprocessing stuff can all go away.
-                zombies = multiprocessing.active_children()
-
-                if len(zombies) > 0:
-                    self.logger.threaddebug(u"Active child processes: {z}".format(z=zombies))
-
-                # =============================== Refresh Cycle ===============================
                 self.csv_refresh()
                 self.charts_refresh()
                 self.sleep(15)
@@ -1195,8 +1181,6 @@ class Plugin(indigo.PluginBase):
         """
         # TODO: migrate this to DLFramework
 
-        import xml.etree.ElementTree as eTree
-
         self.logger.info(u"Updating device properties to match current plugin version.")
 
         try:
@@ -1809,8 +1793,11 @@ class Plugin(indigo.PluginBase):
                     # If all records are older than the delta, return the original data (so
                     # there's something to chart) and send a warning to the log.
                     if len(time_data) == 0:
-                        self.logger.debug(u"[{name} - {cn}] all CSV data are older than the time limit. Returning "
-                                          u"original data.".format(name=dev.name, cn=column_names[0][1].decode('utf-8')))
+                        self.logger.debug(u"[{name} - {cn}] all CSV data are older than the time limit. "
+                                          u"Returning original data.".format(name=dev.name,
+                                                                             cn=column_names[0][1].decode('utf-8')
+                                                                             )
+                                          )
                     else:
                         data = time_data
 
@@ -2450,7 +2437,7 @@ class Plugin(indigo.PluginBase):
         forecast_source_menu = []
 
         # We accept both WUnderground (legacy) and Fantastic Weather devices. We have to
-        # construct these one at a time.
+        # construct these one at a time. Note the typo in the bundle identifier is correct.
         try:
             for dev in indigo.devices.itervalues("com.fogbert.indigoplugin.fantasticwWeather"):
                 if dev.deviceTypeId in ('Daily', 'Hourly'):
@@ -2471,7 +2458,7 @@ class Plugin(indigo.PluginBase):
         return sorted(forecast_source_menu, key=lambda s: s[1].lower())
 
     # =============================================================================
-    def plotActionTest(self, plugin_action, dev, caller_waiting_for_result=False):
+    def plotActionApi(self, plugin_action, dev=None, caller_waiting_for_result=False):
         """
         Plugin API handler
         A container for simple API calls to the matplotlib plugin. All payload elements
@@ -2491,8 +2478,42 @@ class Plugin(indigo.PluginBase):
         :param class 'indigo.Device' dev:
         :param bool caller_waiting_for_result:
         """
+        self.logger.info(u"Scripting payload: {pyld}".format(pyld=dict(plugin_action.props)))
 
-        self.logger.threaddebug(u"Scripting payload: {pyld}".format(pyld=dict(plugin_action.props)))
+        # TODO: this worked well up until where the "real" device would get its data.
+        #  Need to make the API shim device work ith existing get data steps.
+        # # Instantiate an instance of an ApiDevice for data from the API call.
+        # my_device = ApiDevice()
+        #
+        # # =============================  Unpack Payload  ==============================
+        # # Take payload data from action and parse it into API device attributes.
+        # my_device.apiXvalues   = plugin_action.props['x_values']
+        # my_device.apiYvalues   = plugin_action.props['y_values']
+        # my_device.apiKwargs    = plugin_action.props['kwargs']
+        # my_device.path_name    = plugin_action.props['path']
+        # my_device.apiFileName  = plugin_action.props['filename']
+        # my_device.deviceTypeId = plugin_action.props['deviceTypeId']
+        #
+        # # ======================  Obtain All Plugin Preferences  ======================
+        # # Take plugin prefs and parse them into API device attributes.
+        # my_device.globalProps = self.pluginPrefs
+        #
+        # # ==================  Obtain All Properties for Device Type  ==================
+        # # Take device type properties and parse them into API device attributes.
+        #
+        # # Get the config XML for the chart device type
+        # props = self.devicesTypeDict[my_device.deviceTypeId]["ConfigUIRawXml"]
+        # root  = eTree.ElementTree(eTree.fromstring(props))
+        #
+        # # Extract all field ids and defaultValues from XML
+        # for type_tag in root.findall('Field'):
+        #     field_id        = type_tag.get('id')
+        #     default_value   = type_tag.get('defaultValue')
+        #     if field_id not in my_device.globalProps.keys():
+        #         my_device.globalProps[field_id] = default_value
+        #
+        # # Call for chart to be produced.
+        # self.charts_refresh(dev_list=[my_device])
 
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))
@@ -2500,11 +2521,22 @@ class Plugin(indigo.PluginBase):
         face_color   = self.fix_rgb(color=self.pluginPrefs.get('faceColor', '00 00 00'))
         bk_color     = self.fix_rgb(color=self.pluginPrefs.get('backgroundColor', '00 00 00'))
 
+        # =============================  Unpack Payload  ==============================
+        x_values = plugin_action.props['x_values']
+        y_values = plugin_action.props['y_values']
+        kwargs = plugin_action.props['kwargs']
+        path_name = plugin_action.props['path']
+        file_name = plugin_action.props['filename']
+
         try:
             fig = plt.figure(1, figsize=(width / dpi, height / dpi))
-            ax = fig.add_subplot(111, axisbg=face_color)
-            ax.plot(plugin_action.props['x_values'], plugin_action.props['y_values'], **plugin_action.props['kwargs'])
-            plt.savefig(u"{path}{fn}".format(path=plugin_action.props['path'], fn=plugin_action.props['filename']))
+            ax = fig.add_subplot(111)
+            ax.patch.set_facecolor(face_color)
+            ax.plot(x_values, y_values, **kwargs)
+            plt.savefig(u"{path}{fn}".format(path=path_name, fn=file_name),
+                        facecolor=bk_color,
+                        dpi=dpi)
+            plt.clf()
             plt.close('all')
 
         except Exception as sub_error:
@@ -3084,9 +3116,10 @@ class Plugin(indigo.PluginBase):
                                 if p_dict['line{i}Annotate'.format(i=line)] and \
                                         p_dict['line{i}Marker'.format(i=line)] != 'None':
                                     p_dict['line{i}Marker'.format(i=line)] = 'None'
-                                    self.logger.warning(u"[{name}] Line {ln} marker is suppressed to display annotations. "
-                                                        u"To see the marker, disable annotations for this "
-                                                        u"line.".format(name=dev.name, ln=line))
+                                    self.logger.warning(u"[{name}] Line {ln} marker is suppressed to display "
+                                                        u"annotations. To see the marker, disable annotations for "
+                                                        u"this line.".format(name=dev.name, ln=line)
+                                                        )
                             except KeyError:
                                 # Not all devices will contain these keys
                                 pass
@@ -3103,8 +3136,10 @@ class Plugin(indigo.PluginBase):
                         self.__log_dicts(dev)
 
                         plug_dict = dict(self.pluginPrefs)
-                        dev_dict = dict(dev.ownerProps)
+                        dev_dict = dict(dev.pluginProps)
+
                         dev_dict['name'] = dev.name
+                        dev_dict['model'] = dev.model
 
                         # =================================================
                         # TODO: convert all indigo.List(s) to Python lists.
@@ -3461,12 +3496,6 @@ class Plugin(indigo.PluginBase):
 
         self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
 
-    # TODO: if no errors
-    # # =============================================================================
-    # def log_me(self, message="", level='info'):
-    #
-    #     indigo.server.log(message)
-
 
 class MakeChart(object):
 
@@ -3509,11 +3538,6 @@ class MakeChart(object):
 
         return val
 
-    # TODO: delete if no errors
-    # =============================================================================
-    # def eval_expr(self, expr):
-    #     return self.eval_(ast.parse(expr, mode='eval').body)
-
     # =============================================================================
     def eval_(self, mode):
         operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
@@ -3528,24 +3552,116 @@ class MakeChart(object):
         else:
             raise TypeError(mode)
 
-    # TODO: delete if no errors
-    # def pluginErrorHandler(self, sub_error):
-    #     """
-    #     Centralized handling of traceback messages
-    #     Centralized handling of traceback messages formatted for pretty display in the
-    #     plugin log file. If sent here, they will not be displayed in the Indigo Events
-    #     log. Use the following syntax to send exceptions here::
-    #         self.pluginErrorHandler(traceback.format_exc())
-    #     -----
-    #     :param traceback object sub_error:
-    #     """
-    #
-    #     sub_error = sub_error.splitlines()
-    #     logging.critical(u"{0:!^80}".format(" TRACEBACK "))
-    #
-    #     for line in sub_error:
-    #         logging.critical(u"!!! {ln}".format(ln=line))
-    #
-    #     logging.critical(u"!" * 80)
 
-# =============================================================================
+class ApiDevice(object):
+
+    def __init__(self):
+        self.configured = True
+        self.deviceTypeId = ''  # areaChartingDevice, lineChartingDevice, etc.
+        self.enabled = True
+        self.errorState = False
+        self.globalProps = indigo.Dict()
+        self.id = -1
+        self.lastChanged = ""
+        self.lastSuccessfulComm = ""
+        self.model = "API Device"
+        self.name = 'Matplotlib Plugin API Device'
+        self.pluginId = "com.fogbert.indigoplugin.matplotlib"
+        self.pluginProps = self.globalProps
+
+        self.states = indigo.Dict()
+        self.states['chartLastUpdated'] = ""
+        self.states['onOffState'] = ""
+
+        # Attributes to hold payload data
+        self.apiXvalues  = []
+        self.apiYvalues  = []
+        self.apiKwargs   = {}
+        self.apiPathName = ""
+        self.apiFileName = ""
+
+    @staticmethod
+    def __doc__(self):
+        return "A Matplotlib Plugin API shim device. Used to pass scripting payload to the " \
+               "plugin by simulating a built-in device type. See Plugin Wiki for more information."
+
+    def __str__(self):
+        """ Meant to mimic a standard Indigo device doc as much as possible"""
+        output = ""
+        for key in self.__dict__.keys():
+            value = self.__dict__[key]
+            output += u"\n{0} : {1}".format(key, value)
+        return output
+
+    # def __del__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __delattr__(self, item):
+    #     """[built-in method]"""
+    #     del self.__dict__[item]
+    #
+    # def __dir__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __format__(self, format_spec):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __getattribute__(self, item):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __hash__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __module__(self):
+    #     """[Indigo custom attr?]"""
+    #     pass
+    #
+    # def __new__(cls, *args, **kwargs):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __reduce__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __reduce_ex__(self, protocol):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __repr__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __setattr__(self, key, value):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __sizeof__(self):
+    #     """[built-in method]"""
+    #     pass
+    #
+    # def __subclasshook__(self):
+    #     pass
+    #
+    # def __weakref__(self):
+    #     pass
+    # =============================================================================
+
+    # =============================  Custom Methods  ==============================
+    def updateStateOnServer(self, item):
+        indigo.server.log(u"updateStateOnServer: {0}".format(item))
+
+    def updateStatesOnServer(self, item):
+        # Update object attributes based on item payload. Item is a list of dicts
+        # {'key': k, 'value': v, 'uiValue': uiv}
+        for thing in item:
+            self.states[thing['key']] = thing['value']
+
+    def updateStateImageOnServer(self, item):
+        indigo.server.log(u"updateStateImageOnServer: {0}".format(item))
+    # =============================================================================

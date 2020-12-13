@@ -90,7 +90,7 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
@@ -179,7 +179,7 @@
                 <Label>Area 1</Label>
             </Field>
 
-            <Field id="area1Source" type="menu" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Select data source for area 1.">
+            <Field id="area1Source" type="menu" defaultValue="" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Select data source for area 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -282,7 +282,7 @@
                 <Label>Area 2</Label>
             </Field>
 
-            <Field id="area2Source" type="menu" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Select data source for area 2.">
+            <Field id="area2Source" type="menu" defaultValue="" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Select data source for area 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -385,7 +385,7 @@
                 <Label>Area 3</Label>
             </Field>
 
-            <Field id="area3Source" type="menu" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Select data source for area 3.">
+            <Field id="area3Source" type="menu" defaultValue="" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Select data source for area 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -488,7 +488,7 @@
                 <Label>Area 4</Label>
             </Field>
 
-            <Field id="area4Source" type="menu" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Select data source for area 4.">
+            <Field id="area4Source" type="menu" defaultValue="" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Select data source for area 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -591,7 +591,7 @@
                 <Label>Area 5</Label>
             </Field>
 
-            <Field id="area5Source" type="menu" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Select data source for area 5.">
+            <Field id="area5Source" type="menu" defaultValue="" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Select data source for area 5.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -694,7 +694,7 @@
                 <Label>Area 6</Label>
             </Field>
 
-            <Field id="area6Source" type="menu" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Select data source for area 6.">
+            <Field id="area6Source" type="menu" defaultValue="" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Select data source for area 6.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -795,7 +795,7 @@
                 <Label>Area 7</Label>
             </Field>
 
-            <Field id="area7Source" type="menu" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Select data source for area 7.">
+            <Field id="area7Source" type="menu" defaultValue="" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Select data source for area 7.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -896,7 +896,7 @@
                 <Label>Area 8</Label>
             </Field>
 
-            <Field id="area8Source" type="menu" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Select data source for area 8.">
+            <Field id="area8Source" type="menu" defaultValue="" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Select data source for area 8.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1134,7 +1134,7 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
@@ -1223,7 +1223,7 @@
                 <Label>Bar 1</Label>
             </Field>
 
-            <Field id="bar1Source" type="menu" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
+            <Field id="bar1Source" type="menu" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1265,7 +1265,7 @@
                 <Label>Bar 2</Label>
             </Field>
 
-            <Field id="bar2Source" type="menu" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
+            <Field id="bar2Source" type="menu" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1307,7 +1307,7 @@
                 <Label>Bar 3</Label>
             </Field>
 
-            <Field id="bar3Source" type="menu" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
+            <Field id="bar3Source" type="menu" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1350,7 +1350,7 @@
                 <Label>Bar 4</Label>
             </Field>
 
-            <Field id="bar4Source" type="menu" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
+            <Field id="bar4Source" type="menu" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1646,6 +1646,11 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 </List>
             </Field>
 
+            <Field id="todayHighlight" type="colorpicker" defaultValue="55 55 55"
+                   tooltip="Select preference for the highlight color for the cell containing today's date.">
+                <Label>Current Date Color:</Label>
+            </Field>
+
         </ConfigUI>
 
         <States>
@@ -1728,6 +1733,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <!-- Filter Anomalies -->
+            <Field id="filterAnomalies" type="checkbox" defaultValue="False" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+                <Label>Hide Anomalies:</Label>
+                <Description/>
+            </Field>
+
             <Template file="Templates/legend_columns.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
@@ -1753,7 +1764,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
@@ -1842,7 +1853,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 1</Label>
             </Field>
 
-            <Field id="line1Source" type="menu" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Select data source for line 1.">
+            <Field id="line1Source" type="menu" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Select data source for line 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -1955,7 +1966,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 2</Label>
             </Field>
 
-            <Field id="line2Source" type="menu" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Select data source for line 2.">
+            <Field id="line2Source" type="menu" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Select data source for line 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2068,7 +2079,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 3</Label>
             </Field>
 
-            <Field id="line3Source" type="menu" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select data source for line 3.">
+            <Field id="line3Source" type="menu" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Select data source for line 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2181,7 +2192,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 4</Label>
             </Field>
 
-            <Field id="line4Source" type="menu" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select data source for line 4.">
+            <Field id="line4Source" type="menu" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Select data source for line 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2294,7 +2305,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 5</Label>
             </Field>
 
-            <Field id="line5Source" type="menu" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Select data source for line 5.">
+            <Field id="line5Source" type="menu" defaultValue="" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Select data source for line 5.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2407,7 +2418,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 6</Label>
             </Field>
 
-            <Field id="line6Source" type="menu" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Select data source for line 6.">
+            <Field id="line6Source" type="menu" defaultValue="" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Select data source for line 6.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2518,7 +2529,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 7</Label>
             </Field>
 
-            <Field id="line7Source" type="menu" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Select data source for line 7.">
+            <Field id="line7Source" type="menu" defaultValue="" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Select data source for line 7.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2629,7 +2640,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Line 8</Label>
             </Field>
 
-            <Field id="line8Source" type="menu" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Select data source for line 8.">
+            <Field id="line8Source" type="menu" defaultValue="" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Select data source for line 8.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2815,13 +2826,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="thing" type="menu">
+            <Field id="thing" type="menu" defaultValue="">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="thingState" type="menu">
+            <Field id="thingState" type="menu" defaultValue="">
                 <Label>Text to chart:</Label>
                 <List class="self" filter="" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
@@ -2931,7 +2942,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Direction observations are in degrees (0-360). Fractional degrees (123.4) are okay.</Label>
             </Field>
 
-            <Field id="thetaValue" type="menu" tooltip="Select data source for the direction value (theta).">
+            <Field id="thetaValue" type="menu" defaultValue="" tooltip="Select data source for the direction value (theta).">
                 <Label>Direction Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -2940,7 +2951,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Magnitude observations are any real number greater than zero. Fractional numbers are okay.</Label>
             </Field>
 
-            <Field id="radiiValue" type="menu" tooltip="Select data source for the magnitude value (radii).">
+            <Field id="radiiValue" type="menu" defaultValue="" tooltip="Select data source for the magnitude value (radii).">
                 <Label>Magnitude Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -3092,6 +3103,12 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
+            <!-- Filter Anomalies -->
+            <Field id="filterAnomalies" type="checkbox" defaultValue="False" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+                <Label>Hide Anomalies:</Label>
+                <Description/>
+            </Field>
+
             <Template file="Templates/legend_columns.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
@@ -3122,7 +3139,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Label:</Label>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true"
                    tooltip="The format specifier for the label that will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
@@ -3206,7 +3223,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Group 1</Label>
             </Field>
 
-            <Field id="group1Source" type="menu" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
+            <Field id="group1Source" type="menu" defaultValue="" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Select data source for group 1.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -3289,7 +3306,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Group 2</Label>
             </Field>
 
-            <Field id="group2Source" type="menu" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
+            <Field id="group2Source" type="menu" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -3372,7 +3389,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Group 3</Label>
             </Field>
 
-            <Field id="group3Source" type="menu" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
+            <Field id="group3Source" type="menu" defaultValue="" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Select data source for group 3.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -3455,7 +3472,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Group 4</Label>
             </Field>
 
-            <Field id="group4Source" type="menu" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
+            <Field id="group4Source" type="menu" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
@@ -3601,7 +3618,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="forecastSourceDevice" type="menu" tooltip="Select source device for the weather forecast chart.">
+            <Field id="forecastSourceDevice" type="menu" defaultValue="" tooltip="Select source device for the weather forecast chart.">
                 <Label>Source Device:</Label>
                 <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
             </Field>
@@ -3669,7 +3686,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>X Axis</Label>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -3989,7 +4006,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
 
             <Field id="sourceSeparator1" type="separator"/>
 
-            <Field id="forecastSourceDevice" type="menu" tooltip="Select source device for the weather forecast chart.">
+            <Field id="forecastSourceDevice" type="menu" defaultValue="" tooltip="Select source device for the weather forecast chart.">
                 <Label>Source Device:</Label>
                 <List class="self" filter="" method="getForecastSource" dynamicReload="true"/>
             </Field>
@@ -4042,7 +4059,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="xAxisLabelFormat" type="menu" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
+            <Field id="xAxisLabelFormat" type="menu" defaultValue="%A" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -4226,13 +4243,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="addSource" type="menu">
+            <Field id="addSource" type="menu" defaultValue="">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="csv_source" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="addState" type="menu">
+            <Field id="addState" type="menu" defaultValue="">
                 <Label>Data:</Label>
                 <List class="self" filter="" method="deviceStateValueListAdd" dynamicReload="true"/>
             </Field>
@@ -4254,7 +4271,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
             </Field>
 
-            <Field id="csv_item_list" type="menu">
+            <Field id="csv_item_list" type="menu" defaultValue="">
                 <Label>CSV Item List:</Label>
                 <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
                 <CallbackMethod>csv_item_select</CallbackMethod>
@@ -4294,13 +4311,13 @@ number and the color value should be enclosed in double quotes. Multiple entries
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="editSource" type="menu" enabledBindingId="isColumnSelected">
+            <Field id="editSource" type="menu" defaultValue="" enabledBindingId="isColumnSelected">
                 <Label>Source:</Label>
                 <List class="self" filter="" method="csv_source_edit" dynamicReload="true"/>
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="editState" type="menu" enabledBindingId="isColumnSelected">
+            <Field id="editState" type="menu" defaultValue="" enabledBindingId="isColumnSelected">
                 <Label>Data:</Label>
                 <List class="self" filter="" method="deviceStateValueListEdit" dynamicReload="true"/>
             </Field>

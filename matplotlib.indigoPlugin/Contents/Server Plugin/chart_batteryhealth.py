@@ -11,8 +11,9 @@ user input.
 """
 
 import numpy as np
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -181,6 +182,8 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))

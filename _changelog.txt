@@ -1,3 +1,11 @@
+v0.9.22
+- New Feature: hide anomalies in data for line, scatter charts (not currently
+  available for other chart types).
+- New Feature: highlight today's date on calendar charts.
+- Minor improvements to plugin API.
+- Bug fixes
+- Code refinements
+
 v0.9.21
 - Adds device custom font settings to maintenance.py.
 - Code refinements.

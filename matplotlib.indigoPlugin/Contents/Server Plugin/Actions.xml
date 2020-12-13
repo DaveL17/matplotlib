@@ -75,7 +75,7 @@
 
     <Action id="refreshTheChartsAPI" uiPath="hidden">
       <Name>API Action to Draw Simple Chart</Name>
-      <CallbackMethod>plotActionTest</CallbackMethod>
+      <CallbackMethod>plotActionApi</CallbackMethod>
     </Action>
 
 </Actions>

@@ -26,7 +26,6 @@ import matplotlib.ticker as mtick
 # import DLFramework as Dave
 
 # Collection of logging messages.
-# TODO: consider looking at Matt's logging handler and see if that's better.
 log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
 # Unpickle the payload data. The first element of the payload is the name
@@ -726,6 +725,43 @@ def get_data(data_source, logger):
                                  u"information.".format(s=sub_error))
 
         return final_data
+
+
+# =============================================================================
+def hide_anomalies(data, props=True, logger=[]):
+    """Detect outliers in data and replace them with 'NaN'.
+
+    Credit: https://gist.github.com/wmlba/89bc2f4556b8ee397ca7a5017b497657#file-outlier_std-py
+    -----
+    :param list data:
+    :param dict props:
+    :param dict logger:
+    """
+
+    anomalies = []
+
+    if props.get('filterAnomalies', False):
+        # Set upper and lower limit to 2 standard deviations
+        data_std  = np.std(data)
+        data_mean = np.mean(data)
+        two_std   = data_std * 4
+
+        lower_limit = data_mean - two_std
+        upper_limit = data_mean + two_std
+
+        # Generate outliers
+        for outlier in data:
+            if outlier > upper_limit or outlier < lower_limit:
+                anomalies.append(outlier)
+
+        final_data = [_ if _ not in anomalies else 'NaN' for _ in data]
+
+        if 'NaN' in final_data:
+            logger['Warning'].append(u"Outliers in data are hidden (greater than 3 standard deviations.")
+        return final_data
+
+    else:
+        return data
 
 
 # =============================================================================

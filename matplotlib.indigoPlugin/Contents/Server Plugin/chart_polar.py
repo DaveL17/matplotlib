@@ -11,19 +11,20 @@ all of the possible international Unicode values that could be passed to the
 device. Better to make it the responsibility of the user to convert their data
 to degrees.
 
-Note: there is a fatal error with later versions of numpy (specificaly 1.16.6)
+Note: there is a fatal error with later versions of numpy (specifically 1.16.6)
 that causes polar charts to fail spectacularly during the savefig operation.
 There is apparently no way to code around this.
 
 -----
 
 """
-# TODO: CONSIDER GNUPLOT?
 
 import chart_tools
 import numpy as np
 import pickle
 import sys
+import traceback
+
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
@@ -269,6 +270,8 @@ try:
 
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))

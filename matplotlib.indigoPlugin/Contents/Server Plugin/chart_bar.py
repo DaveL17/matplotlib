@@ -10,8 +10,9 @@ All steps required to generate bar charts.
 
 import itertools
 import numpy as np
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -58,8 +59,8 @@ try:
 
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
-            chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in the "
-                                           u"device configuration menu.".format(name=props['name'], i=thing))
+            chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in "
+                                           u"the device configuration menu.".format(name=props['name'], i=thing))
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if p_dict['bar{i}Source'.format(i=thing)] not in ("", "None") and not suppress_bar:
@@ -244,6 +245,8 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))

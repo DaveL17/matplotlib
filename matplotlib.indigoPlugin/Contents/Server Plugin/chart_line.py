@@ -9,8 +9,9 @@ All steps required to generate line charts.
 """
 
 import itertools
-import sys
 import pickle
+import sys
+import traceback
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
@@ -31,6 +32,11 @@ props       = payload['props']
 line_colors = []
 
 log['Threaddebug'].append(u"chart_line.py called.")
+
+# writes out payload to disk
+with open("/Users/Dave/Temp/test.txt", 'w') as out_file:
+    out_file.write(str(payload))
+
 
 try:
 
@@ -88,6 +94,8 @@ try:
 
             data_path = plug_dict['dataPath'].encode("utf-8")
             line_source = p_dict['line{i}Source'.format(i=line)].encode("utf-8")
+
+            # ==============================  Get the Data  ===============================
             data_column = chart_tools.get_data(data_source='{path}{source}'.format(path=data_path,
                                                                                    source=line_source),
                                                logger=log
@@ -142,8 +150,11 @@ try:
                                          logger=log
                                          )
 
+            # ===========================  Hide Anomalous Data  ===========================
+            y_data = chart_tools.hide_anomalies(data=p_dict['y_obs{i}'.format(i=line)], props=props, logger=log)
+
             ax.plot_date(p_dict['x_obs{i}'.format(i=line)],
-                         p_dict['y_obs{i}'.format(i=line)],
+                         y_data,
                          color=p_dict['line{i}Color'.format(i=line)],
                          linestyle=p_dict['line{i}Style'.format(i=line)],
                          marker=p_dict['line{i}Marker'.format(i=line)],
@@ -289,6 +300,8 @@ try:
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+    tb = traceback.format_exc()
+    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
 chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
