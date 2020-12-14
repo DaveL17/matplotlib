@@ -86,6 +86,16 @@ try:
                 p_dict['x_obs{i}'.format(i=thing)].append(element[0])
                 p_dict['y_obs{i}'.format(i=thing)].append(float(element[1]))
 
+            # ============================= Adjustment Factor =============================
+            # Allows user to shift data on the Y axis (for example, to display multiple
+            # binary sources on the same chart.)
+            if props['group{i}adjuster'.format(i=thing)] != "":
+                temp_list = []
+                for obs in p_dict['y_obs{i}'.format(i=thing)]:
+                    expr = u'{o}{p}'.format(o=obs, p=props['group{i}adjuster'.format(i=thing)])
+                    temp_list.append(chart_tools.eval_expr(expr=expr))
+                p_dict['y_obs{i}'.format(i=thing)] = temp_list
+
             # ================================ Prune Data =================================
             # Prune the data if warranted
             dates_to_plot = p_dict['x_obs{i}'.format(i=thing)]

@@ -1,3 +1,7 @@
+v0.9.25
+- Feature: Scatter charts now support adjustment factor
+- Bug fixes
+
 v0.9.24
 - Feature: Custom line segments now supports variable and device substitutions.
 

@@ -185,7 +185,7 @@
             </Field>
 
             <Field id="area1adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 1.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area1Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -288,7 +288,7 @@
             </Field>
 
             <Field id="area2adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 2.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area2Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -391,7 +391,7 @@
             </Field>
 
             <Field id="area3adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 3.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area3Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -494,7 +494,7 @@
             </Field>
 
             <Field id="area4adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 4.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area4Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -597,7 +597,7 @@
             </Field>
 
             <Field id="area5adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 5.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area5Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -700,7 +700,7 @@
             </Field>
 
             <Field id="area6adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 6.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area6Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -801,7 +801,7 @@
             </Field>
 
             <Field id="area7adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 7.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area7Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -902,7 +902,7 @@
             </Field>
 
             <Field id="area8adjuster" type="textfield" defaultValue="" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Please enter adjustment factor for area 8.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="area8Annotate" type="checkbox" defaultValue="false" visibleBindingId="areaLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1858,7 +1858,7 @@
             </Field>
 
             <Field id="line1adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 1.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line1Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1971,7 +1971,7 @@
             </Field>
 
             <Field id="line2adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 2.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line2Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2084,7 +2084,7 @@
             </Field>
 
             <Field id="line3adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 3.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line3Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2197,7 +2197,7 @@
             </Field>
 
             <Field id="line4adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 4.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line4Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2310,7 +2310,7 @@
             </Field>
 
             <Field id="line5adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 5.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line5Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2423,7 +2423,7 @@
             </Field>
 
             <Field id="line6adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 6.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line6Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel6" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2534,7 +2534,7 @@
             </Field>
 
             <Field id="line7adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 7.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line7Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel7" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -2645,7 +2645,7 @@
             </Field>
 
             <Field id="line8adjuster" type="textfield" defaultValue="" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Please enter adjustment factor for line 8.">
-                <Label>Adjustment Factor</Label>
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="line8Annotate" type="checkbox" defaultValue="false" visibleBindingId="lineLabel8" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -3227,6 +3227,10 @@
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
+            <Field id="group1adjuster" type="textfield" defaultValue="" visibleBindingId="groupLabel1" visibleBindingValue="true" tooltip="Please enter adjustment factor for group 1.">
+                <Label>Adjustment Factor:</Label>
+            </Field>
+
             <Field id="group1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel1" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's first group.">
                 <Label>Color:</Label>
@@ -3308,6 +3312,10 @@
             <Field id="group2Source" type="menu" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Select data source for group 2.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="group2adjuster" type="textfield" defaultValue="" visibleBindingId="groupLabel2" visibleBindingValue="true" tooltip="Please enter adjustment factor for group 2.">
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="group2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel2" visibleBindingValue="true"
@@ -3393,6 +3401,10 @@
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
             </Field>
 
+            <Field id="group3adjuster" type="textfield" defaultValue="" visibleBindingId="groupLabel3" visibleBindingValue="true" tooltip="Please enter adjustment factor for group 3.">
+                <Label>Adjustment Factor:</Label>
+            </Field>
+
             <Field id="group3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel3" visibleBindingValue="true"
                    tooltip="Select preference for the color of your chart's third group.">
                 <Label>Color:</Label>
@@ -3474,6 +3486,10 @@
             <Field id="group4Source" type="menu" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Select data source for group 4.">
                 <Label>Data Source:</Label>
                 <List class="self" filter="" method="getFileList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="group4adjuster" type="textfield" defaultValue="" visibleBindingId="groupLabel4" visibleBindingValue="true" tooltip="Please enter adjustment factor for group 4.">
+                <Label>Adjustment Factor:</Label>
             </Field>
 
             <Field id="group4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="groupLabel4" visibleBindingValue="true"

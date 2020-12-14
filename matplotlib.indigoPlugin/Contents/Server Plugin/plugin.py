@@ -32,8 +32,6 @@ the proper Fantastic Weather devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Try to address annotation collisions.
-# TODO: Add facility to have different Y1 and Y2. Add a new group of controls (like Y1) for Y2 and
-#       then have a control to allow user to elect when Y axis to assign the line to.
 # TODO: Add adjustment factor to scatter charts
 # TODO: Add props to adjust the figure to API.
 # TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
@@ -42,10 +40,6 @@ the proper Fantastic Weather devices.
 #       date range (so the chart always shows the specified date range.)
 # TODO: When the number of bars to be plotted is less than the number of bars requested (because
 #       there isn't enough data), the bars plot funny.
-# TODO: Enable substitutions for custom line segments. For example, you might want to plot the
-#       day's forecast high temperature. ('%%d:733695023:d01_temperatureHigh%%', 'blue'). Note
-#       that this is non-trivial because it requires a round-trip outside the class. Needs a
-#       pipe to send things to the host plugin and get a response.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # ================================== IMPORTS ==================================
@@ -98,7 +92,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.24"
+__version__   = u"0.9.25"
 
 # =============================================================================
 
@@ -2986,8 +2980,11 @@ class Plugin(indigo.PluginBase):
                         # Set the defaults for best fit lines in p_dict.
                         for _ in range(1, 9, 1):
 
-                            best_fit_color = dev.pluginProps['line{i}BestFitColor'.format(i=_)]
-                            p_dict['line{i}BestFitColor'.format(i=_)] = best_fit_color
+                            try:
+                                best_fit_color = dev.pluginProps['line{i}BestFitColor'.format(i=_)]
+                                p_dict['line{i}BestFitColor'.format(i=_)] = best_fit_color
+                            except KeyError:
+                                pass
 
                         # ============================== Phantom Labels ===============================
                         # Since users may or may not include axis labels and because we want to ensure
