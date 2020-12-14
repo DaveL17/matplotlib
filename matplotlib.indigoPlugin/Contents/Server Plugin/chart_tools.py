@@ -739,17 +739,16 @@ def hide_anomalies(data, props=True, logger=[]):
     :param dict props:
     :param dict logger:
     """
-
     anomalies = []
 
     if props.get('filterAnomalies', False):
         # Set upper and lower limit to 2 standard deviations
         data_std  = np.std(data)
         data_mean = np.mean(data)
-        two_std   = data_std * 4
+        four_std   = data_std * 4
 
-        lower_limit = data_mean - two_std
-        upper_limit = data_mean + two_std
+        lower_limit = data_mean - four_std
+        upper_limit = data_mean + four_std
 
         # Generate outliers
         for outlier in data:
@@ -759,7 +758,8 @@ def hide_anomalies(data, props=True, logger=[]):
         final_data = [_ if _ not in anomalies else 'NaN' for _ in data]
 
         if 'NaN' in final_data:
-            logger['Warning'].append(u"Outliers in data are hidden (greater than 3 standard deviations.")
+            logger['Warning'].append(u"[{n}] Outliers in data are hidden (greater than {std} standard "
+                                     u"deviations [{a}]).".format(n=props['name'], std=4, a=four_std))
         return final_data
 
     else:

@@ -32,7 +32,6 @@ the proper Fantastic Weather devices.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
 
 # TODO: Try to address annotation collisions.
-# TODO: Add adjustment factor to scatter charts
 # TODO: Add props to adjust the figure to API.
 # TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
 #       bars/lines/scatter etc in one go.
@@ -1208,6 +1207,7 @@ class Plugin(indigo.PluginBase):
     def audit_dict_color(self, _dict_):
         """
         """
+        # TODO: this method can be flattened
 
         # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
         for k in _dict_.keys():
@@ -1217,10 +1217,21 @@ class Plugin(indigo.PluginBase):
                     _dict_[k] = self.fix_rgb(color=_dict_[k])
                 else:
                     pass
+
+            # k_dict is a dict of dicts, so we need to go one level lower.
+            elif isinstance(_dict_[k], dict):
+                for k1 in _dict_[k]:
+                    if isinstance(_dict_[k][k1], unicode):
+                        pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
+                        if re.search(pattern, _dict_[k][k1]):
+                            _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
+                        else:
+                            pass
             else:
                 pass
 
         return _dict_
+
     # =============================================================================
     def audit_save_paths(self):
         """
@@ -3072,27 +3083,36 @@ class Plugin(indigo.PluginBase):
                         # We support substitutions in custom line segments settings. These need to be
                         # converted in the main plugin thread because they can't be converted within
                         # the subprocess.
-                        if p_dict['enableCustomLineSegments'] and \
+                        try:
+                            if p_dict['enableCustomLineSegments'] and \
+                                dev.deviceTypeId in ["areaChartingDevice", "barChartingDevice", "lineChartingDevice", "scatterChartingDevice", "forecastChartingDevice"] and \
                                 p_dict['customLineSegments'] not in ("", "None"):
 
-                            try:
-                                # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb)), Since
-                                # we can't mutate a tuple, we listify it first
-                                constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
-                                substituted_constants = ()
+                                try:
+                                    # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb)), Since
+                                    # we can't mutate a tuple, we listify it first
+                                    constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
+                                    substituted_constants = ()
 
-                                # If val start with '%%' perform a substitution on it
-                                for element in [list(item) for item in constants_to_plot]:
-                                    if str(element[0]).startswith("%%"):
-                                        element[0] = float(self.substitute(element[0]))
-                                    substituted_constants += (tuple(element),)
+                                    # If val start with '%%' perform a substitution on it
+                                    try:
+                                        for element in [list(item) for item in constants_to_plot]:
+                                            if str(element[0]).startswith("%%"):
+                                                element[0] = float(self.substitute(element[0]))
+                                            substituted_constants += (tuple(element),)
 
-                                p_dict['customLineSegments'] = substituted_constants
+                                    except TypeError:
+                                        substituted_constants += constants_to_plot
 
-                            except (ValueError, IndexError):
-                                self.logger.warning(u"Problem with custom line segments. Please ensure setting is"
-                                                    u"in the proper format.")
+                                    p_dict['customLineSegments'] = substituted_constants
 
+                                except (ValueError, IndexError):
+                                    self.logger.warning(u"Problem with custom line segments. Please ensure setting is"
+                                                        u"in the proper format.")
+
+                        # Not all devices support custom line segments
+                        except KeyError:
+                            pass
                         # =================================================
                         # TODO: convert all indigo.List(s) to Python lists.
                         for key in plug_dict.iterkeys():
@@ -3119,6 +3139,12 @@ class Plugin(indigo.PluginBase):
                         # and plugin objets are not pickleable, so we create a proxy to send to the
                         # process. Therefore, devices can't be changed in the processes.
 
+                        # Audit values in p_dict and k_dict to ensure they're in the proper format.
+                        plug_dict = self.audit_dict_color(_dict_=plug_dict)
+                        dev_dict = self.audit_dict_color(_dict_=dev_dict)
+                        p_dict = self.audit_dict_color(_dict_=p_dict)
+                        k_dict = self.audit_dict_color(_dict_=k_dict)
+
                         # Instantiate basic payload sent to the subprocess scripts. Additional
                         # key/value pairs may be added below before payload is sent.
                         raw_payload = {'prefs': plug_dict,
@@ -3127,11 +3153,6 @@ class Plugin(indigo.PluginBase):
                                        'k_dict': k_dict,
                                        'data': None,
                                        }
-
-                        # Audit values in p_dict and k_dict to ensure they're in the proper format.
-                        p_dict = self.audit_dict_color(_dict_=p_dict)
-                        k_dict = self.audit_dict_color(_dict_=k_dict)
-                        # self.logger.info(u"{0}".format(p_dict))
 
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
@@ -3190,11 +3211,11 @@ class Plugin(indigo.PluginBase):
 
                                     # The following line is used for testing the battery health code; it isn't
                                     # needed in production.
-                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
-                                    #                'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
-                                    #                'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
-                                    #                'Device 10': '47'
-                                    #                }
+                                    device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
+                                                   'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
+                                                   'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
+                                                   'Device 10': '47'
+                                                   }
 
                                 except Exception as sub_error:
                                     self.plugin_error_handler(sub_error=traceback.format_exc())

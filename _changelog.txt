@@ -1,3 +1,7 @@
+v0.9.26
+- Fixed bug in color audit.
+- Fixed bug in custom line segments.
+
 v0.9.25
 - Feature: Scatter charts now support adjustment factor
 - Bug fixes

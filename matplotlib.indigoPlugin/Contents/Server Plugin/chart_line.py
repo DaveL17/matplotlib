@@ -33,10 +33,6 @@ line_colors = []
 
 log['Threaddebug'].append(u"chart_line.py called.")
 
-# writes out payload to disk
-with open("/Users/Dave/Temp/test.txt", 'w') as out_file:
-    out_file.write(str(payload))
-
 
 try:
 
