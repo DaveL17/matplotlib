@@ -80,9 +80,6 @@ try:
 except ImportError:
     indigo.server.log(u"There was an error importing necessary Matplotlib components. Please reboot your server and "
                       u"try to re-enable the plugin.", isError=True)
-# import matplotlib.patches as patches
-# import matplotlib.dates as mdate
-# import matplotlib.ticker as mtick
 import matplotlib.font_manager as mfont
 
 # Third-party modules
@@ -92,10 +89,8 @@ import matplotlib.font_manager as mfont
 #     pass
 
 # My modules
-# import chart_tools
 import DLFramework.DLFramework as Dave
 import maintenance
-import chart_tools
 
 # =================================== HEADER ==================================
 
@@ -104,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.22"
+__version__   = u"0.9.23"
 
 # =============================================================================
 
@@ -135,8 +130,7 @@ kDefaultPluginPrefs = {
     u'rectChartWideHeight': 250,
     u'rectChartWideWidth': 1000,
     u'rectChartWidth': 600,
-    u'refreshInterval': 900,
-    u'showDebugLevel': 30,
+    u'showDebugLevel': 30,  # comes from template_debugging.xml
     u'snappyConfigMenus': False,
     u'spineColor': "88 88 88",
     u'sqChartSize': 250,
@@ -155,20 +149,15 @@ class Plugin(indigo.PluginBase):
         self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
         self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
         self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
-
         self.final_data = []
 
         # ========================== Initialize DLFramework ===========================
-        self.Fogbert  = Dave.Fogbert(self)  # Plugin functional framework
-
-        # Log pluginEnvironment information when plugin is first started
-        self.Fogbert.pluginEnvironmentLogger()
-
-        # Maintenance of plugin props and device prefs
-        self.maintain = maintenance.Maintain(self)
+        self.Fogbert = Dave.Fogbert(self)           # Plugin functional framework
+        self.Fogbert.pluginEnvironmentLogger()      # Log universal pluginEnvironment information
+        self.maintain = maintenance.Maintain(self)  # Maintenance of plugin props and device prefs
 
         # =========================== Log More Plugin Info ============================
-        self.pluginEnvironmentLogger()
+        self.pluginEnvironmentLogger()  # Additional information relative to this plugin
 
         # ============================= Initialize Logger =============================
         fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
@@ -234,29 +223,7 @@ class Plugin(indigo.PluginBase):
         # If we're coming here from a sleep state, we need to ensure that the plugin
         # shutdown global is in its proper state.
         self.pluginIsShuttingDown = False
-
         self.maintain.clean_props(dev)
-
-        # If chartLastUpdated is empty, set it to the epoch
-        if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
-            dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
-            self.logger.threaddebug(u"CSV last update unknown. Coercing update.")
-
-        # Note that we check for the existence of the device state before trying to
-        # update it due to how Indigo processes devices when their source plugin has
-        # been changed (i.e., assigning an existing device to a new plugin instance.)
-        if 'onOffState' in dev.states:
-
-            if dev.deviceTypeId != 'rcParamsDevice' and int(dev.pluginProps['refreshInterval']) > 0:
-                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Enabled'}])
-
-            # If the device is set to manual only.
-            elif int(dev.pluginProps['refreshInterval']) == 0 or dev.pluginProps['refreshInterval'] == '':
-                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Manual'}])
-
-            else:
-                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ' '}])
-
         dev.stateListOrDisplayStateIdChanged()
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
@@ -275,9 +242,10 @@ class Plugin(indigo.PluginBase):
 
         try:
 
-            # ===================== Prepare CSV Engine Config Window ======================
+            # ===========================  CSV Engine Defaults  ===========================
             # Put certain props in a state that we expect when the config dialog is first
-            # opened.
+            # opened. These settings are regardless of whether the device has been
+            # initially configured or not.
             if type_id == "csvEngine":
                 values_dict['addItemFieldsCompleted'] = False
                 values_dict['addKey']                 = ""
@@ -297,9 +265,9 @@ class Plugin(indigo.PluginBase):
                 return values_dict
 
             # ========================== Set Config UI Defaults ===========================
-            # For new devices, force certain defaults that don't carry from Devices.xml.
-            # This seems to be especially important for menu items built with callbacks and
-            # colorpicker controls that don't appear to accept defaultValue.
+            # For new devices, force certain defaults in case they don't carry from
+            # Devices.xml. This seems to be especially important for menu items built with
+            # callbacks and colorpicker controls that don't appear to accept defaultValue.
             if not dev.configured:
 
                 values_dict['refreshInterval'] = '900'
@@ -308,13 +276,13 @@ class Plugin(indigo.PluginBase):
                 if type_id == "areaChartingDevice":
 
                     for _ in range(1, 9, 1):
-                        values_dict['area{i}Color'.format(i=_)]        = 'FF FF FF'
-                        values_dict['area{i}Marker'.format(i=_)]       = 'None'
-                        values_dict['area{i}MarkerColor'.format(i=_)]  = 'FF FF FF'
-                        values_dict['area{i}Source'.format(i=_)]       = 'None'
-                        values_dict['area{i}Style'.format(i=_)]        = '-'
-                        values_dict['line{i}Color'.format(i=_)]        = 'FF FF FF'
-                        values_dict['line{i}Style'.format(i=_)]        = 'None'
+                        values_dict['area{i}Color'.format(i=_)]       = 'FF FF FF'
+                        values_dict['area{i}Marker'.format(i=_)]      = 'None'
+                        values_dict['area{i}MarkerColor'.format(i=_)] = 'FF FF FF'
+                        values_dict['area{i}Source'.format(i=_)]      = 'None'
+                        values_dict['area{i}Style'.format(i=_)]       = '-'
+                        values_dict['line{i}Color'.format(i=_)]       = 'FF FF FF'
+                        values_dict['line{i}Style'.format(i=_)]       = 'None'
 
                     values_dict['customLineStyle']     = '-'
                     values_dict['customTickFontSize']  = 8
@@ -337,14 +305,14 @@ class Plugin(indigo.PluginBase):
 
                 # =========================== Battery Health Device ===========================
                 if type_id == "batteryHealthDevice":
-                    values_dict['healthyColor']               = '00 00 CC'
-                    values_dict['cautionLevel']               = '10'
                     values_dict['cautionColor']               = 'FF FF 00'
-                    values_dict['warningLevel']               = '5'
-                    values_dict['warningColor']               = 'FF 00 00'
+                    values_dict['cautionLevel']               = '10'
+                    values_dict['healthyColor']               = '00 00 CC'
                     values_dict['showBatteryLevel']           = True
                     values_dict['showBatteryLevelBackground'] = False
                     values_dict['showDeadBattery']            = False
+                    values_dict['warningColor']               = 'FF 00 00'
+                    values_dict['warningLevel']               = '5'
 
                 # ========================== Calendar Charting Device =========================
                 if type_id == "calendarChartingDevice":
@@ -412,19 +380,20 @@ class Plugin(indigo.PluginBase):
                     values_dict['customLineStyle']      = '-'
                     values_dict['customTickFontSize']   = 8
                     values_dict['customTitleFontSize']  = 10
+                    values_dict['daytimeColor']         = '33 33 33'
                     values_dict['forecastSourceDevice'] = 'None'
                     values_dict['line1Color']           = 'FF 33 33'
                     values_dict['line2Color']           = '00 00 FF'
                     values_dict['line3Color']           = '99 CC FF'
                     values_dict['line3MarkerColor']     = 'FF FF FF'
+                    values_dict['showDaytime']          = 'true'
                     values_dict['xAxisBins']            = 'daily'
                     values_dict['xAxisLabelFormat']     = '%A'
-                    values_dict['showDaytime']          = 'true'
-                    values_dict['daytimeColor']         = '33 33 33'
 
             # ========================= Composite Forecast Device =========================
             if type_id == "compositeForecastDevice":
-                pass
+                values_dict['lineColor']       = "00 00 FF"
+                values_dict['lineMarkerColor'] = "FF 00 00"
 
             if self.pluginPrefs.get('enableCustomLineSegments', False):
                 values_dict['enableCustomLineSegmentsSetting'] = True
@@ -468,10 +437,7 @@ class Plugin(indigo.PluginBase):
                 state_list.append(dynamic_state)
                 state_list.append(self.getDeviceStateDictForStringType('onOffState', 'onOffState', 'onOffState'))
 
-            return state_list
-
-        else:
-            return state_list
+        return state_list
 
     # =============================================================================
     def getMenuActionConfigUiValues(self, menu_id=0):
@@ -482,9 +448,9 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug(u"Getting menu action config prefs: {s}".format(s=dict(settings)))
 
         settings['enableCustomLineSegments']  = self.pluginPrefs.get('enableCustomLineSegments', False)
+        settings['forceOriginLines']          = self.pluginPrefs.get('forceOriginLines', False)
         settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
         settings['snappyConfigMenus']         = self.pluginPrefs.get('snappyConfigMenus', False)
-        settings['forceOriginLines']          = self.pluginPrefs.get('forceOriginLines', False)
 
         return settings, error_msg_dict
 
@@ -511,11 +477,12 @@ class Plugin(indigo.PluginBase):
                          'mainFontSize': '10',
                          'spineColor': '88 88 88',
                          'tickColor': '88 88 88',
-                         'tickFontSize': '8'}
+                         'tickFontSize': '8'
+                         }
 
         # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the
         # defaults_dict above. This should only be necessary the first time the plugin is configured.
-        for key, value in defaults_dict.items():
+        for key, value in defaults_dict.iteritems():
             plugin_prefs[key] = plugin_prefs.get(key, value)
 
         return plugin_prefs
@@ -555,9 +522,6 @@ class Plugin(indigo.PluginBase):
         # ============================= Audit Save Paths ==============================
         self.audit_save_paths()
 
-        # =================== Conform Custom Colors to Color Picker ===================
-        self.convert_custom_colors()
-
     # =============================================================================
     def shutdown(self):
 
@@ -584,7 +548,8 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict[path_prop] = u"The path must end with a forward slash '/'."
 
         # =============================== Chart Colors ================================
-        # Inspects various color controls and sets them to default when the value is not hex.
+        # Inspects various color controls and sets them to default when the value is
+        # not valid hex (A-F, 0-9).
         color_dict = {'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF",
                       'backgroundColor': "00 00 00", 'faceColor': "00 00 00",
                       'gridColor': "88 88 88", 'spineColor': "88 88 88", 'tickColor': "88 88 88",
@@ -600,6 +565,7 @@ class Plugin(indigo.PluginBase):
         for dimension_prop in ('rectChartHeight', 'rectChartWidth', 'rectChartWideHeight', 'rectChartWideWidth',
                                'sqChartSize'):
 
+            # Remove any spaces
             try:
                 values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
             except AttributeError:
@@ -677,6 +643,7 @@ class Plugin(indigo.PluginBase):
 
         # ================================ Area Chart =================================
         if type_id == 'areaChartingDevice':
+
             # There must be at least 1 source selected
             if values_dict['area1Source'] == 'None':
                 error_msg_dict['area1Source'] = u"You must select at least one data source."
@@ -1077,7 +1044,6 @@ class Plugin(indigo.PluginBase):
         :param class 'indigo.Dict' values_dict:
         :param int target_id:
         """
-
         pass
 
     # =============================================================================
@@ -1246,28 +1212,22 @@ class Plugin(indigo.PluginBase):
             return False
 
     # =============================================================================
-    def audit_p_dict(self, p_dict):
+    def audit_dict_color(self, _dict_):
         """
         """
 
-        # Colors are stored in values_dict as "XX XX XX", and we need to convert them to "#XXXXXX".
-        for k in p_dict.keys():
-            if 'color' in k:
-                p_dict[k] = self.fix_rgb(color=p_dict[k])
+        # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
+        for k in _dict_.keys():
+            if isinstance(_dict_[k], unicode):
+                pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
+                if re.search(pattern, _dict_[k]):
+                    _dict_[k] = self.fix_rgb(color=_dict_[k])
+                else:
+                    pass
+            else:
+                pass
 
-        # # Format color values
-        plt.rcParams['grid.color']    = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
-        plt.rcParams['xtick.color']   = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
-        plt.rcParams['ytick.color']   = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
-        p_dict['faceColor']           = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
-        p_dict['fontColor']           = self.fix_rgb(color=self.pluginPrefs.get('fontColor', 'FF FF FF'))
-        p_dict['fontColorAnnotation'] = self.fix_rgb(color=self.pluginPrefs.get('fontColorAnnotation', 'FF FF FF'))
-        p_dict['gridColor']           = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
-        p_dict['spineColor']          = self.fix_rgb(color=self.pluginPrefs.get('spineColor', '88 88 88'))
-        p_dict['backgroundColor']     = self.fix_rgb(color=self.pluginPrefs.get('backgroundColor', 'FF FF FF'))
-
-        return p_dict
-
+        return _dict_
     # =============================================================================
     def audit_save_paths(self):
         """
@@ -1348,31 +1308,6 @@ class Plugin(indigo.PluginBase):
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(u"Exception when trying to kill all comms. Error: {s}. See plugin log for more "
                                   u"information.".format(s=sub_error))
-
-    # =============================================================================
-    def convert_custom_colors(self):
-        """
-        Convert legacy custom hex color values to raw color values
-        Initially, the plugin was constructed with a standard set of colors that could
-        be overwritten by selecting a custom color value. With the inclusion of the
-        color picker control, this is no longer needed. So we try to set the color
-        field to the custom value. This block is for plugin color preferences. Example:
-        convert '#FFFFFF' to 'FF FF FF'.
-        -----
-        """
-
-        if '#custom' in self.pluginPrefs.values():
-
-            self.logger.threaddebug(u"Converting legacy custom color values.")
-
-            for pref in self.pluginPrefs:
-                if 'color' in pref.lower():
-                    if self.pluginPrefs[pref] in ['#custom', 'custom']:
-                        self.logger.threaddebug(u"Adjusting existing color preferences to new color picker.")
-                        if self.pluginPrefs['{p}Other'.format(p=pref)]:
-                            self.pluginPrefs[pref] = self.pluginPrefs['{p}Other'.format(p=pref)]
-                        else:
-                            self.pluginPrefs[pref] = 'FF FF FF'
 
     # =============================================================================
     def csv_check_unique(self):
@@ -2518,8 +2453,8 @@ class Plugin(indigo.PluginBase):
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))
         width        = float(self.pluginPrefs.get('rectChartWidth', 600))
-        face_color   = self.fix_rgb(color=self.pluginPrefs.get('faceColor', '00 00 00'))
-        bk_color     = self.fix_rgb(color=self.pluginPrefs.get('backgroundColor', '00 00 00'))
+        face_color   = self.pluginPrefs.get('faceColor', '#000000')
+        bk_color     = self.pluginPrefs.get('backgroundColor', '#000000')
 
         # =============================  Unpack Payload  ==============================
         x_values = plugin_action.props['x_values']
@@ -2735,8 +2670,6 @@ class Plugin(indigo.PluginBase):
             p_dict  = dict(self.pluginPrefs)
 
             try:
-                p_dict = self.audit_p_dict(p_dict=p_dict)
-
                 p_dict['font_style']    = 'normal'
                 p_dict['font_weight']   = 'normal'
                 p_dict['tick_bottom']   = 'on'
@@ -2769,10 +2702,8 @@ class Plugin(indigo.PluginBase):
                 # ============================== Plot Area color ==============================
                 if not self.pluginPrefs.get('faceColorOther', 'false'):
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor'] = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
-                elif self.pluginPrefs.get('faceColorOther', 'false') == 'false':
+                elif not self.pluginPrefs.get('faceColorOther', 'false'):
                     p_dict['transparent_filled'] = True
-                    p_dict['faceColor'] = self.fix_rgb(color=self.pluginPrefs.get('faceColor', 'FF FF FF'))
                 else:
                     p_dict['transparent_filled'] = False
                     p_dict['faceColor'] = '#000000'
@@ -2796,7 +2727,9 @@ class Plugin(indigo.PluginBase):
                             if refresh_needed:
                                 dev_list.append(dev)
 
-                p_dict = self.audit_p_dict(p_dict=p_dict)
+                plt.rcParams['grid.color'] = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
+                plt.rcParams['xtick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+                plt.rcParams['ytick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
 
                 for dev in dev_list:
 
@@ -3054,10 +2987,8 @@ class Plugin(indigo.PluginBase):
                         # Set the defaults for best fit lines in p_dict.
                         for _ in range(1, 9, 1):
 
-                            lbfc1 = self.fix_rgb(color=dev.pluginProps.get('line{i}BestFitColor'.format(i=_),
-                                                                           'FF 00 00')
-                                                 )
-                            p_dict['line{i}BestFitColor'.format(i=_)] = lbfc1
+                            best_fit_color = dev.pluginProps['line{i}BestFitColor'.format(i=_)]
+                            p_dict['line{i}BestFitColor'.format(i=_)] = best_fit_color
 
                         # ============================== Phantom Labels ===============================
                         # Since users may or may not include axis labels and because we want to ensure
@@ -3175,6 +3106,12 @@ class Plugin(indigo.PluginBase):
                                        'k_dict': k_dict,
                                        'data': None,
                                        }
+
+                        # Audit values in p_dict and k_dict to ensure they're in the proper format.
+                        p_dict = self.audit_dict_color(_dict_=p_dict)
+                        k_dict = self.audit_dict_color(_dict_=k_dict)
+                        # self.logger.info(u"{0}".format(p_dict))
+
                         # ================================ Area Charts ================================
                         if dev.deviceTypeId == "areaChartingDevice":
 

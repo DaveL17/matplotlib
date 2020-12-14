@@ -44,9 +44,6 @@ try:
         pass
 
 
-    for color in ['backgroundColor', 'faceColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
-
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     # ============================== Format X Ticks ===============================
@@ -65,15 +62,6 @@ try:
     for line in range(1, 9, 1):
 
         suppress_line = p_dict.get('suppressLine{i}'.format(i=line), False)
-
-        lc_index = 'line{i}Color'.format(i=line)
-        p_dict[lc_index] = chart_tools.fix_rgb(color=p_dict[lc_index])
-
-        lmc_index = 'line{i}MarkerColor'.format(i=line)
-        p_dict[lmc_index] = chart_tools.fix_rgb(color=p_dict[lmc_index])
-
-        lbf_index = 'line{i}BestFitColor'.format(i=line)
-        p_dict[lbf_index] = chart_tools.fix_rgb(color=p_dict[lbf_index])
 
         # If line color is the same as the background color, alert the user.
         if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor'] and not suppress_line:

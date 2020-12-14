@@ -36,6 +36,8 @@ class Maintain(object):
         """
         Remove legacy keys from non-chart device prefs
 
+        None of the keys listed here should be present in device types using this
+        method to clean their prefs. If they exist, delete them.
         -----
 
         :param unicode dev_name:
@@ -335,8 +337,8 @@ class Maintain(object):
         )
 
         # Iterate the keys to delete and delete them if they exist
-        for key in list_of_keys_to_remove:
-            if key in prefs.keys():
+        for key in prefs.keys():
+            if key in list_of_keys_to_remove:
                 list_of_removed_keys.append(key)
                 del prefs[key]
 
@@ -351,21 +353,12 @@ class Maintain(object):
         """
         Remove legacy keys from device prefs
 
-        # TODO: Note that at some point most, if not all, of this method can go away.
         -----
 
         :return:
         """
 
         props = dev.pluginProps
-
-        def string_props_to_bool(bool_item):
-
-            if not isinstance(props[bool_item], bool):
-                if props[bool_item].strip() in ('False', 'false', ''):
-                    props[bool_item] = False
-                elif props[bool_item] in ('True', 'true'):
-                    props[bool_item] = True
 
         # ================================ All Devices ================================
         # Set whether it's a chart device or not
@@ -384,11 +377,45 @@ class Maintain(object):
 
         props['isChart'] = is_chart_dict[dev.deviceTypeId]
 
+        # Convert string bools to true bools
+        for item in dev.pluginProps.keys():
+            try:
+                if not isinstance(props[item], bool):
+                    if props[item].strip() in ('False', 'false'):
+                        props[item] = False
+                    elif props[item] in ('True', 'true'):
+                        props[item] = True
+            except AttributeError:
+                pass
+
+        # Note that we check for the existence of the device state before trying to
+        # update it due to how Indigo processes devices when their source plugin has
+        # been changed (i.e., assigning an existing device to a new plugin instance.)
+        if 'onOffState' in dev.states:
+
+            refresh_interval = dev.pluginProps.get('refreshInterval', 900)
+
+            if dev.deviceTypeId != 'rcParamsDevice':
+                if int(refresh_interval) > 0:
+                    ui_value = 'Enabled'
+                else:
+                    ui_value = 'Manual'
+            else:
+                ui_value = ' '
+
+            dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ui_value}])
+
         # ============================= Non-chart Devices =============================
         if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
 
             # Remove legacy cruft from csv engine and rcParams device props
             props = self.clean_prefs(dev.name, props)
+
+        # ============================  CSV Engine Device  ============================
+        # If chartLastUpdated is empty, set it to the epoch
+        if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
+            dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
+            self.plugin.logger.threaddebug(u"CSV last update unknown. Coercing update.")
 
         # =============================== Chart Devices ===============================
         elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
@@ -433,132 +460,39 @@ class Maintain(object):
 
             # ============================== Fix Area Props ===============================
             if dev.deviceTypeId == 'areaChartingDevice':
-
-                for _ in range(1, 9, 1):
-
-                    # Coerce these props to bool if needed.
-                    for item in ('area{i}Annotate'.format(i=_),
-                                 'line{i}BestFit'.format(i=_),
-                                 'area{i}Fill'.format(i=_),
-                                 'areaLabel{i}'.format(i=_),
-                                 'plotArea{i}Max'.format(i=_),
-                                 'plotArea{i}Min'.format(i=_),
-                                 'suppressArea{i}'.format(i=_),
-                                 ):
-
-                        if item in dev.ownerProps.keys():
-                            string_props_to_bool(bool_item=item)
+                pass
 
             # =============================== Fix Bar Props ===============================
             if dev.deviceTypeId == 'barChartingDevice':
-
-                for _ in range(1, 5, 1):
-
-                    # Coerce these props to bool if needed.
-                    for item in ('bar{i}Annotate'.format(i=_),
-                                 'barLabel{i}'.format(i=_),
-                                 'plotBar{i}Max'.format(i=_),
-                                 'plotBar{i}Min'.format(i=_),
-                                 'suppressBar{i}'.format(i=_),
-                                 ):
-
-                        if item in dev.ownerProps.keys():
-                            if not isinstance(props[item], bool):
-                                if props[item].strip() in ('False', 'false', ''):
-                                    props[item] = False
-                                else:
-                                    props[item] = True
+                pass
 
             # ========================= Fix Battery Health Props ==========================
             if dev.deviceTypeId == 'batteryHealthDevice':
-
-                # Coerce these props to bool if needed.
-                for item in ('showBatteryLevel', 'showBatteryLevelBackground'):
-                    if not isinstance(props[item], bool):
-                        if props[item].strip() in ('False', 'false', ''):
-                            props[item] = False
-                        else:
-                            props[item] = True
+                pass
 
             # ============================ Fix Calendar Props =============================
             if dev.deviceTypeId == 'calendarChartingDevice':
-
                 pass
 
             # ============================== Fix Line Props ===============================
             if dev.deviceTypeId == 'lineChartingDevice':
-
-                for _ in range(1, 9, 1):
-
-                    # Coerce these props to bool if needed.
-                    for item in ('line{i}Annotate'.format(i=_),
-                                 'line{i}BestFit'.format(i=_),
-                                 'line{i}Fill'.format(i=_),
-                                 'lineLabel{i}'.format(i=_),
-                                 'plotLine{i}Max'.format(i=_),
-                                 'plotLine{i}Min'.format(i=_),
-                                 'suppressLine{i}'.format(i=_),
-                                 ):
-
-                        if item in dev.ownerProps.keys():
-                            string_props_to_bool(bool_item=item)
+                pass
 
             # ========================= Fix Multiline Text Props ==========================
             if dev.deviceTypeId == 'multiLineText':
-
-                # Coerce these props to bool if needed.
-                for item in ('textAreaBorder',
-                             'cleanTheText',
-                             ):
-
-                    if item in dev.ownerProps.keys():
-                        if not isinstance(props[item], bool):
-                            if props[item].strip() in ('False', 'false', ''):
-                                props[item] = False
-                            elif props[item] in ('True', 'true'):
-                                props[item] = True
+                pass
 
             # ============================== Fix Polar Props ==============================
             if dev.deviceTypeId == 'polarChartingDevice':
-
                 pass
 
             # ============================= Fix Scatter Props =============================
             if dev.deviceTypeId == 'scatterChartingDevice':
-
-                # Coerce these props to bool if needed.
-                for _ in range(1, 4, 1):
-
-                    for item in ('line{i}BestFit'.format(i=_),
-                                 'groupLabel{i}'.format(i=_),
-                                 'line{i}BestFit'.format(i=_),
-                                 'plotGroup{i}Min'.format(i=_),
-                                 'plotGroup{i}Max'.format(i=_),
-                                 'suppressGroup{i}'.format(i=_),
-                                 ):
-
-                        if item in dev.ownerProps.keys():
-                            string_props_to_bool(bool_item=item)
-                        else:
-                            props[item] = False
+                pass
 
             # ============================ Fix Forecast Props =============================
             if dev.deviceTypeId == 'forecastChartingDevice':
-
-                for _ in range(1, 4, 1):
-
-                    # Coerce these props to bool if needed.
-                    for item in (
-                                 'lineLabel{i}'.format(i=_),
-                                 'line{i}Annotate'.format(i=_),
-                                 ):
-
-                        if 'item' in dev.ownerProps.keys():
-                            if not isinstance(props[item], bool):
-                                if props[item].strip() in ('False', 'false', ''):
-                                    props[item] = False
-                                elif props[item] in ('True', 'true'):
-                                    props[item] = True
+                pass
 
             # =============== Establish Refresh Interval for Legacy Devices ===============
             # Establish refresh interval for legacy devices. If the prop isn't present, we

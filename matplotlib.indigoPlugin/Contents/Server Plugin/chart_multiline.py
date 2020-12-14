@@ -68,9 +68,6 @@ try:
 
         return val
 
-    for color in ['backgroundColor', 'faceColor', 'textColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
-
     p_dict['figureWidth'] = float(props['figureWidth'])
     p_dict['figureHeight'] = float(props['figureHeight'])
 

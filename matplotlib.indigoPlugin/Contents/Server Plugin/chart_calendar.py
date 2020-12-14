@@ -92,7 +92,7 @@ try:
     highlight_date = [(i, all_cal.index(t)) for i, all_cal in enumerate(all_cal) if t in all_cal][0]
 
     # Set the cell facecolor
-    highlight_color = chart_tools.fix_rgb(props.get('todayHighlight', '55 55 55'))
+    highlight_color = p_dict.get('todayHighlight', '#555555')
     days_rows.get_celld()[highlight_date].set_facecolor(highlight_color)
 
     # =============================  Plot the Chart  ==============================

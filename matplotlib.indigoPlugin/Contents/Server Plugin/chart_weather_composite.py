@@ -77,9 +77,6 @@ try:
         else:
             s_plot.tick_params(axis='both', labelsize=int(plug_dict['tickFontSize']))
 
-    for color in ['backgroundColor', 'faceColor', 'lineColor', 'lineMarkerColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
-
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     # ================================ Set Up Axes ================================

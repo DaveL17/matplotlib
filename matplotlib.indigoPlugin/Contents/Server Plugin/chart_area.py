@@ -39,9 +39,6 @@ try:
     def __init__():
         pass
 
-    for color in ['backgroundColor', 'faceColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
-
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
@@ -50,10 +47,6 @@ try:
     for area in range(1, 9, 1):
 
         suppress_area = p_dict.get('suppressArea{i}'.format(i=area), False)
-
-        p_dict['area{i}Color'.format(i=area)] = chart_tools.fix_rgb(p_dict['area{i}Color'.format(i=area)])
-        p_dict['line{i}Color'.format(i=area)] = chart_tools.fix_rgb(p_dict['line{i}Color'.format(i=area)])
-        p_dict['area{i}MarkerColor'.format(i=area)] = chart_tools.fix_rgb(p_dict['area{i}MarkerColor'.format(i=area)])
 
         # If area color is the same as the background color, alert the user.
         if p_dict['area{i}Color'.format(i=area)] == p_dict['backgroundColor'] and not suppress_area:

@@ -38,8 +38,6 @@ try:
         pass
 
     num_obs = p_dict['numObs']
-    for color in ['backgroundColor', 'faceColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
@@ -50,7 +48,7 @@ try:
 
         suppress_bar = p_dict.get('suppressBar{i}'.format(i=thing), False)
 
-        p_dict['bar{i}Color'.format(i=thing)] = chart_tools.fix_rgb(p_dict['bar{i}Color'.format(i=thing)])
+        # p_dict['bar{i}Color'.format(i=thing)] = chart_tools.fix_rgb(p_dict['bar{i}Color'.format(i=thing)])
 
         # If the bar color is the same as the background color, alert the user.
         if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:

@@ -42,14 +42,6 @@ try:
     def __init__():
         pass
 
-    p_dict['backgroundColor']  = chart_tools.fix_rgb(p_dict['backgroundColor'])
-    p_dict['faceColor']        = chart_tools.fix_rgb(p_dict['faceColor'])
-    p_dict['line1Color']       = chart_tools.fix_rgb(p_dict['line1Color'])
-    p_dict['line2Color']       = chart_tools.fix_rgb(p_dict['line2Color'])
-    p_dict['line3Color']       = chart_tools.fix_rgb(p_dict['line3Color'])
-    p_dict['line1MarkerColor'] = chart_tools.fix_rgb(p_dict['line1MarkerColor'])
-    p_dict['line2MarkerColor'] = chart_tools.fix_rgb(p_dict['line2MarkerColor'])
-
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     dates_to_plot = p_dict['dates_to_plot']
@@ -86,7 +78,6 @@ try:
             p_dict['headers_1']    = ('Temperature',)  # Note that the trailing comma is required to ensure
             # that Matplotlib interprets the legend as a tuple.
             p_dict['headers_2']    = ('Precipitation',)
-            p_dict['daytimeColor'] = chart_tools.fix_rgb(p_dict['daytimeColor'])
 
     # ======================== WUnderground Hourly Device =========================
     elif dev_type == 'wundergroundHourly':
@@ -110,8 +101,6 @@ try:
             # the legend as a tuple.
             p_dict['headers_1']    = ('Temperature',)
             p_dict['headers_2']    = ('Precipitation',)
-
-            p_dict['daytimeColor'] = chart_tools.fix_rgb(p_dict['daytimeColor'])
 
     # ========================== Fantastic Daily Device ===========================
     elif dev_type == 'Daily':

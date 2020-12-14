@@ -4392,7 +4392,6 @@ There are presently no configurations available for this device.
                     <Option value="0">None - Manual Refresh Only</Option>
                 </List>
             </Field>
-
         </ConfigUI>
         <States>
             <State id="chartLastUpdated">

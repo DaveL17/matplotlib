@@ -44,8 +44,6 @@ try:
         pass
 
     num_obs = p_dict['numObs']
-    for color in ['backgroundColor', 'faceColor', 'currentWindColor', 'maxWindColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
 
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from
@@ -112,7 +110,7 @@ try:
         size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
         ax = plt.subplot(111, polar=True)                                 # Create subplot
-        plt.grid(color=chart_tools.fix_rgb(prefs['gridColor']))           # Color the grid
+        plt.grid(color=prefs['gridColor'])                                # Color the grid
         ax.set_theta_zero_location('N')                                   # Set zero to North
         ax.set_theta_direction(-1)                                        # Reverse the rotation
         ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])  # Customize the xtick labels
@@ -258,7 +256,7 @@ try:
                         )
 
     # Set the tick label size
-    font_color = chart_tools.fix_rgb(prefs['fontColor'])
+    font_color = prefs['fontColor']
     if p_dict['customSizeFont']:
         plt.xticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)
         plt.yticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)

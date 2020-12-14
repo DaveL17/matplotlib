@@ -37,9 +37,6 @@ try:
         pass
 
 
-    for color in ['backgroundColor', 'faceColor']:
-        p_dict[color] = chart_tools.fix_rgb(color=p_dict[color])
-
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
@@ -48,14 +45,6 @@ try:
     for thing in range(1, 5, 1):
 
         suppress_group = p_dict.get('suppressGroup{i}'.format(i=thing), False)
-
-        p_dict['group{i}Color'.format(i=thing)] = chart_tools.fix_rgb(p_dict['group{i}Color'.format(i=thing)])
-
-        gmc2 = chart_tools.fix_rgb(p_dict['group{i}MarkerColor'.format(i=thing)])
-        p_dict['group{i}MarkerColor'.format(i=thing)] = gmc2
-
-        best_fit = chart_tools.fix_rgb(p_dict['line{i}BestFitColor'.format(i=thing)])
-        p_dict['line{i}BestFitColor'.format(i=thing)] = best_fit
 
         # If dot color is the same as the background color, alert the user.
         if p_dict['group{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not \

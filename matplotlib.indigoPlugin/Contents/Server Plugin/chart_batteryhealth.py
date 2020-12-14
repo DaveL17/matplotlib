@@ -124,7 +124,7 @@ try:
 
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
     ax.xaxis.set_ticks_position('bottom')
-    ax.tick_params(axis='x', colors=chart_tools.fix_rgb(prefs['fontColor']))
+    ax.tick_params(axis='x', colors=prefs['fontColor'])
 
     # ============================== X Axis Min/Max ===============================
     # We want the X axis scale to always be 0-100.
@@ -142,7 +142,7 @@ try:
     if p_dict.get('showDeviceName', True):
         ax.set_yticklabels(y_text,
                            fontname=p_dict['fontMain'],
-                           color=chart_tools.fix_rgb(prefs['fontColor']),
+                           color=prefs['fontColor'],
                            fontsize=prefs['tickFontSize'],
                            minor=True
                            )

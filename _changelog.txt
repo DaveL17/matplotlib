@@ -1,3 +1,11 @@
+v0.9.23
+- Fixes bug in line color settings for Composite Weather devices when initially
+  created.
+- Code refinements.
+- Faster sorting in maintenance.clean_prefs
+- Removes legacy custom color pre-processing.
+- Refines color management (conversion of (XX XX XX to #XXXXXX).
+
 v0.9.22
 - New Feature: hide anomalies in data for line, scatter charts (not currently
   available for other chart types).
