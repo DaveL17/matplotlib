@@ -48,7 +48,6 @@ the proper Fantastic Weather devices.
 #       pipe to send things to the host plugin and get a response.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
-# TODO: Improve RGB handling.
 # ================================== IMPORTS ==================================
 
 try:
@@ -99,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.23"
+__version__   = u"0.9.24"
 
 # =============================================================================
 
@@ -3071,6 +3070,31 @@ class Plugin(indigo.PluginBase):
 
                         dev_dict['name'] = dev.name
                         dev_dict['model'] = dev.model
+
+                        # ========================  Custom Line Substitutions  ========================
+                        # We support substitutions in custom line segments settings. These need to be
+                        # converted in the main plugin thread because they can't be converted within
+                        # the subprocess.
+                        if p_dict['enableCustomLineSegments'] and \
+                                p_dict['customLineSegments'] not in ("", "None"):
+
+                            try:
+                                # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb)), Since
+                                # we can't mutate a tuple, we listify it first
+                                constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
+                                substituted_constants = ()
+
+                                # If val start with '%%' perform a substitution on it
+                                for element in [list(item) for item in constants_to_plot]:
+                                    if str(element[0]).startswith("%%"):
+                                        element[0] = float(self.substitute(element[0]))
+                                    substituted_constants += (tuple(element),)
+
+                                p_dict['customLineSegments'] = substituted_constants
+
+                            except (ValueError, IndexError):
+                                self.logger.warning(u"Problem with custom line segments. Please ensure setting is"
+                                                    u"in the proper format.")
 
                         # =================================================
                         # TODO: convert all indigo.List(s) to Python lists.

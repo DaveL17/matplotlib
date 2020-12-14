@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# import calendar
 import ast
 import csv
 import datetime as dt
@@ -584,12 +583,15 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
             p_dict['customLineSegments'] not in ("", "None"):
 
         try:
-            constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
+            # constants_to_plot ill be (val, rgb) or ((val, rgb), (val, rgb))
+            # constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
+            constants_to_plot = p_dict['customLineSegments']
 
             cls = ax
 
             for element in constants_to_plot:
-                if type(element) == tuple:
+
+                if isinstance(element, tuple):
                     cls = ax.axhline(y=element[0],
                                      color=element[1],
                                      linestyle=p_dict['customLineStyle'],

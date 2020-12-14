@@ -1,3 +1,6 @@
+v0.9.24
+- Feature: Custom line segments now supports variable and device substitutions.
+
 v0.9.23
 - Fixes bug in line color settings for Composite Weather devices when initially
   created.

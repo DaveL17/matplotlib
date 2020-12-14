@@ -1004,7 +1004,7 @@
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -1399,8 +1399,7 @@
             <Field id="additionalBarSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid
-number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF").'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -2758,7 +2757,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -3560,7 +3559,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -3948,7 +3947,7 @@ number and the color value should be enclosed in double quotes. Multiple entries
             <Field id="additionalLineSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
 
             <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF")'>
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
