@@ -91,7 +91,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.25"
+__version__   = u"0.9.27"
 
 # =============================================================================
 
@@ -2579,8 +2579,8 @@ class Plugin(indigo.PluginBase):
             if "FutureWarning: " in errors:
                 self.logger.threaddebug(errors)
             elif "'numpy.float64' object cannot be interpreted as an index" in errors:
-                self.logger.critical(u"Unfortunately, your version of Matplotlib does not support "
-                                     u"Polar chart plotting. Disabling device.")
+                self.logger.critical(u"[{n}] Unfortunately, your version of Matplotlib does not support "
+                                     u"Polar chart plotting. Disabling device.".format(n=device.name))
                 indigo.device.enable(device, False)
             else:
                 self.logger.critical(errors)
@@ -3141,9 +3141,9 @@ class Plugin(indigo.PluginBase):
 
                         # Audit values in p_dict and k_dict to ensure they're in the proper format.
                         plug_dict = self.audit_dict_color(_dict_=plug_dict)
-                        dev_dict = self.audit_dict_color(_dict_=dev_dict)
-                        p_dict = self.audit_dict_color(_dict_=p_dict)
-                        k_dict = self.audit_dict_color(_dict_=k_dict)
+                        dev_dict  = self.audit_dict_color(_dict_=dev_dict)
+                        p_dict    = self.audit_dict_color(_dict_=p_dict)
+                        k_dict    = self.audit_dict_color(_dict_=k_dict)
 
                         # Instantiate basic payload sent to the subprocess scripts. Additional
                         # key/value pairs may be added below before payload is sent.

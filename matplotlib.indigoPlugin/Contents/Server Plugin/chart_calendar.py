@@ -22,10 +22,11 @@ import matplotlib.pyplot as plt
 
 import chart_tools
 
-log     = chart_tools.log
-payload = chart_tools.payload
-props   = payload['props']
-p_dict  = payload['p_dict']
+log        = chart_tools.log
+payload    = chart_tools.payload
+props      = payload['props']
+chart_name = props['name']
+p_dict     = payload['p_dict']
 
 log['Threaddebug'].append(u"chart_calendar.py called.")
 
@@ -110,9 +111,9 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
 # ==============================  Housekeeping  ===============================
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

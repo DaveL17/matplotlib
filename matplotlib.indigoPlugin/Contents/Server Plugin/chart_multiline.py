@@ -27,6 +27,7 @@ payload      = chart_tools.payload
 p_dict       = payload['p_dict']
 k_dict       = payload['k_dict']
 props        = payload['props']
+chart_name   = props['name']
 plug_dict    = payload['prefs']
 text_to_plot = payload['data']
 
@@ -75,7 +76,9 @@ try:
         height = int(props.get('figureHeight', 300)) / int(plt.rcParams['savefig.dpi'])
         if height < 1:
             height = 1
-            chart_tools.log['Warning'].append(u"Height: Pixels / DPI can not be less than one. Coercing to one.")
+            chart_tools.log['Warning'].append(u"[{n}] Height: Pixels / DPI can not be less than one. Coercing to "
+                                              u"one.".format(n=chart_name)
+                                              )
     except ValueError:
         height = 3
 
@@ -83,7 +86,9 @@ try:
         width = int(props.get('figureWidth', 500)) / int(plt.rcParams['savefig.dpi'])
         if width < 1:
             width = 1
-            chart_tools.log['Warning'].append(u"Width: Pixels / DPI can not be less than one. Coercing to one.")
+            chart_tools.log['Warning'].append(u"[{n}] Width: Pixels / DPI can not be less than one. Coercing to "
+                                              u"one.".format(n=chart_name)
+                                              )
     except ValueError:
         width = 5
 
@@ -104,7 +109,7 @@ try:
             text_to_plot = clean_string(val=text_to_plot)
 
     if plug_dict['verboseLogging']:
-        chart_tools.log['Threaddebug'].append(u"Data: {t}".format(t=text_to_plot))
+        chart_tools.log['Threaddebug'].append(u"[{n}] Data: {t}".format(n=chart_name, t=text_to_plot))
 
     # Wrap the text and prepare it for plotting.
 
@@ -154,8 +159,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

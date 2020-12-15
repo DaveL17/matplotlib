@@ -23,17 +23,18 @@ import matplotlib.patches as patches
 
 import chart_tools
 
-log           = chart_tools.log
-payload       = chart_tools.payload
-p_dict        = payload['p_dict']
-k_dict        = payload['k_dict']
-prefs         = payload['prefs']
-props         = payload['props']
-data          = payload['data']
-bar_colors    = []
-chart_data    = {}
-x_values      = []
-y_text        = []
+log        = chart_tools.log
+payload    = chart_tools.payload
+p_dict     = payload['p_dict']
+k_dict     = payload['k_dict']
+prefs      = payload['prefs']
+props      = payload['props']
+chart_name = props['name']
+data       = payload['data']
+bar_colors = []
+chart_data = {}
+x_values   = []
+y_text     = []
 
 log['Threaddebug'].append(u"chart_batteryhealth.py called.")
 
@@ -183,8 +184,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}]{s}".format(n-chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

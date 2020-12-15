@@ -35,6 +35,7 @@ p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
 prefs      = payload['prefs']
 props      = payload['props']
+chart_name = props['name']
 final_data = []
 
 log['Threaddebug'].append(u"chart_polar.py called.")
@@ -59,7 +60,7 @@ try:
         radii = chart_tools.get_data(data_source=radii_path, logger=log)
         final_data.append(radii)
 
-        chart_tools.log['Threaddebug'].append(u"Data: {0}".format(final_data))
+        chart_tools.log['Threaddebug'].append(u"[{n}] Data: {d}".format(n=chart_name, d=final_data))
 
         # Pull out the header information out of the data.
         del final_data[0][0]
@@ -85,7 +86,7 @@ try:
         # theta and radii, we shouldn't plot the chart.
         if len(p_dict['wind_direction']) != len(p_dict['wind_speed']):
             chart_tools.log['Warning'].append(u"[{name}] Insufficient number of observations "
-                                              u"to plot. Skipped.".format(name=props['name']))
+                                              u"to plot. Skipped.".format(name=chart_name))
             exit()
 
         # Create the array of grey scale for the intermediate lines and set the last
@@ -269,8 +270,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

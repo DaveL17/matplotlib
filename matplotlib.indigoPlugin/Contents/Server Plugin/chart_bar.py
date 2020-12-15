@@ -27,7 +27,8 @@ payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
 props      = payload['props']
-plug_dict      = payload['prefs']
+chart_name = props['name']
+plug_dict  = payload['prefs']
 bar_colors = []
 
 log['Threaddebug'].append(u"chart_bar.py called.")
@@ -53,12 +54,12 @@ try:
         # If the bar color is the same as the background color, alert the user.
         if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:
             chart_tools.log['Info'].append(u"[{name}] Bar {i} color is the same as the background color (so you may "
-                                           u"not be able to see it).".format(name=props['name'], i=thing))
+                                           u"not be able to see it).".format(name=props_name, i=thing))
 
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=props['name'], i=thing))
+                                           u"the device configuration menu.".format(name=props_name, i=thing))
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if p_dict['bar{i}Source'.format(i=thing)] not in ("", "None") and not suppress_bar:
@@ -244,8 +245,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name,s=tb))
     chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

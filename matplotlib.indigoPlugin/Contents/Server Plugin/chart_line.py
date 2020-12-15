@@ -29,6 +29,7 @@ p_dict      = payload['p_dict']
 k_dict      = payload['k_dict']
 plug_dict   = payload['prefs']
 props       = payload['props']
+chart_name  = props['name']
 line_colors = []
 
 log['Threaddebug'].append(u"chart_line.py called.")
@@ -62,12 +63,12 @@ try:
         # If line color is the same as the background color, alert the user.
         if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor'] and not suppress_line:
             chart_tools.log['Warning'].append(u"[{name}] Line {i} color is the same as the background color (so you "
-                                              u"may not be able to see it).".format(name=props['name'], i=line))
+                                              u"may not be able to see it).".format(name=chart_name, i=line))
 
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
             chart_tools.log['Info'].append(u"[{name}] Line {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=props['name'], i=line))
+                                           u"the device configuration menu.".format(name=chart_name, i=line))
 
         # ============================== Plot the Lines ===============================
         # Plot the lines. If suppress_line is True, we skip it.
@@ -86,7 +87,11 @@ try:
                                                )
 
             if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"Data for Line {i}: {c}".format(i=line, c=data_column))
+                chart_tools.log['Threaddebug'].append(u"[{n}] Data for Line {i}: {c}".format(n=chart_name,
+                                                                                             i=line,
+                                                                                             c=data_column
+                                                                                             )
+                                                      )
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -285,8 +290,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

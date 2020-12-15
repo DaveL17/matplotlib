@@ -1,3 +1,10 @@
+v0.9.27
+- Improves logging.
+- Fixed bug where scatter charts were always plotted with a transparent
+  background.
+- Fixed bug where composite weather charts weren't displaying the proper
+  background.
+
 v0.9.26
 - Fixed bug in color audit.
 - Fixed bug in custom line segments.

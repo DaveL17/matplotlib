@@ -17,6 +17,7 @@ import traceback
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 import chart_tools
 
@@ -25,7 +26,8 @@ payload      = chart_tools.payload
 p_dict       = payload['p_dict']
 k_dict       = payload['k_dict']
 props        = payload['props']
-plug_dict        = payload['prefs']
+chart_name   = props['name']
+plug_dict    = payload['prefs']
 group_colors = []
 
 
@@ -50,12 +52,12 @@ try:
         if p_dict['group{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not \
                 suppress_group:
             chart_tools.log['Debug'].append(u"[{name}] Group {i} color is the same as the background color (so you "
-                                            u"may not be able to see it).".format(name=props['name'], i=thing))
+                                            u"may not be able to see it).".format(name=chart_name, i=thing))
 
         # If the group is suppressed, remind the user they suppressed it.
         if suppress_group:
             chart_tools.log['Info'].append(u"[{name}] Group {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=props['name'], i=thing))
+                                           u"the device configuration menu.".format(name=chart_name, i=thing))
 
         # ============================== Plot the Points ==============================
         # Plot the groups. If suppress_group is True, we skip it.
@@ -75,7 +77,11 @@ try:
             data_column = chart_tools.get_data(data_source='{d}{g}'.format(d=data_path, g=group_source), logger=log)
 
             if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"Data for group {i}: {c}".format(i=thing, c=data_column))
+                chart_tools.log['Threaddebug'].append(u"[{n}] Data for group {i}: {c}".format(n=chart_name,
+                                                                                              i=thing,
+                                                                                              c=data_column
+                                                                                              )
+                                                      )
 
             # Pull the headers
             p_dict['headers'].append(data_column[0][1])
@@ -150,6 +156,15 @@ try:
     # ============================== Y1 Axis Min/Max ==============================
     # Min and Max are not 'None'.
     chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
+
+    # Transparent Chart Fill
+    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+        ax.add_patch(patches.Rectangle((0, 0), 1, 1,
+                                       transform=ax.transAxes,
+                                       facecolor=p_dict['faceColor'],
+                                       zorder=1
+                                       )
+                     )
 
     # ================================== Legend ===================================
     if p_dict['showLegend']:
@@ -246,8 +261,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

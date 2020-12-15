@@ -216,12 +216,7 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
                                    u"legend.".format(name=dev['name']))
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting X labels: showLegend = "
-                                     u"{s}".format(s=p_dict['showLegend']))
-        logger['Threaddebug'].append(u"Problem formatting X labels: customAxisLabelX = "
-                                     u"{c}".format(c=p_dict['customAxisLabelX']))
-        logger['Threaddebug'].append(u"Problem formatting X labels: k_x_axis_font = "
-                                     u"{k}".format(k=k_dict['k_x_axis_font']))
+        logger['Threaddebug'].append(u"Problem formatting X labels")
 
 
 # =============================================================================
@@ -850,7 +845,6 @@ def save(logger):
                         **payload['k_dict']['k_plot_fig']
                         )
             logger['Debug'].append(u"Chart {name} saved.".format(name=payload['p_dict']['fileName']))
-
         # Note that this garbage collection may be unneeded since the process will end.
         plt.clf()
         plt.close('all')

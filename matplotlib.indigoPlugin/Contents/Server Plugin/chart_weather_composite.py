@@ -25,6 +25,7 @@ matplotlib.use('AGG')  # Note: this statement must be run before any other matpl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
+import matplotlib.patches as patches
 
 import chart_tools
 
@@ -35,6 +36,7 @@ k_dict           = payload['k_dict']
 state_list       = payload['state_list']
 dev_type         = payload['dev_type']
 props            = payload['props']
+chart_name       = props['name']
 plug_dict        = payload['prefs']
 dates_to_plot    = ()
 dpi              = int(plt.rcParams['savefig.dpi'])
@@ -60,7 +62,7 @@ try:
     def format_subplot(s_plot, title="Title"):
         """Note that we have to set these for each subplot as it's rendered or else
         the settings will only be applied to the last subplot rendered."""
-        subplot[0].set_title(title, **k_dict['k_title_font'])  # The subplot title
+        s_plot.set_title(title, **k_dict['k_title_font'])  # The subplot title
         chart_tools.format_axis_x_ticks(ax=s_plot, p_dict=p_dict, k_dict=k_dict, logger=log)
         chart_tools.format_axis_y(ax=s_plot, p_dict=p_dict, k_dict=k_dict, logger=log)
 
@@ -326,12 +328,19 @@ try:
                         wspace=None
                         )
 
+    # We need to override a few savefig kwargs because of the way the subplots are constructed.
+    k_dict['k_plot_fig']['facecolor'] = "none"
+    k_dict['k_plot_fig']['edgecolor'] = p_dict['backgroundColor']
+    k_dict['k_plot_fig']['transparent'] = False
+
+    chart_tools.log['Info'].append(u"{0}".format(p_dict['backgroundColorOther']))
+
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

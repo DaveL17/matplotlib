@@ -32,6 +32,7 @@ k_dict       = payload['k_dict']
 state_list   = payload['state_list']
 dev_type     = payload['dev_type']
 props        = payload['props']
+chart_name   = props['name']
 plug_dict    = payload['prefs']
 sun_rise_set = payload['sun_rise_set']
 
@@ -50,7 +51,7 @@ try:
 
         if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor']:
             chart_tools.log['Debug'].append(u"[{name}] A line color is the same as the background color (so you will "
-                                            u"not be able to see it).".format(name=props['name']))
+                                            u"not be able to see it).".format(name=chart_name))
 
     # ========================== Fantastic Hourly Device ==========================
     if dev_type == 'Hourly':
@@ -147,11 +148,11 @@ try:
             p_dict['headers_2']    = ('Precipitation',)
 
     else:
-        chart_tools.log['Warning'].append(u"This device type only supports Fantastic Weather (v0.1.05 or later) and "
-                                          u"WUnderground forecast devices.")
+        chart_tools.log['Warning'].append(u"[{n}] This device type only supports Fantastic Weather (v0.1.05 or later) "
+                                          u"and WUnderground forecast devices.".format(n=chart_name))
 
     if plug_dict['verboseLogging']:
-        chart_tools.log['Threaddebug'].append(u"p_dict: {p}".format(p=p_dict))
+        chart_tools.log['Threaddebug'].append(u"[{n}] p_dict: {p}".format(n=chart_name, p=p_dict))
 
     ax1 = chart_tools.make_chart_figure(width=p_dict['chart_width'],
                                         height=p_dict['chart_height'],
@@ -435,8 +436,8 @@ try:
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"{s}".format(s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=props['name']))
+chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)
