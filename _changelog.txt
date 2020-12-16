@@ -1,3 +1,13 @@
+v0.9.28
+- New Device Type: Stock Bar Chart - which displays stock data (as opposed to
+  flow data).
+- New trap for SyntaxError for custom line segments.
+- Adds validation for Y axis min/max to ensure that min < max when both are
+  specified.
+- Adds "chart_type" field to all device types for identifiation through
+  values_dict payload.
+- Fixes bug in color repair for bbox dicts in k_dict (goes another level deep).
+
 v0.9.27
 - Improves logging.
 - Fixed bug where scatter charts were always plotted with a transparent

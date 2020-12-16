@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the bar charts
-All steps required to generate bar charts.
+Creates the flow bar charts
+
+All steps required to generate bar charts that use flow (time-series) data.
 -----
 
 """
@@ -31,7 +32,7 @@ chart_name = props['name']
 plug_dict  = payload['prefs']
 bar_colors = []
 
-log['Threaddebug'].append(u"chart_bar.py called.")
+log['Threaddebug'].append(u"chart_bar_flow.py called.")
 
 try:
 
@@ -54,12 +55,12 @@ try:
         # If the bar color is the same as the background color, alert the user.
         if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:
             chart_tools.log['Info'].append(u"[{name}] Bar {i} color is the same as the background color (so you may "
-                                           u"not be able to see it).".format(name=props_name, i=thing))
+                                           u"not be able to see it).".format(name=chart_name, i=thing))
 
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=props_name, i=thing))
+                                           u"the device configuration menu.".format(name=chart_name, i=thing))
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if p_dict['bar{i}Source'.format(i=thing)] not in ("", "None") and not suppress_bar:

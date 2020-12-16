@@ -10,6 +10,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="area" hidden="true"/>
+
             <Field id="areaChartDeviceText" type="label" alignWithControl="false">
                 <Label>Area Chart Devices are probably the most useful in instances where there are a relatively large number of time series data. They are like Line Chart Devices, where the plots are cumulative. That is, the data for area 2 will be plotted above area 1 (and so on.)</Label>
             </Field>
@@ -1035,11 +1037,13 @@
 
 <!-- Bar Charting Device -->
     <Device id="barChartingDevice" type="custom">
-        <Name>Bar Chart</Name>
+        <Name>Bar Chart (Flow)</Name>
         <ConfigUI>
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="flow bar" hidden="true"/>
 
             <Field id="barChartDeviceText" type="label" alignWithControl="false">
                 <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
@@ -1429,6 +1433,390 @@
 
     </Device>
 
+<!-- Bar Charting Device -->
+    <Device id="barStockChartingDevice" type="custom">
+        <Name>Bar Chart (Stock)</Name>
+        <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="stock bar" hidden="true"/>
+
+            <Field id="barChartDeviceText" type="label" alignWithControl="false">
+                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
+            </Field>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <Field id="fileName" type="textfield" defaultValue="chart_bar.png" tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Template file="Templates/refresh_interval.xml" />
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="chartControlsLabel" type="label" alignText="right">
+                <Label>Chart Controls</Label>
+            </Field>
+
+            <Field id="sourceSeparator1" type="separator"/>
+
+            <Field id="rectWide" type="checkbox" defaultValue="false" tooltip="Check to use Size 2 dimensions.">
+                <Label>Use Size 2?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizeChart" type="checkbox" defaultValue="false" tooltip="Check to override default chart sizes.">
+                <Label>Custom Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizeHeight" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for height. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Height:</Label>
+            </Field>
+
+            <Field id="customSizeWidth" type="textfield" defaultValue="None" visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for width. To set it back to the default size, enter None. Entering a value here will also override the Size 2 setting.">
+                <Label>Custom Width:</Label>
+            </Field>
+
+            <Field id="customSizeFont" type="checkbox" defaultValue="false" tooltip="Check to override default font sizes.">
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Template file="Templates/custom_title_font_size.xml" />
+
+            <Template file="Templates/custom_tick_font_size.xml" />
+
+            <Field id="showLegend" type="checkbox" defaultValue="false" tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                <Label>Display Legend?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Template file="Templates/legend_columns.xml" />
+
+            <Field id="chartTitle" type="textfield" defaultValue="Title" tooltip="Enter the title of your chart (optional).">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <Field id="barWidth" type="textfield" defaultValue="0"
+                   tooltip="To control the width of the bars. Zero will cause bar width to be set automatically. Enter a float greater than zero to set it manually.">
+                <Label>Width of Bars:</Label>
+            </Field>
+
+            <Field id="showZeroBars" type="checkbox" defaultValue="false" tooltip="Check to keep zero value bars from being truncated from start and end of chart.">
+                <Label>Display Zero Bars?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="AxisLabel" type="label" alignText="right">
+                <Label>Axis Controls:</Label>
+            </Field>
+
+            <Field id="xAxisSeparator" type="separator"/>
+
+            <Field id="axisText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each available axis. Check the box to display the controls for the selected chart axis.</Label>
+            </Field>
+
+            <Field id="xAxisLabel" type="checkbox" defaultValue="false">
+                <Label>X Axis</Label>
+            </Field>
+
+            <Field id="showxAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="Check to display X axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the X Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <Field id="yAxisSeparator" visibleBindingId="xAxisLabel" visibleBindingValue="true" type="separator"/>
+
+            <Field id="yAxisLabel" type="checkbox" defaultValue="false">
+                <Label>Y Axis</Label>
+            </Field>
+
+            <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to display Y axis grid.">
+                <Label>Display Grid?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customAxisLabelY" type="textfield" defaultValue="Y Axis" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the text to be displayed as the Y Axis label. Leave blank to display no label.">
+                <Label>Label:</Label>
+            </Field>
+
+            <Field id="yAxisMin" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The minimum Y axis value.">
+                <Label>Min:</Label>
+            </Field>
+
+            <Field id="yAxisMax" type="textfield" defaultValue="None" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="The maximum Y axis value.">
+                <Label>Max:</Label>
+            </Field>
+
+            <Field id="yMirrorValues" type="checkbox" defaultValue="false" visibleBindingId="yAxisLabel" visibleBindingValue="true" tooltip="Check to mirror Y axis values on Y2.">
+                <Label>Mirror Axis?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="yMirrorValuesAlsoY1" type="checkbox" defaultValue="true" visibleBindingId="yMirrorValues" visibleBindingValue="true" tooltip="Uncheck to hide Y1 axis values.">
+                <Label/>
+                <Description>Keep Y1?</Description>
+            </Field>
+
+            <Template file="Templates/y_axis_precision.xml" />
+
+            <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
+                <Label>Tick Labels:</Label>
+            </Field>
+
+            <Field id="customTicksY" type="textfield" defaultValue="" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+                   tooltip="Enter the numbers to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
+                <Label>Tick Locations:</Label>
+            </Field>
+
+            <Field id="barLabel" type="label" alignText="right">
+                <Label>Bar Controls:</Label>
+            </Field>
+
+            <Field id="bar1Top" type="separator"/>
+
+            <Field id="barText" type="label" fontSize="small">
+                <Label>Use this section to display the controls for each bar. Check the box to display the controls for the selected bar.</Label>
+            </Field>
+
+<!-- Bar 1 -->
+            <Field id="barLabel1" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 1.">
+                <Label>Bar 1</Label>
+            </Field>
+
+            <Field id="bar1Source" type="menu" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar1Value" type="menu" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
+                <Label>Value:</Label>
+                <List class="self" filter="" method="generatorDeviceStatesStockBar1" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar1Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's first bar.">
+                <Label>Color:</Label>
+            </Field>
+
+            <Field id="bar1Legend" type="textfield" defaultValue="Bar 1" visibleBindingId="barLabel1" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:&#13;&#13;</Label>
+            </Field>
+
+            <Field id="suppressBar1" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 2 -->
+            <Field id="barLabel2" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 2.">
+                <Label>Bar 2</Label>
+            </Field>
+
+            <Field id="bar2Source" type="menu" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar2Value" type="menu" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
+                <Label>Value:</Label>
+                <List class="self" filter="" method="generatorDeviceStatesStockBar2" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar2Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's second bar.">
+                <Label>Color:</Label>
+            </Field>
+
+            <Field id="bar2Legend" type="textfield" defaultValue="Bar 2" visibleBindingId="barLabel2" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:&#13;&#13;</Label>
+            </Field>
+
+            <Field id="suppressBar2" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 3 -->
+            <Field id="barLabel3" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 3.">
+                <Label>Bar 3</Label>
+            </Field>
+
+            <Field id="bar3Source" type="menu" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar3Value" type="menu" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
+                <Label>Value:</Label>
+                <List class="self" filter="" method="generatorDeviceStatesStockBar3" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar3Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's third bar.">
+                <Label>Color:</Label>
+            </Field>
+
+            <Field id="bar3Legend" type="textfield" defaultValue="Bar 3" visibleBindingId="barLabel3" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:&#13;&#13;</Label>
+            </Field>
+
+            <Field id="suppressBar3" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 4 -->
+            <Field id="barLabel4" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 4.">
+                <Label>Bar 4</Label>
+            </Field>
+
+            <Field id="bar4Source" type="menu" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar4Value" type="menu" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
+                <Label>Value:</Label>
+                <List class="self" filter="" method="generatorDeviceStatesStockBar4" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar4Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fourth bar.">
+                <Label>Color:</Label>
+            </Field>
+
+            <Field id="bar4Legend" type="textfield" defaultValue="Bar 4" visibleBindingId="barLabel4" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:&#13;&#13;</Label>
+            </Field>
+
+            <Field id="suppressBar4" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!-- Bar 5 -->
+            <Field id="barLabel5" type="checkbox" defaultValue="false" tooltip="This control shows/hides the properties for bar 5.">
+                <Label>Bar 5</Label>
+            </Field>
+
+            <Field id="bar5Source" type="menu" defaultValue="" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Select data source for bar 5.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar5Value" type="menu" defaultValue="" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Select data source for bar 5.">
+                <Label>Value:</Label>
+                <List class="self" filter="" method="generatorDeviceStatesStockBar5" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar5Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
+                <Label>Annotate?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar5Color" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="barLabel5" visibleBindingValue="true"
+                   tooltip="Select preference for the color of your chart's fifth bar.">
+                <Label>Color:</Label>
+            </Field>
+
+            <Field id="bar5Legend" type="textfield" defaultValue="Bar 5" visibleBindingId="barLabel5" visibleBindingValue="true"
+                   tooltip="Enter text for legend entry. If blank, the data column header will be used.">
+                <Label>Legend Label:&#13;&#13;</Label>
+            </Field>
+
+            <Field id="suppressBar5" type="checkbox" defaultValue="false" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Check to hide this bar when plotting.">
+                <Label>Suppress Bar?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="barSeparator" type="separator" visibleBindingId="barLabel4" visibleBindingValue="true"/>
+
+            <Field id="enableCustomLineSegmentsSetting" type="checkbox" hidden="true" defaultValue="false">
+                <Label>Enable Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalBarSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   alignText="right">
+                <Label>Custom Line Segments</Label>
+            </Field>
+
+            <Field id="additionalBarSegments" type="separator" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"/>
+
+            <Field id="customLineSegments" type="textfield" defaultValue="None" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                <Label>Constants:</Label>
+            </Field>
+
+            <Template file="Templates/custom_line_style.xml" />
+
+            <Field id="bottomSeparator" type="separator"/>
+
+            <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+                <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
+            </Field>
+
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
 <!-- Battery Health Device -->
     <Device id="batteryHealthDevice" type="custom">
         <Name>Battery Health Chart</Name>
@@ -1437,6 +1825,8 @@
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="battery health" hidden="true"/>
 
             <Field id="batteryDeviceText" type="label" alignWithControl="false">
                 <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.</Label>
@@ -1584,6 +1974,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="calendar" hidden="true"/>
+
             <Field id="CalendarDeviceText" type="label" alignWithControl="false">
                 <Label>Calendar devices are used to create graphic representations of the current month.</Label>
             </Field>
@@ -1677,6 +2069,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="line" hidden="true"/>
+
             <Field id="lineChartDeviceText" type="label" alignWithControl="false">
                 <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
@@ -1733,7 +2127,7 @@
             </Field>
 
             <!-- Filter Anomalies -->
-            <Field id="filterAnomalies" type="checkbox" defaultValue="False" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+            <Field id="filterAnomalies" type="textfield" defaultValue="0" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
                 <Label>Hide Anomalies:</Label>
                 <Description/>
             </Field>
@@ -2795,6 +3189,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="multiline text" hidden="true"/>
+
             <Field id="multilineTextDeviceText" type="label" alignWithControl="false">
                 <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.</Label>
             </Field>
@@ -2916,6 +3312,8 @@
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="polar" hidden="true"/>
 
             <Field id="polarChartDeviceText" type="label" alignWithControl="false">
                 <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).</Label>
@@ -3046,6 +3444,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="scatter" hidden="true"/>
+
             <Field id="scatterChartDeviceText" type="label" alignWithControl="false">
                 <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
             </Field>
@@ -3103,7 +3503,7 @@
             </Field>
 
             <!-- Filter Anomalies -->
-            <Field id="filterAnomalies" type="checkbox" defaultValue="False" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+            <Field id="filterAnomalies" type="textfield" defaultValue="0" tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
                 <Label>Hide Anomalies:</Label>
                 <Description/>
             </Field>
@@ -3613,6 +4013,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="forecast" hidden="true"/>
+
             <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
                 <Label>Weather Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices.</Label>
             </Field>
@@ -4001,6 +4403,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="composite forecast" hidden="true"/>
+
             <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
                 <Label>Composite Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices. Note that hourly forecast devices only provide one forecast temperature so, for these charts, the high and low temperature values will be the same.</Label>
             </Field>
@@ -4195,6 +4599,8 @@
 
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
 
+            <Field id="chart_type" type="textfield" defaultValue="csv engine" hidden="true"/>
+
             <Field id="csvEngineDeviceText" type="label" fontSize="small" alignWithControl="false">
                 <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
             </Field>
@@ -4383,7 +4789,10 @@
         <Name>Matplotlib Parameters Device</Name>
         <ConfigUI>
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="rcparams" hidden="true"/>
 
             <Field id="rcParamsLabel" type="label">
                 <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.

@@ -41,6 +41,7 @@ the proper Fantastic Weather devices.
 #       there isn't enough data), the bars plot funny.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
+# TODO: Change chart colors based on underlying data. (i.e., stock bar chart)
 # ================================== IMPORTS ==================================
 
 try:
@@ -91,7 +92,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.27"
+__version__   = u"0.9.28"
 
 # =============================================================================
 
@@ -142,6 +143,7 @@ class Plugin(indigo.PluginBase):
         self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
         self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
         self.final_data = []
+        self.dev_var_list = []  # List of devices and variables (updated in getDeviceConfigUiValues)
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert = Dave.Fogbert(self)           # Plugin functional framework
@@ -229,6 +231,7 @@ class Plugin(indigo.PluginBase):
     def getDeviceConfigUiValues(self, values_dict, type_id="", dev_id=0):
 
         dev = indigo.devices[int(dev_id)]
+        self.dev_var_list = self.generatorDeviceAndVariableList()
 
         self.logger.threaddebug(u"[{n}] Getting device config props: {v}".format(n=dev.name, v=dict(values_dict)))
 
@@ -282,7 +285,7 @@ class Plugin(indigo.PluginBase):
                     values_dict['xAxisBins']           = 'daily'
                     values_dict['xAxisLabelFormat']    = '%A'
 
-                # ============================ Bar Charting Device ============================
+                # ================================  Flow Bar  =================================
                 if type_id == "barChartingDevice":
 
                     for _ in range(1, 5, 1):
@@ -294,6 +297,17 @@ class Plugin(indigo.PluginBase):
                     values_dict['customTitleFontSize'] = 10
                     values_dict['xAxisBins']           = 'daily'
                     values_dict['xAxisLabelFormat']    = '%A'
+
+                # ================================  Stock Bar  ================================
+                if type_id == "barStockChartingDevice":
+
+                    for _ in range(1, 6, 1):
+                        values_dict['bar{i}Color'.format(i=_)]  = 'FF FF FF'
+                        values_dict['bar{i}Source'.format(i=_)] = 'None'
+
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
 
                 # =========================== Battery Health Device ===========================
                 if type_id == "batteryHealthDevice":
@@ -400,7 +414,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
 
                 for key in ('areaLabel1', 'areaLabel2', 'areaLabel3', 'areaLabel4', 'areaLabel5', 'areaLabel6',
-                            'areaLabel7', 'areaLabel8', 'barLabel1', 'barLabel2', 'barLabel3', 'barLabel4',
+                            'areaLabel7', 'areaLabel8', 'barLabel1', 'barLabel2', 'barLabel3', 'barLabel4', 'barLabel5',
                             'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
                             'lineLabel7', 'lineLabel8', 'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3',
                             'groupLabel4', 'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
@@ -680,8 +694,57 @@ class Plugin(indigo.PluginBase):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
 
-        # ================================= Bar Chart =================================
+        # ================================  Flow Bar  =================================
         if type_id == 'barChartingDevice':
+
+            # Must select at least one source (bar 1)
+            if values_dict['bar1Source'] == 'None':
+                error_msg_dict['bar1Source'] = u"You must select at least one data source."
+
+            try:
+                # Bar width must be greater than 0. Will also trap strings.
+                if not float(values_dict['barWidth']) >= 0:
+                    raise ValueError
+            except ValueError:
+                error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+
+                    for tick in custom_ticks:
+                        # Ensure all custom tick locations are within bounds.
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
+                                                             u"boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
+                                                             u"boundaries of the Y axis."
+
+        # ================================  Stock Bar  ================================
+        if type_id == 'barStockChartingDevice':
 
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
@@ -1005,6 +1068,22 @@ class Plugin(indigo.PluginBase):
                     values_dict[limit_prop] = 'None'
                     error_msg_dict[limit_prop] = u"The axis limit must be a real number or None."
 
+        # Y axis limits min must be less than max
+        try:
+            y_min = float(values_dict.get('yAxisMin', "None"))
+        except ValueError:
+            y_min = min
+
+        try:
+            y_max = float(values_dict.get('yAxisMax', "None"))
+        except ValueError:
+            y_max = max
+
+        if isinstance(y_min, float) and isinstance(y_max, float):
+            if not y_max > y_min:
+                error_msg_dict['yAxisMin'] = u"Min must be less than max if both are specified."
+                error_msg_dict['yAxisMax'] = u"Max must be greater than min if both are specified."
+
         if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = u"Configuration Errors\n\nThere are one or more settings that need to " \
                                               u"be corrected. Fields requiring attention will be highlighted."
@@ -1209,10 +1288,10 @@ class Plugin(indigo.PluginBase):
         """
         # TODO: this method can be flattened
 
+        pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
         # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
         for k in _dict_.keys():
             if isinstance(_dict_[k], unicode):
-                pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
                 if re.search(pattern, _dict_[k]):
                     _dict_[k] = self.fix_rgb(color=_dict_[k])
                 else:
@@ -1222,13 +1301,16 @@ class Plugin(indigo.PluginBase):
             elif isinstance(_dict_[k], dict):
                 for k1 in _dict_[k]:
                     if isinstance(_dict_[k][k1], unicode):
-                        pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
                         if re.search(pattern, _dict_[k][k1]):
                             _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
                         else:
                             pass
-            else:
-                pass
+                    if isinstance(_dict_[k][k1], dict):
+                        for k11 in _dict_[k][k1].keys():
+                            if re.search(pattern, str(_dict_[k][k1][k11])):
+                                _dict_[k][k1][k11] = self.fix_rgb(color=_dict_[k][k1][k11])
+                            else:
+                                pass
 
         return _dict_
 
@@ -1276,6 +1358,56 @@ class Plugin(indigo.PluginBase):
             if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
                 self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
                 self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
+
+    # =============================================================================
+    def chart_stock_bar(self, dev):
+        # We can't access Indigo objects from the subprocess, so we need to get all
+        # the information we need before calling the process.
+        # TODO: do we need to get a ton more stuff for the dict (or is globalProps enough?)
+
+        bars_data = []  # data for all bars (all data should be pickleable.
+
+        for _ in range(1, 6, 1):
+            bar_data = {}  # data for each bar
+            try:
+                annotate    = dev.pluginProps['bar{0}Annotate'.format(_)]
+                color       = dev.pluginProps['bar{0}Color'.format(_)]
+                legend      = dev.pluginProps['bar{0}Legend'.format(_)]
+                suppress    = dev.pluginProps['suppressBar{0}'.format(_)]
+                thing_id    = int(dev.pluginProps['bar{0}Source'.format(_)])
+                thing_state = dev.pluginProps['bar{0}Value'.format(_)]
+
+                # Is it a device
+                if thing_id in indigo.devices.keys():
+                    d = indigo.devices[thing_id]
+                    val = d.states[thing_state]
+                    name = d.name
+                    state = thing_state
+                # or a variable?
+                elif thing_id in indigo.variables.keys():
+                    v = indigo.variables[thing_id]
+                    val = v.value
+                    name = v.name
+                    state = "value"
+
+                else:
+                    raise ValueError
+
+                bar_data['number'] = _
+                bar_data['name'] = name
+                bar_data['state'] = state
+                bar_data['annotate_{0}'.format(_)] = annotate
+                bar_data['color_{0}'.format(_)]    = color
+                bar_data['legend_{0}'.format(_)]   = legend
+                bar_data['suppress_{0}'.format(_)] = suppress
+                bar_data['val_{0}'.format(_)]      = val
+                bars_data.append(bar_data)
+
+            except ValueError:
+                # the bar[X]source field could be empty, so let's ignore it
+                pass
+
+        return bars_data
 
     # =============================================================================
     def commsKillAll(self):
@@ -2138,12 +2270,32 @@ class Plugin(indigo.PluginBase):
         :param unicode type_id:
         :param int target_id:
         """
+        if values_dict['chart_type'] == "multiline text":
+            try:
+                dev_id = values_dict['thing']
+                return self.Fogbert.generatorStateOrValue(dev_id)
+            except KeyError:
+                return [("Select a Source Above", "Select a Source Above")]
 
-        try:
-            dev_id = values_dict['thing']
-            return self.Fogbert.generatorStateOrValue(dev_id)
-        except KeyError:
-            return [("Select a Source Above", "Select a Source Above")]
+    def generatorDeviceStatesStockBar1(self, filter="", values_dict=None, type_id="", target_id=0):
+        dev_id = values_dict['bar1Source']
+        return self.Fogbert.generatorStateOrValue(dev_id)
+
+    def generatorDeviceStatesStockBar2(self, filter="", values_dict=None, type_id="", target_id=0):
+        dev_id = values_dict['bar2Source']
+        return self.Fogbert.generatorStateOrValue(dev_id)
+
+    def generatorDeviceStatesStockBar3(self, filter="", values_dict=None, type_id="", target_id=0):
+        dev_id = values_dict['bar3Source']
+        return self.Fogbert.generatorStateOrValue(dev_id)
+
+    def generatorDeviceStatesStockBar4(self, filter="", values_dict=None, type_id="", target_id=0):
+        dev_id = values_dict['bar4Source']
+        return self.Fogbert.generatorStateOrValue(dev_id)
+
+    def generatorDeviceStatesStockBar5(self, filter="", values_dict=None, type_id="", target_id=0):
+        dev_id = values_dict['bar5Source']
+        return self.Fogbert.generatorStateOrValue(dev_id)
 
     # =============================================================================
     def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
@@ -2162,6 +2314,10 @@ class Plugin(indigo.PluginBase):
         """
 
         return self.Fogbert.deviceList()
+
+    # =============================================================================
+    def latestDevVarList(self, filter="", values_dict=None, type_id="", target_id=0):
+        return self.dev_var_list
 
     # =============================================================================
     def generatorDeviceAndVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
@@ -3085,8 +3241,13 @@ class Plugin(indigo.PluginBase):
                         # the subprocess.
                         try:
                             if p_dict['enableCustomLineSegments'] and \
-                                dev.deviceTypeId in ["areaChartingDevice", "barChartingDevice", "lineChartingDevice", "scatterChartingDevice", "forecastChartingDevice"] and \
-                                p_dict['customLineSegments'] not in ("", "None"):
+                                dev.deviceTypeId in ["areaChartingDevice",
+                                                     "barChartingDevice",
+                                                     "barStockChartingDevice",
+                                                     "lineChartingDevice",
+                                                     "scatterChartingDevice",
+                                                     "forecastChartingDevice"] and \
+                                    p_dict['customLineSegments'] not in ("", "None"):
 
                                 try:
                                     # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb)), Since
@@ -3113,6 +3274,8 @@ class Plugin(indigo.PluginBase):
                         # Not all devices support custom line segments
                         except KeyError:
                             pass
+                        except SyntaxError:
+                            self.logger.warning(u"Custom Line Segments entry is invalid. Skipping.")
                         # =================================================
                         # TODO: convert all indigo.List(s) to Python lists.
                         for key in plug_dict.iterkeys():
@@ -3126,6 +3289,7 @@ class Plugin(indigo.PluginBase):
                         for key in p_dict.iterkeys():
                             if isinstance(p_dict[key], indigo.List):
                                 p_dict[key] = list(p_dict[key])
+
                         # =================================================
 
                         # ============================== rcParams Device ==============================
@@ -3176,7 +3340,7 @@ class Plugin(indigo.PluginBase):
                             reply, err = proc.communicate()
                             self.process_plotting_log(device=dev, replies=reply, errors=err)
 
-                        # ================================ Bar Charts =================================
+                        # ================================  Flow Bar  =================================
                         if dev.deviceTypeId == 'barChartingDevice':
 
                             # Convert any nested indigo.Dict and indigo.List objects to native formats.
@@ -3188,7 +3352,31 @@ class Plugin(indigo.PluginBase):
                             payload = pickle.dumps(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_bar.py'
+                            path_to_file = 'chart_bar_flow.py'
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
+
+                            # Reply is a pickle, err is a string
+                            reply, err = proc.communicate()
+                            self.process_plotting_log(device=dev, replies=reply, errors=err)
+
+                        # ================================  Stock Bar  ================================
+                        if dev.deviceTypeId == 'barStockChartingDevice':
+
+                            raw_payload['data'] = self.chart_stock_bar(dev=dev)
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_bar_stock.py'
                             proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
                                                     stdout=subprocess.PIPE,
                                                     stderr=subprocess.PIPE,

@@ -364,6 +364,7 @@ class Maintain(object):
         # Set whether it's a chart device or not
         is_chart_dict = {'areaChartingDevice': True,
                          'barChartingDevice': True,
+                         'barStockChartingDevice': True,
                          'batteryHealthDevice': True,
                          'calendarChartingDevice': True,
                          'csvEngine': False,
@@ -462,8 +463,12 @@ class Maintain(object):
             if dev.deviceTypeId == 'areaChartingDevice':
                 pass
 
-            # =============================== Fix Bar Props ===============================
+            # ===========================  Fix Flow Bar Props  ============================
             if dev.deviceTypeId == 'barChartingDevice':
+                pass
+
+            # ===========================  Fix Stock Bar Props  ===========================
+            if dev.deviceTypeId == 'barStockChartingDevice':
                 pass
 
             # ========================= Fix Battery Health Props ==========================

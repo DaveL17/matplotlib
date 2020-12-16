@@ -736,11 +736,13 @@ def hide_anomalies(data, props=True, logger=[]):
     """
     anomalies = []
 
-    if props.get('filterAnomalies', False):
+    std_val = int(props.get('filterAnomalies', "0"))
+
+    if std_val > 0:
         # Set upper and lower limit to 2 standard deviations
         data_std  = np.std(data)
         data_mean = np.mean(data)
-        four_std   = data_std * 4
+        four_std   = data_std * std_val
 
         lower_limit = data_mean - four_std
         upper_limit = data_mean + four_std
