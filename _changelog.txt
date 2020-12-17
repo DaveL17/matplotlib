@@ -1,10 +1,14 @@
+v0.9.29
+- Adds maintenance of anomalies filter to convert from bool to int for already
+  established devices.
+
 v0.9.28
 - New Device Type: Stock Bar Chart - which displays stock data (as opposed to
   flow data).
 - New trap for SyntaxError for custom line segments.
 - Adds validation for Y axis min/max to ensure that min < max when both are
   specified.
-- Adds "chart_type" field to all device types for identifiation through
+- Adds "chart_type" field to all device types for identification through
   values_dict payload.
 - Fixes bug in color repair for bbox dicts in k_dict (goes another level deep).
 

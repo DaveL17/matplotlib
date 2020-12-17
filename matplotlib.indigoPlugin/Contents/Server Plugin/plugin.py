@@ -42,6 +42,8 @@ the proper Fantastic Weather devices.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart colors based on underlying data. (i.e., stock bar chart)
+# TODO: the 'REFRESHED' messages are shown even if something has gone wrong. Universal way to be
+#       more accurate with the message?
 # ================================== IMPORTS ==================================
 
 try:
@@ -92,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.28"
+__version__   = u"0.9.29"
 
 # =============================================================================
 

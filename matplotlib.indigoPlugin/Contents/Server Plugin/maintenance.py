@@ -481,7 +481,13 @@ class Maintain(object):
 
             # ============================== Fix Line Props ===============================
             if dev.deviceTypeId == 'lineChartingDevice':
-                pass
+
+                # Convert legacy prop from bool to int
+                if isinstance(props['filterAnomalies'], bool):
+                    if props['filterAnomalies']:
+                        props['filterAnomalies'] = 3
+                    else:
+                        props['filterAnomalies'] = 0
 
             # ========================= Fix Multiline Text Props ==========================
             if dev.deviceTypeId == 'multiLineText':
@@ -493,7 +499,13 @@ class Maintain(object):
 
             # ============================= Fix Scatter Props =============================
             if dev.deviceTypeId == 'scatterChartingDevice':
-                pass
+
+                # Convert legacy prop from bool to int
+                if isinstance(props['filterAnomalies'], bool):
+                    if props['filterAnomalies']:
+                        props['filterAnomalies'] = 3
+                    else:
+                        props['filterAnomalies'] = 0
 
             # ============================ Fix Forecast Props =============================
             if dev.deviceTypeId == 'forecastChartingDevice':

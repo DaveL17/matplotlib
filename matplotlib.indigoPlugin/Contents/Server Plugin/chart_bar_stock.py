@@ -57,6 +57,7 @@ try:
         x_ticks.append(b_num)
         y_val = bar['val_{i}'.format(i=b_num)]
         p_dict['data_array'].append(y_val)
+        bar_colors.append(color)
 
         # ====================  Bar and Background Color the Same  ====================
         # If the bar color is the same as the background color, alert the user.
@@ -139,7 +140,7 @@ try:
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-        headers = [_.decode('utf-8') for _ in p_dict['headers']]
+        headers = [_.decode('utf-8') for _ in x_labels]
         for header in headers:
             if p_dict['bar{c}Legend'.format(c=counter)] == "":
                 final_headers.append(header)

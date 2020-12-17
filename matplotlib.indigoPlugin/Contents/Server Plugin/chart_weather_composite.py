@@ -333,8 +333,6 @@ try:
     k_dict['k_plot_fig']['edgecolor'] = p_dict['backgroundColor']
     k_dict['k_plot_fig']['transparent'] = False
 
-    chart_tools.log['Info'].append(u"{0}".format(p_dict['backgroundColorOther']))
-
     chart_tools.save(logger=log)
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
