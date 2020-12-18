@@ -1,3 +1,11 @@
+v0.9.30
+- Traps bug in format X axis (key error).
+- Traps "OSError: [Errno 7] Argument list too long" for multiline text devices.
+- Modifies device validation to expand control groups to ensure that any flagged
+  setting will be immediately visible (expands closed group if error in group.
+- Modifies Stock Bar device validation to ensure that selected sources can be
+  charted (int, float, bool) since they are not based on external CSV.
+
 v0.9.29
 - Adds maintenance of anomalies filter to convert from bool to int for already
   established devices.

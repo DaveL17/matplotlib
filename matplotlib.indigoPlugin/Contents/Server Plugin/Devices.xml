@@ -1606,7 +1606,7 @@
 
             <Field id="bar1Value" type="menu" defaultValue="" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Select data source for bar 1.">
                 <Label>Value:</Label>
-                <List class="self" filter="" method="generatorDeviceStatesStockBar1" dynamicReload="true"/>
+                <List class="self" filter="bar1Source" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="bar1Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel1" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1642,7 +1642,7 @@
 
             <Field id="bar2Value" type="menu" defaultValue="" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Select data source for bar 2.">
                 <Label>Value:</Label>
-                <List class="self" filter="" method="generatorDeviceStatesStockBar2" dynamicReload="true"/>
+                <List class="self" filter="bar2Source" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="bar2Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel2" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1678,7 +1678,7 @@
 
             <Field id="bar3Value" type="menu" defaultValue="" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Select data source for bar 3.">
                 <Label>Value:</Label>
-                <List class="self" filter="" method="generatorDeviceStatesStockBar3" dynamicReload="true"/>
+                <List class="self" filter="bar3Source" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="bar3Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel3" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1714,7 +1714,7 @@
 
             <Field id="bar4Value" type="menu" defaultValue="" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Select data source for bar 4.">
                 <Label>Value:</Label>
-                <List class="self" filter="" method="generatorDeviceStatesStockBar4" dynamicReload="true"/>
+                <List class="self" filter="bar4Source" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="bar4Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel4" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1750,7 +1750,7 @@
 
             <Field id="bar5Value" type="menu" defaultValue="" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Select data source for bar 5.">
                 <Label>Value:</Label>
-                <List class="self" filter="" method="generatorDeviceStatesStockBar5" dynamicReload="true"/>
+                <List class="self" filter="bar5Source" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="bar5Annotate" type="checkbox" defaultValue="false" visibleBindingId="barLabel5" visibleBindingValue="true" tooltip="Check to plot the data value on the chart.">
@@ -1798,6 +1798,7 @@
             <Field id="bottomLabel" type="label" fontColor="red" fontSize="small" alignText="left">
                 <Label>Changes made here will be applied the next time the charts are refreshed. If you would like to make your changes effective immediately, select 'Redraw Charts Now' from the Indigo Plugins menu.</Label>
             </Field>
+
 
         </ConfigUI>
 
@@ -3229,7 +3230,7 @@
 
             <Field id="thingState" type="menu" defaultValue="">
                 <Label>Text to chart:</Label>
-                <List class="self" filter="" method="generatorDeviceStates" dynamicReload="true"/>
+                <List class="self" filter="thing" method="generatorDeviceStates" dynamicReload="true"/>
             </Field>
 
             <Field id="sourceSpace2" type="label"/>

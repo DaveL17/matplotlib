@@ -43,7 +43,7 @@ the proper Fantastic Weather devices.
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart colors based on underlying data. (i.e., stock bar chart)
 # TODO: the 'REFRESHED' messages are shown even if something has gone wrong. Universal way to be
-#       more accurate with the message?
+#       more accurate with the message?  AND set the device to an error state.
 # ================================== IMPORTS ==================================
 
 try:
@@ -94,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.29"
+__version__   = u"0.9.30"
 
 # =============================================================================
 
@@ -310,6 +310,7 @@ class Plugin(indigo.PluginBase):
                     values_dict['customLineStyle']     = '-'
                     values_dict['customTickFontSize']  = 8
                     values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisLabelFormat']    = 'None'
 
                 # =========================== Battery Health Device ===========================
                 if type_id == "batteryHealthDevice":
@@ -655,6 +656,7 @@ class Plugin(indigo.PluginBase):
             # There must be at least 1 source selected
             if values_dict['area1Source'] == 'None':
                 error_msg_dict['area1Source'] = u"You must select at least one data source."
+                values_dict['areaLabel1'] = True
 
             # Iterate for each area group (1-6).
             for area in range(1, 9, 1):
@@ -662,6 +664,7 @@ class Plugin(indigo.PluginBase):
                 for char in values_dict['area{i}adjuster'.format(i=area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['area{i}adjuster'.format(i=area)] = u"Valid operators are +, -, *, /"
+                        values_dict['areaLabel1'] = True
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -702,6 +705,7 @@ class Plugin(indigo.PluginBase):
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
+                values_dict['barLabel1'] = True
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
@@ -751,6 +755,7 @@ class Plugin(indigo.PluginBase):
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
+                values_dict['barLabel1'] = True
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
@@ -793,6 +798,33 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+
+            # Test the selected values to ensure that they can be charted (int, float, bool)
+            for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
+
+                # Pull the number out of the source key
+                n = re.search('[0-9]', source)
+
+                # Get the id of the bar source
+                if values_dict['bar{0}Source'.format(n.group(0))]:
+                    source_id = int(values_dict['bar{0}Source'.format(n.group(0))])
+
+                    # By definition it will either be a device ID or a variable ID.
+                    if source_id in indigo.devices.keys():
+
+                        # Get the selected device state value
+                        val = indigo.devices[source_id].states[values_dict[source]]
+                        if not isinstance(val, (int, float, bool)):
+                            error_msg_dict[source] = u"The selected device state can not be charted due to its value."
+
+                    else:
+                        val = indigo.variables[source_id].value
+                        try:
+                            float(val)
+                        except ValueError:
+                            if not val.lower() in ['true', 'false']:
+                                error_msg_dict[source] = u"The selected variable value can not be charted due to " \
+                                                         u"its value."
 
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
@@ -863,6 +895,7 @@ class Plugin(indigo.PluginBase):
             # There must be at least 1 source selected
             if values_dict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
+                values_dict['lineLabel1'] = True
 
             # Iterate for each line group (1-6).
             for area in range(1, 9, 1):
@@ -967,6 +1000,7 @@ class Plugin(indigo.PluginBase):
 
             if not values_dict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
+                values_dict['groupLabel1'] = True
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -1365,7 +1399,6 @@ class Plugin(indigo.PluginBase):
     def chart_stock_bar(self, dev):
         # We can't access Indigo objects from the subprocess, so we need to get all
         # the information we need before calling the process.
-        # TODO: do we need to get a ton more stuff for the dict (or is globalProps enough?)
 
         bars_data = []  # data for all bars (all data should be pickleable.
 
@@ -2258,10 +2291,14 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def generatorDeviceStates(self, filter="", values_dict=None, type_id="", target_id=0):
         """
-        Returns a list of device states for the provided device or variable id.
-        The generatorDeviceStates() method returns a list of device states each list
-        includes only states for the selected device. If a variable id is provided, the
-        list returns one element.
+        Returns device states list or variable 'value'.
+
+        Returns a list of device states or 'value' for a variable, based on ID
+        transmitted in the filter attribute. The generatorDeviceStates() method
+        returns a list of device states each list includes only states for the
+        selected device. If a variable id is provided, the list returns one
+        element. The lists are generated in the DLFramework module.
+
         Returns:
           [('dev state name', 'dev state name'), ('dev state name', 'dev state name')]
         or
@@ -2272,32 +2309,7 @@ class Plugin(indigo.PluginBase):
         :param unicode type_id:
         :param int target_id:
         """
-        if values_dict['chart_type'] == "multiline text":
-            try:
-                dev_id = values_dict['thing']
-                return self.Fogbert.generatorStateOrValue(dev_id)
-            except KeyError:
-                return [("Select a Source Above", "Select a Source Above")]
-
-    def generatorDeviceStatesStockBar1(self, filter="", values_dict=None, type_id="", target_id=0):
-        dev_id = values_dict['bar1Source']
-        return self.Fogbert.generatorStateOrValue(dev_id)
-
-    def generatorDeviceStatesStockBar2(self, filter="", values_dict=None, type_id="", target_id=0):
-        dev_id = values_dict['bar2Source']
-        return self.Fogbert.generatorStateOrValue(dev_id)
-
-    def generatorDeviceStatesStockBar3(self, filter="", values_dict=None, type_id="", target_id=0):
-        dev_id = values_dict['bar3Source']
-        return self.Fogbert.generatorStateOrValue(dev_id)
-
-    def generatorDeviceStatesStockBar4(self, filter="", values_dict=None, type_id="", target_id=0):
-        dev_id = values_dict['bar4Source']
-        return self.Fogbert.generatorStateOrValue(dev_id)
-
-    def generatorDeviceStatesStockBar5(self, filter="", values_dict=None, type_id="", target_id=0):
-        dev_id = values_dict['bar5Source']
-        return self.Fogbert.generatorStateOrValue(dev_id)
+        return self.Fogbert.generatorStateOrValue(values_dict[filter])
 
     # =============================================================================
     def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
@@ -3278,8 +3290,9 @@ class Plugin(indigo.PluginBase):
                             pass
                         except SyntaxError:
                             self.logger.warning(u"Custom Line Segments entry is invalid. Skipping.")
+
                         # =================================================
-                        # TODO: convert all indigo.List(s) to Python lists.
+                        # Convert these indigo.List(s) to Python lists.
                         for key in plug_dict.iterkeys():
                             if isinstance(plug_dict[key], indigo.List):
                                 plug_dict[key] = list(plug_dict[key])
@@ -3487,39 +3500,43 @@ class Plugin(indigo.PluginBase):
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
 
-                            # Get the text to plot. We do this here so we don't need to send all the
-                            # devices and variables to the method (the process does not have access to the
-                            # Indigo server).
-                            if int(p_dict['thing']) in indigo.devices:
-                                dev_id = int(p_dict['thing'])
-                                raw_payload['data'] = unicode(indigo.devices[dev_id].states[p_dict['thingState']])
+                            try:
+                                # Get the text to plot. We do this here so we don't need to send all the
+                                # devices and variables to the method (the process does not have access to the
+                                # Indigo server).
+                                if int(p_dict['thing']) in indigo.devices:
+                                    dev_id = int(p_dict['thing'])
+                                    raw_payload['data'] = unicode(indigo.devices[dev_id].states[p_dict['thingState']])
 
-                            elif int(p_dict['thing']) in indigo.variables:
-                                raw_payload['data'] = unicode(indigo.variables[int(p_dict['thing'])].value)
+                                elif int(p_dict['thing']) in indigo.variables:
+                                    raw_payload['data'] = unicode(indigo.variables[int(p_dict['thing'])].value)
 
-                            else:
-                                raw_payload['data'] = u"Unable to reconcile plot text. Confirm device settings."
-                                self.logger.info(u"Presently, the plugin only supports device state and variable "
-                                                 u"values.")
+                                else:
+                                    raw_payload['data'] = u"Unable to reconcile plot text. Confirm device settings."
+                                    self.logger.info(u"Presently, the plugin only supports device state and variable "
+                                                     u"values.")
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
-                            # We wait until this point to convert and pickle it because some devices add
-                            # additional device-specific data.
-                            raw_payload = convert_to_native(raw_payload)
+                                # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                                # We wait until this point to convert and pickle it because some devices add
+                                # additional device-specific data.
+                                raw_payload = convert_to_native(raw_payload)
 
-                            # Serialize the payload
-                            payload = pickle.dumps(raw_payload)
+                                # Serialize the payload
+                                payload = pickle.dumps(raw_payload)
 
-                            # Run the plot
-                            path_to_file = 'chart_multiline.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
+                                # Run the plot
+                                path_to_file = 'chart_multiline.py'
+                                proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                        stdout=subprocess.PIPE,
+                                                        stderr=subprocess.PIPE,
+                                                        )
 
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
+                                # Reply is a pickle, err is a string
+                                reply, err = proc.communicate()
+                                self.process_plotting_log(device=dev, replies=reply, errors=err)
+                            except OSError as err:
+                                if "Argument list too long" in err:
+                                    self.logger.critical(u"Text source too long.")
 
                         # =============================== Polar Charts ================================
                         if dev.deviceTypeId == "polarChartingDevice":

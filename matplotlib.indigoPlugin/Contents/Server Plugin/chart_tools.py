@@ -288,7 +288,7 @@ def format_axis_x_ticks(ax, p_dict, k_dict, logger):
         format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'], logger=log)
 
         # If the x axis format has been set to None, let's hide the labels.
-        if p_dict['xAxisLabelFormat'] == "None":
+        if p_dict.get('xAxisLabelFormat', "None") == "None":
             ax.axes.xaxis.set_ticklabels([])
 
         return ax
