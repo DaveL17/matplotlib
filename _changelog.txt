@@ -1,3 +1,12 @@
+v0.9.31
+- New Feature: Change Chart Colors action.
+- Moves successful charting messages from chart files to plugin.py for error
+  trapping/status reporting.
+- Fixes bug in format X axis for non-date-based charts.
+- More robust log handling, UI reporting, error messages.
+- Cleaner debug logging.
+- Streamlines code in charts_refresh().
+
 v0.9.30
 - Traps bug in format X axis (key error).
 - Traps "OSError: [Errno 7] Argument list too long" for multiline text devices.

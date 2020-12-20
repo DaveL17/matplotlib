@@ -33,12 +33,14 @@ log        = chart_tools.log
 payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
-prefs      = payload['prefs']
+plug_dict  = payload['prefs']
 props      = payload['props']
 chart_name = props['name']
 final_data = []
 
 log['Threaddebug'].append(u"chart_polar.py called.")
+if plug_dict['verboseLogging']:
+    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
 
 try:
     def __init__():
@@ -49,8 +51,8 @@ try:
     # ============================== Column Headings ==============================
     # Pull the column headings for the labels, then delete the row from
     # self.final_data.
-    theta_path = '{d}{t}'.format(d=prefs['dataPath'], t=p_dict['thetaValue'].encode('utf-8'))
-    radii_path = '{d}{r}'.format(d=prefs['dataPath'], r=p_dict['radiiValue'].encode('utf-8'))
+    theta_path = '{d}{t}'.format(d=plug_dict['dataPath'], t=p_dict['thetaValue'].encode('utf-8'))
+    radii_path = '{d}{r}'.format(d=plug_dict['dataPath'], r=p_dict['radiiValue'].encode('utf-8'))
 
     if theta_path != 'None' and radii_path != 'None':
 
@@ -111,7 +113,7 @@ try:
         size = float(p_dict['sqChartSize']) / int(plt.rcParams['savefig.dpi'])
         fig = plt.figure(figsize=(size, size))
         ax = plt.subplot(111, polar=True)                                 # Create subplot
-        plt.grid(color=prefs['gridColor'])                                # Color the grid
+        plt.grid(color=plug_dict['gridColor'])                                # Color the grid
         ax.set_theta_zero_location('N')                                   # Set zero to North
         ax.set_theta_direction(-1)                                        # Reverse the rotation
         ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])  # Customize the xtick labels
@@ -257,7 +259,7 @@ try:
                         )
 
     # Set the tick label size
-    font_color = prefs['fontColor']
+    font_color = plug_dict['fontColor']
     if p_dict['customSizeFont']:
         plt.xticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)
         plt.yticks(fontsize=int(p_dict['customTickFontSize']), color=font_color)
@@ -271,7 +273,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
     chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
-    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

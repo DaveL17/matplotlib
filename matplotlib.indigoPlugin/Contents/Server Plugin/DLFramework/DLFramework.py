@@ -206,6 +206,7 @@ class Fogbert(object):
         ver = self.plugin.versStrToTuple(indigo.server.version)
         if ver[0] < min_ver:
             self.plugin.stopPlugin(u"This plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
+            self.plugin.debug(u"Indigo server version OK.")
 
     def audit_os_version(self, min_ver):
 
@@ -215,6 +216,8 @@ class Fogbert(object):
         if int(ver[1]) < min_ver:
             self.plugin.stopPlugin(u"This plugin requires Mac OS version 10.{0} or above.".format(min_ver),
                                    isError=True)
+
+        self.plugin.logger.debug(u"OS X version OK.")
 
 
 class Formatter(object):

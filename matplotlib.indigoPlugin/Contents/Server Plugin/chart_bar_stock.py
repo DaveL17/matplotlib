@@ -10,7 +10,6 @@ All steps required to generate bar charts that use stock (time-agnostic) data.
 """
 
 import itertools
-import numpy as np
 import pickle
 import sys
 import traceback
@@ -36,7 +35,9 @@ bar_colors = []
 x_labels = []
 x_ticks = []
 
-log['Threaddebug'].append(u"chart_bar_flow.py called.")
+log['Threaddebug'].append(u"chart_bar_stock.py called.")
+if plug_dict['verboseLogging']:
+    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
 
 try:
 
@@ -51,7 +52,7 @@ try:
     # ============================  Iterate the Bars  =============================
     for bar in chart_data:
         b_num        = bar['number']
-        color        = chart_tools.fix_rgb(bar['color_{i}'.format(i=b_num)])  # TODO: refactor so color is processed centrally.
+        color        = bar['color_{i}'.format(i=b_num)]
         suppress_bar = p_dict.get('suppressBar{i}'.format(i=b_num), False)
         x_labels.append(bar['legend_{i}'.format(i=b_num)])
         x_ticks.append(b_num)
@@ -191,10 +192,8 @@ try:
 
     chart_tools.save(logger=log)
 
-except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+except (KeyError, IndexError, ValueError, UnicodeEncodeError, ZeroDivisionError) as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name,s=tb))
-    chart_tools.log['Critical'].append(u"{s}".format(s=sub_error))
+    chart_tools.log['Critical'].append(u"[{n}]\n{s}".format(n=chart_name, s=tb))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

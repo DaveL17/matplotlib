@@ -9,20 +9,16 @@ import numpy as np
 import operator as op
 import pickle
 import sys
+import traceback
 import unicodedata
 
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-# from matplotlib import rcParams
 import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
-# import matplotlib.font_manager as mfont
-
-# import DLFramework as Dave
 
 # Collection of logging messages.
 log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -32,10 +28,9 @@ log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []
 # we will always send the entire payload as element 1.
 try:
     payload = pickle.loads(sys.argv[1])
+    log['Debug'].append(u'[{name}] payload unpickled successfully.'.format(name=payload['props']['name']))
 except IndexError:
     pass
-
-log['Debug'].append(u'payload unpickled successfully.')
 
 
 def __init__():
@@ -57,6 +52,9 @@ def convert_the_data(final_data, data_source, logger):
     :param unicode data_source:
     """
 
+    log['Debug'].append(u"[{name}] Coercing chart data to chartable values where "
+                        u"needed.".format(name=payload['props']['name'])
+                        )
     converter = {'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
                  'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1, 'armed': 1, 'disarmed': 0}
     now = dt.datetime.now()
@@ -95,14 +93,16 @@ def convert_the_data(final_data, data_source, logger):
     # Adds header and one observation. Length of CSV file goes from zero to two.
     if len(final_data) < 1:
         final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
-        logger['Warning'].append(u'CSV file is empty. File: {d}'.format(d=data_source))
+        logger['Warning'].append(u'[{name}] CSV file is empty. File: {d}'.format(name=payload['props']['name'],
+                                                                                 d=data_source)
+                                 )
 
     # ===================== CSV File has Headers but no Data ======================
     # Adds one observation. Length of CSV file goes from one to two.
     if len(final_data) < 2:
         final_data.append((now_text, 0))
-        logger['Warning'].append(u'CSV file does not have sufficient information to make a useful plot. '
-                                 u'File: {d}'.format(d=data_source))
+        logger['Warning'].append(u'[{name}] CSV file does not have sufficient information to make a useful plot. '
+                                 u'File: {d}'.format(name=payload['props']['name'], d=data_source))
 
     # =============================== Malformed CSV ===============================
     # Test to see if any data element is a valid numeric and replace it with 'NaN'
@@ -125,6 +125,7 @@ def convert_the_data(final_data, data_source, logger):
 
 # =============================================================================
 def eval_expr(expr):
+    log['Debug'].append(u"[{name}] Evaluating expressions.".format(name=payload['props']['name']))
     return eval_(ast.parse(expr, mode='eval').body)
 
 
@@ -145,6 +146,7 @@ def eval_(mode):
 
 # =============================================================================
 def fix_rgb(color):
+    log['Debug'].append(U"[{name}] Coercing colors to #RRBBGG.".format(name=payload['props']['name']))
     return r"#{c}".format(c=color.replace(' ', '').replace('#', ''))
 
 
@@ -157,6 +159,7 @@ def format_axis(ax_obj):
     :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
     """
 
+    log['Debug'].append(u"[{name}] Setting axis properties.".format(name=payload['props']['name']))
     ax_props = ax_obj.properties()
     ax_cells = ax_props['child_artists']
     for cell in ax_cells:
@@ -209,14 +212,20 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
 
             if p_dict['verboseLogging']:
                 logger['Threaddebug'].append(u"[{name}] No call for legend. Formatting X "
-                                             u"label.".format(name=dev['name']))
+                                             u"label.".format(name=payload['props']['name']))
 
         if show_legend and custom_axis_label_x.strip(' ') not in ('', 'null'):
             logger['Debug'].append(u"[{name}] X axis label is suppressed to make room for the chart "
-                                   u"legend.".format(name=dev['name']))
+                                   u"legend.".format(name=payload['props']['name']))
 
-    except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting X labels")
+    except (ValueError, TypeError) as err:
+        logger['Threaddebug'].append(u"[{name}] Problem formatting X labels.\n"
+                                     u"{error}".format(name=payload['props']['name'], error=err))
+
+    except RuntimeError as err:
+        if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+            logger['Critical'].append(u"[{name}] Chart data will produce too many X axis ticks. Check source "
+                                      u"data.".format(name=payload['props']['name']))
 
 
 # =============================================================================
@@ -266,7 +275,8 @@ def format_axis_x_scale(x_axis_bins, logger):
             plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting X axis scale: x_axis_bins = {b}".format(b=x_axis_bins))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting X axis scale: "
+                                     u"x_axis_bins = {b}".format(name=payload['props']['name'], b=x_axis_bins))
 
 
 # =============================================================================
@@ -282,26 +292,28 @@ def format_axis_x_ticks(ax, p_dict, k_dict, logger):
     """
 
     try:
-        ax.tick_params(axis='x', **k_dict['k_major_x'])
-        ax.tick_params(axis='x', **k_dict['k_minor_x'])
-        ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
-        format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'], logger=log)
+        # This should skip for devices that don't have date-based X axes.
+        if 'xAxisLabelFormat' in p_dict.keys():
 
-        # If the x axis format has been set to None, let's hide the labels.
-        if p_dict.get('xAxisLabelFormat', "None") == "None":
-            ax.axes.xaxis.set_ticklabels([])
+            ax.tick_params(axis='x', **k_dict['k_major_x'])
+            ax.tick_params(axis='x', **k_dict['k_minor_x'])
+            ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
+            format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'], logger=log)
+
+            # If the x axis format has been set to None, let's hide the labels.
+            if p_dict['xAxisLabelFormat'] == "None":
+                ax.axes.xaxis.set_ticklabels([])
 
         return ax
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting X ticks: k_major_x = "
-                                     u"{k}".format(k=k_dict['k_major_x']))
-        logger['Threaddebug'].append(u"Problem formatting X ticks: k_minor_x = "
-                                     u"{k}".format(k=k_dict['k_minor_x']))
-        logger['Threaddebug'].append(u"Problem formatting X ticks: xAxisLabelFormat = "
-                                     u"{k}".format(k=mdate.DateFormatter(p_dict['xAxisLabelFormat'])))
-        logger['Threaddebug'].append(u"Problem formatting X ticks: xAxisBins = "
-                                     u"{k}".format(k=p_dict['xAxisBins']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting X ticks Labels: "
+                                     u"{k}\n{plf}\n{pb}".format(name=payload['props']['name'],
+                                                                k=k_dict['k_major_x'],
+                                                                plf=p_dict['xAxisLabelFormat'],
+                                                                pb=p_dict['xAxisBins']
+                                                                )
+                                     )
 
 
 # =============================================================================
@@ -342,12 +354,12 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
         plt.yticks(marks, labels)
 
     except (KeyError, ValueError):
-        logger['Threaddebug'].append(u"Problem formatting Y axis ticks: customAxisLabelY = "
-                                     u"{c}".format(c=p_dict['customAxisLabelY']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
-                                     u"{k}".format(k=k_dict['k_y_axis_font']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 axis label: customTicksY = "
-                                     u"{ct}".format(ct=p_dict['customTicksY']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y axis ticks: customAxisLabelY = "
+                                     u"{c}".format(name=payload['props']['name'], c=p_dict['customAxisLabelY']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 axis label: k_y_axis_font = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_y_axis_font']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 axis label: customTicksY = "
+                                     u"{ct}".format(name=payload['props']['name'], ct=p_dict['customTicksY']))
 
 
 # =============================================================================
@@ -394,17 +406,18 @@ def format_axis_y(ax, p_dict, k_dict, logger):
         return ax
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting Y ticks: k_major_y = "
-                                     u"{k}".format(k=k_dict['k_major_y']))
-        logger['Threaddebug'].append(u"Problem formatting Y ticks: k_minor_x = "
-                                     u"{k}".format(k=k_dict['k_minor_y']))
-        lbl_fmt = mtick.FormatStrFormatter(u"%.{p}f".format(p=int(p_dict['yAxisPrecision'])))
-        logger['Threaddebug'].append(u"Problem formatting Y ticks: xAxisLabelFormat = "
-                                     u"{f}".format(f=lbl_fmt))
-        logger['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValues = "
-                                     u"{mv}".format(mv=p_dict['yMirrorValues']))
-        logger['Threaddebug'].append(u"Problem formatting Y ticks: yMirrorValuesAlsoY1 = "
-                                     u"{mv}".format(mv=p_dict['yMirrorValuesAlsoY1']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y ticks: k_major_y = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_major_y']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y ticks: k_minor_x = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_minor_y']))
+        lbl_fmt = mtick.FormatStrFormatter(u"[{name}] %.{p}f".format(name=payload['props']['name'],
+                                                                     p=int(p_dict['yAxisPrecision'])))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y ticks: xAxisLabelFormat = "
+                                     u"{f}".format(name=payload['props']['name'], f=lbl_fmt))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y ticks: yMirrorValues = "
+                                     u"{mv}".format(name=payload['props']['name'], mv=p_dict['yMirrorValues']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y ticks: yMirrorValuesAlsoY1 = "
+                                     u"{mv}".format(name=payload['props']['name'], mv=p_dict['yMirrorValuesAlsoY1']))
 
 
 # =============================================================================
@@ -429,10 +442,10 @@ def format_axis_y1_label(p_dict, k_dict, logger):
             plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting Y1 axis label: customAxisLabelY = "
-                                     u"{c}".format(c=p_dict['customAxisLabelY']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
-                                     u"{k}".format(k=k_dict['k_y_axis_font']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 axis label: customAxisLabelY = "
+                                     u"{c}".format(name=payload['props']['name'], c=p_dict['customAxisLabelY']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 axis label: k_y_axis_font = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_y_axis_font']))
 
 
 # =============================================================================
@@ -484,13 +497,16 @@ def format_axis_y1_min_max(p_dict, logger):
         plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMax = "
-                                     u"{ymax}".format(ymax=p_dict['yAxisMax']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 Min/Max: yAxisMin = "
-                                     u"{ymin}".format(ymin=p_dict['yAxisMin']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 Min/Max: Data Min/Max = "
-                                     u"{d}/{m}".format(d=min(p_dict['data_array']), m=max(p_dict['data_array'])))
-        logger['Warning'].append(u"Error setting axis limits for Y1. Will rely on Matplotlib to determine limits.")
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: yAxisMax = "
+                                     u"{ymax}".format(name=payload['props']['name'], ymax=p_dict['yAxisMax']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: yAxisMin = "
+                                     u"{ymin}".format(name=payload['props']['name'], ymin=p_dict['yAxisMin']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: Data Min/Max = "
+                                     u"{d}/{m}".format(name=payload['props']['name'],
+                                                       d=min(p_dict['data_array']),
+                                                       m=max(p_dict['data_array'])))
+        logger['Warning'].append(u"[{name}] Error setting axis limits for Y1. Will rely on Matplotlib to determine "
+                                 u"limits.".format(name=payload['props']['name']))
 
 
 # =============================================================================
@@ -516,10 +532,10 @@ def format_axis_y2_label(p_dict, k_dict, logger):
             plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
 
     except (KeyError, ValueError):
-        logger['Threaddebug'].append(u"Problem formatting Y2 axis label: customAxisLabelY2 = "
-                                     u"{c}".format(c=p_dict['customAxisLabelY2']))
-        logger['Threaddebug'].append(u"Problem formatting Y1 axis label: k_y_axis_font = "
-                                     u"{k}".format(k=k_dict['k_y_axis_font']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting Y2 axis label: customAxisLabelY2 = "
+                                     u"{c}".format(name=payload['props']['name'], c=p_dict['customAxisLabelY2']))
+        logger['Threaddebug'].append(u"[{namae}] Problem formatting Y1 axis label: k_y_axis_font = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_y_axis_font']))
 
 
 # =============================================================================
@@ -538,6 +554,7 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
     :param dict logger:
     """
 
+    log['Debug'].append(u"[{name}] Formatting best fit line segments.".format(name=payload['props']['name']))
     try:
         color = p_dict.get('line{i}BestFitColor'.format(i=line), '#FF0000')
 
@@ -550,10 +567,12 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
         return ax
 
     except TypeError as sub_error:
-        logger['Threaddebug'].append(u"p_dict: {p}.".format(p=p_dict))
-        logger['Threaddebug'].append(u"dates_to_plot: {d}.".format(d=dates_to_plot))
-        logger['Warning'].append(u"There is a problem with the best fit line segments settings. Error: {s}. "
-                                 u"See plugin log for more information.".format(s=sub_error))
+        logger['Threaddebug'].append(u"[{name}] p_dict: {p}.".format(name=payload['props']['name'], p=p_dict))
+        logger['Threaddebug'].append(u"[{name} dates_to_plot: {d}.".format(name=payload['props']['name'],
+                                                                           d=dates_to_plot))
+        logger['Warning'].append(u"[{name} There is a problem with the best fit line segments settings. Error: {s}. "
+                                 u"See plugin log for more information.".format(name=payload['props']['name'],
+                                                                                s=sub_error))
 
 
 # =============================================================================
@@ -574,6 +593,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
     # the legend is established, otherwise some of the characteristics of the
     # min/max lines will take over the legend props.
 
+    log['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
     if p_dict['enableCustomLineSegments'] and \
             p_dict['customLineSegments'] not in ("", "None"):
 
@@ -612,8 +632,9 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
             return cls
 
         except Exception as sub_error:
-            logger['Warning'].append(u"There is a problem with the custom line segments settings. {s}. See plugin "
-                                     u"log for more information.".format(s=sub_error))
+            logger['Warning'].append(u"[{name}] There is a problem with the custom line segments settings. {s}. "
+                                     u"See plugin log for more information.".format(name=payload['props']['name'],
+                                                                                    s=sub_error))
 
             return ax
 
@@ -629,6 +650,7 @@ def format_dates(list_of_dates, logger):
     :param dict logger:
     """
 
+    log['Debug'].append(u"[{name}] Formatting dates.".format(name=payload['props']['name']))
     dates_to_plot = []
     dates_to_plot_m = []
 
@@ -639,9 +661,12 @@ def format_dates(list_of_dates, logger):
         return dates_to_plot_m
 
     except (KeyError, ValueError):
-        logger['Threaddebug'].append(u"Problem formatting dates: list_of_dates = {d}".format(d=list_of_dates))
-        logger['Threaddebug'].append(u"Problem formatting dates: dates_to_plot = {d}".format(d=dates_to_plot))
-        logger['Threaddebug'].append(u"Problem formatting dates: dates_to_plot_m = {d}".format(d=dates_to_plot_m))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting dates: list_of_dates = "
+                                     u"{d}".format(name=payload['props']['name'], d=list_of_dates))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting dates: dates_to_plot = "
+                                     u"{d}".format(name=payload['props']['name'], d=dates_to_plot))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting dates: dates_to_plot_m = "
+                                     u"{d}".format(name=payload['props']['name'], d=dates_to_plot_m))
 
 
 # =============================================================================
@@ -655,6 +680,8 @@ def format_grids(p_dict, k_dict, logger):
     :param dict logger:
     """
 
+    log['Debug'].append(u"[{name}] Formatting grids.".format(name=payload['props']['name']))
+
     try:
         if p_dict['showxAxisGrid']:
             plt.gca().xaxis.grid(True, **k_dict['k_grid_fig'])
@@ -663,8 +690,10 @@ def format_grids(p_dict, k_dict, logger):
             plt.gca().yaxis.grid(True, **k_dict['k_grid_fig'])
 
     except (KeyError, ValueError):
-        logger['Threaddebug'].append(u"Problem formatting grids: showxAxisGrid = {g}".format(g=p_dict['showxAxisGrid']))
-        logger['Threaddebug'].append(u"Problem formatting grids: k_grid_fig = {k}".format(k=k_dict['k_grid_fig']))
+        logger['Threaddebug'].append(u"[{name}]Problem formatting grids: showxAxisGrid = "
+                                     u"{g}".format(name=payload['props']['name'], g=p_dict['showxAxisGrid']))
+        logger['Threaddebug'].append(u"[{name}] Problem formatting grids: k_grid_fig = "
+                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_grid_fig']))
 
 
 # =============================================================================
@@ -683,7 +712,7 @@ def format_title(p_dict, k_dict, loc, align='center', logger=None):
         plt.suptitle(p_dict['chartTitle'], position=loc, ha=align, **k_dict['k_title_font'])
 
     except KeyError as sub_error:
-        logger['Warning'].append(u"Title Error: {s}".format(s=sub_error))
+        logger['Warning'].append(u"[{name}] Title Error: {s}".format(name=payload['props']['name'], s=sub_error))
 
 
 # =============================================================================
@@ -696,6 +725,8 @@ def get_data(data_source, logger):
     :param unicode data_source:
     :param dict logger:
     """
+
+    log['Debug'].append(u"[{name}] Retrieving CSV data.".format(name=payload['props']['name']))
 
     final_data = []
     now = dt.datetime.now()
@@ -718,8 +749,8 @@ def get_data(data_source, logger):
     # can process without dying.
     except Exception as sub_error:
         final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
-        logger['Warning'].append(u"Error downloading CSV data: {s}. See plugin log for more "
-                                 u"information.".format(s=sub_error))
+        logger['Warning'].append(u"[{name}] Error downloading CSV data: {s}. See plugin log for more "
+                                 u"information.".format(name=payload['props']['name'], s=sub_error))
 
         return final_data
 
@@ -734,6 +765,8 @@ def hide_anomalies(data, props=True, logger=[]):
     :param dict props:
     :param dict logger:
     """
+    log['Debug'].append(u"[{name}] Identifying and disguising anomalous data.".format(name=payload['props']['name']))
+
     anomalies = []
 
     std_val = int(props.get('filterAnomalies', "0"))
@@ -755,8 +788,10 @@ def hide_anomalies(data, props=True, logger=[]):
         final_data = [_ if _ not in anomalies else 'NaN' for _ in data]
 
         if 'NaN' in final_data:
-            logger['Warning'].append(u"[{n}] Outliers in data are hidden (greater than {std} standard "
-                                     u"deviations [{a}]).".format(n=props['name'], std=std_val, a=filter_val))
+            logger['Warning'].append(u"[{name}] Outliers in data are hidden (greater than {std} standard "
+                                     u"deviations [{a}]).".format(name=payload['props']['name'],
+                                                                  std=std_val,
+                                                                  a=filter_val))
         return final_data
 
     else:
@@ -804,9 +839,13 @@ def prune_data(x_data, y_data, limit, new_old, logger):
     :return:
     """
 
+    log['Debug'].append(u"[{name}] Pruning data as needed.".format(name=payload['props']['name']))
+
     now = dt.datetime.now()
     delta = now - dt.timedelta(days=limit)
-    logger['Debug'].append(u"Pruning chart data: {d} through {n}.".format(d=delta, n=now))
+    logger['Debug'].append(u"[{name}] Pruning chart data: {d} through {n}.".format(name=payload['props']['name'],
+                                                                                   d=delta,
+                                                                                   n=now))
 
     # Convert dates from string to datetime for filters
     for i, x in enumerate(x_data):
@@ -826,7 +865,8 @@ def prune_data(x_data, y_data, limit, new_old, logger):
     # If final_x is of length zero, no observations fit the requested time
     # mask. We return empty lists so that there's something to chart.
     if len(final_x) == 0:
-        logger['Warning'].append(u"All data outside time series limits. No observations to return.")
+        logger['Warning'].append(u"[{name}] All data outside time series limits. No observations to "
+                                 u"return.".format(name=payload['props']['name']))
         final_x = [dt.datetime.now()]
         final_y = [0]
 
@@ -846,11 +886,12 @@ def save(logger):
                                          f=payload['p_dict']['fileName']),
                         **payload['k_dict']['k_plot_fig']
                         )
-            logger['Debug'].append(u"Chart {name} saved.".format(name=payload['p_dict']['fileName']))
+            logger['Debug'].append(u"[{name}] Chart file saved to disk.".format(name=payload['props']['name']))
+
         # Note that this garbage collection may be unneeded since the process will end.
         plt.clf()
         plt.close('all')
 
     except RuntimeError as err:
-        if "exceeds Locator.MAXTICKS" in err:
-            logger['critical'].append(u"Chart not saved (too many observations to plot. Check source data.")
+        if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+            logger['Critical'].append(u"[{name}] Chart not saved.".format(name=payload['props']['name']))

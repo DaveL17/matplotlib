@@ -30,6 +30,8 @@ the proper Fantastic Weather devices.
 # TODO: NEW -- Create a floating bar chart
 # TODO: NEW -- Create generic weather forecast charts to support any weather services
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
+# TODO: NEW -- Chart with axes 3 and 4.
+#              (see: https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 
 # TODO: Try to address annotation collisions.
 # TODO: Add props to adjust the figure to API.
@@ -41,9 +43,10 @@ the proper Fantastic Weather devices.
 #       there isn't enough data), the bars plot funny.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
-# TODO: Change chart colors based on underlying data. (i.e., stock bar chart)
-# TODO: the 'REFRESHED' messages are shown even if something has gone wrong. Universal way to be
-#       more accurate with the message?  AND set the device to an error state.
+# TODO: Change chart features based on underlying data. (i.e., stock bar chart)
+# TODO: Change chart features based on conditions (like isDaylight, etc.) through the use of triggers. (Change
+#       plugin props through an action item). Replicate plugin config UI in action item, overwrite plugin dict
+#       with action item dict.
 # ================================== IMPORTS ==================================
 
 try:
@@ -53,6 +56,7 @@ except ImportError as error:
 
 # Built-in modules
 import ast
+import copy
 import csv
 import datetime as dt
 from dateutil.parser import parse as date_parse
@@ -94,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.30"
+__version__   = u"0.9.31"
 
 # =============================================================================
 
@@ -216,6 +220,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def deviceStartComm(self, dev):
 
+        self.logger.debug(u"[{n}] Starting chart device.".format(n=dev.name))
         # If we're coming here from a sleep state, we need to ensure that the plugin
         # shutdown global is in its proper state.
         self.pluginIsShuttingDown = False
@@ -228,6 +233,17 @@ class Plugin(indigo.PluginBase):
 
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'}])
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+
+    # =============================================================================
+    # def getActionConfigUiXml(self, type_id="", dev_id=0):
+    #     pass
+
+    # =============================================================================
+    def getActionConfigUiValues(self, values_dict, type_id="", dev_id=0):
+        if len(values_dict) == 0:
+            return self.pluginPrefs
+        else:
+            return values_dict
 
     # =============================================================================
     def getDeviceConfigUiValues(self, values_dict, type_id="", dev_id=0):
@@ -534,7 +550,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def shutdown(self):
 
-        self.logger.threaddebug(u"Shutdown call.")
+        self.logger.threaddebug(u"Shutdown called.")
         self.pluginIsShuttingDown = True
 
     # =============================================================================
@@ -1198,7 +1214,7 @@ class Plugin(indigo.PluginBase):
         -----
         :return:
         """
-
+        self.logger.debug(u"Auditing CSV health.")
         data_path = self.pluginPrefs['dataPath']
 
         for dev in indigo.devices.iter(filter='self'):
@@ -1214,11 +1230,11 @@ class Plugin(indigo.PluginBase):
                     if not os.path.isdir(data_path):
                         try:
                             os.makedirs(data_path)
-                            self.logger.warning(u"Target data folder does not exist. Creating it.")
+                            self.logger.warning(u"Target data folder doesn't exist. Creating it.")
 
                         except IOError:
                             self.plugin_error_handler(sub_error=traceback.format_exc())
-                            self.logger.critical(u"[{name}] Target data folder does not exist and the plugin is "
+                            self.logger.critical(u"[{name}] Target data folder doesn't exist and the plugin is "
                                                  u"unable to create it. See plugin log for more "
                                                  u"information.".format(name=dev.name))
 
@@ -1228,7 +1244,7 @@ class Plugin(indigo.PluginBase):
                                                  u"See plugin log for more information.".format(name=dev.name))
 
                     if not os.path.isfile(full_path):
-                        self.logger.warning(u"CSV file does not exist. Creating a new one: {fp}".format(fp=full_path))
+                        self.logger.warning(u"CSV file doesn't exist. Creating a new one: {fp}".format(fp=full_path))
                         csv_file = open(full_path, 'w')
                         csv_file.write('{t},{h}\n'.format(t='Timestamp', h=thing[1][2].encode("utf-8")))
                         csv_file.close()
@@ -1254,7 +1270,7 @@ class Plugin(indigo.PluginBase):
         """
         # TODO: migrate this to DLFramework
 
-        self.logger.info(u"Updating device properties to match current plugin version.")
+        self.logger.debug(u"Updating device properties to match current plugin version.")
 
         try:
             # Iterate through the plugin's devices
@@ -1361,6 +1377,8 @@ class Plugin(indigo.PluginBase):
         -----
         :return:
         """
+        self.logger.debug(u"Auditing save paths.")
+
         # ============================= Audit Save Paths ==============================
         # Test the current path settings to ensure that they are valid.
         path_list = (self.pluginPrefs['dataPath'], self.pluginPrefs['chartPath'])
@@ -1371,19 +1389,20 @@ class Plugin(indigo.PluginBase):
             if not os.path.isdir(path_name):
                 try:
                     os.makedirs(path_name)
-                    self.logger.warning(u"Target folder does not exist. Creating path:{path}".format(path=path_name))
+                    self.logger.warning(u"Target folder doesn't exist. Creating path:{path}".format(path=path_name))
 
                 except (IOError, OSError):
                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.critical(u"Target folder does not exist and the plugin is unable to create it. See "
+                    self.logger.critical(u"Target folder doesn't exist and the plugin is unable to create it. See "
                                          u"plugin log for more information.")
 
         # Test to ensure that each path is writeable.
+        self.logger.debug(u"Auditing path IO.")
         for path_name in path_list:
             if os.access(path_name, os.W_OK):
-                self.logger.debug(u"Auditing path IO. Path OK: {path}".format(path=path_name))
+                self.logger.debug(u"   Path OK: {path}".format(path=path_name))
             else:
-                self.logger.critical(u"Plugin does not have the proper rights to write to the path: "
+                self.logger.critical(u"   Plugin doesn't have the proper rights to write to the path: "
                                      u"{path}".format(path=path_name))
 
         # ================ Compare Save Path to Current Indigo Version ================
@@ -1406,7 +1425,7 @@ class Plugin(indigo.PluginBase):
             bar_data = {}  # data for each bar
             try:
                 annotate    = dev.pluginProps['bar{0}Annotate'.format(_)]
-                color       = dev.pluginProps['bar{0}Color'.format(_)]
+                color       = self.fix_rgb(dev.pluginProps['bar{0}Color'.format(_)])
                 legend      = dev.pluginProps['bar{0}Legend'.format(_)]
                 suppress    = dev.pluginProps['suppressBar{0}'.format(_)]
                 thing_id    = int(dev.pluginProps['bar{0}Source'.format(_)])
@@ -1485,6 +1504,7 @@ class Plugin(indigo.PluginBase):
         """
         :return:
         """
+        self.logger.debug(u"Checking CSV references.")
         titles = {}
 
         # Iterate through CSV Engine devices
@@ -1842,15 +1862,15 @@ class Plugin(indigo.PluginBase):
                 if not os.path.isdir(self.pluginPrefs['dataPath']):
                     try:
                         os.makedirs(self.pluginPrefs['dataPath'])
-                        self.logger.warning(u"Target data folder does not exist. Creating it.")
+                        self.logger.warning(u"Target data folder doesn't exist. Creating it.")
 
                     except OSError:
-                        self.logger.critical(u"[{name}] Target data folder either does not exist or the plugin is "
+                        self.logger.critical(u"[{name}] Target data folder either doesn't exist or the plugin is "
                                              u"unable to access/create it.".format(name=dev.name))
 
                 if not os.path.isfile(full_path):
                     try:
-                        self.logger.debug(u"CSV does not exist. Creating: {path}".format(path=full_path))
+                        self.logger.debug(u"CSV doesn't exist. Creating: {path}".format(path=full_path))
                         csv_file = open(full_path, 'w')
                         csv_file.write('{t},{n}\n'.format(t='Timestamp', n=v[0].encode("utf-8")))
                         csv_file.close()
@@ -2137,12 +2157,12 @@ class Plugin(indigo.PluginBase):
         return list_
 
     # =============================================================================
-    def get_csv_device_list(self, filter="", values_dict=None, type_id="", target_id=0):
+    def get_csv_device_list(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV Engine devices set to manual refresh
         The get_csv_device_list() method returns a list of CSV Engine devices with a
         manual refresh interval.
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param target_id:
@@ -2155,12 +2175,12 @@ class Plugin(indigo.PluginBase):
                 dev.deviceTypeId == "csvEngine" and dev.pluginProps['refreshInterval'] == "0"]
 
     # =============================================================================
-    def get_csv_source_list(self, filter="", values_dict=None, type_id="", target_id=0):
+    def get_csv_source_list(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of CSV sources from CSV Engine devices set to manual refresh
         The get_csv_source_list() method returns a list of CSV sources for the target
         CSV Engine device.
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param target_id:
@@ -2289,7 +2309,7 @@ class Plugin(indigo.PluginBase):
         return p_dict
 
     # =============================================================================
-    def generatorDeviceStates(self, filter="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceStates(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Returns device states list or variable 'value'.
 
@@ -2304,15 +2324,15 @@ class Plugin(indigo.PluginBase):
         or
           [('value', 'value')]
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
         """
-        return self.Fogbert.generatorStateOrValue(values_dict[filter])
+        return self.Fogbert.generatorStateOrValue(values_dict[fltr])
 
     # =============================================================================
-    def generatorDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
         Provides a list of Indigo variables for various dropdown menus. The method is
@@ -2321,7 +2341,7 @@ class Plugin(indigo.PluginBase):
             [(dev.id, dev.name), (dev.id, dev.name)].
         The list is generated within the DLFramework module.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2330,11 +2350,11 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceList()
 
     # =============================================================================
-    def latestDevVarList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def latestDevVarList(self, fltr="", values_dict=None, type_id="", target_id=0):
         return self.dev_var_list
 
     # =============================================================================
-    def generatorDeviceAndVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def generatorDeviceAndVariableList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of devices and variables for config menu controls
         Provides a list of Indigo devices and variables for various dropdown menus. The
@@ -2345,7 +2365,7 @@ class Plugin(indigo.PluginBase):
         It prepends (D) or (V) to make it easier to distinguish between the two.
         The list is generated within the DLFramework module.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2354,7 +2374,7 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceAndVariableList()
 
     # =============================================================================
-    def generatorVariableList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def generatorVariableList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of Indigo variables.
         Provides a list of Indigo variables for various dropdown menus. The method is
@@ -2363,7 +2383,7 @@ class Plugin(indigo.PluginBase):
             [(var.id, var.name), (var.id, var.name)].
         The list is generated within the DLFramework module.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2372,13 +2392,13 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.variableList()
 
     # =============================================================================
-    def getAxisList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def getAxisList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Returns a list of axis formats.
         Returns a list of Python date formatting strings for use in plotting date
         labels.  The list does not include all Python format specifiers.
         -----
-        :param str filter:
+        :param str fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2407,7 +2427,7 @@ class Plugin(indigo.PluginBase):
         return axis_list_menu
 
     # =============================================================================
-    def getBatteryDeviceList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def getBatteryDeviceList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Create a list of battery-powered devices
         Creates a list of tuples that contains the device ID and device name of all
@@ -2415,7 +2435,7 @@ class Plugin(indigo.PluginBase):
         If no devices meet the criteria, a single tuple is returned as a place-
         holder.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2429,14 +2449,14 @@ class Plugin(indigo.PluginBase):
         return batt_list
 
 # =============================================================================
-    def getFileList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def getFileList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Get list of CSV files for various dropdown menus.
         Generates a list of CSV source files that are located in the folder specified
         within the plugin configuration dialog. If the method is unable to find any CSV
         files, an empty list is returned.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2469,14 +2489,14 @@ class Plugin(indigo.PluginBase):
         return file_name_list_menu
 
     # =============================================================================
-    def getFontList(self, filter="", values_dict=None, type_id="", target_id=0):
+    def getFontList(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Provide a list of font names for various dropdown menus.
         Note that these are the fonts that Matplotlib can see, not necessarily all of
         the fonts installed on the system. If matplotlib can't find any fonts, then a
         default list of fonts that matplotlib supports natively are provided.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2530,14 +2550,14 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     # =============================================================================
-    def getForecastSource(self, filter="", values_dict=None, type_id="", target_id=0):
+    def getForecastSource(self, fltr="", values_dict=None, type_id="", target_id=0):
         """
         Return a list of WUnderground devices for forecast chart devices
         Generates and returns a list of potential forecast devices for the forecast
         devices type. Presently, the plugin only works with WUnderground devices, but
         the intention is to expand the list of compatible devices going forward.
         -----
-        :param unicode filter:
+        :param unicode fltr:
         :param class 'indigo.Dict' values_dict:
         :param unicode type_id:
         :param int target_id:
@@ -2729,9 +2749,10 @@ class Plugin(indigo.PluginBase):
         # ======================= Process Output Queue ========================
         try:
             replies = pickle.loads(replies)
+            success = True
 
             for msg in replies['Threaddebug']:
-                self.logger.debug(msg)
+                self.logger.threaddebug(msg)
             for msg in replies['Debug']:
                 self.logger.debug(msg)
             for msg in replies['Info']:
@@ -2740,20 +2761,34 @@ class Plugin(indigo.PluginBase):
                 self.logger.warning(msg)
             for msg in replies['Critical']:
                 self.logger.critical(msg)
+                success = False
+
+            if not success:
+                device.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
+                self.logger.critical(u"[{name}] error producing chart. See logs for more "
+                                     u"information.".format(name=device.name))
+            else:
+                device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                self.logger.info(u"[{name}] chart refreshed.".format(name=device.name))
+
+            return success
 
         except EOFError:
             pass
 
-        # Process any output.
+        # Process any special output.
         if len(errors) > 0:
             if "FutureWarning: " in errors:
                 self.logger.threaddebug(errors)
+
             elif "'numpy.float64' object cannot be interpreted as an index" in errors:
-                self.logger.critical(u"[{n}] Unfortunately, your version of Matplotlib does not support "
+                self.logger.critical(u"[{n}] Unfortunately, your version of Matplotlib doesn't support "
                                      u"Polar chart plotting. Disabling device.".format(n=device.name))
                 indigo.device.enable(device, False)
+
             else:
                 self.logger.critical(errors)
+                device.updateStateImageOnServer(indigo.kStateImageSel.Error)
 
     # =============================================================================
     def rcParamsDeviceUpdate(self, dev):
@@ -2826,20 +2861,25 @@ class Plugin(indigo.PluginBase):
             """
             if isinstance(obj, indigo.List):
                 native_list = list()
-                for item in obj:
-                    native_list.append(convert_to_native(item))
+                for _item_ in obj:
+                    native_list.append(convert_to_native(_item_))
                 return native_list
             elif isinstance(obj, indigo.Dict):
                 native_dict = dict()
-                for key, value in obj.items():
-                    native_dict[key] = convert_to_native(value)
+                for _key_, value in obj.items():
+                    native_dict[_key_] = convert_to_native(value)
                 return native_dict
             else:
                 return obj
 
         if not self.pluginIsShuttingDown:
 
-            k_dict  = {}  # A dict of kwarg dicts
+            k_dict = {}  # A dict of kwarg dicts
+            reply  = ""
+            err    = ""
+            path_to_file = ""
+            payload = {}
+
             # A dict of plugin preferences (we set defaults and override with pluginPrefs).
             p_dict  = dict(self.pluginPrefs)
 
@@ -2906,6 +2946,8 @@ class Plugin(indigo.PluginBase):
                 plt.rcParams['ytick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
 
                 for dev in dev_list:
+
+                    self.logger.debug(u"Updating chart: [{0}]".format(dev.name))
 
                     dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
@@ -3094,8 +3136,7 @@ class Plugin(indigo.PluginBase):
                     p_dict['headers_2'] = ()  # Tuple
 
                     try:
-                        kv_list = list()  # A list of state/value pairs used to feed updateStatesOnServer()
-                        kv_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+                        device_states = list()  # A list of state/value pairs used to feed updateStatesOnServer()
                         p_dict.update(dev.pluginProps)
 
                         # ======================= Limit number of observations ========================
@@ -3244,9 +3285,8 @@ class Plugin(indigo.PluginBase):
                         self.__log_dicts(dev)
 
                         plug_dict = dict(self.pluginPrefs)
-                        dev_dict = dict(dev.pluginProps)
-
-                        dev_dict['name'] = dev.name
+                        dev_dict  = dict(dev.pluginProps)
+                        dev_dict['name']  = dev.name
                         dev_dict['model'] = dev.model
 
                         # ========================  Custom Line Substitutions  ========================
@@ -3346,14 +3386,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_area.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ================================  Flow Bar  =================================
                         if dev.deviceTypeId == 'barChartingDevice':
@@ -3368,14 +3400,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_bar_flow.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ================================  Stock Bar  ================================
                         if dev.deviceTypeId == 'barStockChartingDevice':
@@ -3392,14 +3416,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_bar_stock.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
@@ -3444,14 +3460,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_batteryhealth.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Calendar Charts ==============================
                         if dev.deviceTypeId == "calendarChartingDevice":
@@ -3466,14 +3474,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_calendar.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ================================ Line Charts ================================
                         if dev.deviceTypeId == "lineChartingDevice":
@@ -3488,14 +3488,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_line.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Multiline Text ===============================
                         if dev.deviceTypeId == 'multiLineText':
@@ -3526,14 +3518,7 @@ class Plugin(indigo.PluginBase):
 
                                 # Run the plot
                                 path_to_file = 'chart_multiline.py'
-                                proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                        stdout=subprocess.PIPE,
-                                                        stderr=subprocess.PIPE,
-                                                        )
 
-                                # Reply is a pickle, err is a string
-                                reply, err = proc.communicate()
-                                self.process_plotting_log(device=dev, replies=reply, errors=err)
                             except OSError as err:
                                 if "Argument list too long" in err:
                                     self.logger.critical(u"Text source too long.")
@@ -3551,14 +3536,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_polar.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ============================== Scatter Charts ===============================
                         if dev.deviceTypeId == "scatterChartingDevice":
@@ -3573,14 +3550,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_scatter.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ========================== Weather Forecast Charts ==========================
                         if dev.deviceTypeId == "forecastChartingDevice":
@@ -3603,14 +3572,6 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_weather_forecast.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
-
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # ========================== Weather Composite Charts =========================
                         if dev.deviceTypeId == "compositeForecastDevice":
@@ -3631,31 +3592,44 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_weather_composite.py'
-                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                    stdout=subprocess.PIPE,
-                                                    stderr=subprocess.PIPE,
-                                                    )
 
-                            # Reply is a pickle, err is a string
-                            reply, err = proc.communicate()
-                            self.process_plotting_log(device=dev, replies=reply, errors=err)
+                        # =============================  Process Result  ==============================
+                        # Get the results and act on anything
+                        proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE,
+                                                )
 
-                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                        if proc:
+                            try:
+                                reply, err = proc.communicate()
+                            except ValueError:
+                                pass
+
+                        # Parse the output log
+                        result = self.process_plotting_log(device=dev, replies=reply, errors=err)
 
                         # If we have manually asked for all charts to update, don't refresh the last
                         # update time so that the charts will update on their own at the next refresh
                         # cycle.
                         if not self.skipRefreshDateUpdate:
-                            kv_list.append({'key': 'chartLastUpdated', 'value': u"{now}".format(now=dt.datetime.now())})
+                            device_states.append({'key': 'chartLastUpdated',
+                                                  'value': u"{now}".format(now=dt.datetime.now())})
 
-                        dev.updateStatesOnServer(kv_list)
+                        # All has gone well.
+                        if not result:
+                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': 'Error'})
+                        else:
+                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+
+                        dev.updateStatesOnServer(device_states)
 
                     except RuntimeError as sub_error:
                         self.plugin_error_handler(sub_error=traceback.format_exc())
                         self.logger.critical(u"[{name}] Critical Error: {s}. See plugin log for more "
                                              u"information.".format(name=dev.name, s=sub_error))
                         self.logger.critical(u"Skipping device.")
-                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                        dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
 
                 # Ensure the flag is in the proper state for the next automatic refresh.
                 self.skipRefreshDateUpdate = False
@@ -3664,6 +3638,50 @@ class Plugin(indigo.PluginBase):
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.critical(u"[{name}] Error: {s}. See plugin log for more "
                                      u"information.".format(name=dev.name, s=unicode(sub_error)))
+                dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
+
+    # =============================================================================
+    def actionChangeChartColors(self, plugin_action):
+        """
+        Called by an Indigo Action item.
+        Allows the plugin to call the charts_refresh() method from an Indigo Action
+        item. This action will refresh all charts.
+        -----
+        :param class 'indigo.PluginAction' plugin_action:
+        """
+        something_changed = False
+        old_prefs = copy.deepcopy(self.pluginPrefs)
+
+        # Iterate through the action config ui values.
+        for prop in plugin_action.props:
+            # If something is different, update plugin prefs to the
+            # action prop value(s).
+            if plugin_action.props[prop] != self.pluginPrefs.get(prop, None):
+                something_changed = True
+                self.pluginPrefs[prop] = plugin_action.props[prop]
+
+        # Since something changed, lets store the original prefs and eEnsure that
+        # the new prefs changes are blown to disk (and saved to the *.indiPref file).
+        if something_changed:
+            self.pluginPrefs['old_prefs'] = old_prefs
+            indigo.server.savePluginPrefs()
+
+    # =============================================================================
+    def actionRestoreChartColors(self, plugin_action):
+
+        # Get a copy of the archived preferences
+        original_prefs = copy.deepcopy(self.pluginPrefs['old_prefs'])
+
+        # Iterate through each archived preference and save it to pluginPrefs. We
+        # do this with a little overhead in case things have changed in the interim.
+        for pref in original_prefs.keys():
+            try:
+                self.pluginPrefs[pref] = original_prefs[pref]
+            except KeyError:
+                pass
+
+        # Force Indigo to update everything to make sure everything is in sync.
+        indigo.server.savePluginPrefs()
 
     # =============================================================================
     def refreshTheChartsAction(self, plugin_action):
@@ -3680,7 +3698,7 @@ class Plugin(indigo.PluginBase):
 
         self.charts_refresh(dev_list=devices_to_refresh)
 
-        self.logger.info(u"{0:{1}^80}".format(' Refresh Action Complete ', '='))
+        self.logger.info(u"{0:{1}^80}".format(u' Refresh Action Complete ', '='))
 
 
 class MakeChart(object):

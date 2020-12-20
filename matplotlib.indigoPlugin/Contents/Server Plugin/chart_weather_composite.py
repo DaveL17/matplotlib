@@ -25,7 +25,6 @@ matplotlib.use('AGG')  # Note: this statement must be run before any other matpl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
-import matplotlib.patches as patches
 
 import chart_tools
 
@@ -52,6 +51,8 @@ wind_bearing     = ()
 wind_speed       = ()
 
 log['Threaddebug'].append(u"chart_weather_composite.py called.")
+if plug_dict['verboseLogging']:
+    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
 
 try:
 
@@ -338,7 +339,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
     chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
-    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)

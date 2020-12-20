@@ -27,7 +27,7 @@ log        = chart_tools.log
 payload    = chart_tools.payload
 p_dict     = payload['p_dict']
 k_dict     = payload['k_dict']
-prefs      = payload['prefs']
+plug_dict  = payload['prefs']
 props      = payload['props']
 chart_name = props['name']
 data       = payload['data']
@@ -37,6 +37,8 @@ x_values   = []
 y_text     = []
 
 log['Threaddebug'].append(u"chart_batteryhealth.py called.")
+if plug_dict['verboseLogging']:
+    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
 
 try:
 
@@ -119,13 +121,13 @@ try:
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
 
     # =============================== Format Grids ================================
-    if prefs.get('showxAxisGrid', False):
+    if plug_dict.get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
-            ax.axvline(x=_, color=p_dict['gridColor'], linestyle=prefs.get('gridStyle', ':'))
+            ax.axvline(x=_, color=p_dict['gridColor'], linestyle=plug_dict.get('gridStyle', ':'))
 
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
     ax.xaxis.set_ticks_position('bottom')
-    ax.tick_params(axis='x', colors=prefs['fontColor'])
+    ax.tick_params(axis='x', colors=plug_dict['fontColor'])
 
     # ============================== X Axis Min/Max ===============================
     # We want the X axis scale to always be 0-100.
@@ -143,8 +145,8 @@ try:
     if p_dict.get('showDeviceName', True):
         ax.set_yticklabels(y_text,
                            fontname=p_dict['fontMain'],
-                           color=prefs['fontColor'],
-                           fontsize=prefs['tickFontSize'],
+                           color=plug_dict['fontColor'],
+                           fontsize=plug_dict['tickFontSize'],
                            minor=True
                            )
 
@@ -185,7 +187,5 @@ try:
 except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
     tb = traceback.format_exc()
     chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
-    chart_tools.log['Critical'].append(u"[{n}]{s}".format(n-chart_name, s=sub_error))
 
-chart_tools.log['Info'].append(u"[{name}] chart refreshed.".format(name=chart_name))
 pickle.dump(chart_tools.log, sys.stdout)
