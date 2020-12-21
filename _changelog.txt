@@ -1,3 +1,9 @@
+v0.9.34
+- Fixes stock bar annotations when bars plotted with values of zero.
+- Traps stock bar error when data starts with zero, but Display Zero Bars
+  unchecked.
+- Changes default setting for Stock Bar Display Zero Bars to True.
+
 v0.9.33
 - Fixes stock bar validation error where device would fail validation when
   less than 100 percent of bars populated.

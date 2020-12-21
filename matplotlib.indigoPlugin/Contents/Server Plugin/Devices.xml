@@ -1508,7 +1508,7 @@
                 <Label>Width of Bars:</Label>
             </Field>
 
-            <Field id="showZeroBars" type="checkbox" defaultValue="false" tooltip="Check to keep zero value bars from being truncated from start and end of chart.">
+            <Field id="showZeroBars" type="checkbox" defaultValue="true" tooltip="Check to keep zero value bars from being truncated from start and end of chart.">
                 <Label>Display Zero Bars?</Label>
                 <Description>Yes/No</Description>
             </Field>

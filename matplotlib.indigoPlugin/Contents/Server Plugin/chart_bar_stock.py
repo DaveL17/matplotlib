@@ -56,7 +56,7 @@ try:
         suppress_bar = p_dict.get('suppressBar{i}'.format(i=b_num), False)
         x_labels.append(bar['legend_{i}'.format(i=b_num)])
         x_ticks.append(b_num)
-        y_val = bar['val_{i}'.format(i=b_num)]
+        y_val = float(bar['val_{i}'.format(i=b_num)])
         p_dict['data_array'].append(y_val)
         bar_colors.append(color)
 
@@ -76,10 +76,10 @@ try:
         # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
         # With this setting, we replace the Y values of zero with a very small positive value
         # (0 becomes 1e-06). We get a slice of the original data for annotations.
+        annotation_values.append(y_val)
         if p_dict.get('showZeroBars', False):
             if y_val == 0:
                 y_val = 1e-06
-        annotation_values.append(y_val)
 
         # ================================  Bar Width  ================================
         try:
@@ -190,7 +190,13 @@ try:
                         wspace=None
                         )
 
-    chart_tools.save(logger=log)
+    try:
+        chart_tools.save(logger=log)
+
+    except OverflowError as err:
+        if "date value out of range" in traceback.format_exc(err):
+            chart_tools.log['Critical'].append(u"[{name}] Chart not saved. Try enabling Display Zero Bars in "
+                                               u"device settings.".format(name=payload['props']['name']))
 
 except (KeyError, IndexError, ValueError, UnicodeEncodeError, ZeroDivisionError) as sub_error:
     tb = traceback.format_exc()
