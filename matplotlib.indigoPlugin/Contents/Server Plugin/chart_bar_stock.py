@@ -108,7 +108,7 @@ try:
         # ===============================  Annotations  ===============================
         # If annotations desired, plot those too.
         if bar['annotate_{i}'.format(i=b_num)] and not suppress_bar:
-            ax.annotate(unicode(y_val),
+            ax.annotate(unicode(annotation_values[b_num-1]),
                         xy=(b_num, y_val),
                         xytext=(0, 0),
                         zorder=10,

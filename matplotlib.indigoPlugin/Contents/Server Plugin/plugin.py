@@ -98,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.32"
+__version__   = u"0.9.33"
 
 # =============================================================================
 
@@ -822,7 +822,7 @@ class Plugin(indigo.PluginBase):
                 n = re.search('[0-9]', source)
 
                 # Get the id of the bar source
-                if values_dict['bar{0}Source'.format(n.group(0))]:
+                if values_dict['bar{0}Source'.format(n.group(0))] != "None":
                     source_id = int(values_dict['bar{0}Source'.format(n.group(0))])
 
                     # By definition it will either be a device ID or a variable ID.

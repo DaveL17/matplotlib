@@ -1,3 +1,8 @@
+v0.9.33
+- Fixes stock bar validation error where device would fail validation when
+  less than 100 percent of bars populated.
+- Fixes stock bar annotations when bars plotted with values of zero.
+
 v0.9.32
 - Fixes bug where new action data didn't pickle properly.
 
