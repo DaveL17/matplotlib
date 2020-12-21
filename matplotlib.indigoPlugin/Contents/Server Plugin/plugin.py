@@ -98,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.31"
+__version__   = u"0.9.32"
 
 # =============================================================================
 
@@ -3359,9 +3359,11 @@ class Plugin(indigo.PluginBase):
                         # process. Therefore, devices can't be changed in the processes.
 
                         # Audit values in p_dict and k_dict to ensure they're in the proper format.
-                        plug_dict = self.audit_dict_color(_dict_=plug_dict)
+                        plug_dict = copy.deepcopy(self.audit_dict_color(_dict_=plug_dict))
+                        plug_dict['old_prefs'] = None
                         dev_dict  = self.audit_dict_color(_dict_=dev_dict)
-                        p_dict    = self.audit_dict_color(_dict_=p_dict)
+                        p_dict    = copy.deepcopy(self.audit_dict_color(_dict_=p_dict))
+                        p_dict['old_prefs'] = None
                         k_dict    = self.audit_dict_color(_dict_=k_dict)
 
                         # Instantiate basic payload sent to the subprocess scripts. Additional

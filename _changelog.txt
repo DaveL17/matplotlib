@@ -1,3 +1,6 @@
+v0.9.32
+- Fixes bug where new action data didn't pickle properly.
+
 v0.9.31
 - New Feature: Change Chart Colors action.
 - Moves successful charting messages from chart files to plugin.py for error
