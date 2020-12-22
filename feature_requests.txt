@@ -3,13 +3,6 @@ Matplotlib Plugin Feature Requests
 ===============================================================================
 
 ===============================================================================
-2019-06-10  jltnol
-===============================================================================
-Create charts where the plotted data can be stock values (instead of flow). For
-example, a bar chart where each bar is a distinct variable or device state
-value.
-
-===============================================================================
 2019-01-04  Autolog
 ===============================================================================
 I would like to be able to specify a different scale on the Y2 axis - Is this
@@ -24,6 +17,13 @@ valve opening against the temperature.
 ===============================================================================
 COMPLETED =====================================================================
 ===============================================================================
+
+===============================================================================
+2019-06-10  jltnol [COMPLETE]
+===============================================================================
+Create charts where the plotted data can be stock values (instead of flow). For
+example, a bar chart where each bar is a distinct variable or device state
+value.
 
 ===============================================================================
 2019-02-12  RogueProeliator [COMPLETE]

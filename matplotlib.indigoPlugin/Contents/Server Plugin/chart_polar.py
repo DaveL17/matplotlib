@@ -19,15 +19,19 @@ There is apparently no way to code around this.
 
 """
 
-import chart_tools
+# Built-in Modules
 import numpy as np
 import pickle
 import sys
 import traceback
 
+# Third-party Modules
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
+
+# My modules
+import chart_tools
 
 log        = chart_tools.log
 payload    = chart_tools.payload

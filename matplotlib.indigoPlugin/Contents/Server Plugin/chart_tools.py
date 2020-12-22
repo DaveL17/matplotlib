@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Built-in Modules
 import ast
 import csv
 import datetime as dt
@@ -12,13 +13,15 @@ import sys
 import traceback
 import unicodedata
 
+# Third-party Modules
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
-
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
+
+# My modules
 
 # Collection of logging messages.
 log = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
@@ -531,11 +534,9 @@ def format_axis_y2_label(p_dict, k_dict, logger):
         else:
             plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
 
-    except (KeyError, ValueError):
-        logger['Threaddebug'].append(u"[{name}] Problem formatting Y2 axis label: customAxisLabelY2 = "
-                                     u"{c}".format(name=payload['props']['name'], c=p_dict['customAxisLabelY2']))
-        logger['Threaddebug'].append(u"[{namae}] Problem formatting Y1 axis label: k_y_axis_font = "
-                                     u"{k}".format(name=payload['props']['name'], k=k_dict['k_y_axis_font']))
+    except (KeyError, ValueError) as err:
+        logger['Threaddebug'].append(u"[{name}] Problem formatting axis labels: "
+                                     u"{e}".format(name=payload['props']['name'], e=err))
 
 
 # =============================================================================

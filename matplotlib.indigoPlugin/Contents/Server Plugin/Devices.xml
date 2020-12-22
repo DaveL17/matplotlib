@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Devices>
 
-<!-- Area Charting Device -->
+    <!-- =====================  Area Charting Device  ===================== -->
     <Device id="areaChartingDevice" type="custom">
         <Name>Area Chart</Name>
 
@@ -1035,7 +1035,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- Bar Charting Device -->
+    <!-- =====================  Bar Charting Device  ====================== -->
     <Device id="barChartingDevice" type="custom">
         <Name>Bar Chart (Flow)</Name>
         <ConfigUI>
@@ -1433,7 +1433,7 @@
 
     </Device>
 
-<!-- Bar Charting Device -->
+    <!-- ==================  Stock Bar Charting Device  =================== -->
     <Device id="barStockChartingDevice" type="custom">
         <Name>Bar Chart (Stock)</Name>
         <ConfigUI>
@@ -1818,7 +1818,7 @@
 
     </Device>
 
-<!-- Battery Health Device -->
+    <!-- ====================  Battery Health Device  ===================== -->
     <Device id="batteryHealthDevice" type="custom">
         <Name>Battery Health Chart</Name>
 
@@ -1966,7 +1966,7 @@
 
     </Device>
 
-<!-- Calendar Charting Device -->
+    <!-- ===================  Calendar Charting Device  =================== -->
     <Device id="calendarChartingDevice" type="custom">
         <Name>Calendar Chart</Name>
 
@@ -2061,7 +2061,7 @@
 
     </Device>
 
-<!-- Line Charting Device -->
+    <!-- =====================  Line Charting Device  ===================== -->
     <Device id="lineChartingDevice" type="custom">
         <Name>Line Chart</Name>
 
@@ -3181,7 +3181,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- Multiline Text Device -->
+    <!-- ====================  Multiline Text Device  ===================== -->
     <Device id="multiLineText" type="custom">
         <Name>Multiline Text Chart</Name>
 
@@ -3305,7 +3305,7 @@
 
     </Device>
 
-<!-- Polar Charting Device -->
+    <!-- ====================  Polar Charting Device  ===================== -->
     <Device id="polarChartingDevice" type="custom">
         <Name>Polar Chart</Name>
 
@@ -3436,7 +3436,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- Scatter Charting Device -->
+    <!-- ===================  Scatter Charting Device  ==================== -->
     <Device id="scatterChartingDevice" type="custom">
         <Name>Scatter Chart</Name>
 
@@ -4005,7 +4005,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- Forecast Charting Device -->
+    <!-- ===================  Forecast Charting Device  =================== -->
     <Device id="forecastChartingDevice" type="custom">
         <Name>Weather Forecast Chart</Name>
 
@@ -4395,7 +4395,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- Composite Forecast Device -->
+    <!-- ==================  Composite Forecast Device  =================== -->
     <Device id="compositeForecastDevice" type="custom">
         <Name>Weather Forecast Composite Chart</Name>
 
@@ -4592,7 +4592,7 @@
         <UiDisplayStateId>onOffState</UiDisplayStateId>
     </Device>
 
-<!-- CSV Engine -->
+    <!-- ==========================  CSV Engine  ========================== -->
     <Device id="csvEngine" type="custom">
         <Name>CSV Engine Device</Name>
         <ConfigUI>
@@ -4785,7 +4785,7 @@
 
     </Device>
 
-<!-- rcParams Text Device -->
+    <!-- =====================  rcParams Text Device  ===================== -->
     <Device id="rcParamsDevice" type="custom">
         <Name>Matplotlib Parameters Device</Name>
         <ConfigUI>

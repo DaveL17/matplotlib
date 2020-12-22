@@ -9,31 +9,34 @@ All steps required to generate bar charts that use stock (time-agnostic) data.
 
 """
 
+# Built-in Modules
 import itertools
 import pickle
 import sys
 import traceback
 
+# Third-party Modules
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+# My modules
 import chart_tools
 
-log        = chart_tools.log
-payload    = chart_tools.payload
-chart_data = payload['data']
-p_dict     = payload['p_dict']
-k_dict     = payload['k_dict']
-props      = payload['props']
-chart_name = props['name']
-plug_dict  = payload['prefs']
+log               = chart_tools.log
+payload           = chart_tools.payload
+chart_data        = payload['data']
+p_dict            = payload['p_dict']
+k_dict            = payload['k_dict']
+props             = payload['props']
+chart_name        = props['name']
+plug_dict         = payload['prefs']
 annotation_values = []
-bar_colors = []
-x_labels = []
-x_ticks = []
+bar_colors        = []
+x_labels          = []
+x_ticks           = []
 
 log['Threaddebug'].append(u"chart_bar_stock.py called.")
 if plug_dict['verboseLogging']:
@@ -76,7 +79,8 @@ try:
         # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
         # With this setting, we replace the Y values of zero with a very small positive value
         # (0 becomes 1e-06). We get a slice of the original data for annotations.
-        annotation_values.append(y_val)
+        # annotation_values.append(y_val)
+        annotation_values.append(bar['val_{i}'.format(i=b_num)])
         if p_dict.get('showZeroBars', False):
             if y_val == 0:
                 y_val = 1e-06

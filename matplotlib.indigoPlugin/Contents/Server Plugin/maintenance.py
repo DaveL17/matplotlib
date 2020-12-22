@@ -3,22 +3,28 @@
 
 """
 maintenance is a container for code that makes specific to consolidate methods used throughout all
-Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier.
+Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customoized for
+each plugin.
 """
 
+# Built-in Modules
+import logging
+import re
+
+# Third-party Modules
 try:
     import indigo
 except ImportError:
     pass
-import logging
-import re
 
-__author__ = "DaveL17"
-__build__ = "Unused"
+# My modules
+
+__author__    = "DaveL17"
+__build__     = "Unused"
 __copyright__ = "Copyright 2017-2019 DaveL17"
-__license__ = "MIT"
-__title__ = "maintenance"
-__version__ = "0.1.02"
+__license__   = "MIT"
+__title__     = "maintenance"
+__version__   = "0.1.02"
 
 
 class Maintain(object):

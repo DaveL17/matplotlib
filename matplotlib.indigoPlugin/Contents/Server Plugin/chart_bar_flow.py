@@ -9,18 +9,21 @@ All steps required to generate bar charts that use flow (time-series) data.
 
 """
 
+# Built-in Modules
 import itertools
 import numpy as np
 import pickle
 import sys
 import traceback
 
+# Third-party Modules
 # Note the order and structure of matplotlib imports is intentional.
 import matplotlib
 matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+# My modules
 import chart_tools
 
 log        = chart_tools.log

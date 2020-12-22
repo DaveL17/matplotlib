@@ -1,3 +1,6 @@
+v0.9.35
+- Improves handling of chart annotation values for Stock Bar Charts.
+
 v0.9.34
 - Fixes stock bar annotations when bars plotted with values of zero.
 - Traps stock bar error when data starts with zero, but Display Zero Bars

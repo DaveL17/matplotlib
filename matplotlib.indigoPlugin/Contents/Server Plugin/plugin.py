@@ -24,17 +24,16 @@ the proper Fantastic Weather devices.
 
 # =================================== TO DO ===================================
 
-# TODO: NEW -- Create a new device to create a horizontal bar chart (i.e., like device battery
-#              levels.)
-# TODO: NEW -- Create an "error" chart with min/max/avg
-# TODO: NEW -- Create a floating bar chart
-# TODO: NEW -- Create generic weather forecast charts to support any weather services
+# TODO: NEW -- Horizontal bar chart (i.e., like device battery levels.)
+# TODO: NEW -- "Error" chart with min/max/avg
+# TODO: NEW -- Floating bar chart
+# TODO: NEW -- Generic weather forecast charts to support any weather services and drop support for WU and FW.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
-# TODO: NEW -- Chart with axes 3 and 4.
+# TODO: NEW -- Bar gauge chart (semi-circle)
+# TODO: NEW -- Chart with axes (scales) 3 and 4.
 #              (see: https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 
 # TODO: Try to address annotation collisions.
-# TODO: Add props to adjust the figure to API.
 # TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
 #       bars/lines/scatter etc in one go.
 # TODO: Consider adding a leading zero obs when date range limited data is less than the specified
@@ -44,9 +43,9 @@ the proper Fantastic Weather devices.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
-# TODO: Change chart features based on conditions (like isDaylight, etc.) through the use of triggers. (Change
-#       plugin props through an action item). Replicate plugin config UI in action item, overwrite plugin dict
-#       with action item dict.
+# TODO: A chart with a manual update changes from 'manual' to 'updated' in the UI when it's been
+#       updated. Should this be somehow different to still show that the chart isn't an
+#       automatic refresh chart?
 # ================================== IMPORTS ==================================
 
 try:
@@ -98,7 +97,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.34"
+__version__   = u"0.9.35"
 
 # =============================================================================
 
@@ -2609,8 +2608,10 @@ class Plugin(indigo.PluginBase):
         """
         self.logger.info(u"Scripting payload: {pyld}".format(pyld=dict(plugin_action.props)))
 
+        # TODO: take a look at broadcast messages and whether this is something else that can be made to
+        #       work in this neighborhood.
         # TODO: this worked well up until where the "real" device would get its data.
-        #  Need to make the API shim device work ith existing get data steps.
+        #       Need to make the API shim device work ith existing get data steps.
         # # Instantiate an instance of an ApiDevice for data from the API call.
         # my_device = ApiDevice()
         #
@@ -3643,7 +3644,7 @@ class Plugin(indigo.PluginBase):
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
 
     # =============================================================================
-    def actionChangeChartColors(self, plugin_action):
+    def actionChangeChartTheme(self, plugin_action):
         """
         Called by an Indigo Action item.
         Allows the plugin to call the charts_refresh() method from an Indigo Action
@@ -3669,7 +3670,7 @@ class Plugin(indigo.PluginBase):
             indigo.server.savePluginPrefs()
 
     # =============================================================================
-    def actionRestoreChartColors(self, plugin_action):
+    def actionRestoreChartTheme(self, plugin_action):
 
         # Get a copy of the archived preferences
         original_prefs = copy.deepcopy(self.pluginPrefs['old_prefs'])

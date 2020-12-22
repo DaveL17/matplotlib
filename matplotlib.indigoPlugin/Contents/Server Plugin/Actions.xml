@@ -2,7 +2,6 @@
 <Actions>
 
     <!-- ========================= Refresh CSV Device ========================= -->
-
     <Action id="refresh_csv_device" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Device</Name>
 
@@ -26,7 +25,6 @@
     </Action>
 
     <!-- ========================= Refresh CSV Source ========================= -->
-
     <Action id="refresh_csv_source" deviceFilter="" uiPath="DeviceActions">
       <Name>Manual Refresh - CSV Source</Name>
       <ConfigUI>
@@ -59,7 +57,6 @@
     <Action id="sep1" uiPath="DeviceActions"/>
 
     <!-- =========================== Chart Devices ============================ -->
-
     <!-- The device filter is excluding devices that aren't chart devices. -->
     <Action id="refreshAChartAction" deviceFilter="self, props.isChart" uiPath="DeviceActions">
       <Name>Redraw One Chart</Name>
@@ -74,15 +71,14 @@
     <!-- Separator -->
     <Action id="sep2" uiPath="DeviceActions"/>
 
-    <!-- =========================== Chart Devices ============================ -->
-
-    <Action id="changeChartColors"  uiPath="DeviceActions">
-      <Name>Change Chart Colors (Beta)</Name>
-      <CallbackMethod>actionChangeChartColors</CallbackMethod>
+    <!-- =========================  Chart Themes  ========================= -->
+    <Action id="changeChartTheme"  uiPath="DeviceActions">
+      <Name>Change Chart Theme (Beta)</Name>
+      <CallbackMethod>actionChangeChartTheme</CallbackMethod>
 
       <ConfigUI>
         <Field id="color_label_1" type="label">
-            <Label>Use this action to make "permanent" changes to select plugin settings. These changes will affect every chart that uses the setting. The action will take a "snapshot" of the original settings before modifying them. To restore the settings back to their original state, create another action using the "Restore Chart Colors" action item.</Label>
+            <Label>Use this action to make "permanent" changes to the default theme of your charts. These changes will affect every chart that uses the settings you change. The action will take a "snapshot" of the original settings before modifying them. To restore the settings back to their original state, create another action using the "Restore Chart Theme" action item.</Label>
         </Field>
         <!-- Font Color for Annotations -->
         <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's annotation text.">
@@ -136,12 +132,17 @@
 
     </Action>
 
-    <Action id="restoreChartColors"  uiPath="DeviceActions">
-      <Name>Restore Chart Colors (Beta)</Name>
-      <CallbackMethod>actionRestoreChartColors</CallbackMethod>
+    <Action id="restoreChartTheme"  uiPath="DeviceActions">
+      <Name>Restore Chart Theme (Beta)</Name>
+      <ConfigUI>
+        <Field id="restoreThemeLabel" type="label">
+          <Label>Use this action to revert to the last theme used before a Change Chart Theme action was invoked.&#13;&#13;This action has no configuration settings.</Label>
+        </Field>
+      </ConfigUI>
+      <CallbackMethod>actionRestoreChartTheme</CallbackMethod>
     </Action>
-    <!-- =========================== Hidden Actions =========================== -->
 
+    <!-- =========================== Hidden Actions =========================== -->
     <Action id="refreshTheChartsAPI" uiPath="hidden">
       <Name>API Action to Draw Simple Chart</Name>
       <CallbackMethod>plotActionApi</CallbackMethod>
