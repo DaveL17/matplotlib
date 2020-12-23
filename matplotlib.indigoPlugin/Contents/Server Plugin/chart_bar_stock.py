@@ -66,8 +66,8 @@ try:
         # ====================  Bar and Background Color the Same  ====================
         # If the bar color is the same as the background color, alert the user.
         if color == p_dict['backgroundColor'] and not suppress_bar:
-            chart_tools.log['Info'].append(u"[{name}] Bar {i} color is the same as the background color (so you may "
-                                           u"not be able to see it).".format(name=chart_name, i=b_num))
+            chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so "
+                                              u"you may not be able to see it).".format(name=chart_name, i=b_num))
 
         # =============================  Bar Suppressed  ==============================
         # If the bar is suppressed, remind the user they suppressed it.

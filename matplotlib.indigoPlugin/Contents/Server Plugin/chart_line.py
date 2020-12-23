@@ -63,11 +63,6 @@ try:
 
         suppress_line = p_dict.get('suppressLine{i}'.format(i=line), False)
 
-        # If line color is the same as the background color, alert the user.
-        if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor'] and not suppress_line:
-            chart_tools.log['Warning'].append(u"[{name}] Line {i} color is the same as the background color (so you "
-                                              u"may not be able to see it).".format(name=chart_name, i=line))
-
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
             chart_tools.log['Info'].append(u"[{name}] Line {i} is suppressed by user setting. You can re-enable it in "
@@ -76,6 +71,11 @@ try:
         # ============================== Plot the Lines ===============================
         # Plot the lines. If suppress_line is True, we skip it.
         if p_dict['line{i}Source'.format(i=line)] not in (u"", u"None") and not suppress_line:
+
+            # If line color is the same as the background color, alert the user.
+            if p_dict['line{i}Color'.format(i=line)] == p_dict['backgroundColor'] and not suppress_line:
+                chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so "
+                                                  u"you may not be able to see it).".format(name=chart_name, i=line))
 
             # Add line color to list for later use
             line_colors.append(p_dict['line{i}Color'.format(i=line)])

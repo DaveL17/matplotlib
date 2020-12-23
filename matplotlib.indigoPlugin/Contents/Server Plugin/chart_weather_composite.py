@@ -27,6 +27,7 @@ matplotlib.use('AGG')  # Note: this statement must be run before any other matpl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
 import matplotlib.ticker as mtick
+import matplotlib.patches as patches
 
 # My modules
 import chart_tools
@@ -82,6 +83,14 @@ try:
             s_plot.tick_params(axis='both', labelsize=int(props['customTickFontSize']))
         else:
             s_plot.tick_params(axis='both', labelsize=int(plug_dict['tickFontSize']))
+
+    def transparent_chart_fill(s):
+
+        if p_dict['transparent_filled']:
+            s.add_patch(patches.Rectangle((0, 0), 1, 1,
+                                          transform=s.transAxes,
+                                          facecolor=p_dict['faceColor'],
+                                          zorder=1))
 
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
@@ -149,6 +158,7 @@ try:
     if 'show_high_temperature' in axes:
         subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])    # Plot it
         format_subplot(subplot[0], title="high temperature")   # Format the subplot
+        transparent_chart_fill(subplot[0])
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -166,6 +176,7 @@ try:
     if 'show_low_temperature' in axes:
         subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
         format_subplot(subplot[0], title='low temperature')
+        transparent_chart_fill(subplot[0])
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -184,6 +195,7 @@ try:
         subplot[0].plot(x1, temperature_high, color=p_dict['lineColor'])
         subplot[0].plot(x1, temperature_low, color=p_dict['lineColor'])
         format_subplot(subplot[0], title='high/low temperature')
+        transparent_chart_fill(subplot[0])
 
         if p_dict['temperature_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['temperature_min']))
@@ -201,6 +213,7 @@ try:
     if 'show_humidity' in axes:
         subplot[0].plot(x1, humidity, color=p_dict['lineColor'])
         format_subplot(subplot[0], title='humidity')
+        transparent_chart_fill(subplot[0])
 
         if p_dict['humidity_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['humidity_min']))
@@ -218,6 +231,7 @@ try:
     if 'show_barometric_pressure' in axes:
         subplot[0].plot(x1, pressure, color=p_dict['lineColor'])
         format_subplot(subplot[0], title='barometric pressure')
+        transparent_chart_fill(subplot[0])
 
         if p_dict['pressure_min'] not in ("", "None"):
             subplot[0].set_ylim(bottom=float(p_dict['pressure_min']))
@@ -236,6 +250,7 @@ try:
         data = zip(x1, wind_speed, wind_bearing)
         subplot[0].plot(x1, wind_speed, color=p_dict['lineColor'])
         subplot[0].set_ylim(0, max(wind_speed) + 1)
+        transparent_chart_fill(subplot[0])
 
         for _ in data:
             day = mdate.date2num(_[0])
@@ -280,6 +295,7 @@ try:
     if 'show_precipitation' in axes:
         subplot[0].plot(x1, precipitation, color=p_dict['lineColor'])
         format_subplot(subplot[0], title='total precipitation')
+        transparent_chart_fill(subplot[0])
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
@@ -301,6 +317,7 @@ try:
     if 'show_precipitation_bar' in axes:
         subplot[0].bar(x1, precipitation, width=0.4, align='center', color=p_dict['lineColor'])
         format_subplot(subplot[0], title='total precipitation')
+        transparent_chart_fill(subplot[0])
 
         # Force precip to 2 decimals regardless of device setting.
         subplot[0].yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.2f"))
@@ -331,11 +348,6 @@ try:
                         hspace=None,
                         wspace=None
                         )
-
-    # We need to override a few savefig kwargs because of the way the subplots are constructed.
-    k_dict['k_plot_fig']['facecolor'] = "none"
-    k_dict['k_plot_fig']['edgecolor'] = p_dict['backgroundColor']
-    k_dict['k_plot_fig']['transparent'] = False
 
     chart_tools.save(logger=log)
 

@@ -43,9 +43,6 @@ the proper Fantastic Weather devices.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
-# TODO: A chart with a manual update changes from 'manual' to 'updated' in the UI when it's been
-#       updated. Should this be somehow different to still show that the chart isn't an
-#       automatic refresh chart?
 # ================================== IMPORTS ==================================
 
 try:
@@ -97,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.35"
+__version__   = u"0.9.36"
 
 # =============================================================================
 
@@ -2915,13 +2912,14 @@ class Plugin(indigo.PluginBase):
                     p_dict['backgroundColor']    = '#000000'
 
                 # ============================== Plot Area color ==============================
+                # facColorOther is the transparent plot config setting
                 if not self.pluginPrefs.get('faceColorOther', 'false'):
-                    p_dict['transparent_filled'] = True
-                elif not self.pluginPrefs.get('faceColorOther', 'false'):
+                    # Transparent is False, therefore we want filled.
                     p_dict['transparent_filled'] = True
                 else:
+                    # Transparent is True, so we don't want filled.
                     p_dict['transparent_filled'] = False
-                    p_dict['faceColor'] = '#000000'
+                    # p_dict['faceColor'] = '#000000'
 
                 # A list of chart ids may be passed to the method. In that case, refresh only
                 # those charts. Otherwise, chart_id is None and we evaluate all of the charts
@@ -3364,7 +3362,7 @@ class Plugin(indigo.PluginBase):
                         plug_dict['old_prefs'] = None
                         dev_dict  = self.audit_dict_color(_dict_=dev_dict)
                         p_dict    = copy.deepcopy(self.audit_dict_color(_dict_=p_dict))
-                        p_dict['old_prefs'] = None
+                        p_dict['old_prefs']    = None
                         k_dict    = self.audit_dict_color(_dict_=k_dict)
 
                         # Instantiate basic payload sent to the subprocess scripts. Additional
@@ -3448,7 +3446,7 @@ class Plugin(indigo.PluginBase):
                                 device_dict['No Battery Devices'] = 0
 
                             dev_dict['excludedDevices'] = convert_to_native(dev_dict['excludedDevices'])
-                            p_dict['excludedDevices'] = convert_to_native(p_dict['excludedDevices'])
+                            p_dict['excludedDevices']   = convert_to_native(p_dict['excludedDevices'])
 
                             # Payload sent to the subprocess script
                             raw_payload['data'] = device_dict
@@ -3603,11 +3601,11 @@ class Plugin(indigo.PluginBase):
                                                 stderr=subprocess.PIPE,
                                                 )
 
-                        if proc:
-                            try:
+                        try:
+                            if proc:
                                 reply, err = proc.communicate()
-                            except ValueError:
-                                pass
+                        except (TypeError, ValueError):
+                            pass
 
                         # Parse the output log
                         result = self.process_plotting_log(device=dev, replies=reply, errors=err)
@@ -3623,7 +3621,16 @@ class Plugin(indigo.PluginBase):
                         if not result:
                             device_states.append({'key': 'onOffState', 'value': True, 'uiValue': 'Error'})
                         else:
-                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+                            refresh_interval = dev.pluginProps.get('refreshInterval', 900)
+
+                            if dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) > 0:
+                                ui_value = 'Updated'
+                            elif dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) == 0:
+                                ui_value = 'Manual'
+                            else:
+                                ui_value = " "
+
+                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': ui_value})
 
                         dev.updateStatesOnServer(device_states)
 

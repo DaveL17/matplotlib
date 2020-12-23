@@ -4796,9 +4796,7 @@
             <Field id="chart_type" type="textfield" defaultValue="rcparams" hidden="true"/>
 
             <Field id="rcParamsLabel" type="label">
-                <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.
-
-There are presently no configurations available for this device.
+                <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.&#13;&#13;There are presently no configurations available for this device.
                 </Label>
             </Field>
 

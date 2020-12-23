@@ -57,11 +57,6 @@ try:
 
         # p_dict['bar{i}Color'.format(i=thing)] = chart_tools.fix_rgb(p_dict['bar{i}Color'.format(i=thing)])
 
-        # If the bar color is the same as the background color, alert the user.
-        if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:
-            chart_tools.log['Info'].append(u"[{name}] Bar {i} color is the same as the background color (so you may "
-                                           u"not be able to see it).".format(name=chart_name, i=thing))
-
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in "
@@ -69,6 +64,11 @@ try:
 
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if p_dict['bar{i}Source'.format(i=thing)] not in ("", "None") and not suppress_bar:
+
+            # If the bar color is the same as the background color, alert the user.
+            if p_dict['bar{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_bar:
+                chart_tools.log['Warning'].append(u"[{name}] Bar {i} color is the same as the background color (so "
+                                                  u"you may not be able to see it).".format(name=chart_name, i=thing))
 
             # Add bar color to list for later use
             bar_colors.append(p_dict['bar{i}Color'.format(i=thing)])

@@ -53,12 +53,6 @@ try:
 
         suppress_group = p_dict.get('suppressGroup{i}'.format(i=thing), False)
 
-        # If dot color is the same as the background color, alert the user.
-        if p_dict['group{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not \
-                suppress_group:
-            chart_tools.log['Debug'].append(u"[{name}] Group {i} color is the same as the background color (so you "
-                                            u"may not be able to see it).".format(name=chart_name, i=thing))
-
         # If the group is suppressed, remind the user they suppressed it.
         if suppress_group:
             chart_tools.log['Info'].append(u"[{name}] Group {i} is suppressed by user setting. You can re-enable it in "
@@ -67,6 +61,11 @@ try:
         # ============================== Plot the Points ==============================
         # Plot the groups. If suppress_group is True, we skip it.
         if p_dict['group{i}Source'.format(i=thing)] not in ("", "None") and not suppress_group:
+
+            # If dot color is the same as the background color, alert the user.
+            if p_dict['group{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_group:
+                chart_tools.log['Warning'].append(u"[{name}] Group {i} color is the same as the background color (so "
+                                                  u"you may not be able to see it).".format(name=chart_name, i=thing))
 
             # Add group color to list for later use
             group_colors.append(p_dict['group{i}Color'.format(i=thing)])

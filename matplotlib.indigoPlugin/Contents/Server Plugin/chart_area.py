@@ -53,11 +53,6 @@ try:
 
         suppress_area = p_dict.get('suppressArea{i}'.format(i=area), False)
 
-        # If area color is the same as the background color, alert the user.
-        if p_dict['area{i}Color'.format(i=area)] == p_dict['backgroundColor'] and not suppress_area:
-            chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so you "
-                                              u"may not be able to see it).".format(name=chart_name, i=area))
-
         # If the area is suppressed, remind the user they suppressed it.
         if suppress_area:
             chart_tools.log['Info'].append(u"[{name}] Area {i} is suppressed by user setting. You can re-enable it in "
@@ -66,6 +61,11 @@ try:
         # ============================== Plot the Areas ===============================
         # Plot the areas. If suppress_area is True, we skip it.
         if p_dict['area{i}Source'.format(i=area)] not in (u"", u"None") and not suppress_area:
+
+            # If area color is the same as the background color, alert the user.
+            if p_dict['area{i}Color'.format(i=area)] == p_dict['backgroundColor'] and not suppress_area:
+                chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so "
+                                                  u"you may not be able to see it).".format(name=chart_name, i=area))
 
             data_path   = plug_dict['dataPath'].encode("utf-8")
             area_source = p_dict['area{i}Source'.format(i=area)].encode("utf-8")

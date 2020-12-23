@@ -132,6 +132,7 @@
 
     </Action>
 
+    <!-- =====================  Restore Chart Themes  ===================== -->
     <Action id="restoreChartTheme"  uiPath="DeviceActions">
       <Name>Restore Chart Theme (Beta)</Name>
       <ConfigUI>

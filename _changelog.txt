@@ -1,3 +1,13 @@
+v0.9.36
+- Improves color collision auditing so only those chart elements where
+  a source is defined will be checked (doesn;'t audit non-configured
+  elements.)
+- Changes UI status for manual chart devices so that, after an chart
+  update, the status is returned to 'manual'.
+- Fixes bug where non-chart devices could throw an error on first
+  refresh after plugin loaded.
+- Fixes bug in how Composite Forecast device implemented transparency.
+
 v0.9.35
 - Improves handling of chart annotation values for Stock Bar Charts.
 

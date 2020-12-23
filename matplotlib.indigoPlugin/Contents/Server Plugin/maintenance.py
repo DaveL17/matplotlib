@@ -402,14 +402,12 @@ class Maintain(object):
 
             refresh_interval = dev.pluginProps.get('refreshInterval', 900)
 
-            if dev.deviceTypeId != 'rcParamsDevice':
-                if int(refresh_interval) > 0:
-                    ui_value = 'Enabled'
-                else:
-                    ui_value = 'Manual'
+            if dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) > 0:
+                ui_value = 'Enabled'
+            elif dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) == 0:
+                ui_value = 'Manual'
             else:
-                ui_value = ' '
-
+                ui_value = " "
             dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ui_value}])
 
         # ============================= Non-chart Devices =============================
