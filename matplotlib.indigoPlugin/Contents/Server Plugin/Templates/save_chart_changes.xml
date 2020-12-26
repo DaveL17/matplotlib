@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<Template>
+    <Field id="save_chart_changes" type="label" fontColor="red" fontSize="small" alignText="left">
+        <Label>Changes will appear when the chart is refreshed. If you want your changes to appear immediately, select 'Redraw Charts Now' from the Matplotlib Plugin menu.</Label>
+    </Field>
+</Template>

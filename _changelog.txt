@@ -1,6 +1,16 @@
+v0.9.37
+- New Device Type: Horizontal Stock Bar Chart
+- New Feature: Menu Item [Redraw Charts Now] now give option to
+  skip manual update charts.
+- Significant refinements to how settings are displayed in chart
+  configuration dialogs.
+- Changes default bar width for all charts to 0.8.
+- Moves chart config dialog warning text to template.
+- Reduces runconcurrentThread sleep from 15 to 1.
+
 v0.9.36
 - Improves color collision auditing so only those chart elements where
-  a source is defined will be checked (doesn;'t audit non-configured
+  a source is defined will be checked (doesn't audit non-configured
   elements.)
 - Changes UI status for manual chart devices so that, after an chart
   update, the status is returned to 'manual'.

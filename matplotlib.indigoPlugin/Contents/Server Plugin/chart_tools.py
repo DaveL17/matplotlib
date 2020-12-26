@@ -172,7 +172,7 @@ def format_axis(ax_obj):
         cell._text.set_fontsize(int(payload['props']['fontSize']))
         cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
 
-        # TODO: This may not be supportable without including fonts with the plugin.
+        # This may not be supportable without including fonts with the plugin.
         # cell._text.set_fontstretch(1000)
 
         # Controls grid display
@@ -229,6 +229,59 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):
         if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
             logger['Critical'].append(u"[{name}] Chart data will produce too many X axis ticks. Check source "
                                       u"data.".format(name=payload['props']['name']))
+
+
+# =============================================================================
+def format_axis_x_min_max(p_dict, logger):
+    """
+    Format x axis range limits
+    Setting the limits before the plot turns off autoscaling, which causes the
+    limit that's not set to behave weirdly at times. This block is meant to
+    overcome that weirdness for something more desirable.
+    -----
+    :param dict p_dict: plotting parameters
+    :param dict logger:
+    """
+
+    try:
+
+        x_min = min(p_dict['data_array'])
+        x_max = max(p_dict['data_array'])
+        x_min_wanted = p_dict['xAxisMin']
+        x_max_wanted = p_dict['xAxisMax']
+
+        # Since the min / max is used here only for chart boundaries, we "trick"
+        # Matplotlib by using a number that's very nearly zero.
+        if x_min == 0:
+            x_min = 0.000001
+
+        if x_max == 0:
+            x_max = 0.000001
+
+        # Y min
+        if isinstance(x_min_wanted, unicode) and x_min_wanted.lower() == 'none':
+            if x_min > 0:
+                x_axis_min = x_min * (1 - (1 / abs(x_min) ** 1.25))
+            else:
+                x_axis_min = x_min * (1 + (1 / abs(x_min) ** 1.25))
+        else:
+            x_axis_min = float(x_min_wanted)
+
+        # Y max
+        if isinstance(x_max_wanted, unicode) and x_max_wanted.lower() == 'none':
+            if x_max > 0:
+                x_axis_max = x_max * (1 + (1 / abs(x_max) ** 1.25))
+            else:
+                x_axis_max = x_max * (1 - (1 / abs(x_max) ** 1.25))
+
+        else:
+            x_axis_max = float(x_max_wanted)
+
+        plt.xlim(xmin=x_axis_min, xmax=x_axis_max)
+
+    except (ValueError, TypeError) as err:
+        logger['Warning'].append(u"[{name}] Error setting axis limits for x axis. Will rely on Matplotlib to determine "
+                                 u"limits. ({e})".format(name=payload['props']['name'], e=err))
 
 
 # =============================================================================
@@ -500,20 +553,12 @@ def format_axis_y1_min_max(p_dict, logger):
         plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
     except (ValueError, TypeError):
-        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: yAxisMax = "
-                                     u"{ymax}".format(name=payload['props']['name'], ymax=p_dict['yAxisMax']))
-        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: yAxisMin = "
-                                     u"{ymin}".format(name=payload['props']['name'], ymin=p_dict['yAxisMin']))
-        logger['Threaddebug'].append(u"[{name}] Problem formatting Y1 Min/Max: Data Min/Max = "
-                                     u"{d}/{m}".format(name=payload['props']['name'],
-                                                       d=min(p_dict['data_array']),
-                                                       m=max(p_dict['data_array'])))
         logger['Warning'].append(u"[{name}] Error setting axis limits for Y1. Will rely on Matplotlib to determine "
                                  u"limits.".format(name=payload['props']['name']))
 
 
 # =============================================================================
-# TODO: this is currently unused.
+# this is currently unused.
 def format_axis_y2_label(p_dict, k_dict, logger):
     """
     Format Y2 axis properties
@@ -577,7 +622,7 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
 
 
 # =============================================================================
-def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
+def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="horiz"):
     """
     Chart custom line segments handler
     Process any custom line segments and add them to the
@@ -588,6 +633,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
     :param dict p_dict: plotting parameters
     :param dict k_dict: plotting kwargs
     :param dict logger:
+    :param str orient: orientation of custom line segments
     """
 
     # Plot the custom lines if needed.  Note that these need to be plotted after
@@ -595,30 +641,46 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
     # min/max lines will take over the legend props.
 
     log['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
-    if p_dict['enableCustomLineSegments'] and \
-            p_dict['customLineSegments'] not in ("", "None"):
+
+    if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
 
         try:
-            # constants_to_plot ill be (val, rgb) or ((val, rgb), (val, rgb))
+            # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb))
             # constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
-            constants_to_plot = p_dict['customLineSegments']
-
+            constants_to_plot = (ast.literal_eval(str(p_dict['customLineSegments'])),)
             cls = ax
 
             for element in constants_to_plot:
 
-                if isinstance(element, tuple):
-                    cls = ax.axhline(y=element[0],
-                                     color=element[1],
-                                     linestyle=p_dict['customLineStyle'],
-                                     marker='',
-                                     **k_dict['k_custom']
-                                     )
+                # ===============================  Horizontal  ================================
+                if orient == 'horiz':
+                    if isinstance(element, tuple):
+                        cls = ax.axhline(element[0],
+                                         color=element[1],
+                                         linestyle=p_dict['customLineStyle'],
+                                         marker='',
+                                         **k_dict['k_custom']
+                                         )
 
                     # If we want to promote custom line segments, we need to add them to the list that's used to
                     # calculate the Y axis limits.
                     if plug_dict.get('promoteCustomLineSegments', False):
                         p_dict['data_array'].append(element[0])
+
+                # ================================  Vertical  =================================
+                elif orient == 'vert':
+                    if isinstance(element, tuple):
+                        cls = ax.axvline(element[0],
+                                         color=element[1],
+                                         linestyle=p_dict['customLineStyle'],
+                                         marker='',
+                                         **k_dict['k_custom']
+                                         )
+
+                    if plug_dict.get('promoteCustomLineSegments', False):
+                        p_dict['data_array'].append(element[0])
+
+                # ==================================  Other  ==================================
                 else:
                     cls = ax.axhline(y=constants_to_plot[0],
                                      color=constants_to_plot[1],
@@ -636,9 +698,6 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger):
             logger['Warning'].append(u"[{name}] There is a problem with the custom line segments settings. {s}. "
                                      u"See plugin log for more information.".format(name=payload['props']['name'],
                                                                                     s=sub_error))
-
-            return ax
-
 
 # =============================================================================
 def format_dates(list_of_dates, logger):

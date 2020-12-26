@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="xAxisPrecision" type="menu" defaultValue="0" visibleBindingId="xAxisLabel" visibleBindingValue="true"
+           tooltip="Select preference for the precision of your chart's X axis.">
+        <Label>Precision:</Label>
+        <List>
+            <Option value="0">0*</Option>
+            <Option value="1">1</Option>
+            <Option value="2">2</Option>
+            <Option value="3">3</Option>
+        </List>
+    </Field>
+
+</Template>

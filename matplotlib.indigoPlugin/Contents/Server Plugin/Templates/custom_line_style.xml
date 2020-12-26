@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Template>
 
-    <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="enableCustomLineSegmentsSetting" visibleBindingValue="true"
+    <Field id="customLineStyle" type="menu" defaultValue="-" visibleBindingId="settingsGroup" visibleBindingValue="cls"
            tooltip="Select preference for the style of your chart's custom line segments.">
         <Label>Style:</Label>
         <List>

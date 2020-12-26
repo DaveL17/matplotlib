@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Creates the bar charts
+Creates the horizontal bar charts
 
-All steps required to generate bar charts that use stock (time-agnostic) data.
+All steps required to generate horizontal bar charts that use stock (time-agnostic) data.
 -----
-
 """
 
 # Built-in Modules
@@ -35,8 +34,8 @@ chart_name        = props['name']
 plug_dict         = payload['prefs']
 annotation_values = []
 bar_colors        = []
-x_labels          = []
-x_ticks           = []
+y_labels          = []
+y_ticks           = []
 
 log['Threaddebug'].append(u"chart_bar_stock.py called.")
 if plug_dict['verboseLogging']:
@@ -49,7 +48,8 @@ try:
 
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
-    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
+    ax.tick_params(axis='x', **k_dict['k_major_x'])
+    ax.tick_params(axis='x', **k_dict['k_minor_x'])
     chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     # ============================  Iterate the Bars  =============================
@@ -57,10 +57,10 @@ try:
         b_num        = bar['number']
         color        = bar['color_{i}'.format(i=b_num)]
         suppress_bar = p_dict.get('suppressBar{i}'.format(i=b_num), False)
-        x_labels.append(bar['legend_{i}'.format(i=b_num)])
-        x_ticks.append(b_num)
-        y_val = float(bar['val_{i}'.format(i=b_num)])
-        p_dict['data_array'].append(y_val)
+        y_labels.append(bar['legend_{i}'.format(i=b_num)])
+        y_ticks.append(b_num)
+        x_val = float(bar['val_{i}'.format(i=b_num)])
+        p_dict['data_array'].append(x_val)
         bar_colors.append(color)
 
         # ====================  Bar and Background Color the Same  ====================
@@ -82,8 +82,8 @@ try:
         # annotation_values.append(y_val)
         annotation_values.append(bar['val_{i}'.format(i=b_num)])
         if p_dict.get('showZeroBars', False):
-            if y_val == 0:
-                y_val = 1e-06
+            if x_val == 0:
+                x_val = 1e-06
 
         # ================================  Bar Width  ================================
         try:
@@ -100,30 +100,29 @@ try:
         # ==============================  Plot the Bar  ===============================
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if not suppress_bar:
-            ax.bar(b_num,
-                   y_val,
-                   width=float(p_dict['barWidth']),
-                   color=color,
-                   bottom=None,
-                   align='center',
-                   edgecolor=color,
-                   **k_dict['k_bar'])
+            ax.barh(b_num,
+                    width=x_val,
+                    height=float(p_dict['barWidth']),
+                    color=color,
+                    align='center',
+                    edgecolor=color,
+                    **k_dict['k_bar'])
 
         # ===============================  Annotations  ===============================
         # If annotations desired, plot those too.
         if bar['annotate_{i}'.format(i=b_num)] and not suppress_bar:
             ax.annotate(unicode(annotation_values[b_num-1]),
-                        xy=(b_num, y_val),
+                        xy=(x_val, b_num),
                         xytext=(0, 0),
                         zorder=10,
                         **k_dict['k_annotation']
                         )
 
-    # ===============================  X Tick Bins  ===============================
-    ax.set_xticks(x_ticks)
-    ax.set_xticklabels(x_labels)
+    # ===============================  Y Tick Bins  ===============================
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_labels)
 
-    chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
+    chart_tools.format_axis_x_min_max(p_dict=p_dict, logger=log)
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
 
@@ -145,7 +144,7 @@ try:
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-        headers = [_.decode('utf-8') for _ in x_labels]
+        headers = [_.decode('utf-8') for _ in y_labels]
         for header in headers:
             if p_dict['bar{c}Legend'.format(c=counter)] == "":
                 final_headers.append(header)
@@ -179,7 +178,7 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log, orient="horiz")
+    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log, orient="vert")
     chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
     chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)

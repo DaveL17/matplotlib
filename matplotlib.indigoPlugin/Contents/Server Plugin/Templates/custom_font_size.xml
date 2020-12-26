@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <Template>
 
-    <Field id="fontSize" type="menu" default="12" tooltip="Select the size of the font to use for the calendar plot.">
+    <Field id="fontSize" type="menu" default="12"  visibleBindingId="settingsGroup" visibleBindingValue="ch"
+           tooltip="Select the size of the font to use for the calendar plot.">
         <Label>Font Size:</Label>
         <List>
             <Option value="6">6</Option>

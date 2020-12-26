@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <Template>
 
-    <Field id="refreshInterval" type="menu" defaultValue="900" tooltip="How frequently would you like the plugin to redraw this chart?">
+    <Field id="refreshInterval" type="menu" defaultValue="900"  visibleBindingId="settingsGroup" visibleBindingValue="ch"
+           tooltip="How frequently would you like the plugin to redraw this chart?">
         <Label>Refresh Interval:</Label>
         <List>
             <Option value="60">Every Minute</Option>

@@ -24,12 +24,11 @@ the proper Fantastic Weather devices.
 
 # =================================== TO DO ===================================
 
-# TODO: NEW -- Horizontal bar chart (i.e., like device battery levels.)
 # TODO: NEW -- "Error" chart with min/max/avg
 # TODO: NEW -- Floating bar chart
 # TODO: NEW -- Generic weather forecast charts to support any weather services and drop support for WU and FW.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
-# TODO: NEW -- Bar gauge chart (semi-circle)
+# TODO: NEW -- Bar gauge chart (i.e., semi-circle)
 # TODO: NEW -- Chart with axes (scales) 3 and 4.
 #              (see: https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 
@@ -43,6 +42,11 @@ the proper Fantastic Weather devices.
 # TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
+# TODO: Move more code out of plugin.py
+# TODO: Figure out save path reversion to 7.4 (is this fixed with the removal of nested old_prefs?
+# TODO: Audit device config ui changes against prod server.
+# TODO: Audit XML files to make maximum use of templates.
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -62,9 +66,11 @@ import numpy as np
 import operator as op
 import os
 import pickle
+from queue import Queue
 import re
 import shutil
 import subprocess
+import threading
 import traceback
 
 import matplotlib
@@ -94,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.36"
+__version__   = u"0.9.37"
 
 # =============================================================================
 
@@ -146,6 +152,7 @@ class Plugin(indigo.PluginBase):
         self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
         self.final_data = []
         self.dev_var_list = []  # List of devices and variables (updated in getDeviceConfigUiValues)
+        self.refresh_queue = Queue()
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert = Dave.Fogbert(self)           # Plugin functional framework
@@ -193,6 +200,10 @@ class Plugin(indigo.PluginBase):
             self.logger.threaddebug(u"User cancelled.")
 
         return True
+
+    # =============================================================================
+    def closedMenuConfigUi(self, values_dict=None, user_cancelled=False, type_id="", dev_id=0):
+        pass
 
     # =============================================================================
     def closedPrefsConfigUi(self, values_dict=None, user_cancelled=False):
@@ -273,10 +284,17 @@ class Plugin(indigo.PluginBase):
 
                 return values_dict
 
+            # ======================  Open Config on Chart Controls  ======================
+            # Ensure that every time a device config dialog is opened, it reverts to the
+            # 'Chart Controls' settings group.
+            if 'settingsGroup' in values_dict.keys():
+                values_dict['settingsGroup'] = u'ch'
+
             # ========================== Set Config UI Defaults ===========================
             # For new devices, force certain defaults in case they don't carry from
             # Devices.xml. This seems to be especially important for menu items built with
-            # callbacks and colorpicker controls that don't appear to accept defaultValue.
+            # callbacks and colorpicker controls that don't accept defaultValue (Indigo
+            # version 7.5 adds support for colorpicker defaultValue.
             if not dev.configured:
 
                 values_dict['refreshInterval'] = '900'
@@ -314,6 +332,18 @@ class Plugin(indigo.PluginBase):
 
                 # ================================  Stock Bar  ================================
                 if type_id == "barStockChartingDevice":
+
+                    for _ in range(1, 6, 1):
+                        values_dict['bar{i}Color'.format(i=_)]  = 'FF FF FF'
+                        values_dict['bar{i}Source'.format(i=_)] = 'None'
+
+                    values_dict['customLineStyle']     = '-'
+                    values_dict['customTickFontSize']  = 8
+                    values_dict['customTitleFontSize'] = 10
+                    values_dict['xAxisLabelFormat']    = 'None'
+
+                # ================================  Stock Bar  ================================
+                if type_id == "barStockHorizontalChartingDevice":
 
                     for _ in range(1, 6, 1):
                         values_dict['bar{i}Color'.format(i=_)]  = 'FF FF FF'
@@ -461,17 +491,18 @@ class Plugin(indigo.PluginBase):
         return state_list
 
     # =============================================================================
-    def getMenuActionConfigUiValues(self, menu_id=0):
+    def getMenuActionConfigUiValues(self, menu_id=""):
 
         settings       = indigo.Dict()
         error_msg_dict = indigo.Dict()
 
         self.logger.threaddebug(u"Getting menu action config prefs: {s}".format(s=dict(settings)))
 
-        settings['enableCustomLineSegments']  = self.pluginPrefs.get('enableCustomLineSegments', False)
-        settings['forceOriginLines']          = self.pluginPrefs.get('forceOriginLines', False)
-        settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
-        settings['snappyConfigMenus']         = self.pluginPrefs.get('snappyConfigMenus', False)
+        if menu_id not in ["refreshChartsNow"]:
+            settings['enableCustomLineSegments']  = self.pluginPrefs.get('enableCustomLineSegments', False)
+            settings['forceOriginLines']          = self.pluginPrefs.get('forceOriginLines', False)
+            settings['promoteCustomLineSegments'] = self.pluginPrefs.get('promoteCustomLineSegments', False)
+            settings['snappyConfigMenus']         = self.pluginPrefs.get('snappyConfigMenus', False)
 
         return settings, error_msg_dict
 
@@ -515,10 +546,10 @@ class Plugin(indigo.PluginBase):
 
         while True:
             if not self.pluginIsShuttingDown:
-
+                self.refresh_the_chaarts_queue()
                 self.csv_refresh()
                 self.charts_refresh()
-                self.sleep(15)
+                self.sleep(1)
 
     def sendDevicePing(self, dev_id=0, suppress_logging=False):
 
@@ -763,6 +794,83 @@ class Plugin(indigo.PluginBase):
 
         # ================================  Stock Bar  ================================
         if type_id == 'barStockChartingDevice':
+
+            # Must select at least one source (bar 1)
+            if values_dict['bar1Source'] == 'None':
+                error_msg_dict['bar1Source'] = u"You must select at least one data source."
+                values_dict['barLabel1'] = True
+
+            try:
+                # Bar width must be greater than 0. Will also trap strings.
+                if not float(values_dict['barWidth']) >= 0:
+                    raise ValueError
+            except ValueError:
+                error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+
+            # =============================== Custom Ticks ================================
+            # Ensure all custom tick locations are numeric, within bounds and of the same length.
+            if values_dict['customTicksY'].lower() not in ("", 'none'):
+                custom_ticks = values_dict['customTicksY'].replace(' ', '')
+                custom_ticks = custom_ticks.split(',')
+                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
+
+                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
+                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
+
+                try:
+                    custom_ticks = [float(_) for _ in custom_ticks]
+                except ValueError:
+                    error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+
+                # Ensure tick labels and values are the same length.
+                if len(custom_tick_labels) != len(custom_ticks):
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+
+                # Ensure all custom Y tick locations are within bounds. User has elected to
+                # change at least one Y axis boundary (if both upper and lower bounds are set
+                # to 'None', we move on).
+                if not all(default_y_axis):
+
+                    for tick in custom_ticks:
+                        # Ensure all custom tick locations are within bounds.
+                        if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
+                                                             u"boundaries of the Y axis."
+
+                        if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
+                            error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
+                                                             u"boundaries of the Y axis."
+
+            # Test the selected values to ensure that they can be charted (int, float, bool)
+            for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
+
+                # Pull the number out of the source key
+                n = re.search('[0-9]', source)
+
+                # Get the id of the bar source
+                if values_dict['bar{0}Source'.format(n.group(0))] != "None":
+                    source_id = int(values_dict['bar{0}Source'.format(n.group(0))])
+
+                    # By definition it will either be a device ID or a variable ID.
+                    if source_id in indigo.devices.keys():
+
+                        # Get the selected device state value
+                        val = indigo.devices[source_id].states[values_dict[source]]
+                        if not isinstance(val, (int, float, bool)):
+                            error_msg_dict[source] = u"The selected device state can not be charted due to its value."
+
+                    else:
+                        val = indigo.variables[source_id].value
+                        try:
+                            float(val)
+                        except ValueError:
+                            if not val.lower() in ['true', 'false']:
+                                error_msg_dict[source] = u"The selected variable value can not be charted due to " \
+                                                         u"its value."
+
+        # ==========================  Stock Horizontal Bar  ===========================
+        if type_id == 'barStockHorizontalChartingDevice':
 
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
@@ -1141,6 +1249,10 @@ class Plugin(indigo.PluginBase):
         return True, values_dict, error_msg_dict
 
     # =============================================================================
+    def validateMenuConfigUi(self, values_dict=None, type_id="", dev_id=0):
+        pass
+
+    # =============================================================================
     def __log_dicts(self, dev=None):
         """
         Write parameters dicts to log under verbose logging
@@ -1373,19 +1485,19 @@ class Plugin(indigo.PluginBase):
         -----
         :return:
         """
-        self.logger.debug(u"Auditing save paths.")
 
         # ============================= Audit Save Paths ==============================
         # Test the current path settings to ensure that they are valid.
         path_list = (self.pluginPrefs['dataPath'], self.pluginPrefs['chartPath'])
 
         # If the target folders do not exist, create them.
+        self.logger.debug(u"Auditing save paths.")
         for path_name in path_list:
 
             if not os.path.isdir(path_name):
                 try:
-                    os.makedirs(path_name)
                     self.logger.warning(u"Target folder doesn't exist. Creating path:{path}".format(path=path_name))
+                    os.makedirs(path_name)
 
                 except (IOError, OSError):
                     self.plugin_error_handler(sub_error=traceback.format_exc())
@@ -2608,7 +2720,7 @@ class Plugin(indigo.PluginBase):
         # TODO: take a look at broadcast messages and whether this is something else that can be made to
         #       work in this neighborhood.
         # TODO: this worked well up until where the "real" device would get its data.
-        #       Need to make the API shim device work ith existing get data steps.
+        #       Need to make the API shim device work with existing get data steps.
         # # Instantiate an instance of an ApiDevice for data from the API call.
         # my_device = ApiDevice()
         #
@@ -2823,7 +2935,7 @@ class Plugin(indigo.PluginBase):
         self.charts_refresh(dev_list=[dev])
 
     # =============================================================================
-    def refresh_the_charts_now(self):
+    def refresh_the_charts_now(self, values_dict, menu_id):
         """
         Refresh all enabled charts
         Refresh all enabled charts based on some user action (like an Indigo menu
@@ -2832,10 +2944,23 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         self.skipRefreshDateUpdate = True
-        devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if
-                              dev.enabled and dev.deviceTypeId != 'csvEngine']
-        self.charts_refresh(dev_list=devices_to_refresh)
-        self.logger.info(u"{0:{1}^80}".format(' Redraw Charts Now Menu Action Complete ', '='))
+
+        # Skip charts set to manual updates
+        if values_dict['allCharts'] == 'auto':
+            devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if
+                                  dev.enabled and dev.deviceTypeId != 'csvEngine' and
+                                  int(dev.ownerProps.get('refreshInterval', "0")) > 0]
+            self.logger.info(u"Redraw Charts Now: Skipping manual charts.")
+
+        # Refresh all charts regardless
+        else:
+            devices_to_refresh = [dev for dev in indigo.devices.itervalues('self') if
+                                  dev.enabled and dev.deviceTypeId != 'csvEngine']
+            self.logger.info(u"Redraw Charts Now: Redrawing all charts.")
+
+        # Put the request in the queue
+        self.refresh_queue.put(devices_to_refresh)
+        return True, values_dict
 
     # =============================================================================
     def charts_refresh(self, dev_list=None):
@@ -3288,7 +3413,7 @@ class Plugin(indigo.PluginBase):
                         dev_dict['name']  = dev.name
                         dev_dict['model'] = dev.model
 
-                        # ========================  Custom Line Substitutions  ========================
+                        # ==========================  Custom Line Segments  ===========================
                         # We support substitutions in custom line segments settings. These need to be
                         # converted in the main plugin thread because they can't be converted within
                         # the subprocess.
@@ -3417,6 +3542,22 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_bar_stock.py'
+
+                        # ==========================  Stock Horizontal Bar  ===========================
+                        if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
+
+                            raw_payload['data'] = self.chart_stock_bar(dev=dev)
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_bar_stock_horizontal.py'
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':
@@ -3596,16 +3737,16 @@ class Plugin(indigo.PluginBase):
 
                         # =============================  Process Result  ==============================
                         # Get the results and act on anything
-                        proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
-                                                stdout=subprocess.PIPE,
-                                                stderr=subprocess.PIPE,
-                                                )
-
                         try:
+                            proc = subprocess.Popen(['python2.7', path_to_file, payload, ],
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.PIPE,
+                                                    )
                             if proc:
                                 reply, err = proc.communicate()
+
                         except (TypeError, ValueError):
-                            pass
+                            self.logger.debug(u"Payload raised error: {0}".format(payload))
 
                         # Parse the output log
                         result = self.process_plotting_log(device=dev, replies=reply, errors=err)
@@ -3673,6 +3814,7 @@ class Plugin(indigo.PluginBase):
         # Since something changed, lets store the original prefs and eEnsure that
         # the new prefs changes are blown to disk (and saved to the *.indiPref file).
         if something_changed:
+            del old_prefs['old_prefs']  # If we don't delete the old ones, they'll nest forever.
             self.pluginPrefs['old_prefs'] = old_prefs
             indigo.server.savePluginPrefs()
 
@@ -3708,7 +3850,18 @@ class Plugin(indigo.PluginBase):
 
         self.charts_refresh(dev_list=devices_to_refresh)
 
-        self.logger.info(u"{0:{1}^80}".format(u' Refresh Action Complete ', '='))
+    # =============================================================================
+    def refresh_the_chaarts_queue(self):
+
+        def work_the_refresh_queue():
+            while not self.refresh_queue.empty():
+                q = self.refresh_queue.get()
+                self.charts_refresh(q)
+                self.logger.info(u"{0:{1}^80}".format(u' Refresh Action Complete ', '='))
+
+        t = threading.Thread(target=work_the_refresh_queue(), args=())
+        t.daemon = True
+        t.start()
 
 
 class MakeChart(object):
