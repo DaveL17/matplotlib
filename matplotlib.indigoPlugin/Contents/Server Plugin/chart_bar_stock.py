@@ -57,7 +57,7 @@ try:
         b_num        = bar['number']
         color        = bar['color_{i}'.format(i=b_num)]
         suppress_bar = p_dict.get('suppressBar{i}'.format(i=b_num), False)
-        x_labels.append(bar['legend_{i}'.format(i=b_num)])
+        # x_labels.append(bar['legend_{i}'.format(i=b_num)])
         x_ticks.append(b_num)
         y_val = float(bar['val_{i}'.format(i=b_num)])
         p_dict['data_array'].append(y_val)
@@ -119,9 +119,16 @@ try:
                         **k_dict['k_annotation']
                         )
 
+        if bar['legend_{i}'.format(i=b_num)] == u"":
+            x_labels.append(unicode(b_num))
+        else:
+            x_labels.append(bar['legend_{i}'.format(i=b_num)])
+
     # ===============================  X Tick Bins  ===============================
+
     ax.set_xticks(x_ticks)
     ax.set_xticklabels(x_labels)
+    ax.xaxis.label.set_color('red')
 
     chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)

@@ -1,3 +1,6 @@
+v0.9.39
+- sync
+
 v0.9.38
 - Increases visual space between legends and plots.
 - When device config validation fails, try to automatically force
