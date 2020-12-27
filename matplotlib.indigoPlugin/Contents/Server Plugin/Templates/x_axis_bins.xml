@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <Template>
 
-    <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="xAxisLabel" visibleBindingValue="true" tooltip="The datetime units for the x axis.">
+    <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
+           tooltip="The datetime units for the x axis.">
         <Label>Scale:</Label>
         <List>
             <Option value="quarter-hourly">Every 15 Minutes</Option>

@@ -216,7 +216,7 @@ try:
 
         legend = ax.legend(final_headers,
                            loc='upper center',
-                           bbox_to_anchor=(0.5, -0.1),
+                           bbox_to_anchor=(0.5, -0.15),
                            ncol=num_col,
                            prop={'size': float(p_dict['legendFontSize'])}
                            )

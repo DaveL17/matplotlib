@@ -43,9 +43,7 @@ the proper Fantastic Weather devices.
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
 # TODO: Move more code out of plugin.py
-# TODO: Figure out save path reversion to 7.4 (is this fixed with the removal of nested old_prefs?
 # TODO: Audit device config ui changes against prod server.
-# TODO: Audit XML files to make maximum use of templates.
 
 # ================================== IMPORTS ==================================
 
@@ -100,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.37"
+__version__   = u"0.9.38"
 
 # =============================================================================
 
@@ -546,7 +544,7 @@ class Plugin(indigo.PluginBase):
 
         while True:
             if not self.pluginIsShuttingDown:
-                self.refresh_the_chaarts_queue()
+                self.refresh_the_charts_queue()
                 self.csv_refresh()
                 self.charts_refresh()
                 self.sleep(1)
@@ -699,15 +697,15 @@ class Plugin(indigo.PluginBase):
             # There must be at least 1 source selected
             if values_dict['area1Source'] == 'None':
                 error_msg_dict['area1Source'] = u"You must select at least one data source."
-                values_dict['areaLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
-            # Iterate for each area group (1-6).
+            # Iterate for each area group (1-8).
             for area in range(1, 9, 1):
                 # Line adjustment values
                 for char in values_dict['area{i}adjuster'.format(i=area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['area{i}adjuster'.format(i=area)] = u"Valid operators are +, -, *, /"
-                        values_dict['areaLabel1'] = True
+                        values_dict['settingsGroup'] = str(area)
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -723,11 +721,15 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the " \
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick locations must be the " \
                                                           u"same length."
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick locations must be the " \
+                                                          u"same length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -737,10 +739,12 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
         # ================================  Flow Bar  =================================
         if type_id == 'barChartingDevice':
@@ -749,6 +753,7 @@ class Plugin(indigo.PluginBase):
             if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
                 values_dict['barLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
@@ -756,6 +761,7 @@ class Plugin(indigo.PluginBase):
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+                values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -771,11 +777,13 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and locations must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and locations must be the same length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -787,10 +795,12 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
         # ================================  Stock Bar  ================================
         if type_id == 'barStockChartingDevice':
@@ -798,7 +808,7 @@ class Plugin(indigo.PluginBase):
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
-                values_dict['barLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
@@ -806,6 +816,7 @@ class Plugin(indigo.PluginBase):
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+                values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -821,11 +832,13 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and locations must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and locations must be the same length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -837,10 +850,12 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
             # Test the selected values to ensure that they can be charted (int, float, bool)
             for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
@@ -868,6 +883,7 @@ class Plugin(indigo.PluginBase):
                             if not val.lower() in ['true', 'false']:
                                 error_msg_dict[source] = u"The selected variable value can not be charted due to " \
                                                          u"its value."
+                                values_dict['settingsGroup'] = str(n)
 
         # ==========================  Stock Horizontal Bar  ===========================
         if type_id == 'barStockHorizontalChartingDevice':
@@ -875,7 +891,7 @@ class Plugin(indigo.PluginBase):
             # Must select at least one source (bar 1)
             if values_dict['bar1Source'] == 'None':
                 error_msg_dict['bar1Source'] = u"You must select at least one data source."
-                values_dict['barLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
@@ -883,6 +899,7 @@ class Plugin(indigo.PluginBase):
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = u"You must enter a bar width greater than 0."
+                values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -898,11 +915,13 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and values must be the same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and values must be the same length."
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and locations must be the same length."
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and locations must be the same length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -914,10 +933,12 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
             # Test the selected values to ensure that they can be charted (int, float, bool)
             for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
@@ -936,6 +957,7 @@ class Plugin(indigo.PluginBase):
                         val = indigo.devices[source_id].states[values_dict[source]]
                         if not isinstance(val, (int, float, bool)):
                             error_msg_dict[source] = u"The selected device state can not be charted due to its value."
+                            values_dict['settingsGroup'] = str(n)
 
                     else:
                         val = indigo.variables[source_id].value
@@ -945,6 +967,7 @@ class Plugin(indigo.PluginBase):
                             if not val.lower() in ['true', 'false']:
                                 error_msg_dict[source] = u"The selected variable value can not be charted due to " \
                                                          u"its value."
+                                values_dict['settingsGroup'] = str(n)
 
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
@@ -956,6 +979,7 @@ class Plugin(indigo.PluginBase):
                         raise ValueError
                 except ValueError:
                     error_msg_dict[prop] = u"Alert levels must between 0 and 100 (integer)."
+                    values_dict['settingsGroup'] = "dsp"
 
         # ============================== Calendar Chart ===============================
         # There are currently no unique validation steps needed for calendar devices
@@ -1015,7 +1039,7 @@ class Plugin(indigo.PluginBase):
             # There must be at least 1 source selected
             if values_dict['line1Source'] == 'None':
                 error_msg_dict['line1Source'] = u"You must select at least one data source."
-                values_dict['lineLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
             # Iterate for each line group (1-6).
             for area in range(1, 9, 1):
@@ -1024,10 +1048,12 @@ class Plugin(indigo.PluginBase):
                 for char in values_dict['line{i}adjuster'.format(i=area)]:
                     if char not in ' +-/*.0123456789':  # allowable numeric specifiers
                         error_msg_dict['line{i}adjuster'.format(i=area)] = u"Valid operators are +, -, *, /"
+                        values_dict['settingsGroup'] = str(area)
 
                 # Fill is illegal for the steps line type
                 if values_dict['line{i}Style'.format(i=area)] == 'steps' and values_dict['line{i}Fill'.format(i=area)]:
                     error_msg_dict['line{i}Fill'.format(i=area)] = u"Fill is not supported for the Steps line type."
+                    values_dict['settingsGroup'] = str(area)
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -1043,13 +1069,15 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the " \
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick locations must be the " \
                                                           u"same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same " \
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick locations must be the same " \
                                                      u"length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -1061,10 +1089,12 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
@@ -1073,6 +1103,7 @@ class Plugin(indigo.PluginBase):
                 # A data source must be selected
                 if not values_dict[prop] or values_dict[prop] == 'None':
                     error_msg_dict[prop] = u"You must select a data source."
+                    values_dict['settingsGroup'] = "src"
 
             try:
                 if int(values_dict['numberOfCharacters']) < 1:
@@ -1080,6 +1111,7 @@ class Plugin(indigo.PluginBase):
             except ValueError:
                 error_msg_dict['numberOfCharacters'] = u"The number of characters must be a positive number greater " \
                                                        u"than zero (integer)."
+                values_dict['settingsGroup'] = "dsp"
 
             # Figure width and height.
             for prop in ('figureWidth', 'figureHeight'):
@@ -1089,6 +1121,7 @@ class Plugin(indigo.PluginBase):
                 except ValueError:
                     error_msg_dict[prop] = u"The figure width and height must be positive whole numbers greater " \
                                            u"than zero (pixels)."
+                    values_dict['settingsGroup'] = "dsp"
 
             # Font size
             try:
@@ -1096,31 +1129,36 @@ class Plugin(indigo.PluginBase):
                     raise ValueError
             except ValueError:
                 error_msg_dict['multilineFontSize'] = u"The font size must be a positive real number greater than zero."
+                values_dict['settingsGroup'] = "dsp"
 
         # ================================ Polar Chart ================================
         if type_id == 'polarChartingDevice':
 
             if not values_dict['thetaValue']:
                 error_msg_dict['thetaValue'] = u"You must select a direction source."
+                values_dict['settingsGroup'] = "src"
 
             if not values_dict['radiiValue']:
                 error_msg_dict['radiiValue'] = u"You must select a magnitude source."
+                values_dict['settingsGroup'] = "src"
 
             # Number of observations
             try:
                 if int(values_dict['numObs']) < 1:
                     error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number " \
                                                u"integer)."
+                    values_dict['settingsGroup'] = "dsp"
             except ValueError:
                 error_msg_dict['numObs'] = u"You must specify at least 1 observation (must be a whole number " \
                                            u"integer)."
+                values_dict['settingsGroup'] = "dsp"
 
         # =============================== Scatter Chart ===============================
         if type_id == 'scatterChartingDevice':
 
             if not values_dict['group1Source']:
                 error_msg_dict['group1Source'] = u"You must select at least one data source."
-                values_dict['groupLabel1'] = True
+                values_dict['settingsGroup'] = "1"
 
             # =============================== Custom Ticks ================================
             # Ensure all custom tick locations are numeric, within bounds and of the same length.
@@ -1136,13 +1174,15 @@ class Plugin(indigo.PluginBase):
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
                     error_msg_dict['customTicksY'] = u"All custom tick locations must be numeric values."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
                 if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick values must be the " \
+                    error_msg_dict['customTicksLabelY'] = u"Custom tick labels and custom tick locations must be the " \
                                                           u"same length."
-                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick values must be the same " \
+                    error_msg_dict['customTicksY'] = u"Custom tick labels and custom tick locations must be the same " \
                                                      u"length."
+                    values_dict['settingsGroup'] = "y"
 
                 # Ensure all custom Y tick locations are within bounds. User has elected to
                 # change at least one Y axis boundary (if both upper and lower bounds are set
@@ -1154,22 +1194,26 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = u"All custom tick locations must be within the " \
                                                              u"boundaries of the Y axis."
+                            values_dict['settingsGroup'] = "y"
 
         # =============================== Weather Chart ===============================
         if type_id == 'forecastChartingDevice':
 
             if not values_dict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
+                values_dict['settingsGroup'] = "ch"
 
         # ========================== Composite Weather Chart ==========================
         if type_id == 'compositeForecastDevice':
 
             if not values_dict['forecastSourceDevice']:
                 error_msg_dict['forecastSourceDevice'] = u"You must select a weather forecast source device."
+                values_dict['settingsGroup'] = "ch"
 
             for _ in ('pressure_min', 'pressure_max',
                       'temperature_min', 'temperature_max',
@@ -1184,9 +1228,11 @@ class Plugin(indigo.PluginBase):
                         pass
                     else:
                         error_msg_dict[_] = u"The value must be empty, 'None', or a numeric value."
+                        values_dict['settingsGroup'] = "y1"
 
             if len(values_dict['component_list']) < 2:
                 error_msg_dict['component_list'] = u"You must select at least two plot elements."
+                values_dict['settingsGroup'] = "fe"
 
         # ============================== All Chart Types ==============================
         # The following validation blocks are applied to all graphical chart device
@@ -3422,6 +3468,7 @@ class Plugin(indigo.PluginBase):
                                 dev.deviceTypeId in ["areaChartingDevice",
                                                      "barChartingDevice",
                                                      "barStockChartingDevice",
+                                                     "barStockHorizontalChartingDevice",
                                                      "lineChartingDevice",
                                                      "scatterChartingDevice",
                                                      "forecastChartingDevice"] and \
@@ -3809,9 +3856,10 @@ class Plugin(indigo.PluginBase):
             # action prop value(s).
             if plugin_action.props[prop] != self.pluginPrefs.get(prop, None):
                 something_changed = True
-                self.pluginPrefs[prop] = plugin_action.props[prop]
+                if prop not in ('dataPath', 'chartPath'):
+                    self.pluginPrefs[prop] = plugin_action.props[prop]
 
-        # Since something changed, lets store the original prefs and eEnsure that
+        # Since something changed, lets store the original prefs and ensure that
         # the new prefs changes are blown to disk (and saved to the *.indiPref file).
         if something_changed:
             del old_prefs['old_prefs']  # If we don't delete the old ones, they'll nest forever.
@@ -3851,7 +3899,7 @@ class Plugin(indigo.PluginBase):
         self.charts_refresh(dev_list=devices_to_refresh)
 
     # =============================================================================
-    def refresh_the_chaarts_queue(self):
+    def refresh_the_charts_queue(self):
 
         def work_the_refresh_queue():
             while not self.refresh_queue.empty():

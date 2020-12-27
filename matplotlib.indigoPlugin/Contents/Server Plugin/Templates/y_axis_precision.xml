@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Template>
 
-    <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="yAxisLabel" visibleBindingValue="true"
+    <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
            tooltip="Select preference for the precision of your chart's Y axis.">
         <Label>Precision:</Label>
         <List>

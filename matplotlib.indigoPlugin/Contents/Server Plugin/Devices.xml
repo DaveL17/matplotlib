@@ -36,6 +36,7 @@
                     <Option value="8">Area 8</Option>
                     <Option value="cls">Custom Line Segments</Option>
                 </List>
+                <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
             <Field id="settingsSpaceBottom" type="label"/>
@@ -116,23 +117,7 @@
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
             <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="settingsGroup" visibleBindingValue="x" hidden="true"
@@ -186,16 +171,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="Enter the labels to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -1202,23 +1178,7 @@
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
             <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="settingsGroup" visibleBindingValue="x" hidden="true"
@@ -1272,16 +1232,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -1642,16 +1593,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -2666,23 +2608,7 @@
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
             <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="settingsGroup" visibleBindingValue="x" hidden="true"
@@ -2736,16 +2662,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="Enter the labels to be used for the custom Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -4117,23 +4034,7 @@
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
             <Field id="limitDataRange" type="menu" defaultValue="N" visibleBindingId="settingsGroup" visibleBindingValue="x" hidden="true"
@@ -4187,16 +4088,7 @@
                 <Description>Keep Y1?</Description>
             </Field>
 
-            <Field id="yAxisPrecision" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="y"
-                   tooltip="Select preference for the precision of your chart's Y axis.">
-                <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
-            </Field>
+            <Template file="Templates/y_axis_precision.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue="" visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="Enter the labels to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic labels.">
@@ -4715,23 +4607,7 @@
                 <CallbackMethod>dummyCallback</CallbackMethod>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="settingsGroup" visibleBindingValue="y1"
                    tooltip="Check to display Y axis grid.">
@@ -5065,23 +4941,7 @@
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
 
-            <Field id="xAxisBins" type="menu" defaultValue="daily" visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The datetime units for the x axis.">
-                <Label>Scale:</Label>
-                <List>
-                    <Option value="quarter-hourly">Every 15 Minutes</Option>
-                    <Option value="half-hourly">Every 30 Minutes</Option>
-                    <Option value="hourly">Every Hour</Option>
-                    <Option value="hourly_2">Every 2 Hours</Option>
-                    <Option value="hourly_4">Every 4 Hours</Option>
-                    <Option value="hourly_8">Every 8 Hours</Option>
-                    <Option value="hourly_12">Every 12 Hours</Option>
-                    <Option value="daily">Every Day*</Option>
-                    <Option value="weekly">Every Week</Option>
-                    <Option value="monthly">Every Month</Option>
-                    <Option value="yearly">Every Year</Option>
-                </List>
-            </Field>
+            <Template file="Templates/x_axis_bins.xml" />
 
             <Field id="showyAxisGrid" type="checkbox" defaultValue="false" visibleBindingId="settingsGroup" visibleBindingValue="y1"
                    tooltip="Check to display Y axis grid.">

@@ -213,7 +213,7 @@ try:
         legend = ax.legend(legend_styles,
                            final_headers,
                            loc='upper center',
-                           bbox_to_anchor=(0.5, -0.1),
+                           bbox_to_anchor=(0.5, -0.15),
                            ncol=int(p_dict['legendColumns']),
                            numpoints=1,
                            markerscale=0.6,

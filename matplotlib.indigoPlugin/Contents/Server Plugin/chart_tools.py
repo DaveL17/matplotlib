@@ -640,15 +640,18 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
     # the legend is established, otherwise some of the characteristics of the
     # min/max lines will take over the legend props.
 
-    log['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
+    if p_dict['verboseLogging']:
+        logger['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
 
     if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
-
         try:
             # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb))
-            # constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
-            constants_to_plot = (ast.literal_eval(str(p_dict['customLineSegments'])),)
+            constants_to_plot = p_dict['customLineSegments']
             cls = ax
+
+            # If a single tuple comes in, we need to tuple the tuple.  (a, b) --> ((a, b),)
+            if not isinstance(constants_to_plot[0], tuple):
+                constants_to_plot = (constants_to_plot,)
 
             for element in constants_to_plot:
 

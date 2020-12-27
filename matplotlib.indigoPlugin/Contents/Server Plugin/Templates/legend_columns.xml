@@ -2,7 +2,7 @@
 <Template>
 
     <Field id="legendColumns" type="menu" defaultValue="5" visibleBindingId="showLegend" visibleBindingValue="true"
-           tooltip="The number of columns for the legend entries.">
+           alwaysUseInDialogHeightCalc="true" tooltip="The number of columns for the legend entries.">
         <Label>Legend Columns:</Label>
         <List>
             <Option value="1">1</Option>

@@ -255,7 +255,7 @@ try:
         headers = [_.decode('utf-8') for _ in p_dict['headers_2']]
         legend = ax1.legend(headers,
                             loc='upper right',
-                            bbox_to_anchor=(1.0, -0.12),
+                            bbox_to_anchor=(1.0, -0.15),
                             ncol=1,
                             prop={'size': float(p_dict['legendFontSize'])}
                             )
@@ -402,7 +402,7 @@ try:
         headers = [_.decode('utf-8') for _ in p_dict['headers_1']]
         legend = ax2.legend(headers,
                             loc='upper left',
-                            bbox_to_anchor=(0.0, -0.12),
+                            bbox_to_anchor=(0.0, -0.15),
                             ncol=2,
                             prop={'size': float(p_dict['legendFontSize'])}
                             )

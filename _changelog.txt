@@ -1,3 +1,8 @@
+v0.9.38
+- Increases visual space between legends and plots.
+- When device config validation fails, try to automatically force
+  dialog to settings group with the error.
+
 v0.9.37
 - New Device Type: Horizontal Stock Bar Chart
 - New Feature: Menu Item [Redraw Charts Now] now give option to
