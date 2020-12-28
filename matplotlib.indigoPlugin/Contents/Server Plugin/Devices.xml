@@ -1181,7 +1181,7 @@
             <Field id="topSeparator" type="separator"/>
 
             <!-- ========================  Chart Controls  ======================== -->
-            <Field id="fileName" type="textfield" defaultValue="chart_bar.png"
+            <Field id="fileName" type="textfield" defaultValue="chart_bar_flow.png"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
                    tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
@@ -1611,7 +1611,7 @@
             <Field id="topSeparator" type="separator"/>
 
             <!-- ========================  Chart Controls  ======================== -->
-            <Field id="fileName" type="textfield" defaultValue="chart_bar.png"
+            <Field id="fileName" type="textfield" defaultValue="chart_stock_bar_vertical.png"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
                    tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>
@@ -2028,7 +2028,7 @@
             <Field id="topSeparator" type="separator"/>
 
             <!-- ========================  Chart Controls  ======================== -->
-            <Field id="fileName" type="textfield" defaultValue="chart_bar_h.png"
+            <Field id="fileName" type="textfield" defaultValue="chart_stock_bar_horizontal.png"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
                    tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>

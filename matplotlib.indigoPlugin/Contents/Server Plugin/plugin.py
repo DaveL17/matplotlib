@@ -98,7 +98,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.40"
+__version__   = u"0.9.41"
 
 # =============================================================================
 
@@ -197,7 +197,8 @@ class Plugin(indigo.PluginBase):
         else:
             self.logger.threaddebug(u"User cancelled.")
 
-        self.refresh_queue.put([dev])
+        if dev.configured:
+            self.refresh_queue.put([dev])
 
         return True
 
@@ -342,7 +343,7 @@ class Plugin(indigo.PluginBase):
                     values_dict['customTitleFontSize'] = 10
                     values_dict['xAxisLabelFormat']    = 'None'
 
-                # ================================  Stock Bar  ================================
+                # ================================  Stock Bar H ===============================
                 if type_id == "barStockHorizontalChartingDevice":
 
                     for _ in range(1, 6, 1):
@@ -1641,12 +1642,12 @@ class Plugin(indigo.PluginBase):
         for _ in range(1, 6, 1):
             bar_data = {}  # data for each bar
             try:
-                annotate    = dev.pluginProps['bar{0}Annotate'.format(_)]
+                annotate    = dev.ownerProps['bar{0}Annotate'.format(_)]
                 color       = self.fix_rgb(dev.pluginProps['bar{0}Color'.format(_)])
-                legend      = dev.pluginProps['bar{0}Legend'.format(_)]
-                suppress    = dev.pluginProps['suppressBar{0}'.format(_)]
-                thing_id    = int(dev.pluginProps['bar{0}Source'.format(_)])
-                thing_state = dev.pluginProps['bar{0}Value'.format(_)]
+                legend      = dev.ownerProps['bar{0}Legend'.format(_)]
+                suppress    = dev.ownerProps['suppressBar{0}'.format(_)]
+                thing_id    = int(dev.ownerProps['bar{0}Source'.format(_)])
+                thing_state = dev.ownerProps['bar{0}Value'.format(_)]
 
                 # Is it a device
                 if thing_id in indigo.devices.keys():

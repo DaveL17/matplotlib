@@ -125,10 +125,9 @@ try:
             x_labels.append(bar['legend_{i}'.format(i=b_num)])
 
     # ===============================  X Tick Bins  ===============================
-
-    ax.set_xticks(x_ticks)
-    ax.set_xticklabels(x_labels)
-    ax.xaxis.label.set_color('red')
+    ax.set_xticks(x_ticks)  # we set the tick value off the bar number.
+    ax.set_xticklabels(x_labels)  # we set the tick label off the bar number (unless the user has set one explicitly).
+    ax.tick_params(axis='x', colors=p_dict['fontColor'])  # we set this becuase it's apparently reset by the two preceeding lines.
 
     chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)

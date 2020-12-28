@@ -1,3 +1,6 @@
+v0.9.41
+- Sorts x axis label color bug for stock bar charts.
+
 v0.9.40
 - Refinements to PluginConfig.xml
 - Refinements to MenuItems.xml
