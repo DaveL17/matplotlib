@@ -1,152 +1,134 @@
 <?xml version="1.0"?>
 <MenuItems>
 
-    <MenuItem id="commsKillAll">
-        <Name>Disable All Plugin Devices</Name>
-        <CallbackMethod>commsKillAll</CallbackMethod>
-    </MenuItem>
+<!-- ========================  Comms Kill All  ======================== -->
+<MenuItem id="commsKillAll">
+	<Name>Disable All Plugin Devices</Name>
+	<CallbackMethod>commsKillAll</CallbackMethod>
+</MenuItem>
 
-    <MenuItem id="commsUnkillAll">
-        <Name>Enable All Plugin Devices</Name>
-        <CallbackMethod>commsUnkillAll</CallbackMethod>
-    </MenuItem>
+<!-- =======================  Comms Unkill All  ======================= -->
+<MenuItem id="commsUnkillAll">
+	<Name>Enable All Plugin Devices</Name>
+	<CallbackMethod>commsUnkillAll</CallbackMethod>
+</MenuItem>
 
-    <MenuItem id="titleSeparator" type="separator"/>
+<MenuItem id="titleSeparator" type="separator"/>
 
-    <MenuItem id="advancedSettings">
-        <!--The advanced settings menu is used to manage more obscure plugin preferences. Adding an element here will
-            require hooks in most, if not all of the following methods in the plugin.py file:
-            PluginConfig.xml (a hidden control to store the setting)
-            getMenuActionConfigUiValues
-            advancedSettingsMenu
-            advancedSettingsExecuted-->
-        <Name>Advanced Settings...</Name>
-        <CallbackMethod>advancedSettingsExecuted</CallbackMethod>
-        <ButtonTitle>Save</ButtonTitle>
-		<ConfigUI>
-            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/advanced_settings</SupportURL>
+<!-- ======================  Advanced Settings  ======================= -->
+<!-- =======================  About Matplotlib  ======================= -->
+<MenuItem id="aboutMatplotlib">
+	<Name>About Matplotlib...</Name>
+	<ConfigUI>
+		<!--
+		Matplotlib citation per TOS.
+		-->
+		<Field id="aboutLabel" type="label">
+			<Label>Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.</Label>
+		</Field>
+		<Field id="authorLabel" type="label">
+			<Label>Authored by: J.D. Hunter</Label>
+		</Field>
+	</ConfigUI>
+</MenuItem>
 
-			<Field id="instructionsLabel" type="label" fontColor="black" fontSize="regular">
-				<Label>Advanced Plugin Settings</Label>
-			</Field>
+<MenuItem id="advancedSettings">
+	<!--
+	The advanced settings menu is used to manage more obscure plugin preferences. Adding an element here will
+	require hooks in most, if not all of the following methods in the plugin.py file:
+	- PluginConfig.xml (a hidden control to store the setting)
+	- getMenuActionConfigUiValues
+	- advancedSettingsMenu
+	- advancedSettingsExecuted
+	-->
+	<Name>Advanced Settings...</Name>
+	<CallbackMethod>advancedSettingsExecuted</CallbackMethod>
+	<ButtonTitle>Save</ButtonTitle>
+	<ConfigUI>
+		<SupportURL>https://github.com/DaveL17/matplotlib/wiki/advanced_settings</SupportURL>
+		<Field id="instructionsLabel" type="label">
+			<Label>Advanced Plugin Settings</Label>
+		</Field>
+		<Field id="enableCustomLineSegmentsHeader" type="label" alignText="right">
+			<Label>Custom Line Segments</Label>
+		</Field>
+		<Field id="enableCustomLineSegmentsSeparator" type="separator"/>
+		<Field id="enableCustomLineSegments" type="checkbox" defaultValue="false">
+			<Label/>
+			<Description>Enable Custom Line Segments</Description>
+			<CallbackMethod>advancedSettingsMenu</CallbackMethod>
+		</Field>
+		<Field id="enableCustomLineSegmentsLabel" type="label" fontSize="small" alignWithControl="true">
+			<Label>Adds controls to plot user-defined line segments. If later disabled, previously defined segments will be ignored (the settings will be retained and hidden).</Label>
+		</Field>
+		<Field id="promoteCustomLineSegments" type="checkbox" defaultValue="false" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true">
+			<Label/>
+			<Description>Promote Custom Line Segments</Description>
+			<CallbackMethod>advancedSettingsMenu</CallbackMethod>
+		</Field>
+		<Field id="promoteCustomLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true" fontSize="small" alignWithControl="true">
+			<Label>If enabled, chart ranges will be expanded to display custom line segments at all times. If disabled, custom line segments will only be displayed if they are within range of plotted data.</Label>
+		</Field>
+		<Field id="logEachChartCompletedHeader" type="label" alignText="right">
+			<Label>Other</Label>
+		</Field>
+		<Field id="logEachChartCompletedSeparator" type="separator"/>
+		<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">
+			<Label/>
+			<Description>Enable Snappy Menus</Description>
+			<CallbackMethod>advancedSettingsMenu</CallbackMethod>
+		</Field>
+		<Field id="snappyConfigMenusLabel" type="label" fontSize="small" alignWithControl="true">
+			<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>
+		</Field>
+		<Field id="forceOriginLines" type="checkbox" defaultValue="true">
+			<Label/>
+			<Description>Force Origin Lines</Description>
+			<CallbackMethod>advancedSettingsMenu</CallbackMethod>
+		</Field>
+		<Field id="forceOriginLinesMenu" type="label" fontSize="small" alignWithControl="true">
+			<Label>For a clean look, the plugin default is to plot "invisible" origin lines when charts contain both positive and negative values. Enable this setting to force origin lines to be displayed.</Label>
+		</Field>
+		<Field id="matplotlibAdvancedSettingsLabel" type="label" alignText="right">
+			<Label>Matplotlib Style Sheets</Label>
+		</Field>
+		<Field id="matplotlibSeparator" type="separator"/>
+		<Field id="matplotlibAdvancedSettings" type="label" fontSize="small" alignWithControl="true">
+			<Label>You can also modify the Matplotlib style sheet (located within the plugin package). Note that the plugin necessarily modifies some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by newer versions of the plugin).</Label>
+		</Field>
+		<Field id="saveSettingsSeparator" type="separator"/>
+		<Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
+			<Label>Existing charts will be regenerated when you click save. Please be patient.</Label>
+		</Field>
+	</ConfigUI>
+</MenuItem>
 
-			<Field id="enableCustomLineSegmentsHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
-				<Label>Custom Line Segments</Label>
-			</Field>
+<!-- ======================  Refresh Charts Now  ====================== -->
+<MenuItem id="refreshChartsNow">
+<Name>Redraw Charts Now...</Name>
+	<ConfigUI>
+		<!--Matplotlib citation per TOS.-->
+		<Field id="aboutLabel" type="label">
+			<Label>Redraw all Matplotlib Charts</Label>
+		</Field>
+		<Field id="aboutLabel1" type="label">
+			<Label>Select which charts to redraw. Note that this dialog box will remain open until task is complete.</Label>
+		</Field>
+		<Field id="allCharts" type="menu" defaultValue="all">
+			<Label>Redraw:</Label>
+			<List>
+				<Option value="all">All Charts</Option>
+				<Option value="auto">Skip Manual Charts</Option>
+			</List>
+		</Field>
+	</ConfigUI>
+	<CallbackMethod>refresh_the_charts_now</CallbackMethod>
+</MenuItem>
 
-            <Field id="enableCustomLineSegmentsSeparator" type="separator"/>
-
-			<Field id="enableCustomLineSegments" type="checkbox" defaultValue="false">
-				<Label/>
-                <Description>Enable Custom Line Segments</Description>
-		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
-			</Field>
-
-			<Field id="enableCustomLineSegmentsLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>Adds controls to plot user-defined line segments. If later disabled, previously defined segments will be ignored (the settings will be retained and hidden).</Label>
-			</Field>
-
-			<Field id="promoteCustomLineSegments" type="checkbox" defaultValue="false" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true">
-				<Label/>
-                <Description>Promote Custom Line Segments</Description>
-		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
-			</Field>
-
-			<Field id="promoteCustomLineSegmentsLabel" type="label" visibleBindingId="enableCustomLineSegments" visibleBindingValue="true" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>If enabled, chart ranges will be expanded to display custom line segments at all times. If disabled, custom line segments will only be displayed if they are within range of plotted data.</Label>
-			</Field>
-
-			<Field id="logEachChartCompletedHeader" type="label" fontColor="black" fontSize="regular" alignText="right">
-				<Label>Other</Label>
-			</Field>
-
-            <Field id="logEachChartCompletedSeparator" type="separator"/>
-
-			<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">
-				<Label/>
-                <Description>Enable Snappy Menus</Description>
-		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
-			</Field>
-
-			<Field id="snappyConfigMenusLabel" type="label" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>
-			</Field>
-
-			<Field id="forceOriginLines" type="checkbox" defaultValue="true">
-				<Label/>
-                <Description>Force Origin Lines</Description>
-		        <CallbackMethod>advancedSettingsMenu</CallbackMethod>
-			</Field>
-
-			<Field id="forceOriginLinesMenu" type="label" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>For a clean look, the plugin default is to plot "invisible" origin lines when charts contain both positive and negative values. Enable this setting to force origin lines to be displayed.</Label>
-			</Field>
-
-			<Field id="matplotlibAdvancedSettingsLabel" type="label" fontColor="black" fontSize="regular" alignText="right">
-				<Label>Matplotlib Style Sheets</Label>
-			</Field>
-
-            <Field id="matplotlibSeparator" type="separator"/>
-
-			<Field id="matplotlibAdvancedSettings" type="label" fontColor="black" fontSize="small" alignWithControl="true">
-				<Label>You can also modify the Matplotlib style sheet (located within the plugin package). Note that the plugin necessarily modifies some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by newer versions of the plugin).</Label>
-			</Field>
-
-            <Field id="saveSettingsSeparator" type="separator"/>
-
-            <Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
-                <Label>Existing charts will be regenerated when you click save. Please be patient.</Label>
-            </Field>
-
-		</ConfigUI>
-	</MenuItem>
-
-    <MenuItem id="refreshChartsNow">
-        <Name>Redraw Charts Now</Name>
-		<ConfigUI>
-
-            <!--Matplotlib citation per TOS.-->
-			<Field id="aboutLabel" type="label" fontColor="black" fontSize="regular">
-				<Label>Redraw all Matplotlib Charts</Label>
-			</Field>
-
-			<Field id="aboutLabel1" type="label" fontColor="black" fontSize="regular">
-				<Label>Select which charts to redraw. Note that this dialog box will remain open until task is complete.</Label>
-			</Field>
-
-			<Field id="allCharts" type="menu" defaultValue="all" fontColor="black" fontSize="regular">
-				<Label>Redraw:</Label>
-				<List>
-					<Option value="all">All Charts</Option>
-					<Option value="auto">Skip Manual Charts</Option>
-				</List>
-			</Field>
-
-		</ConfigUI>
-        <CallbackMethod>refresh_the_charts_now</CallbackMethod>
-    </MenuItem>
-
-<!--    <MenuItem id="import_export">-->
-<!--        <Name>Import / Export Device...</Name>-->
-<!--		<ConfigUI>-->
-<!--			<Template file="Templates/import_export.xml"/>-->
-<!--		</ConfigUI>-->
-<!--	</MenuItem>-->
-
-    <MenuItem id="aboutMatplotlib">
-        <Name>About Matplotlib...</Name>
-		<ConfigUI>
-
-            <!--Matplotlib citation per TOS.-->
-			<Field id="aboutLabel" type="label" fontColor="black" fontSize="regular">
-				<Label>Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.</Label>
-			</Field>
-
-			<Field id="authorLabel" type="label" fontColor="black" fontSize="regular">
-				<Label>Authored by: J.D. Hunter</Label>
-			</Field>
-
-		</ConfigUI>
-	</MenuItem>
+<!-- ========================  Save Snapshot  ========================= -->
+<MenuItem id="saveSnapshot">
+	<Name>Save Snapshot to File</Name>
+	<CallbackMethod>save_snapshot</CallbackMethod>
+</MenuItem>
 
 </MenuItems>

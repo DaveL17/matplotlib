@@ -1,3 +1,11 @@
+v0.9.40
+- Refinements to PluginConfig.xml
+- Refinements to MenuItems.xml
+- Refinements to Devices.xml
+- Refinements to Actions.xml
+- Fixes 'xAxisBins' KeyError in chart_bar_stock.py
+- Devices now refresh "instantly" after saving configuration.
+
 v0.9.39
 - sync
 

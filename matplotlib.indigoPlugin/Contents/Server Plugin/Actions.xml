@@ -1,152 +1,134 @@
 <?xml version="1.0"?>
 <Actions>
-
     <!-- ========================= Refresh CSV Device ========================= -->
     <Action id="refresh_csv_device" deviceFilter="" uiPath="DeviceActions">
-      <Name>Manual Refresh - CSV Device</Name>
-
-      <ConfigUI>
+        <Name>Manual Refresh - CSV Device</Name>
         <SupportURL>https://github.com/DaveL17/matplotlib/wiki/actions</SupportURL>
-
-        <Field id="Instructions" type="label">
-          <Label>Use this action to refresh all data sources associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
-        </Field>
-
-        <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
-          <Label>CSV Engine Device:</Label>
-          <List class="self" filter="self" method="get_csv_device_list"/>
-        </Field>
-
-        <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
-          <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
-        </Field>
-      </ConfigUI>
-      <CallbackMethod>csv_refresh_device_action</CallbackMethod>
+        <ConfigUI>
+            <Field id="Instructions" type="label">
+                <Label>Use this action to refresh all data sources associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
+            </Field>
+            <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
+                <Label>CSV Engine Device:</Label>
+                <List class="self" filter="self" method="get_csv_device_list"/>
+            </Field>
+            <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
+                <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>csv_refresh_device_action</CallbackMethod>
     </Action>
 
     <!-- ========================= Refresh CSV Source ========================= -->
     <Action id="refresh_csv_source" deviceFilter="" uiPath="DeviceActions">
-      <Name>Manual Refresh - CSV Source</Name>
-      <ConfigUI>
+        <Name>Manual Refresh - CSV Source</Name>
         <SupportURL>https://github.com/DaveL17/matplotlib/wiki/actions</SupportURL>
-
+        <ConfigUI>
         <Field id="Instructions" type="label">
-          <Label>Use this action to refresh the selected data source associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
+            <Label>Use this action to refresh the selected data source associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
         </Field>
-
         <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
-          <Label>CSV Engine Device:</Label>
-          <List class="self" filter="self" method="get_csv_device_list"/>
-          <CallbackMethod>dummyCallback</CallbackMethod>
+            <Label>CSV Engine Device:</Label>
+            <List class="self" filter="self" method="get_csv_device_list"/>
+            <CallbackMethod>dummyCallback</CallbackMethod>
         </Field>
-
         <Field id="targetSource" type="menu" tooltip="Please select a source to be updated.">
-          <Label>CSV Engine Source:</Label>
-          <List class="self" filter="self" method="get_csv_source_list" dynamicReload="true"/>
+            <Label>CSV Engine Source:</Label>
+            <List class="self" filter="self" method="get_csv_source_list" dynamicReload="true"/>
         </Field>
-
         <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
-          <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
+            <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
         </Field>
-
-      </ConfigUI>
-      <CallbackMethod>csv_refresh_source_action</CallbackMethod>
+        </ConfigUI>
+        <CallbackMethod>csv_refresh_source_action</CallbackMethod>
     </Action>
 
-    <!-- Separator -->
     <Action id="sep1" uiPath="DeviceActions"/>
 
     <!-- =========================== Chart Devices ============================ -->
     <!-- The device filter is excluding devices that aren't chart devices. -->
     <Action id="refreshAChartAction" deviceFilter="self, props.isChart" uiPath="DeviceActions">
-      <Name>Redraw One Chart</Name>
-      <CallbackMethod>refreshAChartAction</CallbackMethod>
+        <Name>Redraw One Chart</Name>
+        <CallbackMethod>refreshAChartAction</CallbackMethod>
     </Action>
 
-    <Action id="refreshTheChartsAction"  uiPath="DeviceActions">
-      <Name>Redraw All Charts</Name>
-      <CallbackMethod>refreshTheChartsAction</CallbackMethod>
+    <Action id="action_refresh_the_charts"  uiPath="DeviceActions">
+        <Name>Redraw All Charts</Name>
+        <CallbackMethod>action_refresh_the_charts</CallbackMethod>
     </Action>
 
-    <!-- Separator -->
     <Action id="sep2" uiPath="DeviceActions"/>
 
     <!-- =========================  Chart Themes  ========================= -->
     <Action id="changeChartTheme"  uiPath="DeviceActions">
-      <Name>Change Chart Theme (Beta)</Name>
-      <CallbackMethod>actionChangeChartTheme</CallbackMethod>
-
-      <ConfigUI>
-        <Field id="color_label_1" type="label">
-            <Label>Use this action to make "permanent" changes to the default theme of your charts. These changes will affect every chart that uses the settings you change. The action will take a "snapshot" of the original settings before modifying them. To restore the settings back to their original state, create another action using the "Restore Chart Theme" action item.</Label>
-        </Field>
-        <!-- Font Color for Annotations -->
-        <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's annotation text.">
-            <Label>Annotation Color:</Label>
-        </Field>
-
-        <!-- Background Color -->
-        <Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00" tooltip="Select preference for the background color of your chart.">
-            <Label>Canvas Color:</Label>
-        </Field>
-
-        <!-- Transparent Background Color -->
-        <Field id="backgroundColorOther" type="checkbox" defaultValue="false"
-               tooltip="Check this box if you would like to override the background color selection with a transparent background.">
-            <Label>Transparent Canvas?</Label>
-        </Field>
-
-        <!-- Font Color -->
-        <Field id="fontColor" type="colorpicker" defaultValue="FF FF FF" tooltip="Select preference for the color of your chart's text.">
-            <Label>Font Color:</Label>
-        </Field>
-
-        <!-- Grid Color -->
-        <Field id="gridColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's grids.">
-            <Label>Grid Color:</Label>
-        </Field>
-
-        <!-- Plot Area Color -->
-        <Field id="faceColor" type="colorpicker" defaultValue="00 00 00"
-               tooltip="Select preference for the plot area color of your chart. Note that this only affects the plot area and any selected canvas color will display.">
-            <Label>Plot Area Color:</Label>
-        </Field>
-
-        <!-- Transparent Plot Area Color -->
-        <Field id="faceColorOther" type="checkbox" defaultValue="false"
-               tooltip="Check this box if you would like to override the background color selection with a transparent background.">
-            <Label>Transparent Plot?</Label>
-        </Field>
-
-        <!-- Spine Color -->
-        <Field id="spineColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's spines.">
-            <Label>Spine Color:</Label>
-        </Field>
-
-        <!-- Tick Color -->
-        <Field id="tickColor" type="colorpicker" defaultValue="88 88 88" tooltip="Select preference for the color of your chart's ticks.">
-            <Label>Tick Color:</Label>
-        </Field>
-
-      </ConfigUI>
-
+        <Name>Change Chart Theme (Beta)</Name>
+        <CallbackMethod>actionChangeChartTheme</CallbackMethod>
+        <ConfigUI>
+            <Field id="color_label_1" type="label">
+                <Label>Use this action to make "permanent" changes to the default theme of your charts. These changes will affect every chart that uses the settings you change. The action will take a "snapshot" of the original settings before modifying them. To restore the settings back to their original state, create another action using the "Restore Chart Theme" action item.</Label>
+            </Field>
+            <!-- Font Color for Annotations -->
+            <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF"
+                   tooltip="Select preference for the color of your chart's annotation text.">
+                <Label>Annotation Color:</Label>
+            </Field>
+            <!-- Background Color -->
+            <Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00"
+                   tooltip="Select preference for the background color of your chart.">
+                <Label>Canvas Color:</Label>
+            </Field>
+            <!-- Transparent Background Color -->
+            <Field id="backgroundColorOther" type="checkbox" defaultValue="false"
+                   tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+                <Label>Transparent Canvas?</Label>
+            </Field>
+            <!-- Font Color -->
+            <Field id="fontColor" type="colorpicker" defaultValue="FF FF FF"
+                   tooltip="Select preference for the color of your chart's text.">
+                <Label>Font Color:</Label>
+            </Field>
+            <!-- Grid Color -->
+            <Field id="gridColor" type="colorpicker" defaultValue="88 88 88"
+                   tooltip="Select preference for the color of your chart's grids.">
+                <Label>Grid Color:</Label>
+            </Field>
+            <!-- Plot Area Color -->
+            <Field id="faceColor" type="colorpicker" defaultValue="00 00 00"
+                   tooltip="Select preference for the plot area color of your chart. Note that this only affects the plot area and any selected canvas color will display.">
+                <Label>Plot Area Color:</Label>
+            </Field>
+            <!-- Transparent Plot Area Color -->
+            <Field id="faceColorOther" type="checkbox" defaultValue="false"
+                   tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+                <Label>Transparent Plot?</Label>
+            </Field>
+            <!-- Spine Color -->
+            <Field id="spineColor" type="colorpicker" defaultValue="88 88 88"
+                   tooltip="Select preference for the color of your chart's spines.">
+                <Label>Spine Color:</Label>
+            </Field>
+            <!-- Tick Color -->
+            <Field id="tickColor" type="colorpicker" defaultValue="88 88 88"
+                   tooltip="Select preference for the color of your chart's ticks.">
+                <Label>Tick Color:</Label>
+            </Field>
+        </ConfigUI>
     </Action>
 
     <!-- =====================  Restore Chart Themes  ===================== -->
     <Action id="restoreChartTheme"  uiPath="DeviceActions">
-      <Name>Restore Chart Theme (Beta)</Name>
-      <ConfigUI>
-        <Field id="restoreThemeLabel" type="label">
-          <Label>Use this action to revert to the last theme used before a Change Chart Theme action was invoked.&#13;&#13;This action has no configuration settings.</Label>
-        </Field>
-      </ConfigUI>
-      <CallbackMethod>actionRestoreChartTheme</CallbackMethod>
+        <Name>Restore Chart Theme (Beta)</Name>
+        <ConfigUI>
+            <Field id="restoreThemeLabel" type="label">
+                <Label>Use this action to revert to the last theme used before a Change Chart Theme action was invoked.&#13;&#13;This action has no configuration settings.</Label>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>actionRestoreChartTheme</CallbackMethod>
     </Action>
 
     <!-- =========================== Hidden Actions =========================== -->
     <Action id="refreshTheChartsAPI" uiPath="hidden">
-      <Name>API Action to Draw Simple Chart</Name>
-      <CallbackMethod>plotActionApi</CallbackMethod>
+        <Name>API Action to Draw Simple Chart</Name>
+        <CallbackMethod>plotActionApi</CallbackMethod>
     </Action>
-
 </Actions>

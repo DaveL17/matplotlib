@@ -354,7 +354,7 @@ def format_axis_x_ticks(ax, p_dict, k_dict, logger):
             ax.tick_params(axis='x', **k_dict['k_major_x'])
             ax.tick_params(axis='x', **k_dict['k_minor_x'])
             ax.xaxis.set_major_formatter(mdate.DateFormatter(p_dict['xAxisLabelFormat']))
-            format_axis_x_scale(x_axis_bins=p_dict['xAxisBins'], logger=log)
+            format_axis_x_scale(x_axis_bins=p_dict.get('xAxisBins', "%A"), logger=log)
 
             # If the x axis format has been set to None, let's hide the labels.
             if p_dict['xAxisLabelFormat'] == "None":
