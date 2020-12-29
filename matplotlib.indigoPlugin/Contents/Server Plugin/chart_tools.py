@@ -297,11 +297,15 @@ def format_axis_x_scale(x_axis_bins, logger):
 
     try:
         if x_axis_bins == 'quarter-hourly':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 96)))
+            plt.gca().xaxis.set_major_locator(mdate.MinuteLocator(interval=15))
+            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 1)))
+            # plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            # plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 96)))
         if x_axis_bins == 'half-hourly':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
-            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 48)))
+            plt.gca().xaxis.set_major_locator(mdate.MinuteLocator(interval=30))
+            plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 1)))
+            # plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            # plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 48)))
         elif x_axis_bins == 'hourly':
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=1))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 24)))
@@ -445,7 +449,7 @@ def format_axis_y(ax, p_dict, k_dict, logger):
     try:
         ax.tick_params(axis='y', **k_dict['k_major_y'])
         ax.tick_params(axis='y', **k_dict['k_minor_y'])
-        ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{p}f".format(p=int(p_dict['yAxisPrecision']))))
+        ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(u"%.{p}f".format(p=int(p_dict.get('yAxisPrecision', "0")))))
 
         # Mirror Y axis values on Y2. Not all charts will support this option.
         try:
@@ -642,12 +646,14 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
 
     if p_dict['verboseLogging']:
         logger['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
+        logger['debug'].append(u"Custom Segments Payload: {s}".format(s=p_dict['customLineSegments']))
 
     if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
         try:
             # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb))
             constants_to_plot = p_dict['customLineSegments']
             cls = ax
+
 
             # If a single tuple comes in, we need to tuple the tuple.  (a, b) --> ((a, b),)
             if not isinstance(constants_to_plot[0], tuple):

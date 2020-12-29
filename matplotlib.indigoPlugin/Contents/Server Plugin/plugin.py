@@ -44,7 +44,7 @@ the proper Fantastic Weather devices.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
 # TODO: Move more code out of plugin.py
 # TODO: Audit device config ui changes against prod server.
-
+# TODO: Can do away with snappyconfigmenus
 # ================================== IMPORTS ==================================
 
 try:
@@ -444,8 +444,9 @@ class Plugin(indigo.PluginBase):
 
             # ========================= Composite Forecast Device =========================
             if type_id == "compositeForecastDevice":
-                values_dict['lineColor']       = "00 00 FF"
-                values_dict['lineMarkerColor'] = "FF 00 00"
+                values_dict['lineColor']        = "00 00 FF"
+                values_dict['lineMarkerColor']  = "FF 00 00"
+                values_dict['xAxisLabelFormat'] = "%A"
 
             if self.pluginPrefs.get('enableCustomLineSegments', False):
                 values_dict['enableCustomLineSegmentsSetting'] = True
@@ -2187,7 +2188,7 @@ class Plugin(indigo.PluginBase):
                         except KeyError:
                             pass
                         except SyntaxError:
-                            self.logger.warning(u"Custom Line Segments entry is invalid. Skipping.")
+                            self.logger.warning(u"[{name}] Custom Line Segments entry is invalid. Skipping.".format(name=dev.name))
 
                         # =================================================
                         # Convert these indigo.List(s) to Python lists.
@@ -3922,8 +3923,8 @@ class Plugin(indigo.PluginBase):
 
         def work_the_refresh_queue():
             while not self.refresh_queue.empty():
-                q = self.refresh_queue.get()
-                self.charts_refresh(q)
+                queue_dev = self.refresh_queue.get()
+                self.charts_refresh(queue_dev)
 
         t = threading.Thread(target=work_the_refresh_queue(), args=())
         t.daemon = True

@@ -1146,7 +1146,7 @@
 
     <!-- =====================  Bar Charting Device  ====================== -->
     <Device id="barChartingDevice" type="custom">
-        <Name>Bar Chart (Flow)</Name>
+        <Name>Bar Chart (Vertical Flow)</Name>
         <ConfigUI>
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
@@ -1575,7 +1575,7 @@
 
     <!-- ==================  Stock Bar Charting Device  =================== -->
     <Device id="barStockChartingDevice" type="custom">
-        <Name>Bar Chart (Stock)</Name>
+        <Name>Bar Chart (Vertical Stock)</Name>
         <ConfigUI>
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
@@ -5363,7 +5363,7 @@
             <Field id="topSeparator" type="separator"/>
 
             <!-- ========================  Chart Controls  ======================== -->
-            <Field id="fileName" type="textfield" defaultValue="chart_forecast.png"
+            <Field id="fileName" type="textfield" defaultValue="chart_forecast_composite.png"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
                    tooltip="Enter the file name of your chart (filename.png).">
                 <Label>Output File Name:</Label>

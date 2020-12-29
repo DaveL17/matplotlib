@@ -1,5 +1,6 @@
 v0.9.42
--
+- Sorts yAxisPrecision KeyError for stock horizontal charts.
+- Fixes bug in A axis tick formatting for quarter- and half-hour increments.
 
 v0.9.41
 - Sorts x axis label color bug for stock bar charts.

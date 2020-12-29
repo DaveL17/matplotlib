@@ -278,7 +278,6 @@ try:
 
     # ============================= Sunrise / Sunset ==============================
     # Note that this highlights daytime hours on the chart.
-
     daylight = props.get('showDaytime', True)
 
     if daylight and dev_type in ('Hourly', 'wundergroundHourly'):

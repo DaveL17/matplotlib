@@ -34,6 +34,8 @@ props      = payload['props']
 chart_name = props['name']
 plug_dict  = payload['prefs']
 bar_colors = []
+dates_to_plot = []
+x_ticks = []
 
 log['Threaddebug'].append(u"chart_bar_flow.py called.")
 if plug_dict['verboseLogging']:
@@ -48,7 +50,6 @@ try:
 
     ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
 
-    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
 
     for thing in range(1, 5, 1):
@@ -96,49 +97,46 @@ try:
             # Prune the data if warranted
             dates_to_plot = p_dict['x_obs{i}'.format(i=thing)]
 
+            # Get limit -- if blank or none then zero limit.
             try:
                 limit = float(props['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
+            y_obs   = p_dict['y_obs{i}'.format(i=thing)]
+            new_old = props['limitDataRange']
             if limit > 0:
-                y_obs   = p_dict['y_obs{i}'.format(i=thing)]
-                new_old = props['limitDataRange']
                 dtp = chart_tools.prune_data(x_data=dates_to_plot,
                                              y_data=y_obs,
                                              limit=limit,
                                              new_old=new_old,
                                              logger=log
                                              )
-                p_dict['x_obs{i}'.format(i=thing)], p_dict['y_obs{i}'.format(i=thing)] = dtp
+                dates_to_plot, y_obs = dtp
 
             # Convert the date strings for charting.
-            p_dict['x_obs{i}'.format(i=thing)] = \
-                chart_tools.format_dates(list_of_dates=p_dict['x_obs{i}'.format(i=thing)],
-                                         logger=log
-                                         )
+            dates_to_plot = chart_tools.format_dates(list_of_dates=dates_to_plot, logger=log)
 
             # If the user sets the width to 0, this will perform an introspection of the
             # dates to plot and get the minimum of the difference between the dates.
             try:
                 if float(p_dict['barWidth']) == 0.0:
-                    width = np.min(np.diff(p_dict['x_obs{i}'.format(i=thing)])) * 0.8
+                    width = np.min(np.diff(dates_to_plot)) * 0.8
                 else:
                     width = float(p_dict['barWidth'])
             except ValueError as sub_error:
-                width = 1
+                width = 0.8
 
             # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
             # With this setting, we replace the Y values of zero with a very small positive value
             # (0 becomes 1e-06). We get a slice of the original data for annotations.
-            annotation_values = p_dict['y_obs{i}'.format(i=thing)][:]
+            annotation_values = y_obs[:]
             if p_dict.get('showZeroBars', False):
-                p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in
-                                                                     p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]]
+                y_obs[num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in y_obs[num_obs * -1:]]
 
             # Plot the bar. Note: hatching is not supported in the PNG backend.
-            ax.bar(p_dict['x_obs{i}'.format(i=thing)][num_obs * -1:],
-                   p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:],
+            ax.bar(dates_to_plot[num_obs * -1:],
+                   y_obs[num_obs * -1:],
                    align='center',
                    width=width,
                    color=p_dict['bar{i}Color'.format(i=thing)],
@@ -146,11 +144,11 @@ try:
                    **k_dict['k_bar']
                    )
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]]
+            [p_dict['data_array'].append(node) for node in y_obs[num_obs * -1:]]
 
             # If annotations desired, plot those too.
             if p_dict['bar{i}Annotate'.format(i=thing)]:
-                for xy in zip(p_dict['x_obs{i}'.format(i=thing)], annotation_values):
+                for xy in zip(dates_to_plot, annotation_values):
                     ax.annotate(u"{i}".format(i=xy[1]),
                                 xy=xy,
                                 xytext=(0, 0),
@@ -158,6 +156,7 @@ try:
                                 **k_dict['k_annotation']
                                 )
 
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
     chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
     chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
@@ -220,12 +219,12 @@ try:
     # props.
     for thing in range(1, 5, 1):
         if p_dict['plotBar{i}Min'.format(i=thing)]:
-            ax.axhline(y=min(p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]),
+            ax.axhline(y=min(y_obs[num_obs * -1:]),
                        color=p_dict['bar{i}Color'.format(i=thing)],
                        **k_dict['k_min']
                        )
         if p_dict['plotBar{i}Max'.format(i=thing)]:
-            ax.axhline(y=max(p_dict['y_obs{i}'.format(i=thing)][num_obs * -1:]),
+            ax.axhline(y=max(y_obs[num_obs * -1:]),
                        color=p_dict['bar{i}Color'.format(i=thing)],
                        **k_dict['k_max']
                        )
