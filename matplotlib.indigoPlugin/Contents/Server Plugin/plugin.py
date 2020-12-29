@@ -45,6 +45,7 @@ the proper Fantastic Weather devices.
 # TODO: Move more code out of plugin.py
 # TODO: Audit device config ui changes against prod server.
 # TODO: Can do away with snappyconfigmenus
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -98,7 +99,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.42"
+__version__   = u"0.9.43"
 
 # =============================================================================
 
@@ -1342,51 +1343,6 @@ class Plugin(indigo.PluginBase):
 
         self.charts_refresh(dev_list=devices_to_refresh)
         self.logger.info(u"{0:{1}^80}".format(u' Redraw All Charts Action Complete ', '='))
-
-    # =============================================================================
-    def actionChangeChartTheme(self, plugin_action):
-        """
-        Called by an Indigo Action item.
-        Allows the plugin to call the charts_refresh() method from an Indigo Action
-        item. This action will refresh all charts.
-        -----
-        :param class 'indigo.PluginAction' plugin_action:
-        """
-        something_changed = False
-        old_prefs = copy.deepcopy(self.pluginPrefs)
-
-        # Iterate through the action config ui values.
-        for prop in plugin_action.props:
-            # If something is different, update plugin prefs to the
-            # action prop value(s).
-            if plugin_action.props[prop] != self.pluginPrefs.get(prop, None):
-                something_changed = True
-                if prop not in ('dataPath', 'chartPath'):
-                    self.pluginPrefs[prop] = plugin_action.props[prop]
-
-        # Since something changed, lets store the original prefs and ensure that
-        # the new prefs changes are blown to disk (and saved to the *.indiPref file).
-        if something_changed:
-            del old_prefs['old_prefs']  # If we don't delete the old ones, they'll nest forever.
-            self.pluginPrefs['old_prefs'] = old_prefs
-            indigo.server.savePluginPrefs()
-
-    # =============================================================================
-    def actionRestoreChartTheme(self, plugin_action):
-
-        # Get a copy of the archived preferences
-        original_prefs = copy.deepcopy(self.pluginPrefs['old_prefs'])
-
-        # Iterate through each archived preference and save it to pluginPrefs. We
-        # do this with a little overhead in case things have changed in the interim.
-        for pref in original_prefs.keys():
-            try:
-                self.pluginPrefs[pref] = original_prefs[pref]
-            except KeyError:
-                pass
-
-        # Force Indigo to update everything to make sure everything is in sync.
-        indigo.server.savePluginPrefs()
 
     # =============================================================================
     def advancedSettingsExecuted(self, values_dict=None, menu_id=0):

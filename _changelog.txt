@@ -1,3 +1,6 @@
+v0.9.43
+- Factors out chart themes for a different implementation.
+
 v0.9.42
 - Sorts yAxisPrecision KeyError for stock horizontal charts.
 - Fixes bug in A axis tick formatting for quarter- and half-hour increments.
