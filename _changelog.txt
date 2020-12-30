@@ -1,3 +1,8 @@
+v0.9.44
+- New Feature: Theme Manager
+- Reorders display settings in Theme Manager (categories).
+- Hides display settings in plugin config.
+
 v0.9.43
 - Factors out chart themes for a different implementation.
 

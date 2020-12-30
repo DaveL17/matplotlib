@@ -160,7 +160,7 @@ class Maintain(object):
             'font_style',
             'font_weight',
             'fontColorOther',
-            'foo',
+            'themeNameGenerator',
             'forecastSourceDevice',
             'gridColorOther',
             'line1adjuster',

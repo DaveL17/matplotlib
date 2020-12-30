@@ -335,7 +335,7 @@ ytick.major.pad       : 5      # distance to major tick label in points
 #savefig.dpi       : 100      # figure dots per inch
 #savefig.facecolor : white    # figure facecolor when saving
 #savefig.edgecolor : white    # figure edgecolor when saving
-#savefig.extension : auto     # what extension to use for savefig('foo'), or 'auto'
+#savefig.extension : auto     # what extension to use for savefig('themeNameGenerator'), or 'auto'
 
 #cairo.format      : png      # png, ps, pdf, svg
 

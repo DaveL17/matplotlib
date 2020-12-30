@@ -131,4 +131,260 @@
 	<CallbackMethod>save_snapshot</CallbackMethod>
 </MenuItem>
 
+<!-- ========================  Theme Manager  ========================= -->
+<MenuItem id="themeManager">
+<Name>Theme Manager</Name>
+	<ButtonTitle>Close</ButtonTitle>
+	<CallbackMethod>themeManagerCloseUi</CallbackMethod>
+	<ConfigUI>
+
+<!-- ====================================================================== -->
+<!-- ==========================  Theme Settings  ========================== -->
+<!-- ====================================================================== -->
+
+		<Field id="currentThemeSettings" type="label" alignText="right">
+			<Label>Current Theme</Label>
+		</Field>
+
+		<Field id="currentThemeSettingsSeparator" type="separator"/>
+
+		<Field id="themeMenu" type="menu" defaultValue="colors">
+			<Label/>
+			<List>
+				<Option value="colors">Color Settings</Option>
+				<Option value="font">Font Settings</Option>
+				<Option value="other">Other Settings</Option>
+				<Option value="transparency">Transparency Settings</Option>
+			</List>
+		</Field>
+
+		<!-- Font Color for Annotations -->
+		<Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the color of your chart's annotation text.">
+			<Label>Annotation Color:</Label>
+		</Field>
+
+		<!-- Background Color -->
+		<Field id="backgroundColor" type="colorpicker" defaultValue="00 00 00" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the background color of your chart.">
+			<Label>Canvas Color:</Label>
+		</Field>
+
+		<!-- Font Color -->
+		<Field id="fontColor" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the color of your chart's text.">
+			<Label>Font Color:</Label>
+		</Field>
+
+		<!-- Grid Color -->
+		<Field id="gridColor" type="colorpicker" defaultValue="88 88 88" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the color of your chart's grids.">
+			<Label>Grid Color:</Label>
+		</Field>
+
+		<!-- Plot Area Color -->
+		<Field id="faceColor" type="colorpicker" defaultValue="00 00 00" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the plot area color of your chart. Note that this only affects the plot area and any selected canvas color will display.">
+			<Label>Plot Area Color:</Label>
+		</Field>
+
+		<!-- Spine Color -->
+		<Field id="spineColor" type="colorpicker" defaultValue="88 88 88" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the color of your chart's spines.">
+			<Label>Spine Color:</Label>
+		</Field>
+
+		<!-- Tick Color -->
+		<Field id="tickColor" type="colorpicker" defaultValue="88 88 88" visibleBindingId="themeMenu" visibleBindingValue="colors"
+			   tooltip="Select preference for the color of your chart's ticks.">
+			<Label>Tick Color:</Label>
+		</Field>
+
+		<!-- Main Font Style -->
+		<Field id="fontMain" type="menu" defaultValue="Arial" visibleBindingId="themeMenu" visibleBindingValue="font"
+			   tooltip="Select preference for the font of your chart.">
+			<Label>Font Style:</Label>
+			<List class="self" filter="" method="getFontList" dynamicReload="true"/>
+		</Field>
+
+		<!-- Legend Font Size -->
+		<Field id="legendFontSize" type="menu" defaultValue="6" visibleBindingId="themeMenu" visibleBindingValue="font"
+			   tooltip="Enter your preference for the legend font size of your chart (integer).">
+			<Label>Legend Font Size:</Label>
+			<List>
+				<Option value="6">6*</Option>
+				<Option value="7">7</Option>
+				<Option value="8">8</Option>
+				<Option value="9">9</Option>
+				<Option value="10">10</Option>
+				<Option value="11">11</Option>
+				<Option value="12">12</Option>
+				<Option value="13">13</Option>
+				<Option value="14">14</Option>
+				<Option value="15">15</Option>
+				<Option value="16">16</Option>
+				<Option value="17">17</Option>
+				<Option value="18">18</Option>
+				<Option value="19">19</Option>
+				<Option value="20">20</Option>
+				<Option value="21">21</Option>
+			</List>
+		</Field>
+
+		<!-- Tick Font Size -->
+		<Field id="tickFontSize" type="menu" defaultValue="8" visibleBindingId="themeMenu" visibleBindingValue="font"
+			   tooltip="Enter your preference for the tick font size of your chart (integer).">
+			<Label>Tick Font Size:</Label>
+			<List>
+				<Option value="6">6</Option>
+				<Option value="7">7</Option>
+				<Option value="8">8*</Option>
+				<Option value="9">9</Option>
+				<Option value="10">10</Option>
+				<Option value="11">11</Option>
+				<Option value="12">12</Option>
+				<Option value="13">13</Option>
+				<Option value="14">14</Option>
+				<Option value="15">15</Option>
+				<Option value="16">16</Option>
+				<Option value="17">17</Option>
+				<Option value="18">18</Option>
+				<Option value="19">19</Option>
+				<Option value="20">20</Option>
+				<Option value="21">21</Option>
+			</List>
+		</Field>
+
+		<!-- Title Font Size -->
+		<Field id="mainFontSize" type="menu" defaultValue="10" visibleBindingId="themeMenu" visibleBindingValue="font"
+			   tooltip="Enter your preference for the title font size of your chart (integer).">
+			<Label>Title Font Size:</Label>
+			<List>
+				<Option value="6">6</Option>
+				<Option value="7">7</Option>
+				<Option value="8">8</Option>
+				<Option value="9">9</Option>
+				<Option value="10">10*</Option>
+				<Option value="11">11</Option>
+				<Option value="12">12</Option>
+				<Option value="13">13</Option>
+				<Option value="14">14</Option>
+				<Option value="15">15</Option>
+				<Option value="16">16</Option>
+				<Option value="17">17</Option>
+				<Option value="18">18</Option>
+				<Option value="19">19</Option>
+				<Option value="20">20</Option>
+				<Option value="21">21</Option>
+			</List>
+		</Field>
+
+		<!-- Grid Style -->
+		<Field id="gridStyle" type="menu" defaultValue=":" visibleBindingId="themeMenu" visibleBindingValue="other"
+           tooltip="Select preference for the style of your chart's grids.">
+        <Label>Grid Style:</Label>
+        <List>
+            <Option value="--">Dashed</Option>
+            <Option value=":">Dotted</Option>
+            <Option value="-.">Dot Dash</Option>
+            <Option value="-">Solid*</Option>
+            <Option value="steps">Steps</Option>
+            <Option value="steps-mid">Steps Mid</Option>
+            <Option value="steps-post">Steps Post</Option>
+            <Option value="-1">%%separator%%</Option>
+            <Option value="None">None</Option>
+        </List>
+		</Field>
+
+		<!-- Tick Size -->
+		<Field id="tickSize" type="menu" defaultValue="4" visibleBindingId="themeMenu" visibleBindingValue="other"
+			   tooltip="Select preference for the size of the major tick marks. The minor ticks will be half as tall.">
+			<Label>Tick Size:</Label>
+			<List>
+				<Option value="0">0</Option>
+				<Option value="1">1</Option>
+				<Option value="2">2</Option>
+				<Option value="3">3</Option>
+				<Option value="4">4*</Option>
+				<Option value="5">5</Option>
+				<Option value="6">6</Option>
+				<Option value="7">7</Option>
+				<Option value="8">8</Option>
+			</List>
+		</Field>
+
+		<!-- Line Weight -->
+		<Field id="lineWeight" type="textfield" defaultValue="1.0" visibleBindingId="themeMenu" visibleBindingValue="other"
+			   tooltip="Enter the weight for all graph lines as a positive float(1.0).">
+			<Label>Line Weight:</Label>
+		</Field>
+
+		<!-- Transparent Background Color -->
+		<Field id="backgroundColorOther" type="checkbox" defaultValue="false" visibleBindingId="themeMenu" visibleBindingValue="transparency"
+			   tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+			<Label>Transparent Canvas?</Label>
+		</Field>
+
+		<!-- Transparent Plot Area Color -->
+		<Field id="faceColorOther" type="checkbox" defaultValue="false" visibleBindingId="themeMenu" visibleBindingValue="transparency"
+			   tooltip="Check this box if you would like to override the background color selection with a transparent background.">
+			<Label>Transparent Plot?</Label>
+		</Field>
+
+<!-- ====================================================================== -->
+<!-- ====================================================================== -->
+<!-- ====================================================================== -->
+
+		<Field id="themeManagerControls" type="label" alignText="right">
+			<Label>Theme Manager Controls</Label>
+		</Field>
+
+		<Field id="themeSettingsSeparator" type="separator"/>
+
+		<Field id="space1" type="label">
+			<Label/>
+		</Field>
+		<Field id="allThemes" type="list" rows="5">
+			<Label>Themes:</Label>
+			<List class="self" method="themeNameGenerator" dynamicReload="true"/>
+		</Field>
+		<Field id="selectText" type="label" visibleBindingId="menu" visibleBindingValue="select" alwaysUseInDialogHeightCalc="true" alignWithControl="true">
+			<Label/>
+		</Field>
+		<Field id="applyText" type="label" visibleBindingId="menu" visibleBindingValue="apply" alignWithControl="true">
+			<Label>Apply selected theme.</Label>
+		</Field>
+		<Field id="deleteText" type="label" visibleBindingId="menu" visibleBindingValue="delete" alignWithControl="true">
+			<Label>Delete selected theme.</Label>
+		</Field>
+		<Field id="renameText" type="label" visibleBindingId="menu" visibleBindingValue="rename" alignWithControl="true">
+			<Label>Rename selected theme.</Label>
+		</Field>
+		<Field id="saveText" type="label" visibleBindingId="menu" visibleBindingValue="save" alignWithControl="true">
+			<Label>Save configured theme.</Label>
+		</Field>
+		<Field id="menu" type="menu" defaultValue="select">
+			<Label/>
+			<List>
+				<Option value="select">Select an Action...</Option>
+				<Option value="apply">Apply</Option>
+				<Option value="delete">Delete</Option>
+				<Option value="rename">Rename</Option>
+				<Option value="save">Save</Option>
+			</List>
+		</Field>
+		<Field id="newTheme" type="textfield" visibleBindingId="menu" visibleBindingValue="save" alwaysUseInDialogHeightCalc="true">
+			<Label>Save as:</Label>
+		</Field>
+		<Field id="newThemeName" type="textfield" visibleBindingId="menu" visibleBindingValue="rename" alwaysUseInDialogHeightCalc="true">
+			<Label>New Name:</Label>
+		</Field>
+		<Field id="themeExecuteActionButton" type="button">
+			<Label> </Label>
+			<Title> Execute Action </Title>
+			<CallbackMethod>themeExecuteActionButton</CallbackMethod>
+		</Field>
+	</ConfigUI>
+</MenuItem>
+
 </MenuItems>
