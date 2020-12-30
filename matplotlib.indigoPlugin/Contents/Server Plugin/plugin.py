@@ -47,6 +47,8 @@ the proper Fantastic Weather devices.
 # TODO: Can do away with snappyconfigmenus
 # TODO: Move multiline text font color to theme color
 # TODO: Move multiline text font size to theme size
+# TODO: Update wiki for new theme manager
+
 # ================================== IMPORTS ==================================
 
 try:
@@ -101,7 +103,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.44"
+__version__   = u"0.9.45"
 
 # =============================================================================
 
@@ -242,11 +244,13 @@ class Plugin(indigo.PluginBase):
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
     # =============================================================================
-    # def getActionConfigUiXml(self, type_id="", dev_id=0):
-    #     pass
-
-    # =============================================================================
     def getActionConfigUiValues(self, values_dict, type_id="", dev_id=0):
+
+        # ===========================  Apply Theme Action  ============================
+        if type_id == "themeApplyAction":
+            return values_dict
+
+        # ==================================  Else  ===================================
         if len(values_dict) == 0:
             return self.pluginPrefs
         else:
@@ -3927,17 +3931,15 @@ class Plugin(indigo.PluginBase):
 
     def themeNameGenerator(self, fltr="", values_dict=None, type_id="", target_id=0):
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
-
-        # TODO: convert this stuff to a global object to minimize IO.
-        # Get theme names
         with open(full_path, 'r') as f:
             infile = json.load(f)
 
+        self.logger.debug(u"themeNameGenerator: infile.keys() = {}".format(infile.keys()))
         return [(key, key) for key in sorted(infile.keys())]
 
     def themeManagerCloseUi(self, values_dict=None, menu_item_id="", foo=None):
         # Don't need to trap user cancel since this callback won't be called
-        # if user cancels.
+        # if user cancels. There is no way to trap the cancel.
 
         # ==========================  Apply Theme Settings  ===========================
         for key in ['backgroundColor', 'backgroundColorOther', 'faceColor', 'faceColorOther', 'fontColor',
@@ -3945,9 +3947,29 @@ class Plugin(indigo.PluginBase):
                     'lineWeight', 'mainFontSize', 'spineColor', 'tickColor', 'tickFontSize', 'tickSize']:
             self.pluginPrefs[key] = values_dict[key]
 
-        self.logger.info(u"close")
         return True
 
+    # =============================================================================
+    def themeApplyAction(self, plugin_action):
+        full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
+        selected_theme = plugin_action.props['targetTheme']
+
+        # ==============================  Get the Theme  ==============================
+        with open(full_path, 'r') as f:
+            infile = json.load(f)
+
+        # ======================  Confirm Theme is Still Valid  =======================
+        if selected_theme not in infile.keys():
+            self.logger.warning(u"Cannot change theme. Selected theme no longer valid.")
+            return
+
+        # =============================  Apply the Theme  =============================
+        for key in infile[selected_theme]:
+            self.pluginPrefs[key] = infile[selected_theme][key]
+
+        self.logger.info(u"[{}] theme applied.".format(selected_theme))
+
+    # =============================================================================
     def themeApply(self, values_dict, menu_item_id):
         error_msg_dict = indigo.Dict()
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
@@ -3976,9 +3998,9 @@ class Plugin(indigo.PluginBase):
         # ======================  Reset Theme Manager Controls  =======================
         values_dict['allThemes'] = ""
         values_dict['menu'] = 'select'
-        self.logger.info(u"apply")
         return values_dict
 
+    # =============================================================================
     def themeExecuteActionButton(self, values_dict, menu_item_id):
 
         error_msg_dict = indigo.Dict()
@@ -3990,6 +4012,7 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['showAlertText'] = u"You must select an action to execute."
             return values_dict, error_msg_dict
 
+        # ==================  Execute Selected Theme Manager Action  ==================
         if values_dict['menu'] == 'apply':
             result = self.themeApply(values_dict, menu_item_id)
         elif values_dict['menu'] == 'delete':
@@ -4002,6 +4025,7 @@ class Plugin(indigo.PluginBase):
 
         return result
 
+    # =============================================================================
     def themeRename(self, values_dict, menu_item_id):
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         old_name = values_dict['allThemes']
@@ -4024,8 +4048,6 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['showAlertText'] = u"You must enter a new theme name."
             return values_dict, error_msg_dict
 
-        # Validation passed, so let's do this
-
         # Get existing themes
         with open(full_path, 'r') as f:
             infile = json.load(f)
@@ -4038,25 +4060,30 @@ class Plugin(indigo.PluginBase):
             json.dump(infile, f, indent=4, sort_keys=True)
 
         values_dict['menu'] = 'select'
-        self.logger.info(u"rename")
         return values_dict
 
+    # =============================================================================
     def themeSave(self, values_dict, menu_item_id):
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         new_theme_name = values_dict['newTheme']
         error_msg_dict = indigo.Dict()
 
+        # ===========================  Get existing Themes  ===========================
+        with open(full_path, 'r') as f:
+            infile = json.load(f)
+
         # ===============================  Validation  ================================
+        # Save name blank
         if values_dict['newTheme'] == "":
             error_msg_dict['newTheme'] = u"You must specify a theme name."
             error_msg_dict['showAlertText'] = u"You must specify a theme name."
             return values_dict, error_msg_dict
 
-        # TODO: convert to global object to reduce IO.
-        # TODO: ensure save name is unique.
-        # Get existing themes
-        with open(full_path, 'r') as f:
-            infile = json.load(f)
+        # Save name already used
+        if values_dict['newTheme'] in infile.keys():
+            error_msg_dict['newTheme'] = u"You must specify a unique name."
+            error_msg_dict['showAlertText'] = u"You must specify a unique name."
+            return values_dict, error_msg_dict
 
         infile[new_theme_name] = {}
 
@@ -4075,9 +4102,9 @@ class Plugin(indigo.PluginBase):
         # Reset field
         values_dict['newTheme'] = ""
         values_dict['menu'] = 'select'
-        self.logger.info(u"save")
         return values_dict
 
+    # =============================================================================
     def themeDelete(self, values_dict, menu_item_id):
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         del_theme_name = [name for name in values_dict['allThemes']]
@@ -4089,7 +4116,6 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['showAlertText'] = u"You must select at least one theme to delete."
             return values_dict, error_msg_dict
 
-        # TODO: convert to global object to reduce IO.
         # Get existing themes
         with open(full_path, 'r') as f:
             infile = json.load(f)
@@ -4101,7 +4127,6 @@ class Plugin(indigo.PluginBase):
         with open(full_path, 'w') as f:
             json.dump(infile, f, indent=4, sort_keys=True)
 
-        self.logger.info(u"Deleted themes: {}".format(del_theme_name))
         values_dict['menu'] = 'select'
         return values_dict
 

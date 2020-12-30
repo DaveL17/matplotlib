@@ -24,21 +24,21 @@
         <Name>Manual Refresh - CSV Source</Name>
         <SupportURL>https://github.com/DaveL17/matplotlib/wiki/actions</SupportURL>
         <ConfigUI>
-        <Field id="Instructions" type="label">
-            <Label>Use this action to refresh the selected data source associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
-        </Field>
-        <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
-            <Label>CSV Engine Device:</Label>
-            <List class="self" filter="self" method="get_csv_device_list"/>
-            <CallbackMethod>dummyCallback</CallbackMethod>
-        </Field>
-        <Field id="targetSource" type="menu" tooltip="Please select a source to be updated.">
-            <Label>CSV Engine Source:</Label>
-            <List class="self" filter="self" method="get_csv_source_list" dynamicReload="true"/>
-        </Field>
-        <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
-            <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
-        </Field>
+            <Field id="Instructions" type="label">
+                <Label>Use this action to refresh the selected data source associated with the selected CSV Engine device. The device must be set to "Manual Refresh Only".</Label>
+            </Field>
+            <Field id="targetDevice" type="menu" tooltip="Please select a CSV Engine device to update.">
+                <Label>CSV Engine Device:</Label>
+                <List class="self" filter="self" method="get_csv_device_list"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+            <Field id="targetSource" type="menu" tooltip="Please select a source to be updated.">
+                <Label>CSV Engine Source:</Label>
+                <List class="self" filter="self" method="get_csv_source_list" dynamicReload="true"/>
+            </Field>
+            <Field id="Instructions2" type="label" fontSize="small" alignWithControl="true">
+                <Label>(Only devices set to manual update will be displayed. CSV Engine devices with timed refresh intervals will be automatically refreshed).</Label>
+            </Field>
         </ConfigUI>
         <CallbackMethod>csv_refresh_source_action</CallbackMethod>
     </Action>
@@ -58,6 +58,20 @@
     </Action>
 
     <Action id="sep2" uiPath="DeviceActions"/>
+
+    <Action id="themeApplyAction" deviceFilter="" uiPath="DeviceActions">
+        <Name>Apply Theme</Name>
+        <CallbackMethod>themeApplyAction</CallbackMethod>
+        <ConfigUI>
+            <Field id="Instructions" type="label">
+                <Label>Use this action to apply a theme to your charts.</Label>
+            </Field>
+            <Field id="targetTheme" type="menu" tooltip="Please select a theme to apply.">
+                <Label>Theme:</Label>
+                <List class="self" filter="self" method="themeNameGenerator"/>
+            </Field>
+        </ConfigUI>
+    </Action>
 
     <!-- =========================== Hidden Actions =========================== -->
     <Action id="refreshTheChartsAPI" uiPath="hidden">

@@ -138,15 +138,16 @@
 	<CallbackMethod>themeManagerCloseUi</CallbackMethod>
 	<ConfigUI>
 
-<!-- ====================================================================== -->
 <!-- ==========================  Theme Settings  ========================== -->
-<!-- ====================================================================== -->
-
 		<Field id="currentThemeSettings" type="label" alignText="right">
 			<Label>Current Theme</Label>
 		</Field>
 
 		<Field id="currentThemeSettingsSeparator" type="separator"/>
+
+		<Field id="currentThemeLabel" type="label" fontSize="small">
+			<Label>Current theme settings affect how your charts will appear. Use the dropdown menu to select different groups of theme settings. Changes to the current theme will not be applied until you close this window (or save the theme with the Theme Manager.)</Label>
+		</Field>
 
 		<Field id="themeMenu" type="menu" defaultValue="colors">
 			<Label/>
@@ -157,6 +158,8 @@
 				<Option value="transparency">Transparency Settings</Option>
 			</List>
 		</Field>
+
+		<Field id="themeMenuSpacer" type="label"/>
 
 		<!-- Font Color for Annotations -->
 		<Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" visibleBindingId="themeMenu" visibleBindingValue="colors"
@@ -332,37 +335,46 @@
 		</Field>
 
 <!-- ====================================================================== -->
-<!-- ====================================================================== -->
-<!-- ====================================================================== -->
 
 		<Field id="themeManagerControls" type="label" alignText="right">
-			<Label>Theme Manager Controls</Label>
+			<Label>Theme Manager</Label>
 		</Field>
 
 		<Field id="themeSettingsSeparator" type="separator"/>
 
+		<Field id="themeManagerLabel" type="label" fontSize="small">
+			<Label>Theme Manager actions allow you to save and manage multiple themes. Actions take effect immediately (selecting cancel below does not undue the changes.)</Label>
+		</Field>
+
 		<Field id="space1" type="label">
 			<Label/>
 		</Field>
+
 		<Field id="allThemes" type="list" rows="5">
 			<Label>Themes:</Label>
 			<List class="self" method="themeNameGenerator" dynamicReload="true"/>
 		</Field>
+
 		<Field id="selectText" type="label" visibleBindingId="menu" visibleBindingValue="select" alwaysUseInDialogHeightCalc="true" alignWithControl="true">
 			<Label/>
 		</Field>
-		<Field id="applyText" type="label" visibleBindingId="menu" visibleBindingValue="apply" alignWithControl="true">
+
+		<Field id="applyText" type="label" visibleBindingId="menu" visibleBindingValue="apply" alignWithControl="true" fontSize="small">
 			<Label>Apply selected theme.</Label>
 		</Field>
-		<Field id="deleteText" type="label" visibleBindingId="menu" visibleBindingValue="delete" alignWithControl="true">
+
+		<Field id="deleteText" type="label" visibleBindingId="menu" visibleBindingValue="delete" alignWithControl="true" fontSize="small">
 			<Label>Delete selected theme.</Label>
 		</Field>
-		<Field id="renameText" type="label" visibleBindingId="menu" visibleBindingValue="rename" alignWithControl="true">
+
+		<Field id="renameText" type="label" visibleBindingId="menu" visibleBindingValue="rename" alignWithControl="true" fontSize="small">
 			<Label>Rename selected theme.</Label>
 		</Field>
-		<Field id="saveText" type="label" visibleBindingId="menu" visibleBindingValue="save" alignWithControl="true">
+
+		<Field id="saveText" type="label" visibleBindingId="menu" visibleBindingValue="save" alignWithControl="true" fontSize="small">
 			<Label>Save configured theme.</Label>
 		</Field>
+
 		<Field id="menu" type="menu" defaultValue="select">
 			<Label/>
 			<List>
@@ -373,17 +385,21 @@
 				<Option value="save">Save</Option>
 			</List>
 		</Field>
+
 		<Field id="newTheme" type="textfield" visibleBindingId="menu" visibleBindingValue="save" alwaysUseInDialogHeightCalc="true">
 			<Label>Save as:</Label>
 		</Field>
+
 		<Field id="newThemeName" type="textfield" visibleBindingId="menu" visibleBindingValue="rename" alwaysUseInDialogHeightCalc="true">
 			<Label>New Name:</Label>
 		</Field>
+
 		<Field id="themeExecuteActionButton" type="button">
 			<Label> </Label>
 			<Title> Execute Action </Title>
 			<CallbackMethod>themeExecuteActionButton</CallbackMethod>
 		</Field>
+
 	</ConfigUI>
 </MenuItem>
 
