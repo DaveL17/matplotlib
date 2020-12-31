@@ -12,8 +12,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="area" hidden="true"/>
 
-            <Field id="areaChartDeviceText" type="label" alignWithControl="false">
-                <Label>Area Chart Devices are probably the most useful in instances where there are a relatively large number of time series data. They are unlike Line Chart Devices in that the plot values are cumulative. That is, the data for area 2 will be plotted above area 1 (and so on.)</Label>
+            <Field id="areaChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Area Chart Devices are probably the most useful in instances where there are a relatively large number of time series data. They are unlike Line Chart Devices in that the plot values are cumulative. That is, the data for area 2 will be plotted above area 1 (and so on.)&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -91,7 +91,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -114,7 +114,7 @@
 
             <Field id="xAxisLabelFormat" type="menu" defaultValue="%A"
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                   tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -1121,7 +1121,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -1154,8 +1154,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="flow bar" hidden="true"/>
 
-            <Field id="barChartDeviceText" type="label" alignWithControl="false">
-                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
+            <Field id="barChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -1228,7 +1228,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -1549,7 +1549,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -1583,8 +1583,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="stock bar" hidden="true"/>
 
-            <Field id="barChartDeviceText" type="label" alignWithControl="false">
-                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.</Label>
+            <Field id="barChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -1658,7 +1658,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -1965,7 +1965,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -1999,7 +1999,7 @@
 
             <Field id="chart_type" type="textfield" defaultValue="stock bar" hidden="true"/>
 
-            <Field id="barChartDeviceText" type="label" alignWithControl="false">
+            <Field id="barChartDeviceText" type="label" alignWithControl="false" fontSize="small">
                 <Label>Bar Chart Devices are most useful in instances where there are a relatively small number of distinct observations.&#13;</Label>
             </Field>
 
@@ -2075,7 +2075,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -2412,7 +2412,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -2447,8 +2447,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="battery health" hidden="true"/>
 
-            <Field id="batteryDeviceText" type="label" alignWithControl="false">
-                <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.</Label>
+            <Field id="batteryDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Battery Health devices are used to create a graphic representation of the health of battery-powered Indigo devices.&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -2525,19 +2525,19 @@
             <!-- =======================  Display Settings  ======================= -->
             <Field id="healthyColor" type="colorpicker" defaultValue="00 00 CC"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
-                   tooltip="Select preference for the color for devices with batteries that are at the healthy level.">
+                   tooltip="Select preference for the color for devices with batteries at the healthy level.">
                 <Label>Healthy Color:</Label>
             </Field>
 
             <Field id="cautionColor" type="colorpicker" defaultValue="FF FF 00"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
-                   tooltip="Select preference for the color for devices with batteries that are at caution level.">
+                   tooltip="Select preference for the color for devices with batteries at caution level.">
                 <Label>Caution Color:</Label>
             </Field>
 
             <Field id="warningColor" type="colorpicker" defaultValue="FF 00 00"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
-                   tooltip="Select preference for the color for devices with batteries that are at the warning level.">
+                   tooltip="Select preference for the color for devices with batteries at the warning level.">
                 <Label>Warning Color:</Label>
             </Field>
 
@@ -2622,8 +2622,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="calendar" hidden="true"/>
 
-            <Field id="CalendarDeviceText" type="label" alignWithControl="false">
-                <Label>Calendar devices are used to create graphic representations of the current month.</Label>
+            <Field id="CalendarDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Calendar devices are used to create graphic representations of the current month.&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -2746,9 +2746,11 @@
 
             <Field id="chart_type" type="textfield" defaultValue="line" hidden="true"/>
 
-            <Field id="lineChartDeviceText" type="label" alignWithControl="false">
-                <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
+            <Field id="lineChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Line Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.&#13;</Label>
             </Field>
+
+            <Template file="Templates/save_chart_changes.xml" />
 
             <Field id="settingsSpace" type="label"/>
 
@@ -2822,7 +2824,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -2865,7 +2867,7 @@
 
             <Field id="xAxisLabelFormat" type="menu" defaultValue="%A"
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                   tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -4001,7 +4003,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -4035,8 +4037,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="multiline text" hidden="true"/>
 
-            <Field id="multilineTextDeviceText" type="label" alignWithControl="false">
-                <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.</Label>
+            <Field id="multilineTextDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Multiline text devices are used to create graphics containing many lines of text from long strings.&#13;</Label>
             </Field>
 
             <Template file="Templates/save_chart_changes.xml" />
@@ -4175,8 +4177,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="polar" hidden="true"/>
 
-            <Field id="polarChartDeviceText" type="label" alignWithControl="false">
-                <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).</Label>
+            <Field id="polarChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Polar Chart Devices display direction and magnitude (with wind charts for example, the angle represents direction and the distance from the center represents speed).&#13;</Label>
             </Field>
 
             <Field id="settingsSpace" type="label"/>
@@ -4279,7 +4281,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -4324,9 +4326,11 @@
 
             <Field id="chart_type" type="textfield" defaultValue="scatter" hidden="true"/>
 
-            <Field id="scatterChartDeviceText" type="label" alignWithControl="false">
-                <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.</Label>
+            <Field id="scatterChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Scatter Chart Devices are probably the most useful in instances where there are a relatively large number of time series data.&#13;</Label>
             </Field>
+
+            <Template file="Templates/save_chart_changes.xml" />
 
             <Field id="settingsSpace" type="label"/>
 
@@ -4395,7 +4399,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -4433,7 +4437,7 @@
 
             <Field id="xAxisLabelFormat" type="menu" defaultValue="%A"
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
-                   tooltip="The format specifier for the label that will be displayed on the x axis.">
+                   tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
                 <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
             </Field>
@@ -4906,7 +4910,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -4940,9 +4944,11 @@
 
             <Field id="chart_type" type="textfield" defaultValue="forecast" hidden="true"/>
 
-            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
-                <Label>Weather Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices.</Label>
+            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Weather Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices.&#13;</Label>
             </Field>
+
+            <Template file="Templates/save_chart_changes.xml" />
 
             <Field id="settingsSpace" type="label"/>
 
@@ -5019,7 +5025,7 @@
 
             <Field id="showDaytime" type="checkbox" defaultValue="true"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to highlight daytime hours.">
+                   tooltip="Check to highlight daytime hours. Daylight won't be plotted on hourly forecast charts.">
                 <Label>Plot Daylight?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -5032,7 +5038,7 @@
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="Check to display chart legend. Note that any X axis labels will be suppressed to make room for the legend entries.">
+                   tooltip="Check to display chart legend. Any X axis labels will be suppressed to make room for the legend entries.">
                 <Label>Display Legend?</Label>
                 <Description>Yes/No</Description>
             </Field>
@@ -5308,7 +5314,7 @@
             <!-- =====================  Custom Line Segments  ===================== -->
             <Field id="customLineSegments" type="textfield" defaultValue="None"
                    visibleBindingId="settingsGroup" visibleBindingValue="cls"
-                   tooltip='For any constants that you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
+                   tooltip='For any constants you would like to chart, enter the data here. The proper format is (data, "color"). The data to be charted must be a valid number and the color value should be enclosed in double quotes. Multiple entries must be separated by a comma: (32.0, "blue"), (32.1, "#0000FF"), ("%%v:12345678%%", "green")'>
                 <Label>Constants:</Label>
             </Field>
 
@@ -5342,9 +5348,11 @@
 
             <Field id="chart_type" type="textfield" defaultValue="composite forecast" hidden="true"/>
 
-            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false">
-                <Label>Composite Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices. Note that hourly forecast devices only provide one forecast temperature so, for these charts, the high and low temperature values will be the same.</Label>
+            <Field id="forecastSourceDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Composite Forecast Charts only work with Fantastic Weather and WUnderground Forecast Devices. Hourly forecast devices only provide one forecast temperature so, for these charts, the high and low temperature values will be the same.&#13;</Label>
             </Field>
+
+            <Template file="Templates/save_chart_changes.xml" />
 
             <Field id="settingsSpace" type="label"/>
 
@@ -5453,7 +5461,7 @@
 
             <Field id="precip_precision_label" type="label" fontSize="small" alignWithControl="true"
                    visibleBindingId="settingsGroup" visibleBindingValue="y1">
-                <Label>Note that the precision setting does not affect the precipitation plot which requires two decimal points.</Label>
+                <Label>The precision setting does not affect the precipitation plot which requires two decimal points.</Label>
             </Field>
 
             <Field id="pressure_min" type="textfield" defaultValue=""
@@ -5570,8 +5578,8 @@
 
             <Field id="chart_type" type="textfield" defaultValue="csv engine" hidden="true"/>
 
-            <Field id="csvEngineDeviceText" type="label" fontSize="small" alignWithControl="false">
-                <Label>The CSV Engine Device is used to construct data files for charting. The use of this device is not required, but is provided as a convenience. To use your own CSV data simply place the CSV files in the main data directory specified in the plugin configuration dialog.</Label>
+            <Field id="csvEngineDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Use the CSV Engine Device to manage data for charting. A CSV Engine device is not required, and is provided as a convenience. To use your own CSV data, save the CSV files in the folder specified in the plugin configuration dialog.</Label>
             </Field>
 
             <Field id="topSeparator" type="separator"/>
@@ -5582,7 +5590,7 @@
             </Field>
 
             <Field id="numLinesToKeepText" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the maximum number of observations that you would like to retain in your CSV files.</Label>
+                <Label>Enter the maximum number of observations you would like to retain in your CSV files.</Label>
             </Field>
 
             <Field id="numLinesToKeepTime" type="textfield" defaultValue="0" hidden="false"
@@ -5591,7 +5599,7 @@
             </Field>
 
             <Field id="numLinesToKeepTextTime" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the maximum time duration to apply to your CSV files (in hours). For example, entering 24 will cause observations older than 24 hours to be discarded. Leave empty or enter a value of zero for no limit.</Label>
+                <Label>Enter the maximum time duration to apply to your CSV files (in hours). For example, entering 24 will cause observations older than 24 hours to be discarded. Enter zero or Leave empty for no limit.</Label>
             </Field>
 
             <Field id="refreshInterval" type="textfield" defaultValue="900"
@@ -5600,7 +5608,7 @@
             </Field>
 
             <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the desired frequency of CSV updates (in seconds). The default value is 900 (refresh every 15 minutes). Leave empty or enter a value of zero to elect manual refresh only.</Label>
+                <Label>Enter the desired frequency of CSV updates (in seconds). Leave empty or enter a value of zero to elect manual refresh only.</Label>
             </Field>
 
             <Field id="addItemLabel" type="label" alignText="right">
@@ -5610,7 +5618,7 @@
             <Field id="sep2" type="separator"/>
 
             <Field id="label5" type="label" fontSize="small">
-                <Label>Use this section to add a new item. Enter a title and select a device or variable and its companion value then click 'Add Item'. You can limit the number of sources that appear by using the Filter control menu.</Label>
+                <Label>Use this section to add a new item. Enter a name and select a device or variable and its companion value. Click 'Add Item' to confirm.</Label>
             </Field>
 
             <Field id="addKey" type="textfield" hidden="true">
@@ -5618,7 +5626,7 @@
             </Field>
 
             <Field id="addValue" type="textfield"
-                   tooltip="Please enter a title for your CSV file. This is the name that will be given to the file and used throughout the plugin.">
+                   tooltip="Please enter a title for your CSV file. This name will be given to the file and used throughout the plugin.">
                 <Label>Name:</Label>
             </Field>
 
@@ -5656,17 +5664,13 @@
             <Field id="sep1" type="separator"/>
 
             <Field id="label0.5" type="label" fontSize="small">
-                <Label>Use this section to update or delete existing items. The Item List contains those items that have been created by the CSV Engine device.  Select an item from the Item List to update its settings or delete it from the plugin.</Label>
+                <Label>Use this section to update or delete existing items. The Item List contains items created with the CSV Engine device. Select an item from the Item List to update its settings or delete it from the plugin.</Label>
             </Field>
 
             <Field id="csv_item_list" type="menu" defaultValue="">
                 <Label>CSV Item List:</Label>
                 <List class="self" filter="" method="csv_item_list" dynamicReload="true"/>
                 <CallbackMethod>csv_item_select</CallbackMethod>
-            </Field>
-
-            <Field id="sep3" type="label" alignWithControl="true">
-                <Label/>
             </Field>
 
             <Field id="isColumnSelected" type="checkbox" hidden="true" default="False">
@@ -5729,7 +5733,7 @@
             <Field id="bottomSeparator" type="separator"/>
 
             <Field id="label6" type="label" fontColor="red" fontSize="small" alignText="left">
-                <Label>Note that changes made in this dialog will not be fully committed until you click the "Save" button.</Label>
+                <Label>Changes made will not be fully committed until you click the "Save" button.</Label>
             </Field>
 
         </ConfigUI>
@@ -5761,9 +5765,16 @@
 
             <Field id="chart_type" type="textfield" defaultValue="rcparams" hidden="true"/>
 
-            <Field id="rcParamsLabel" type="label">
-                <Label>The Matplotlib Parameters device is a repository for the initial settings that the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.&#13;&#13;There are presently no configurations available for this device.
-                </Label>
+            <Field id="rcParamsLabel1" type="label" fontSize="small">
+                <Label>The Matplotlib Parameters device is a repository for the initial settings the plugin uses *before* any customizations are applied by the plugin. It provides a way to know what the plugin uses for its default parameters.</Label>
+            </Field>
+
+            <Field id="rcParamsLabel2" type="label" fontSize="small">
+                <Label>You can also modify the Matplotlib style sheet (located within the plugin package). The plugin necessarily modifies some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by newer versions of the plugin).</Label>
+            </Field>
+
+            <Field id="rcParamsLabel3" type="label" fontSize="small">
+                <Label>There are presently no configurations available for this device.</Label>
             </Field>
 
             <Field id="refreshInterval" type="menu" defaultValue="900" hidden="true">

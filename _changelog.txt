@@ -1,3 +1,8 @@
+v0.9.46
+- Deprecates snappy config menus as they are no longer needed with the new UI
+  changes.
+- Refinements
+
 v0.9.45
 - Refinements
 

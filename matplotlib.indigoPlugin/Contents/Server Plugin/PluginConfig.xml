@@ -49,10 +49,10 @@
     </Field>
 
     <!-- The snappyConfigMenus flag element is set in the advanced settings menu. -->
-    <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">
-        <Label>Snappy Menus</Label>
-        <Description>Enable/Disable</Description>
-    </Field>
+<!--    <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">-->
+<!--        <Label>Snappy Menus</Label>-->
+<!--        <Description>Enable/Disable</Description>-->
+<!--    </Field>-->
 
     <!-- The forceOriginLines flag element is set in the advanced settings menu. -->
     <Field id="forceOriginLines" type="checkbox" defaultValue="false" hidden="True">
@@ -134,12 +134,18 @@ Note that we are now hiding all the theme properties in plugin config, but
 we still refer to them when creating charts.  These hidden settings are now
 managed through the Theme Manager.
 # TODO: migrate away from using pluginPrefs for these settings in plugin.py, etc.
+# TODO: turn off red text after a couple beats, then delete the text altogether.
 -->
-    <Field id="chartPropsLabel" type="label" alignText="right" hidden="True">
+    <Field id="chartPropsLabel" type="label" alignText="right" hidden="false">
         <Label>Chart Properties</Label>
     </Field>
 
-    <Field id="chartPropsSeparator" type="separator" hidden="True"/>
+    <Field id="chartPropsSeparator" type="separator" hidden="false"/>
+
+    <!-- Chart Properties Placeholder -->
+    <Field id="chartPropertiesPlaceholder" type="label" fontSize="small" fontColor="red">
+        <Label>Chart properties are now located in the Theme Manager (Plugins menu).</Label>
+    </Field>
 
     <!-- Font Color for Annotations -->
     <Field id="fontColorAnnotation" type="colorpicker" defaultValue="FF FF FF" hidden="True"

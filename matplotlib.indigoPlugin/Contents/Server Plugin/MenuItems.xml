@@ -73,14 +73,14 @@
 			<Label>Other</Label>
 		</Field>
 		<Field id="logEachChartCompletedSeparator" type="separator"/>
-		<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">
-			<Label/>
-			<Description>Enable Snappy Menus</Description>
-			<CallbackMethod>advancedSettingsMenu</CallbackMethod>
-		</Field>
-		<Field id="snappyConfigMenusLabel" type="label" fontSize="small" alignWithControl="true">
-			<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>
-		</Field>
+<!--		<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">-->
+<!--			<Label/>-->
+<!--			<Description>Enable Snappy Menus</Description>-->
+<!--			<CallbackMethod>advancedSettingsMenu</CallbackMethod>-->
+<!--		</Field>-->
+<!--		<Field id="snappyConfigMenusLabel" type="label" fontSize="small" alignWithControl="true">-->
+<!--			<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>-->
+<!--		</Field>-->
 		<Field id="forceOriginLines" type="checkbox" defaultValue="true">
 			<Label/>
 			<Description>Force Origin Lines</Description>
@@ -96,10 +96,10 @@
 		<Field id="matplotlibAdvancedSettings" type="label" fontSize="small" alignWithControl="true">
 			<Label>You can also modify the Matplotlib style sheet (located within the plugin package). Note that the plugin necessarily modifies some of these parameters and your changes may be ignored. You should only attempt this if you know what you're doing (backup your changes as this file will be overwritten by newer versions of the plugin).</Label>
 		</Field>
-		<Field id="saveSettingsSeparator" type="separator"/>
-		<Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">
-			<Label>Existing charts will be regenerated when you click save. Please be patient.</Label>
-		</Field>
+<!--		<Field id="saveSettingsSeparator" type="separator"/>-->
+<!--		<Field id="saveSettingsLabel" type="label" fontColor="red" fontSize="small" alignText="left">-->
+<!--			<Label>Existing charts will be regenerated when you click save. Please be patient.</Label>-->
+<!--		</Field>-->
 	</ConfigUI>
 </MenuItem>
 
@@ -107,12 +107,8 @@
 <MenuItem id="refreshChartsNow">
 <Name>Redraw Charts Now...</Name>
 	<ConfigUI>
-		<!--Matplotlib citation per TOS.-->
-		<Field id="aboutLabel" type="label">
-			<Label>Redraw all Matplotlib Charts</Label>
-		</Field>
-		<Field id="aboutLabel1" type="label">
-			<Label>Select which charts to redraw. Note that this dialog box will remain open until task is complete.</Label>
+		<Field id="aboutLabel1" type="label" fontSize="small">
+			<Label>Select the charts to refresh. You can elect to refresh all charts or skip charts set to manual refresh.</Label>
 		</Field>
 		<Field id="allCharts" type="menu" defaultValue="all">
 			<Label>Redraw:</Label>
@@ -133,7 +129,7 @@
 
 <!-- ========================  Theme Manager  ========================= -->
 <MenuItem id="themeManager">
-<Name>Theme Manager</Name>
+<Name>Theme Manager...</Name>
 	<ButtonTitle>Close</ButtonTitle>
 	<CallbackMethod>themeManagerCloseUi</CallbackMethod>
 	<ConfigUI>

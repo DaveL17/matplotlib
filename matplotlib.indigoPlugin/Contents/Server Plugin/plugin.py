@@ -7,7 +7,7 @@ author: DaveL17
 The matplotlib plugin is used to produce various types of charts and graphics
 for use on Indigo control pages. The key benefits of the plugin are its ability
 to make global changes to all generated charts (i.e., fonts, colors) and its
-relative simplicity.  It contains direct support for some automated charts (for
+relative simplicity. It contains direct support for some automated charts (for
 example, it can create Fantastic Weather plugin forecast charts if linked to
 the proper Fantastic Weather devices.
 """
@@ -43,11 +43,8 @@ the proper Fantastic Weather devices.
 #       and don't even cycle the plugin when the location is gone.
 # TODO: Change chart features based on underlying data. (i.e., stock bar chart)
 # TODO: Move more code out of plugin.py
-# TODO: Audit device config ui changes against prod server.
-# TODO: Can do away with snappyconfigmenus
 # TODO: Move multiline text font color to theme color
 # TODO: Move multiline text font size to theme size
-# TODO: Update wiki for new theme manager
 
 # ================================== IMPORTS ==================================
 
@@ -103,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.45"
+__version__   = u"0.9.46"
 
 # =============================================================================
 
@@ -135,7 +132,7 @@ kDefaultPluginPrefs = {
     u'rectChartWideWidth': 1000,
     u'rectChartWidth': 600,
     u'showDebugLevel': 30,  # comes from template_debugging.xml
-    u'snappyConfigMenus': False,
+    # u'snappyConfigMenus': False,
     u'spineColor': "88 88 88",
     u'sqChartSize': 250,
     u'tickColor': "88 88 88",
@@ -202,7 +199,7 @@ class Plugin(indigo.PluginBase):
         else:
             self.logger.threaddebug(u"User cancelled.")
 
-        if dev.configured:
+        if dev.configured and dev.deviceTypeId not in ("rcParamsDevice", "csvEngine"):
             self.refresh_queue.put([dev])
 
         return True
@@ -460,16 +457,16 @@ class Plugin(indigo.PluginBase):
             # If Snappy Config Menus are enabled, reset all device config dialogs to a
             # minimized state (all sub-groups minimized upon open.) Otherwise, leave them
             # where they are.
-            if self.pluginPrefs.get('snappyConfigMenus', False):
-                self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
-
-                for key in ('areaLabel1', 'areaLabel2', 'areaLabel3', 'areaLabel4', 'areaLabel5', 'areaLabel6',
-                            'areaLabel7', 'areaLabel8', 'barLabel1', 'barLabel2', 'barLabel3', 'barLabel4', 'barLabel5',
-                            'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
-                            'lineLabel7', 'lineLabel8', 'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3',
-                            'groupLabel4', 'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
-                    if key in values_dict.keys():
-                        values_dict[key] = False
+            # if self.pluginPrefs.get('snappyConfigMenus', False):
+            #     self.logger.threaddebug(u"Enabling advanced feature: Snappy Config Menus.")
+            #
+            #     for key in ('areaLabel1', 'areaLabel2', 'areaLabel3', 'areaLabel4', 'areaLabel5', 'areaLabel6',
+            #                 'areaLabel7', 'areaLabel8', 'barLabel1', 'barLabel2', 'barLabel3', 'barLabel4', 'barLabel5',
+            #                 'lineLabel1', 'lineLabel2', 'lineLabel3', 'lineLabel4', 'lineLabel5', 'lineLabel6',
+            #                 'lineLabel7', 'lineLabel8', 'groupLabel1', 'groupLabel1', 'groupLabel2', 'groupLabel3',
+            #                 'groupLabel4', 'xAxisLabel', 'xAxisLabel', 'y2AxisLabel', 'yAxisLabel', ):
+            #         if key in values_dict.keys():
+            #             values_dict[key] = False
 
             return values_dict
 
@@ -2475,20 +2472,19 @@ class Plugin(indigo.PluginBase):
                         # If we have manually asked for all charts to update, don't refresh the last
                         # update time so that the charts will update on their own at the next refresh
                         # cycle.
-                        if not self.skipRefreshDateUpdate:
+                        if 'chartLastUpdated' in dev.states and not self.skipRefreshDateUpdate:
                             device_states.append({'key': 'chartLastUpdated',
                                                   'value': u"{now}".format(now=dt.datetime.now())})
 
                         # All has gone well.
-                        if not result:
+                        if not result and dev.deviceTypeId not in ('rcParamsDevice',):
                             device_states.append({'key': 'onOffState', 'value': True, 'uiValue': 'Error'})
-                        else:
+                        elif dev.deviceTypeId:
                             refresh_interval = dev.pluginProps.get('refreshInterval', 900)
-
-                            if dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) > 0:
-                                ui_value = 'Updated'
-                            elif dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) == 0:
+                            if int(refresh_interval) == 0 and dev.deviceTypeId not in ('rcParamsDevice',):
                                 ui_value = 'Manual'
+                            elif int(refresh_interval) > 0 and dev.deviceTypeId not in ('rcParamsDevice',):
+                                ui_value = 'Updated'
                             else:
                                 ui_value = " "
 
@@ -3906,6 +3902,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def refresh_the_charts_queue(self):
+        """Create and manage the queue for chart updates"""
 
         def work_the_refresh_queue():
             while not self.refresh_queue.empty():
@@ -3918,7 +3915,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def save_snapshot(self, action=None):
-
+        """Save a snapshot of select plugin information to disk for later debugging."""
         home = os.path.expanduser("~")
         with open(home + "/matplotlib_snapshot.txt", 'w') as outfile:
             outfile.write(u"{0:50} - {1}\n".format("pluginPrefs", dict(self.pluginPrefs)))
@@ -3927,9 +3924,10 @@ class Plugin(indigo.PluginBase):
             for dev in indigo.devices.iter(filter="self"):
                 outfile.write(u"{0:50} - {1}\n".format(dev.name, dict(dev.ownerProps)))
 
-        self.logger.info(u'Snapshot written to user home directory.')
+        indigo.server.log(u'Snapshot written to user home directory.')  # Write to log regardless of plugin debug level.
 
     def themeNameGenerator(self, fltr="", values_dict=None, type_id="", target_id=0):
+        """Generate a list of theme names from the json file for UI controls"""
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         with open(full_path, 'r') as f:
             infile = json.load(f)
@@ -3938,6 +3936,7 @@ class Plugin(indigo.PluginBase):
         return [(key, key) for key in sorted(infile.keys())]
 
     def themeManagerCloseUi(self, values_dict=None, menu_item_id="", foo=None):
+        """Apply theme settings when user closes Theme Manager dialog"""
         # Don't need to trap user cancel since this callback won't be called
         # if user cancels. There is no way to trap the cancel.
 
@@ -3951,6 +3950,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeApplyAction(self, plugin_action):
+        """Process the Indigo Apply Theme action item"""
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         selected_theme = plugin_action.props['targetTheme']
 
@@ -3971,6 +3971,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeApply(self, values_dict, menu_item_id):
+        """Process the Theme Manager Apply Theme action"""
         error_msg_dict = indigo.Dict()
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         selected_theme = values_dict['allThemes']
@@ -4002,7 +4003,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeExecuteActionButton(self, values_dict, menu_item_id):
-
+        """Process the Theme Manager Execute Action button press"""
         error_msg_dict = indigo.Dict()
         result = None
 
@@ -4027,6 +4028,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeRename(self, values_dict, menu_item_id):
+        """Process the Theme Manager Rename Theme action"""
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         old_name = values_dict['allThemes']
         new_name = values_dict['newThemeName']
@@ -4064,6 +4066,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeSave(self, values_dict, menu_item_id):
+        """Process the Theme Manager Save Theme action"""
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         new_theme_name = values_dict['newTheme']
         error_msg_dict = indigo.Dict()
@@ -4106,6 +4109,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeDelete(self, values_dict, menu_item_id):
+        """Process the Theme Manager Delete Theme action"""
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         del_theme_name = [name for name in values_dict['allThemes']]
         error_msg_dict = indigo.Dict()

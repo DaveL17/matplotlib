@@ -646,7 +646,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
 
     if p_dict['verboseLogging']:
         logger['Debug'].append(u"[{name}] Formatting custom line segments.".format(name=payload['props']['name']))
-        logger['debug'].append(u"Custom Segments Payload: {s}".format(s=p_dict['customLineSegments']))
+        logger['Debug'].append(u"Custom Segments Payload: {s}".format(s=p_dict['customLineSegments']))
 
     if p_dict['enableCustomLineSegments'] and p_dict['customLineSegments'] not in ("", "None"):
         try:
