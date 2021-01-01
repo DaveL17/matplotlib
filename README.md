@@ -18,7 +18,7 @@ example, you can change the background color of all your charts
 simultaneously. You can add additional customizations to each individual 
 chart if you like, such as overriding the default chart size or displaying a 
 chart legend only on selected charts. The overriding emphasis in designing the 
-plugin is simplicity. The instructions below seem like a lot, but almost all 
+plugin is simplicity. The instructions in the wiki may seem like a lot, but almost all 
 the settings can be left at their default when you begin. It's probably 
 best to read through all these instructions before getting started.
 

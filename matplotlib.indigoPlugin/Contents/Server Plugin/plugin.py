@@ -2290,11 +2290,11 @@ class Plugin(indigo.PluginBase):
 
                                     # The following line is used for testing the battery health code; it isn't
                                     # needed in production.
-                                    device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
-                                                   'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
-                                                   'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
-                                                   'Device 10': '47'
-                                                   }
+                                    # device_dict = {'Device 1': '0', 'Device 2': '100', 'Device 3': '8',
+                                    #                'Device 4': '4', 'Device 5': '92', 'Device 6': '72',
+                                    #                'Device 7': '47', 'Device 8': '68', 'Device 9': '0',
+                                    #                'Device 10': '47'
+                                    #                }
 
                                 except Exception as sub_error:
                                     self.plugin_error_handler(sub_error=traceback.format_exc())
