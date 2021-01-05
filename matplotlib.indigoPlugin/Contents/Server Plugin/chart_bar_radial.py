@@ -37,12 +37,10 @@ color_font   = p_dict['fontColor']
 color_border = p_dict['gridColor']
 font_main    = p_dict['fontMain']
 precision    = p_dict['precision']
-icon_height  = 100
-icon_width   = 100
-# icon_height  = p_dict['sqChartSize']
-# icon_width   = p_dict['sqChartSize']
+icon_height  = p_dict['sqChartSize']
+icon_width   = p_dict['sqChartSize']
 slice_width  = 0.35
-plot_scale   = float(payload['scale'])
+plot_scale   = float(payload.get('scale', p_dict['scale']))
 
 log['Threaddebug'].append(u"chart_bar_radial.py called.")
 if plug_dict['verboseLogging']:

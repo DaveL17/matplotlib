@@ -2479,6 +2479,18 @@
                 </List>
             </Field>
 
+            <Field id="customSizeChart" type="checkbox" defaultValue="false"
+                   tooltip="Check to override default chart sizes.">
+                <Label>Custom Chart Size?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="customSizePolar" type="textfield" defaultValue="100"
+                   visibleBindingId="customSizeChart" visibleBindingValue="true"
+                   tooltip="This value will override the size value set in the main plugin configuration. The value will be used for both height and width. To set it back to the default size, enter None.">
+                <Label>Custom Size:</Label>
+            </Field>
+
             <Field id="customSizeFont" type="checkbox" defaultValue="false"
                    tooltip="Check to override default font sizes.">
                 <Label>Custom Font Sizes?</Label>
