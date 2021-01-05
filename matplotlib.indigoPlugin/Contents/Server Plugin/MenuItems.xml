@@ -73,14 +73,6 @@
 			<Label>Other</Label>
 		</Field>
 		<Field id="logEachChartCompletedSeparator" type="separator"/>
-<!--		<Field id="snappyConfigMenus" type="checkbox" defaultValue="true">-->
-<!--			<Label/>-->
-<!--			<Description>Enable Snappy Menus</Description>-->
-<!--			<CallbackMethod>advancedSettingsMenu</CallbackMethod>-->
-<!--		</Field>-->
-<!--		<Field id="snappyConfigMenusLabel" type="label" fontSize="small" alignWithControl="true">-->
-<!--			<Label>If enabled, all sub-menus will be minimized when dialog windows are opened.</Label>-->
-<!--		</Field>-->
 		<Field id="forceOriginLines" type="checkbox" defaultValue="true">
 			<Label/>
 			<Description>Force Origin Lines</Description>

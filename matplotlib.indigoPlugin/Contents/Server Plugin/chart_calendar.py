@@ -121,3 +121,4 @@ except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
 
 # ==============================  Housekeeping  ===============================
 pickle.dump(chart_tools.log, sys.stdout)
+

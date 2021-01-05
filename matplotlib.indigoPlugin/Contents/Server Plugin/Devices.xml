@@ -2436,6 +2436,120 @@
 
     </Device>
 
+    <!-- =============  Radial Bar Chart ============= -->
+    <Device id="radialBarChartingDevice" type="custom">
+        <Name>Bar Chart (Radial)</Name>
+        <ConfigUI>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
+
+            <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
+
+            <Field id="chart_type" type="textfield" defaultValue="radial bar" hidden="true"/>
+
+            <Field id="barChartDeviceText" type="label" alignWithControl="false" fontSize="small">
+                <Label>Radial Bar Chart Devices are most useful for displaying a discrete value against a constant scale.  For example, plotting the level of a dimmer (0-100)&#13;</Label>
+            </Field>
+
+            <Template file="Templates/save_chart_changes.xml" />
+
+            <Field id="outputFileSpace" type="label"/>
+
+            <Field id="topSeparator" type="separator"/>
+
+            <!-- ========================  Chart Controls  ======================== -->
+            <Field id="fileName" type="textfield" defaultValue="chart_stock_bar_radial.png"
+                   tooltip="Enter the file name of your chart (filename.png).">
+                <Label>Output File Name:</Label>
+            </Field>
+
+            <Field id="refreshInterval" type="menu" defaultValue="0"
+                   tooltip="How frequently would you like the plugin to redraw this chart?">
+                <Label>Refresh Interval:</Label>
+                <List>
+                    <Option value="60">Every Minute</Option>
+                    <Option value="300">Every 5 Minutes</Option>
+                    <Option value="600">Every 10 Minutes</Option>
+                    <Option value="900">Every 15 Minutes*</Option>
+                    <Option value="1800">Every 30 Minutes</Option>
+                    <Option value="3600">Every Hour</Option>
+                    <Option value="86400">Every Day</Option>
+                    <Option value="604800">Every Week</Option>
+                    <Option value="-1">%%separator%%</Option>
+                    <Option value="0">None - Manual Refresh Only</Option>
+                </List>
+            </Field>
+
+            <Field id="customSizeFont" type="checkbox" defaultValue="false"
+                   tooltip="Check to override default font sizes.">
+                <Label>Custom Font Sizes?</Label>
+                <Description>Yes/No</Description>
+            </Field>
+
+<!--            <Template file="Templates/custom_title_font_size.xml" />-->
+
+            <Template file="Templates/custom_tick_font_size.xml" />
+
+            <Field id="chartTitle" type="textfield" defaultValue="Title" hidden="true"
+                   tooltip="Enter the title of your chart (optional).">
+                <Label>Chart Title:</Label>
+            </Field>
+
+            <Field id="bar1Source" type="menu" defaultValue=""
+                   tooltip="Select data source for bar 1.">
+                <Label>Data Source:</Label>
+                <List class="self" filter="" method="latestDevVarList" dynamicReload="true"/>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+
+            <Field id="bar1Value" type="menu" defaultValue=""
+                   tooltip="Select data source for bar 1.">
+                <Label>Value:</Label>
+                <List class="self" filter="bar1Source" method="generatorDeviceStates" dynamicReload="true"/>
+            </Field>
+
+            <Field id="bar_1" type="colorpicker" defaultValue="00 FF 00"
+                   tooltip="Select the desired color for your radial chart">
+                <Label>Bar Color:</Label>
+            </Field>
+
+            <Field id="bar_2" type="colorpicker" defaultValue="33 33 33"
+                   tooltip="Select the desired offset color for your radial chart">
+                <Label>Bar Offset Color:</Label>
+            </Field>
+
+            <Field id="scale" type="textfield" defaultValue="100"
+                   tooltip="Enter the maximum value of the scale of your chart. For example, 100 for a dimmer (0-100). The scale field supports Indigo substitutions ('%%d:DEVID:STATENAME%%', '%%v:VARID%%'.">
+                <Label>Scale Max:</Label>
+            </Field>
+
+            <Field id="precision" type="menu" defaultValue="0"
+                   tooltip="Select the desired precision level for this chart.">
+                <Label>Precision:</Label>
+                <List>
+                    <Option value="0">0 (XX)*</Option>
+                    <Option value="1">1 (XX.X)</Option>
+                    <Option value="2">2 (XX.XX)</Option>
+                </List>
+                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+        </ConfigUI>
+
+        <States>
+            <State id="chartLastUpdated">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Chart Last Updated</TriggerLabel>
+                <ControlPageLabel>Chart Last Updated</ControlPageLabel>
+            </State>
+            <State id="onOffState">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Device State</TriggerLabel>
+                <ControlPageLabel>Device State</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>onOffState</UiDisplayStateId>
+
+    </Device>
+
     <!-- ====================  Battery Health Device  ===================== -->
     <Device id="batteryHealthDevice" type="custom">
         <Name>Battery Health Chart</Name>

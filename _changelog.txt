@@ -1,3 +1,6 @@
+v0.9.47
+- New Device Type: Radial Bar Chart
+
 v0.9.46
 - Deprecates snappy config menus as they are no longer needed with the new UI
   changes.

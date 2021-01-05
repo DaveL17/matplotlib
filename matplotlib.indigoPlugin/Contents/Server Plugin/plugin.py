@@ -100,7 +100,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.46"
+__version__   = u"0.9.47"
 
 # =============================================================================
 
@@ -354,6 +354,13 @@ class Plugin(indigo.PluginBase):
                     values_dict['customTickFontSize']  = 8
                     values_dict['customTitleFontSize'] = 10
                     values_dict['xAxisLabelFormat']    = 'None'
+
+                # ================================  Raidal Bar ================================
+                if type_id == "radialBarChartingDevice":
+
+                    values_dict['bar_1']  = '00 FF 00'
+                    values_dict['bar_2']  = '33 33 33'
+                    values_dict['bar1Source'] = 'None'
 
                 # =========================== Battery Health Device ===========================
                 if type_id == "batteryHealthDevice":
@@ -985,6 +992,20 @@ class Plugin(indigo.PluginBase):
                                 error_msg_dict[source] = u"The selected variable value can not be charted due to " \
                                                          u"its value."
                                 values_dict['settingsGroup'] = str(n)
+
+        # ===============================  Radial Bar  ================================
+        if type_id == 'radialBarChartingDevice':
+
+            # Must select at least one source (bar 1)
+            if values_dict['bar1Source'] == 'None':
+                error_msg_dict['bar1Source'] = u"You must select at least one data source."
+
+            # See if the scale value will float.
+            if values_dict['scale'].startswith('%%'):
+                try:
+                    float(self.substitute(values_dict['scale']))
+                except ValueError:
+                    error_msg_dict['scale'] = u"The substitution field is not valid."
 
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
@@ -2276,6 +2297,35 @@ class Plugin(indigo.PluginBase):
 
                             # Run the plot
                             path_to_file = 'chart_bar_stock_horizontal.py'
+
+                        # ============================  Stock Radial Bar  =============================
+                        if dev.deviceTypeId == 'radialBarChartingDevice':
+
+                            source_id = int(dev.pluginProps['bar1Source'])
+                            source_value = dev.pluginProps['bar1Value']
+                            scale = dev.pluginProps['scale']
+
+                            # The data value to chart.
+                            if source_id in indigo.devices:
+                                raw_payload['data'] = float(indigo.devices[source_id].states[source_value])
+                            else:
+                                raw_payload['data'] = float(indigo.variables[source_id].value)
+
+                            # Convert scale value if it's a substitution. The substitution value should be valid
+                            # because we checked it in validation.
+                            if scale.startswith('%%'):
+                                raw_payload['scale'] = self.substitute(scale)
+
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats.
+                            # We wait until this point to convert and pickle it because some devices add
+                            # additional device-specific data.
+                            raw_payload = convert_to_native(raw_payload)
+
+                            # Serialize the payload
+                            payload = pickle.dumps(raw_payload)
+
+                            # Run the plot
+                            path_to_file = 'chart_bar_radial.py'
 
                         # =========================== Battery Health Chart ============================
                         if dev.deviceTypeId == 'batteryHealthDevice':

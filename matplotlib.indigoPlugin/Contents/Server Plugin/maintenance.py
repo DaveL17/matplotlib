@@ -372,6 +372,7 @@ class Maintain(object):
                          'barChartingDevice': True,
                          'barStockChartingDevice': True,
                          'barStockHorizontalChartingDevice': True,
+                         'radialBarChartingDevice': True,
                          'batteryHealthDevice': True,
                          'calendarChartingDevice': True,
                          'csvEngine': False,
@@ -478,6 +479,10 @@ class Maintain(object):
 
             # ===========================  Fix Stock Bar Props  ===========================
             if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
+                pass
+
+            # ==========================  Fix Radial Bar Props  ===========================
+            if dev.deviceTypeId == 'radialBarChartingDevice':
                 pass
 
             # ========================= Fix Battery Health Props ==========================
