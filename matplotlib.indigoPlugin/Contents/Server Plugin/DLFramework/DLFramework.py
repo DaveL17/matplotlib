@@ -201,23 +201,43 @@ class Fogbert(object):
             return [(0, 'Pick a Device or Variable')]
 
     def audit_server_version(self, min_ver):
+        """
+        Audit Indigo Version
 
-        # =========================== Audit Indigo Version ============================
+        Compare current Indigo version to the minimum version required to successfully
+        run the plugin.
+
+        -----
+        :param min_ver:
+        :return:
+        """
+
         ver = self.plugin.versStrToTuple(indigo.server.version)
         if ver[0] < min_ver:
             self.plugin.stopPlugin(u"This plugin requires Indigo version {0} or above.".format(min_ver), isError=True)
-            self.plugin.debug(u"Indigo server version OK.")
+
+        self.plugin.logger.debug(u"Indigo server version OK.")
 
     def audit_os_version(self, min_ver):
+        """
+        Audit Operating System Version
 
-        # =========================== Audit Operating System Version ============================
-        ver = platform.mac_ver()[0].split('.')
+        Compare current OS version to the minimum version required to successfully run
+        the plugin. Thanks to FlyingDiver for improved audit code.
 
-        if int(ver[1]) < min_ver:
-            self.plugin.stopPlugin(u"This plugin requires Mac OS version 10.{0} or above.".format(min_ver),
-                                   isError=True)
+        -----
+        :param min_ver:
+        :return:
+        """
 
-        self.plugin.logger.debug(u"OS X version OK.")
+        min_ver = tuple(map(int, (str(min_ver).split("."))))  # minimum allowable version. i.e., (10, 13)
+        mac_os = platform.mac_ver()[0]
+        current_ver = tuple(map(int, (str(mac_os).split("."))))  # current version. i.e., (11, 4)
+
+        if current_ver < min_ver:
+            self.plugin.stopPlugin(u"The plugin requires macOS version {0} or above.".format(min_ver), isError=True)
+        else:
+            self.plugin.logger.debug(u"macOS version OK.")
 
 
 class Formatter(object):

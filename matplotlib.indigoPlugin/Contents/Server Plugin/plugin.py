@@ -28,7 +28,6 @@ the proper Fantastic Weather devices.
 # TODO: NEW -- Floating bar chart
 # TODO: NEW -- Generic weather forecast charts to support any weather services and drop support for WU and FW.
 # TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
-# TODO: NEW -- Bar gauge chart (i.e., semi-circle)
 # TODO: NEW -- Chart with axes (scales) 3 and 4.
 #              (see: https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 
@@ -46,6 +45,10 @@ the proper Fantastic Weather devices.
 # TODO: Move multiline text font color to theme color
 # TODO: Move multiline text font size to theme size
 
+# TODO: Make sure any existing processes have been closed with communicate(), before
+#       starting a new one.  (Too many open files error.)
+# TODO: Text idea of throwing up a dialog box when new version of plugin installed.  Use
+#       version number key of last one viewed.
 # ================================== IMPORTS ==================================
 
 try:
@@ -90,6 +93,7 @@ import matplotlib.font_manager as mfont
 #     pass
 
 # My modules
+from Constants import *
 import DLFramework.DLFramework as Dave
 import maintenance
 
@@ -100,7 +104,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.47"
+__version__   = u"0.9.50"
 
 # =============================================================================
 
@@ -604,10 +608,10 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def validatePrefsConfigUi(self, values_dict=None):
-
+        # TODO: convert all validation calls to *.get()
         error_msg_dict = indigo.Dict()
 
-        self.debug_level = int(values_dict['showDebugLevel'])
+        self.debug_level = int(values_dict.get('showDebugLevel', 30))
         self.indigo_log_handler.setLevel(self.debug_level)
 
         self.logger.threaddebug(u"Validating plugin configuration parameters.")
@@ -1617,13 +1621,24 @@ class Plugin(indigo.PluginBase):
                                      u"{path}".format(path=path_name))
 
         # ================ Compare Save Path to Current Indigo Version ================
-        new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/static/"
+        indigo_ver = self.versStrToTuple(indigo.server.version)[0]
         current_save_path = self.pluginPrefs['chartPath']
 
-        if new_save_path != current_save_path:
-            if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
-                self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
-                self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
+        if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
+
+            if indigo_ver <= 7:
+                new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/"
+
+                if new_save_path != current_save_path:
+                    self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
+                    self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
+
+            elif indigo_ver == 2021:
+                new_save_path = indigo.server.getInstallFolderPath() + u"/Web Assets/images/controls/"
+
+                if new_save_path != current_save_path:
+                    self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
+                    self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
 
     @staticmethod
     # =============================================================================
@@ -3612,35 +3627,7 @@ class Plugin(indigo.PluginBase):
             self.logger.error(u"Error building font list.  Returning generic list. {s}. See plugin log for more "
                               u"information.".format(s=sub_error))
 
-            font_menu = ['Arial',
-                         'Apple Chancery',
-                         'Andale Mono',
-                         'Bitstream Vera Sans',
-                         'Bitstream Vera Sans Mono',
-                         'Bitstream Vera Serif',
-                         'Century Schoolbook L',
-                         'Charcoal',
-                         'Chicago',
-                         'Comic Sans MS',
-                         'Courier',
-                         'Courier New',
-                         'cursive',
-                         'fantasy',
-                         'Felipa',
-                         'Geneva',
-                         'Helvetica',
-                         'Humor Sans',
-                         'Impact',
-                         'Lucida Grande',
-                         'Lucid',
-                         'New Century Schoolbook',
-                         'Nimbus Mono L',
-                         'Sand',
-                         'Script MT',
-                         'Textile',
-                         'Verdana',
-                         'Western',
-                         'Zapf Chancery']
+            font_menu = FONT_MENU
 
         return sorted(font_menu)
 
@@ -3773,6 +3760,9 @@ class Plugin(indigo.PluginBase):
                 return {'success': False, 'message': u"{s}".format(s=sub_error)}
 
         if caller_waiting_for_result:
+            # Note! returns from actions that were called by calls to indigo.executeAction()
+            # can't be Bools, indigo.Dict -- and likely other types. Strings and the following
+            # dict will work.
             return {'success': True, 'message': u"Success"}
 
     # =============================================================================
@@ -4209,19 +4199,8 @@ class MakeChart(object):
         :return val:
         """
 
-        # List of (elements, replacements)
-        clean_list = ((' am ', ' AM '),
-                      (' pm ', ' PM '),
-                      ('*', ' '),
-                      ('\u000A', ' '),
-                      ('...', ' '),
-                      ('/ ', '/'),
-                      (' /', '/'),
-                      ('/', ' / ')
-                      )
-
         # Take the old, and replace it with the new.
-        for (old, new) in clean_list:
+        for (old, new) in CLEAN_LIST:
             val = val.replace(old, new)
 
         val = ' '.join(val.split())  # Eliminate spans of whitespace.

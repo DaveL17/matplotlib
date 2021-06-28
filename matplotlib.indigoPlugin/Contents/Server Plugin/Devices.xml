@@ -2542,7 +2542,16 @@
                     <Option value="1">1 (XX.X)</Option>
                     <Option value="2">2 (XX.XX)</Option>
                 </List>
-                <CallbackMethod>dummyCallback</CallbackMethod>
+            </Field>
+            <Field id="startAngle" type="menu" defaultValue="90"
+                   tooltip="Select where you would like the zero value to be located.">
+                <Label>Start at:</Label>
+                <List>
+                    <Option value="90">Top*</Option>
+                    <Option value="180">Left</Option>
+                    <Option value="0">Right</Option>
+                    <Option value="270">Bottom</Option>
+                </List>
             </Field>
         </ConfigUI>
 

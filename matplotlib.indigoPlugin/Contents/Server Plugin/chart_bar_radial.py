@@ -41,6 +41,7 @@ icon_height  = p_dict['sqChartSize']
 icon_width   = p_dict['sqChartSize']
 slice_width  = 0.35
 plot_scale   = float(payload.get('scale', p_dict['scale']))
+zero_loc = int(p_dict['startAngle'])
 
 log['Threaddebug'].append(u"chart_bar_radial.py called.")
 if plug_dict['verboseLogging']:
@@ -64,7 +65,7 @@ try:
     ax.axis('equal')
 
     # ========================= Plot Figure and Decorate ==========================
-    kwargs     = dict(colors=[color_light, color_dark], startangle=270)
+    kwargs     = dict(colors=[color_light, color_dark], startangle=zero_loc)
     outside, _ = ax.pie([plot_value, plot_scale-plot_value], radius=1, pctdistance=(1 - slice_width / 2), labels=['', ''], **kwargs)
     plt.setp(outside, width=slice_width, edgecolor=color_border)
 
