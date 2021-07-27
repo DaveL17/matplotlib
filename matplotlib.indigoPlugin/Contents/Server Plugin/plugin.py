@@ -49,11 +49,11 @@ the proper Fantastic Weather devices.
 #       starting a new one.  (Too many open files error.)
 # TODO: Text idea of throwing up a dialog box when new version of plugin installed.  Use
 #       version number key of last one viewed.
-# ================================== IMPORTS ==================================
 
+# ================================== IMPORTS ==================================
 try:
     import indigo
-except ImportError as error:
+except ImportError:
     pass
 
 # Built-in modules
@@ -69,7 +69,12 @@ import numpy as np
 import operator as op
 import os
 import pickle
-from queue import Queue
+
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
+
 import re
 import shutil
 import subprocess
@@ -104,7 +109,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = u"Matplotlib Plugin for Indigo"
-__version__   = u"0.9.50"
+__version__   = u"0.9.51"
 
 # =============================================================================
 
