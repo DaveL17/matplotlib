@@ -50,6 +50,9 @@ the proper Fantastic Weather devices.
 # TODO: Text idea of throwing up a dialog box when new version of plugin installed.  Use
 #       version number key of last one viewed.
 
+# TODO: Fix Calendar device sizing issue.  It's sizing off the traceback now. Fix that by addressing the custom size
+#       issue and by adding settings to the device definition to allow size control (it doesn't have that now.)
+
 # ================================== IMPORTS ==================================
 try:
     import indigo
@@ -1635,15 +1638,15 @@ class Plugin(indigo.PluginBase):
                 new_save_path = indigo.server.getInstallFolderPath() + u"/IndigoWebServer/images/controls/"
 
                 if new_save_path != current_save_path:
-                    self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
-                    self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
+                    self.logger.warning(u"Charts are being saved to: {path})".format(path=current_save_path))
+                    self.logger.warning(u"You may want to change the save path to: {path}".format(path=new_save_path))
 
             elif indigo_ver == 2021:
-                new_save_path = indigo.server.getInstallFolderPath() + u"/Web Assets/images/controls/"
+                new_save_path = indigo.server.getInstallFolderPath() + u"/Web Assets/images/controls/static/"
 
                 if new_save_path != current_save_path:
-                    self.logger.critical(u"Charts are being saved to: {path})".format(path=current_save_path))
-                    self.logger.critical(u"You may want to change the save path to: {path}".format(path=new_save_path))
+                    self.logger.warning(u"Charts are being saved to: {path})".format(path=current_save_path))
+                    self.logger.warning(u"You may want to change the save path to: {path}".format(path=new_save_path))
 
     @staticmethod
     # =============================================================================

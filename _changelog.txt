@@ -1,3 +1,9 @@
+v0.9.52
+- Fixes bug in file save location testing.
+- Fixes bug that caused multiline text title to move to the left.
+- Changes alert that file save locations do not match current Indigo version
+  from error level to warning.
+
 v0.9.51
 - Addresses queue `module not found` import error.
 

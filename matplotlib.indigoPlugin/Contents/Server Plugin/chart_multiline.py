@@ -148,7 +148,7 @@ try:
                      )
 
     # =============================== Format Title ================================
-    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.05, 0.98), align='center')
+    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98), align='center')
 
     # Note that subplots_adjust affects the space surrounding the subplots and not
     # the fig.
