@@ -1,86 +1,108 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
+# noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
-# see also https://stackoverflow.com/a/49733577/2827397
+"""
+Title Placeholder
 
-import pickle
+Body placeholder
+see also https://stackoverflow.com/a/49733577/2827397
+"""
+
+import json
 import sys
 import traceback
-
 # Third-party Modules
-# Note the order and structure of matplotlib imports is intentional.
-import matplotlib
-matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-
+from matplotlib import pyplot as plt
+# from matplotlib import patches
 # My modules
-import chart_tools
+import chart_tools  # noqa
 
-log               = chart_tools.log
-payload           = chart_tools.payload
-plot_value        = payload['data']
-p_dict            = payload['p_dict']
-k_dict            = payload['k_dict']
-props             = payload['props']
-chart_name        = props['name']
-plug_dict         = payload['prefs']
-annotation_values = []
-bar_colors        = []
-x_labels          = []
-x_ticks           = []
+LOG               = chart_tools.LOG
+PAYLOAD           = chart_tools.payload
+PLOT_VALUE        = PAYLOAD['data']
+P_DICT            = PAYLOAD['p_dict']
+K_DICT            = PAYLOAD['k_dict']
+PROPS             = PAYLOAD['props']
+CHART_NAME        = PROPS['name']
+PLUG_DICT         = PAYLOAD['prefs']
+ANNOTATION_VALUES = []
+BAR_COLORS        = []
+X_LABELS          = []
+X_TICKS           = []
 
 # ================================== Globals ==================================
-color_light   = p_dict['bar_1']
-color_dark  = p_dict['bar_2']
-color_font   = p_dict['fontColor']
-color_border = p_dict['gridColor']
-font_main    = p_dict['fontMain']
-precision    = p_dict['precision']
-icon_height  = p_dict['sqChartSize']
-icon_width   = p_dict['sqChartSize']
-slice_width  = 0.35
-plot_scale   = float(payload.get('scale', p_dict['scale']))
-zero_loc = int(p_dict['startAngle'])
+COLOR_LIGHT   = P_DICT['bar_1']
+COLOR_DARK  = P_DICT['bar_2']
+COLOR_FONT   = P_DICT['fontColor']
+COLOR_BORDER = P_DICT['gridColor']
+FONT_MAIN    = P_DICT['fontMain']
+PRECISION    = P_DICT['precision']
+ICON_HEIGHT  = P_DICT['sqChartSize']
+ICON_WIDTH   = P_DICT['sqChartSize']
+SLICE_WIDTH  = 0.35
+PLOT_SCALE   = float(PAYLOAD.get('scale', P_DICT['scale']))
+ZERO_LOC = int(P_DICT['startAngle'])
 
-log['Threaddebug'].append(u"chart_bar_radial.py called.")
-if plug_dict['verboseLogging']:
-    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
-chart_tools.log['Threaddebug'].append(u"Value: {0} Scale: {1}".format(plot_value, plot_scale))
+LOG['Threaddebug'].append("chart_bar_radial.py called.")
+plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
+
+if PLUG_DICT['verboseLogging']:
+    LOG['Threaddebug'].append(PAYLOAD)
+LOG['Threaddebug'].append(f"Value: {PLOT_VALUE} Scale: {PLOT_SCALE}")
 
 try:
 
     def __init__():
-        pass
+        """
+        Title Placeholder
+
+        Body placeholder
+        :return:
+        """
 
     # ============================  Custom Font Size  =============================
     # User has selected a custom font size.
-    if not p_dict['customSizeFont']:
-        size_font = p_dict['mainFontSize']
+    if not P_DICT['customSizeFont']:
+        size_font = P_DICT['mainFontSize']
     else:
-        size_font = p_dict['customTickFontSize']
+        size_font = P_DICT['customTickFontSize']
 
     # ================================== Figure ===================================
-    ax = chart_tools.make_chart_figure(width=icon_width, height=icon_height, p_dict=p_dict)
+    ax = chart_tools.make_chart_figure(width=ICON_WIDTH, height=ICON_HEIGHT, p_dict=P_DICT)
     ax.axis('equal')
 
     # ========================= Plot Figure and Decorate ==========================
-    kwargs     = dict(colors=[color_light, color_dark], startangle=zero_loc)
-    outside, _ = ax.pie([plot_value, plot_scale-plot_value], radius=1, pctdistance=(1 - slice_width / 2), labels=['', ''], **kwargs)
-    plt.setp(outside, width=slice_width, edgecolor=color_border)
+    kwargs     = dict(colors=[COLOR_LIGHT, COLOR_DARK], startangle=ZERO_LOC)
+    outside, _ = ax.pie(
+        [PLOT_VALUE, PLOT_SCALE - PLOT_VALUE],
+        radius=1,
+        pctdistance=(1 - SLICE_WIDTH / 2),
+        labels=['', ''],
+        **kwargs
+    )
+    plt.setp(outside, width=SLICE_WIDTH, edgecolor=COLOR_BORDER)
 
     # =================================== Text ====================================
-    kwargs = dict(size=size_font, fontweight='bold', va='center', color=color_font, fontname=font_main)
-    ax.text(0, 0, str(u"{0:0.{1}f}".format(plot_value, precision)), ha='center', **kwargs)
+    kwargs = dict(
+        size=size_font,
+        fontweight='bold',
+        va='center',
+        color=COLOR_FONT,
+        fontname=FONT_MAIN
+    )
+    ax.text(0, 0, str(f"{PLOT_VALUE:0.{PRECISION}f}"), ha='center', **kwargs)
 
     # ============================= Format Plot Area ==============================
-    plt.subplots_adjust(left=0, right=1.0, top=1.0, bottom=0)  # Reduce whitespace around figure
-    plt.rcParams.update({"savefig.facecolor": (0.0, 0.0, 1.0, 0.0)})  # RGBA setting background as transparent
+    # Reduce whitespace around figure
+    plt.subplots_adjust(left=0, right=1.0, top=1.0, bottom=0)
+    # RGBA setting background as transparent
+    plt.rcParams.update({"savefig.facecolor": (0.0, 0.0, 1.0, 0.0)})
 
-    chart_tools.save(logger=log)
+    chart_tools.save(logger=LOG)
 
-except (KeyError, IndexError, ValueError, UnicodeEncodeError, ZeroDivisionError) as sub_error:
+except Exception as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"[{n}]\n{s}".format(n=chart_name, s=tb))
+    tb_type = sys.exc_info()[1]
+    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type}")
 
-pickle.dump(chart_tools.log, sys.stdout)
+json.dump(LOG, sys.stdout, indent=4)

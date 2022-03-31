@@ -1,98 +1,99 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
+# noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
 Creates the battery health charts
-The chart_battery_health method creates battery health charts. These chart
-types are dynamic and are created "on the fly" rather than through direct
-user input.
------
 
+The chart_battery_health method creates battery health charts. These chart types are dynamic and
+are created "on the fly" rather than through direct user input.
 """
 
-import numpy as np
 # Built-in Modules
-import pickle
+import json
 import sys
 import traceback
-
+import numpy as np
 # Third-party Modules
-# Note the order and structure of matplotlib imports is intentional.
-import matplotlib
-matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-
+from matplotlib import pyplot as plt
+from matplotlib import patches
 # My modules
-import chart_tools
+import chart_tools  # noqa
 
-log        = chart_tools.log
-payload    = chart_tools.payload
-p_dict     = payload['p_dict']
-k_dict     = payload['k_dict']
-plug_dict  = payload['prefs']
-props      = payload['props']
-chart_name = props['name']
-data       = payload['data']
-bar_colors = []
-chart_data = {}
-x_values   = []
-y_text     = []
+LOG        = chart_tools.LOG
+PAYLOAD    = chart_tools.payload
+P_DICT     = PAYLOAD['p_dict']
+K_DICT     = PAYLOAD['k_dict']
+PLUG_DICT  = PAYLOAD['prefs']
+PROPS      = PAYLOAD['props']
+CHART_NAME = PROPS['name']
+DATA       = PAYLOAD['data']
+BAR_COLORS = []
+CHART_DATA = {}
+X_VALUES   = []
+Y_TEXT     = []
 
-log['Threaddebug'].append(u"chart_batteryhealth.py called.")
-if plug_dict['verboseLogging']:
-    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
+LOG['Threaddebug'].append("chart_batteryhealth.py called.")
+plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
+
+if PLUG_DICT['verboseLogging']:
+    LOG['Threaddebug'].append(PAYLOAD)
 
 try:
-
-    bar_colors = []
-    caution_color = r"#{rgb}".format(rgb=p_dict['cautionColor'].replace(' ', '').replace('#', ''))
-    caution_level = int(p_dict['cautionLevel'])
-    chart_data = {}
-    font_size = plt.rcParams['ytick.labelsize']
-    healthy_color = r"#{rgb}".format(rgb=p_dict['healthyColor'].replace(' ', '').replace('#', ''))
-    level_box = p_dict['showBatteryLevelBackground']
-    show_level = p_dict['showBatteryLevel']
-    dead_ones = p_dict.get('showDeadBattery', False)
-    warning_color = r"#{rgb}".format(rgb=p_dict['warningColor'].replace(' ', '').replace('#', ''))
-    warning_level = int(p_dict['warningLevel'])
-    x_values = []
-    y_text = []
+    rgb = P_DICT['cautionColor'].replace(' ', '').replace('#', '')
+    caution_color = f"#{rgb}"
+    caution_level = int(P_DICT['cautionLevel'])
+    font_size     = plt.rcParams['ytick.labelsize']
+    rgb = P_DICT['healthyColor'].replace(' ', '').replace('#', '')
+    healthy_color = f"#{rgb}"
+    level_box     = P_DICT['showBatteryLevelBackground']
+    show_level    = P_DICT['showBatteryLevel']
+    dead_ones     = P_DICT.get('showDeadBattery', False)
+    rgb = P_DICT['warningColor'].replace(' ', '').replace('#', '')
+    warning_color = f"#{rgb}"
+    warning_level = int(P_DICT['warningLevel'])
 
     # ============================ Create Device Dict =============================
-    # 'thing' here is a tuple ('name', 'battery level')
-    for thing in sorted(data.iteritems(), reverse=True):
-        chart_data[thing[0]] = {}
+    # 'thing' is a tuple ('name', int)
+    for thing in sorted(DATA.items(), reverse=True):
+        CHART_DATA[thing[0]] = {}
 
         # Add the battery level for each device
         try:
-            chart_data[thing[0]]['batteryLevel'] = float(thing[1])
+            CHART_DATA[thing[0]]['batteryLevel'] = int(thing[1])
         except ValueError:
-            chart_data[thing[0]]['batteryLevel'] = 0.0
+            CHART_DATA[thing[0]]['batteryLevel'] = 0
 
-        # Determine the appropriate bar color
-        if chart_data[thing[0]]['batteryLevel'] > caution_level:
-            chart_data[thing[0]]['color'] = healthy_color
-        elif caution_level >= chart_data[thing[0]]['batteryLevel'] > warning_level:
-            chart_data[thing[0]]['color'] = caution_color
+        # Determine the appropriate bar color for battery level
+        if CHART_DATA[thing[0]]['batteryLevel'] > caution_level:
+            CHART_DATA[thing[0]]['color'] = healthy_color
+        elif caution_level >= CHART_DATA[thing[0]]['batteryLevel'] > warning_level:
+            CHART_DATA[thing[0]]['color'] = caution_color
         else:
-            chart_data[thing[0]]['color'] = warning_color
+            CHART_DATA[thing[0]]['color'] = warning_color
 
         # =========================== Create Chart Elements ===========================
-        bar_colors.append(chart_data[thing[0]]['color'])
-        x_values.append(chart_data[thing[0]]['batteryLevel'])
-        y_text.append(unicode(thing[0]))
+        BAR_COLORS.append(CHART_DATA[thing[0]]['color'])
+        X_VALUES.append(CHART_DATA[thing[0]]['batteryLevel'])
+        Y_TEXT.append(thing[0])
 
     # Create a range of values to plot on the Y axis, since we can't plot on device names.
-    y_values = np.arange(len(y_text))
+    y_values = np.arange(len(Y_TEXT))
 
     # Create the chart figure
-    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+    ax = chart_tools.make_chart_figure(
+        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
+    )
 
     # =============================== Plot the Bars ===============================
     # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
     # it off the origin.
-    rects = ax.barh((y_values + 1), x_values, color=bar_colors, align='center', linewidth=0, **k_dict['k_bar'])
+    rects = ax.barh(
+        (y_values + 1),
+        X_VALUES,
+        color=BAR_COLORS,
+        align='center',
+        linewidth=0,
+        **K_DICT['k_bar']
+    )
 
     # ================================ Data Labels ================================
     # Plot data labels inside or outside depending on bar length
@@ -105,32 +106,52 @@ try:
         # With bbox.  We give a little extra room horizontally for the bbox.
         if show_level in ('true', 'True', True) and level_box:
             if width >= caution_level:
-                plt.annotate(u"{0:.0f}".format(width), xy=(width - 3, y + height / 2), fontsize=font_size,
-                             fontname=p_dict['fontMain'], **k_dict['k_annotation_battery'])
+                plt.annotate(
+                    f"{width:.0f}",
+                    xy=(width - 3, y + height / 2),
+                    fontsize=font_size,
+                    fontname=P_DICT['fontMain'],
+                    **K_DICT['k_annotation_battery']
+                )
             else:
-                plt.annotate(u"{0:.0f}".format(width), xy=(width + 3, y + height / 2), fontsize=font_size,
-                             fontname=p_dict['fontMain'], **k_dict['k_annotation_battery'])
+                plt.annotate(
+                    f"{width:.0f}",
+                    xy=(width + 3, y + height / 2),
+                    fontsize=font_size,
+                    fontname=P_DICT['fontMain'],
+                    **K_DICT['k_annotation_battery']
+                )
 
         # Without bbox.
         elif show_level in ('true', 'True', True):
             if width >= caution_level:
-                plt.annotate(u"{0:.0f}".format(width), xy=(width - 2, y + height / 2), fontsize=font_size,
-                             fontname=p_dict['fontMain'], **k_dict['k_battery'])
+                plt.annotate(
+                    f"{width:.0f}",
+                    xy=(width - 2, y + height / 2),
+                    fontsize=font_size,
+                    fontname=P_DICT['fontMain'],
+                    **K_DICT['k_battery']
+                )
             else:
-                plt.annotate(u"{0:.0f}".format(width), xy=(width + 2, y + height / 2), fontsize=font_size,
-                             fontname=p_dict['fontMain'], **k_dict['k_battery'])
+                plt.annotate(
+                    f"{width:.0f}",
+                    xy=(width + 2, y + height / 2),
+                    fontsize=font_size,
+                    fontname=P_DICT['fontMain'],
+                    **K_DICT['k_battery']
+                )
 
     # ================================ Chart Title ================================
-    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
+    chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
 
     # =============================== Format Grids ================================
-    if plug_dict.get('showxAxisGrid', False):
+    if PLUG_DICT.get('showxAxisGrid', False):
         for _ in (20, 40, 60, 80):
-            ax.axvline(x=_, color=p_dict['gridColor'], linestyle=plug_dict.get('gridStyle', ':'))
+            ax.axvline(x=_, color=P_DICT['gridColor'], linestyle=PLUG_DICT.get('gridStyle', ':'))
 
-    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     ax.xaxis.set_ticks_position('bottom')
-    ax.tick_params(axis='x', colors=plug_dict['fontColor'])
+    ax.tick_params(axis='x', colors=PLUG_DICT['fontColor'])
 
     # ============================== X Axis Min/Max ===============================
     # We want the X axis scale to always be 0-100.
@@ -141,25 +162,26 @@ try:
     ax.set_yticklabels('')
     ax.yaxis.set_ticks_position('left')
 
-    # Customize minor tick label position
-    ax.set_yticks([n for n in range(1, len(y_values) + 1)], minor=True)
+    # Set the number of Y ticks
+    ax.set_yticks(list(range(1, len(y_values) + 1)), minor=False)
 
-    # Assign device names to the minor ticks if wanted
-    if p_dict.get('showDeviceName', True):
-        ax.set_yticklabels(y_text,
-                           fontname=p_dict['fontMain'],
-                           color=plug_dict['fontColor'],
-                           fontsize=plug_dict['tickFontSize'],
-                           minor=True
-                           )
+    # Assign device names to the ticks (if wanted)
+    if P_DICT.get('showDeviceName', True):
+        ax.set_yticklabels(
+            Y_TEXT,
+            fontname=P_DICT['fontMain'],
+            color=PLUG_DICT['fontColor'],
+            fontsize=PLUG_DICT['tickFontSize'],
+            minor=False
+        )
 
-    # Mark devices that have a battery level of zero by coloring their y axis label
-    # using the same warning color that is used for the bar.
+    # Mark devices that have a battery level of zero by coloring their y-axis label using the same
+    # warning color that is used for the bar.
     if dead_ones:
         counter = 0
-        for key, value in sorted(data.iteritems(), reverse=True):
+        for key, value in sorted(DATA.items(), reverse=True):
             if int(value) == 0:
-                ax.yaxis.get_minorticklabels()[counter].set_color(warning_color)
+                ax.yaxis.get_majorticklabels()[counter].set_color(warning_color)
             counter += 1
 
     # ============================== Y Axis Min/Max ===============================
@@ -172,23 +194,31 @@ try:
         ax.spines[spine].set_visible(False)
 
     # Add a patch so that we can have transparent charts but a filled plot area.
-    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
         ax.add_patch(
-            patches.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor=p_dict['faceColor'], zorder=1))
+            patches.Rectangle(
+                (0, 0), 1, 1,
+                transform=ax.transAxes,
+                facecolor=P_DICT['faceColor'],
+                zorder=1)
+        )
 
-    plt.subplots_adjust(top=0.98,
-                        bottom=0.05,
-                        left=0.02,
-                        right=0.98,
-                        hspace=None,
-                        wspace=None
-                        )
+    plt.subplots_adjust(
+        top=0.98,
+        bottom=0.05,
+        left=0.02,
+        right=0.98,
+        hspace=None,
+        wspace=None
+    )
 
     plt.tight_layout()
-    chart_tools.save(logger=log)
+    chart_tools.save(logger=LOG)
 
-except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+except Exception as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    tb_type = sys.exc_info()[1]
+    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type}")
 
-pickle.dump(chart_tools.log, sys.stdout)
+json.dump(LOG, sys.stdout, indent=4)

@@ -116,7 +116,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis"
@@ -1272,7 +1272,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis"
@@ -2720,7 +2720,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Please select the devices to exclude.">
                 <Label>Excluded Devices:</Label>
-                <List class="self" filter="" method="getBatteryDeviceList"/>
+                <List class="self" filter="" method="get_battery_device_list"/>
             </Field>
 
             <Field id="excludedDevicesLabel" type="label" alignWithControl="true" fontSize="small" 
@@ -3004,7 +3004,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis"
@@ -4574,7 +4574,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the label will be displayed on the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Template file="Templates/x_axis_bins.xml" />
@@ -5189,7 +5189,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Field id="showxAxisGrid" type="checkbox" defaultValue="false"
@@ -5569,7 +5569,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="The format specifier for the data for the x axis.">
                 <Label>Format:</Label>
-                <List class="self" filter="" method="getAxisList" dynamicReload="true"/>
+                <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
             <Template file="Templates/x_axis_bins.xml" />
@@ -5783,7 +5783,7 @@
 
             <Field id="addState" type="menu" defaultValue="">
                 <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueListAdd" dynamicReload="true"/>
+                <List class="self" filter="" method="device_state_value_list_add" dynamicReload="true"/>
             </Field>
 
             <Field id="csv_item_add" type="button">
@@ -5846,7 +5846,7 @@
 
             <Field id="editState" type="menu" defaultValue="" enabledBindingId="isColumnSelected">
                 <Label>Data:</Label>
-                <List class="self" filter="" method="deviceStateValueListEdit" dynamicReload="true"/>
+                <List class="self" filter="" method="device_state_value_list_edit" dynamicReload="true"/>
             </Field>
 
             <Field id="csv_item_update" type="button" enabledBindingId="isColumnSelected">

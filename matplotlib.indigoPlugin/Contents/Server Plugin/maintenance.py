@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
 maintenance is a container for code that makes specific to consolidate methods used throughout all
-Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customoized for
+Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for
 each plugin.
 """
 
@@ -27,25 +26,38 @@ __title__     = "maintenance"
 __version__   = "0.1.02"
 
 
-class Maintain(object):
+class Maintain:
+    """
+    Title Placeholder
+
+    Body placeholder
+    """
 
     def __init__(self, plugin):
+        """
+        Title Placeholder
+
+        Body placeholder
+        :param plugin:
+        """
         self.plugin = plugin
         self.pluginPrefs = plugin.pluginPrefs
 
         fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S'))
+        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt,
+                                                                       datefmt='%Y-%m-%d %H:%M:%S'
+                                                                       )
+                                                     )
 
-        self.plugin.logger.threaddebug(u"Initializing maintenance framework.")
+        self.plugin.logger.threaddebug("Initializing maintenance framework.")
 
     def clean_prefs(self, dev_name, prefs):
         """
         Remove legacy keys from non-chart device prefs
 
-        None of the keys listed here should be present in device types using this
-        method to clean their prefs. If they exist, delete them.
+        None of the keys listed here should be present in device types using this method to clean
+        their prefs. If they exist, delete them.
         -----
-
         :param unicode dev_name:
         :param dict prefs:
         :return:
@@ -343,15 +355,17 @@ class Maintain(object):
         )
 
         # Iterate the keys to delete and delete them if they exist
-        for key in prefs.keys():
+        # for key in prefs.keys():
+        for key in prefs:
             if key in list_of_keys_to_remove:
                 list_of_removed_keys.append(key)
                 del prefs[key]
 
         # Log list of removed keys
         if list_of_removed_keys:
-            self.plugin.logger.debug(u"[{d}] Performing maintenance - removing unneeded keys: "
-                                     u"{k}".format(d=dev_name, k=list_of_removed_keys))
+            self.plugin.logger.debug(
+                f"[{dev_name}] Performing maintenance - removing unneeded  keys: "
+                f"{list_of_removed_keys}")
 
         return prefs
 
@@ -386,154 +400,165 @@ class Maintain(object):
 
         props['isChart'] = is_chart_dict[dev.deviceTypeId]
 
-        # Convert string bools to true bools
-        for item in dev.pluginProps.keys():
-            try:
-                if not isinstance(props[item], bool):
-                    if props[item].strip() in ('False', 'false'):
-                        props[item] = False
-                    elif props[item] in ('True', 'true'):
-                        props[item] = True
-            except AttributeError:
-                pass
+        try:
+            # Convert string bools to true bools
+            # for item in dev.pluginProps.keys():
+            for item in dev.pluginProps:
+                try:
+                    if not isinstance(props[item], bool):
+                        if props[item].strip() in ('False', 'false'):
+                            props[item] = False
+                        elif props[item] in ('True', 'true'):
+                            props[item] = True
+                except AttributeError:
+                    pass
 
-        # Note that we check for the existence of the device state before trying to
-        # update it due to how Indigo processes devices when their source plugin has
-        # been changed (i.e., assigning an existing device to a new plugin instance.)
-        if 'onOffState' in dev.states:
+            # Note that we check for the existence of the device state before trying to update it
+            # due to how Indigo processes devices when their source plugin has been changed (i.e.,
+            # assigning an existing device to a new plugin instance.)
+            if 'onOffState' in dev.states:
 
-            refresh_interval = dev.pluginProps.get('refreshInterval', 900)
+                refresh_interval = dev.pluginProps.get('refreshInterval', 900)
 
-            if dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) > 0:
-                ui_value = 'Enabled'
-            elif dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) == 0:
-                ui_value = 'Manual'
-            else:
-                ui_value = " "
-            dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ui_value}])
+                if dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) > 0:
+                    ui_value = 'Enabled'
+                elif dev.deviceTypeId != 'rcParamsDevice' and int(refresh_interval) == 0:
+                    ui_value = 'Manual'
+                else:
+                    ui_value = " "
+                dev.updateStatesOnServer(
+                    [{'key': 'onOffState', 'value': True, 'uiValue': ui_value}]
+                )
 
-        # ============================= Non-chart Devices =============================
-        if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
+            # ============================= Non-chart Devices =============================
+            if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
 
-            # Remove legacy cruft from csv engine and rcParams device props
-            props = self.clean_prefs(dev.name, props)
+                # Remove legacy cruft from csv engine and rcParams device props
+                props = self.clean_prefs(dev.name, props)
 
-        # ============================  CSV Engine Device  ============================
-        # If chartLastUpdated is empty, set it to the epoch
-        if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
-            dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
-            self.plugin.logger.threaddebug(u"CSV last update unknown. Coercing update.")
+            # ============================  CSV Engine Device  ============================
+            # If chartLastUpdated is empty, set it to the epoch
+            if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
+                dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
+                self.plugin.logger.threaddebug("CSV last update unknown. Coercing update.")
 
-        # =============================== Chart Devices ===============================
-        elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
+            # =============================== Chart Devices ===============================
+            elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
 
-            try:
-                # Ensure that these values are not empty.
-                if props['customTitleFontSize'] == "":
-                    props['customTitleFontSize'] = '12'
-                if props['customTickFontSize'] == "":
-                    props['customTickFontSize'] = '8'
-            except KeyError:
-                pass
+                try:
+                    # Ensure that these values are not empty.
+                    if props['customTitleFontSize'] == "":
+                        props['customTitleFontSize'] = '12'
+                    if props['customTickFontSize'] == "":
+                        props['customTickFontSize'] = '8'
+                except KeyError:
+                    pass
 
-            # ============================= Fix Custom Colors =============================
-            # For all chart device types
-            # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
-            for prop in props:
-                if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', unicode(props[prop])):
-                    self.plugin.logger.debug(u"[{d}] Refactoring color property: ({p})".format(d=dev.name, p=prop))
-                    props[prop] = u'{r} {g} {b}'.format(r=prop[0:3], g=prop[3:5], b=prop[5:7]).replace('#', '')
-
-            # ======================== Reset Legacy Color Settings ========================
-            # Initially, the plugin was constructed with a standard set of colors that
-            # could be overwritten by electing to set a custom color value. With the
-            # inclusion of the color picker control, this was no longer needed. So we try
-            # to set the color field to the custom value. This block is for device color
-            # preferences. They should be updated whether or not the device is enabled in
-            # the Indigo UI.
-            if '#custom' in props.values() or 'custom' in props.values():
+                # ============================= Fix Custom Colors =============================
+                # For all chart device types
+                # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
                 for prop in props:
-                    if 'color' in prop.lower():
-                        if props[prop] in ('#custom', 'custom'):
+                    if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
+                        self.plugin.logger.debug(
+                            f"[{dev.name}] Refactoring color property: ({prop})"
+                        )
+                        props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
 
-                            self.plugin.logger.debug(u"Resetting legacy device preferences for custom colors to new "
-                                                     u"color picker.")
+                # ======================== Reset Legacy Color Settings ========================
+                # Initially, the plugin was constructed with a standard set of colors that could be
+                # overwritten by electing to set a custom color value. With the inclusion of the
+                # color picker control, this was no longer needed. So we try to set the color field
+                # to the custom value. This block is for device color preferences. They should be
+                # updated whether the device is enabled in the Indigo UI or not.
+                if '#custom' in props.values() or 'custom' in props.values():
+                    for prop in props:
+                        if 'color' in prop.lower():
+                            if props[prop] in ('#custom', 'custom'):
 
-                            if props[u'{p}Other'.format(p=prop)]:
-                                props[prop] = props[u'{0}Other'.format(prop)]
+                                self.plugin.logger.debug(
+                                    "Resetting legacy device preferences for custom colors to new "
+                                    "color picker.")
 
-                            else:
-                                props[prop] = 'FF FF FF'
+                                if props[f'{prop}Other']:
+                                    props[prop] = props[f'{prop}Other']
 
-            # ============================== Fix Area Props ===============================
-            if dev.deviceTypeId == 'areaChartingDevice':
-                pass
+                                else:
+                                    props[prop] = 'FF FF FF'
 
-            # ===========================  Fix Flow Bar Props  ============================
-            if dev.deviceTypeId == 'barChartingDevice':
-                pass
+                # ============================== Fix Area Props ===============================
+                if dev.deviceTypeId == 'areaChartingDevice':
+                    pass
 
-            # ===========================  Fix Stock Bar Props  ===========================
-            if dev.deviceTypeId == 'barStockChartingDevice':
-                pass
+                # ===========================  Fix Flow Bar Props  ============================
+                if dev.deviceTypeId == 'barChartingDevice':
+                    pass
 
-            # ===========================  Fix Stock Bar Props  ===========================
-            if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
-                pass
+                # ===========================  Fix Stock Bar Props  ===========================
+                if dev.deviceTypeId == 'barStockChartingDevice':
+                    pass
 
-            # ==========================  Fix Radial Bar Props  ===========================
-            if dev.deviceTypeId == 'radialBarChartingDevice':
-                pass
+                # ===========================  Fix Stock Bar Props  ===========================
+                if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
+                    pass
 
-            # ========================= Fix Battery Health Props ==========================
-            if dev.deviceTypeId == 'batteryHealthDevice':
-                pass
+                # ==========================  Fix Radial Bar Props  ===========================
+                if dev.deviceTypeId == 'radialBarChartingDevice':
+                    pass
 
-            # ============================ Fix Calendar Props =============================
-            if dev.deviceTypeId == 'calendarChartingDevice':
-                pass
+                # ========================= Fix Battery Health Props ==========================
+                if dev.deviceTypeId == 'batteryHealthDevice':
+                    pass
 
-            # ============================== Fix Line Props ===============================
-            if dev.deviceTypeId == 'lineChartingDevice':
+                # ============================ Fix Calendar Props =============================
+                if dev.deviceTypeId == 'calendarChartingDevice':
+                    pass
 
-                # Convert legacy prop from bool to int
-                if isinstance(props['filterAnomalies'], bool):
-                    if props['filterAnomalies']:
-                        props['filterAnomalies'] = 3
-                    else:
-                        props['filterAnomalies'] = 0
+                # ============================== Fix Line Props ===============================
+                if dev.deviceTypeId == 'lineChartingDevice':
 
-            # ========================= Fix Multiline Text Props ==========================
-            if dev.deviceTypeId == 'multiLineText':
-                pass
+                    # Convert legacy prop from bool to int
+                    if isinstance(props['filterAnomalies'], bool):
+                        if props['filterAnomalies']:
+                            props['filterAnomalies'] = 3
+                        else:
+                            props['filterAnomalies'] = 0
 
-            # ============================== Fix Polar Props ==============================
-            if dev.deviceTypeId == 'polarChartingDevice':
-                pass
+                # ========================= Fix Multiline Text Props ==========================
+                if dev.deviceTypeId == 'multiLineText':
+                    pass
 
-            # ============================= Fix Scatter Props =============================
-            if dev.deviceTypeId == 'scatterChartingDevice':
+                # ============================== Fix Polar Props ==============================
+                if dev.deviceTypeId == 'polarChartingDevice':
+                    pass
 
-                # Convert legacy prop from bool to int
-                if isinstance(props['filterAnomalies'], bool):
-                    if props['filterAnomalies']:
-                        props['filterAnomalies'] = 3
-                    else:
-                        props['filterAnomalies'] = 0
+                # ============================= Fix Scatter Props =============================
+                if dev.deviceTypeId == 'scatterChartingDevice':
 
-            # ============================ Fix Forecast Props =============================
-            if dev.deviceTypeId == 'forecastChartingDevice':
-                pass
+                    # Convert legacy prop from bool to int
+                    if isinstance(props['filterAnomalies'], bool):
+                        if props['filterAnomalies']:
+                            props['filterAnomalies'] = 3
+                        else:
+                            props['filterAnomalies'] = 0
 
-            # =============== Establish Refresh Interval for Legacy Devices ===============
-            # Establish refresh interval for legacy devices. If the prop isn't present, we
-            # set it equal to the user's current global refresh rate.
-            if 'refreshInterval' not in props.keys():
-                self.plugin.logger.debug(u"Adding refresh interval to legacy device. Set to 900 seconds.")
-                props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
+                # ============================ Fix Forecast Props =============================
+                if dev.deviceTypeId == 'forecastChartingDevice':
+                    pass
 
-        # ============================= Update the Server =============================
-        dev.replacePluginPropsOnServer(props)
+                # =============== Establish Refresh Interval for Legacy Devices ===============
+                # Establish refresh interval for legacy devices. If the prop isn't present, we set
+                # it equal to the user's current global refresh rate.
+                # if 'refreshInterval' not in props.keys():
+                if 'refreshInterval' not in props:
+                    self.plugin.logger.debug(
+                        "Adding refresh interval to legacy device. Set to 900 seconds.")
+                    props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
 
-        if self.plugin.pluginPrefs['verboseLogging']:
-            self.plugin.logger.threaddebug(u"[{name}] prefs cleaned.".format(name=dev.name))
+            # ============================= Update the Server =============================
+            dev.replacePluginPropsOnServer(props)
+
+            if self.plugin.pluginPrefs['verboseLogging']:
+                self.plugin.logger.threaddebug(f"[{dev.name}] prefs cleaned.")
+
+        except Exception as err:
+            indigo.server.log(str(err), isError=True)

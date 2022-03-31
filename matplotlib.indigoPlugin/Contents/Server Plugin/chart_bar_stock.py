@@ -1,215 +1,235 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
+# noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
 Creates the bar charts
 
 All steps required to generate bar charts that use stock (time-agnostic) data.
------
-
 """
 
 # Built-in Modules
 import itertools
-import pickle
+import json
 import sys
 import traceback
-
 # Third-party Modules
-# Note the order and structure of matplotlib imports is intentional.
-import matplotlib
-matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-
+from matplotlib import pyplot as plt
+from matplotlib import patches
 # My modules
-import chart_tools
+import chart_tools  # noqa
 
-log               = chart_tools.log
-payload           = chart_tools.payload
-chart_data        = payload['data']
-p_dict            = payload['p_dict']
-k_dict            = payload['k_dict']
-props             = payload['props']
-chart_name        = props['name']
-plug_dict         = payload['prefs']
-annotation_values = []
-bar_colors        = []
-x_labels          = []
-x_ticks           = []
+LOG               = chart_tools.LOG
+PAYLOAD           = chart_tools.payload
+CHART_DATA        = PAYLOAD['data']
+P_DICT            = PAYLOAD['p_dict']
+K_DICT            = PAYLOAD['k_dict']
+PROPS             = PAYLOAD['props']
+CHART_NAME        = PROPS['name']
+PLUG_DICT         = PAYLOAD['prefs']
+ANNOTATION_VALUE  = []
+BAR_COLORS        = []
+X_LABELS          = []
+X_TICKS           = []
 
-log['Threaddebug'].append(u"chart_bar_stock.py called.")
-if plug_dict['verboseLogging']:
-    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
+LOG['Threaddebug'].append("chart_bar_stock.py called.")
+plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
+
+if PLUG_DICT['verboseLogging']:
+    LOG['Threaddebug'].append(PAYLOAD)
 
 try:
 
     def __init__():
         pass
 
-    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+    ax = chart_tools.make_chart_figure(
+        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
+    )
 
-    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # ============================  Iterate the Bars  =============================
-    for bar in chart_data:
+    for bar in CHART_DATA:
         b_num        = bar['number']
-        color        = bar['color_{i}'.format(i=b_num)]
-        suppress_bar = p_dict.get('suppressBar{i}'.format(i=b_num), False)
-        # x_labels.append(bar['legend_{i}'.format(i=b_num)])
-        x_ticks.append(b_num)
-        y_val = float(bar['val_{i}'.format(i=b_num)])
-        p_dict['data_array'].append(y_val)
-        bar_colors.append(color)
+        color        = bar[f'color_{b_num}']
+        suppress_bar = P_DICT.get(f'suppressBar{b_num}', False)
+        # x_labels.append(bar[f"legend_{b_num}"])
+        X_TICKS.append(b_num)
+        y_val = float(bar[f'val_{b_num}'])
+        P_DICT['data_array'].append(y_val)
+        BAR_COLORS.append(color)
 
         # ====================  Bar and Background Color the Same  ====================
         # If the bar color is the same as the background color, alert the user.
-        if color == p_dict['backgroundColor'] and not suppress_bar:
-            chart_tools.log['Warning'].append(u"[{name}] Area {i} color is the same as the background color (so "
-                                              u"you may not be able to see it).".format(name=chart_name, i=b_num))
+        if color == P_DICT['backgroundColor'] and not suppress_bar:
+            LOG['Warning'].append(
+                f"[{CHART_NAME}] Area {b_num} color is the same as the  background color (so you "
+                f"may not be able to see it)."
+            )
 
         # =============================  Bar Suppressed  ==============================
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
-            chart_tools.log['Info'].append(u"[{name}] Bar {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=chart_name, i=b_num))
+            LOG['Info'].append(
+                f"[{CHART_NAME}] Bar {b_num} is suppressed by user setting. You can re-enable it "
+                f"in the device configuration menu."
+            )
 
         # ============================  Display Zero Bars  ============================
-        # Early versions of matplotlib will truncate leading and trailing bars where the value is zero.
-        # With this setting, we replace the Y values of zero with a very small positive value
+        # Early versions of matplotlib will truncate leading and trailing bars where the value is
+        # zero. With this setting, we replace the Y values of zero with a very small positive value
         # (0 becomes 1e-06). We get a slice of the original data for annotations.
         # annotation_values.append(y_val)
-        annotation_values.append(bar['val_{i}'.format(i=b_num)])
-        if p_dict.get('showZeroBars', False):
+        ANNOTATION_VALUE.append(bar[f'val_{b_num}'])
+        if P_DICT.get('showZeroBars', False):
             if y_val == 0:
                 y_val = 1e-06
 
         # ================================  Bar Width  ================================
         try:
-            bar_width = float(p_dict['barWidth'])
+            bar_width = float(P_DICT['barWidth'])
             if bar_width == 0:
                 width = 0.8
             else:
-                width = float(p_dict['barWidth'])
+                width = float(P_DICT['barWidth'])
         except ValueError:
             width = 0.8
-            chart_tools.log['Warning'].append(u"[{n}] Problem setting bar width. Check value "
-                                              u"({w}).".format(n=chart_name, w=p_dict['barWidth']))
+            LOG['Warning'].append(
+                f"[{CHART_NAME}] Problem setting bar width. Check value ({P_DICT['barWidth']})."
+            )
 
         # ==============================  Plot the Bar  ===============================
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
         if not suppress_bar:
-            ax.bar(b_num,
-                   y_val,
-                   width=float(p_dict['barWidth']),
-                   color=color,
-                   bottom=None,
-                   align='center',
-                   edgecolor=color,
-                   **k_dict['k_bar'])
+            ax.bar(
+                b_num,
+                y_val,
+                width=float(P_DICT['barWidth']),
+                color=color,
+                bottom=None,
+                align='center',
+                edgecolor=color,
+                **K_DICT['k_bar']
+            )
 
         # ===============================  Annotations  ===============================
         # If annotations desired, plot those too.
-        if bar['annotate_{i}'.format(i=b_num)] and not suppress_bar:
-            ax.annotate(unicode(annotation_values[b_num-1]),
-                        xy=(b_num, y_val),
-                        xytext=(0, 0),
-                        zorder=10,
-                        **k_dict['k_annotation']
-                        )
+        if bar[f'annotate_{b_num}'] and not suppress_bar:
+            ax.annotate(
+                ANNOTATION_VALUE[b_num - 1],
+                xy=(b_num, y_val),
+                xytext=(0, 0),
+                zorder=10,
+                **K_DICT['k_annotation']
+            )
 
-        if bar['legend_{i}'.format(i=b_num)] == u"":
-            x_labels.append(unicode(b_num))
+        if bar[f'legend_{b_num}'] == "":
+            X_LABELS.append(b_num)
         else:
-            x_labels.append(bar['legend_{i}'.format(i=b_num)])
+            X_LABELS.append(bar[f'legend_{b_num}'])
 
     # ===============================  X Tick Bins  ===============================
-    ax.set_xticks(x_ticks)  # we set the tick value off the bar number.
-    ax.set_xticklabels(x_labels)  # we set the tick label off the bar number (unless the user has set one explicitly).
-    ax.tick_params(axis='x', colors=p_dict['fontColor'])  # we set this becuase it's apparently reset by the two preceeding lines.
+    # we set the tick value off the bar number.
+    ax.set_xticks(X_TICKS)
+    # we set the tick label off the bar number (unless the user has set one explicitly).
+    ax.set_xticklabels(X_LABELS)
+    # we set this because it's apparently reset by the two preceding lines.
+    ax.tick_params(axis='x', colors=P_DICT['fontColor'])
 
-    chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
-    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_y1_min_max(p_dict=P_DICT, logger=LOG)
+    chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # ===========================  Transparent Border  ============================
     # Add a patch so that we can have transparent charts but a filled plot area.
-    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-        ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                       transform=ax.transAxes,
-                                       facecolor=p_dict['faceColor'],
-                                       zorder=1
-                                       )
-                     )
+    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
+        ax.add_patch(
+            patches.Rectangle((0, 0), 1, 1,
+                              transform=ax.transAxes,
+                              facecolor=P_DICT['faceColor'],
+                              zorder=1
+                              )
+        )
 
     # ============================= Legend Properties =============================
-    # Legend should be plotted before any other lines are plotted (like averages or
-    # custom line segments).
-    if p_dict['showLegend']:
+    # Legend should be plotted before any other lines are plotted (like averages or custom line
+    # segments).
+    if P_DICT['showLegend']:
 
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-        headers = [_.decode('utf-8') for _ in x_labels]
+        headers = [_.decode('utf-8') for _ in X_LABELS]
         for header in headers:
-            if p_dict['bar{c}Legend'.format(c=counter)] == "":
+            if P_DICT[f'bar{counter}Legend'] == "":
                 final_headers.append(header)
             else:
-                final_headers.append(p_dict['bar{c}Legend'.format(c=counter)])
+                final_headers.append(P_DICT[f'bar{counter}Legend'])
             counter += 1
 
         # Set the legend
         # Reorder the headers so that they fill by row instead of by column
-        num_col = int(p_dict['legendColumns'])
+        num_col = int(P_DICT['legendColumns'])
         iter_headers   = itertools.chain(*[final_headers[i::num_col] for i in range(num_col)])
-        final_headers = [_ for _ in iter_headers]
+        final_headers = list(iter_headers)
 
-        iter_colors  = itertools.chain(*[bar_colors[i::num_col] for i in range(num_col)])
-        final_colors = [_ for _ in iter_colors]
+        iter_colors  = itertools.chain(*[BAR_COLORS[i::num_col] for i in range(num_col)])
+        final_colors = list(iter_colors)
 
-        legend = ax.legend(final_headers,
-                           loc='upper center',
-                           bbox_to_anchor=(0.5, -0.15),
-                           ncol=int(p_dict['legendColumns']),
-                           prop={'size': float(p_dict['legendFontSize'])}
-                           )
+        legend = ax.legend(
+            final_headers,
+            loc='upper center',
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=int(P_DICT['legendColumns']),
+            prop={'size': float(P_DICT['legendFontSize'])}
+        )
 
         # Set legend font color
-        [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+        _ = [text.set_color(P_DICT['fontColor']) for text in legend.get_texts()]
 
         # Set legend bar colors
         num_handles = len(legend.legendHandles)
-        [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
+        _ = [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
         frame = legend.get_frame()
         frame.set_alpha(0)
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log, orient="horiz")
-    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_custom_line_segments(
+        ax=ax,
+        plug_dict=PLUG_DICT,
+        p_dict=P_DICT,
+        k_dict=K_DICT,
+        logger=LOG,
+        orient="horiz"
+    )
+    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
+    chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # Note that subplots_adjust affects the space surrounding the subplots and
-    # not the fig.
-    plt.subplots_adjust(top=0.90,
-                        bottom=0.20,
-                        left=0.10,
-                        right=0.90,
-                        hspace=None,
-                        wspace=None
-                        )
+    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
+    plt.subplots_adjust(
+        top=0.90,
+        bottom=0.20,
+        left=0.10,
+        right=0.90,
+        hspace=None,
+        wspace=None
+    )
 
     try:
-        chart_tools.save(logger=log)
+        chart_tools.save(logger=LOG)
 
     except OverflowError as err:
         if "date value out of range" in traceback.format_exc(err):
-            chart_tools.log['Critical'].append(u"[{name}] Chart not saved. Try enabling Display Zero Bars in "
-                                               u"device settings.".format(name=payload['props']['name']))
+            LOG['Critical'].append(
+                f"[{PAYLOAD['props']['name']}] Chart not saved. Try enabling Display  Zero Bars "
+                f"in device settings."
+            )
 
-except (KeyError, IndexError, ValueError, UnicodeEncodeError, ZeroDivisionError) as sub_error:
+except Exception as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"[{n}]\n{s}".format(n=chart_name, s=tb))
+    tb_type = sys.exc_info()[1]
+    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type}")
 
-pickle.dump(chart_tools.log, sys.stdout)
+json.dump(LOG, sys.stdout, indent=4)

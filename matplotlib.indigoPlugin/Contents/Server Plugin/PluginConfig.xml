@@ -48,12 +48,6 @@
         <Description>Enable/Disable</Description>
     </Field>
 
-    <!-- The snappyConfigMenus flag element is set in the advanced settings menu. -->
-<!--    <Field id="snappyConfigMenus" type="checkbox" defaultValue="false" hidden="True">-->
-<!--        <Label>Snappy Menus</Label>-->
-<!--        <Description>Enable/Disable</Description>-->
-<!--    </Field>-->
-
     <!-- The forceOriginLines flag element is set in the advanced settings menu. -->
     <Field id="forceOriginLines" type="checkbox" defaultValue="false" hidden="True">
         <Label>Force Origin Lines</Label>

@@ -1,42 +1,38 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
+# noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
 Creates the scatter charts
-All steps required to generate scatter charts.
------
 
+All steps required to generate scatter charts.
 """
 
 # Built-in Modules
 import itertools
-import pickle
+import json
 import sys
 import traceback
-
 # Third-party Modules
-# Note the order and structure of matplotlib imports is intentional.
-import matplotlib
-matplotlib.use('AGG')  # Note: this statement must be run before any other matplotlib imports are done.
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-
+from matplotlib import pyplot as plt
+# from matplotlib import patches as patches
+from matplotlib import patches
 # My modules
-import chart_tools
+import chart_tools  # noqa
 
-log          = chart_tools.log
-payload      = chart_tools.payload
-p_dict       = payload['p_dict']
-k_dict       = payload['k_dict']
-props        = payload['props']
-chart_name   = props['name']
-plug_dict    = payload['prefs']
-group_colors = []
+LOG          = chart_tools.LOG
+PAYLOAD      = chart_tools.payload
+P_DICT       = PAYLOAD['p_dict']
+K_DICT       = PAYLOAD['k_dict']
+PROPS        = PAYLOAD['props']
+CHART_NAME   = PROPS['name']
+PLUG_DICT    = PAYLOAD['prefs']
+GROUP_COLORS = []
 
 
-log['Threaddebug'].append(u"chart_scatter.py called.")
-if plug_dict['verboseLogging']:
-    chart_tools.log['Threaddebug'].append(u"{0}".format(payload))
+LOG['Threaddebug'].append("chart_scatter.py called.")
+plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
+
+if PLUG_DICT['verboseLogging']:
+    LOG['Threaddebug'].append(PAYLOAD)
 
 try:
 
@@ -44,134 +40,144 @@ try:
         pass
 
 
-    ax = chart_tools.make_chart_figure(width=p_dict['chart_width'], height=p_dict['chart_height'], p_dict=p_dict)
+    ax = chart_tools.make_chart_figure(
+        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
+    )
 
-    chart_tools.format_axis_x_ticks(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_axis_y(ax=ax, p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     for thing in range(1, 5, 1):
 
-        suppress_group = p_dict.get('suppressGroup{i}'.format(i=thing), False)
+        suppress_group = P_DICT.get(f'suppressGroup{thing}', False)
 
         # If the group is suppressed, remind the user they suppressed it.
         if suppress_group:
-            chart_tools.log['Info'].append(u"[{name}] Group {i} is suppressed by user setting. You can re-enable it in "
-                                           u"the device configuration menu.".format(name=chart_name, i=thing))
+            LOG['Info'].append(
+                f"[{CHART_NAME}] Group {thing} is suppressed by user setting. You can re-enable "
+                f"it in the device configuration menu."
+            )
 
         # ============================== Plot the Points ==============================
         # Plot the groups. If suppress_group is True, we skip it.
-        if p_dict['group{i}Source'.format(i=thing)] not in ("", "None") and not suppress_group:
+        if P_DICT[f'group{thing}Source'] not in ("", "None") and not suppress_group:
 
             # If dot color is the same as the background color, alert the user.
-            if p_dict['group{i}Color'.format(i=thing)] == p_dict['backgroundColor'] and not suppress_group:
-                chart_tools.log['Warning'].append(u"[{name}] Group {i} color is the same as the background color (so "
-                                                  u"you may not be able to see it).".format(name=chart_name, i=thing))
+            if P_DICT[f'group{thing}Color'] == P_DICT['backgroundColor'] and not suppress_group:
+                LOG['Warning'].append(
+                    f"[{CHART_NAME}] Group {thing} color is the same as the background color (so "
+                    f"you may not be able to see it)."
+                )
 
             # Add group color to list for later use
-            group_colors.append(p_dict['group{i}Color'.format(i=thing)])
+            GROUP_COLORS.append(P_DICT[f'group{thing}Color'])
 
-            # There is a bug in matplotlib (fixed in newer versions) where points would not
-            # plot if marker set to 'none'. This overrides the behavior.
-            if p_dict['group{i}Marker'.format(i=thing)] == u'None':
-                p_dict['group{i}Marker'.format(i=thing)] = '.'
-                p_dict['group{i}MarkerColor'.format(i=thing)] = p_dict['group{i}Color'.format(i=thing)]
+            # There is a bug in matplotlib (fixed in newer versions) where points would not plot if
+            # marker set to 'none'. This overrides the behavior.
+            if P_DICT[f'group{thing}Marker'] == 'None':
+                P_DICT[f'group{thing}Marker'] = '.'
+                P_DICT[f'group{thing}MarkerColor'] = P_DICT[f'group{thing}Color']
 
-            data_path = plug_dict['dataPath'].encode("utf-8")
-            group_source = p_dict['group{i}Source'.format(i=thing)].encode("utf-8")
-            data_column = chart_tools.get_data(data_source='{d}{g}'.format(d=data_path, g=group_source), logger=log)
+            data_path = PLUG_DICT['dataPath']
+            group_source = P_DICT[f'group{thing}Source']
+            data_column = chart_tools.get_data(data_source=f'{data_path}{group_source}', logger=LOG)
 
-            if plug_dict['verboseLogging']:
-                chart_tools.log['Threaddebug'].append(u"[{n}] Data for group {i}: {c}".format(n=chart_name,
-                                                                                              i=thing,
-                                                                                              c=data_column
-                                                                                              )
-                                                      )
+            if PLUG_DICT['verboseLogging']:
+                LOG['Threaddebug'].append(f"[{CHART_NAME}] Data for group {thing}: {data_column}")
 
             # Pull the headers
-            p_dict['headers'].append(data_column[0][1])
+            P_DICT['headers'].append(data_column[0][1])
             del data_column[0]
 
             # Pull the observations into distinct lists for charting.
             for element in data_column:
-                p_dict['x_obs{i}'.format(i=thing)].append(element[0])
-                p_dict['y_obs{i}'.format(i=thing)].append(float(element[1]))
+                P_DICT[f'x_obs{thing}'].append(element[0])
+                P_DICT[f'y_obs{thing}'].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
-            # Allows user to shift data on the Y axis (for example, to display multiple
-            # binary sources on the same chart.)
-            if props['group{i}adjuster'.format(i=thing)] != "":
+            # Allows user to shift data on the Y axis (for example, to display multiple binary
+            # sources on the same chart.)
+            if PROPS[f'group{thing}adjuster'] != "":
                 temp_list = []
-                for obs in p_dict['y_obs{i}'.format(i=thing)]:
-                    expr = u'{o}{p}'.format(o=obs, p=props['group{i}adjuster'.format(i=thing)])
+                for obs in P_DICT[f'y_obs{thing}']:
+                    expr = f"{obs}{PROPS[f'group{thing}adjuster']}"
                     temp_list.append(chart_tools.eval_expr(expr=expr))
-                p_dict['y_obs{i}'.format(i=thing)] = temp_list
+                P_DICT[f'y_obs{thing}'] = temp_list
 
             # ================================ Prune Data =================================
             # Prune the data if warranted
-            dates_to_plot = p_dict['x_obs{i}'.format(i=thing)]
+            dates_to_plot = P_DICT[f'x_obs{thing}']
 
             try:
-                limit = float(props['limitDataRangeLength'])
+                limit = float(PROPS['limitDataRangeLength'])
             except ValueError:
                 limit = 0
 
             if limit > 0:
-                y_obs   = p_dict['y_obs{i}'.format(i=thing)]
-                new_old = props['limitDataRange']
+                y_obs   = P_DICT[f'y_obs{thing}']
+                new_old = PROPS['limitDataRange']
 
-                prune = chart_tools.prune_data(x_data=dates_to_plot,
-                                               y_data=y_obs,
-                                               limit=limit,
-                                               new_old=new_old,
-                                               logger=log
-                                               )
-                p_dict['x_obs{i}'.format(i=thing)], p_dict['y_obs{i}'.format(i=thing)] = prune
+                prune = chart_tools.prune_data(
+                    x_data=dates_to_plot,
+                    y_data=y_obs,
+                    limit=limit,
+                    new_old=new_old,
+                    logger=LOG
+                )
+                P_DICT[f'x_obs{thing}'], P_DICT[f'y_obs{thing}'] = prune
 
             # Convert the date strings for charting.
-            p_dict['x_obs{i}'.format(i=thing)] = \
-                chart_tools.format_dates(list_of_dates=p_dict['x_obs{i}'.format(i=thing)],
-                                         logger=log
-                                         )
+            P_DICT[f'x_obs{thing}'] = \
+                chart_tools.format_dates(list_of_dates=P_DICT[f'x_obs{thing}'], logger=LOG)
 
-            y_data = chart_tools.hide_anomalies(data=p_dict['y_obs{i}'.format(i=thing)], props=props, logger=log)
+            y_data = chart_tools.hide_anomalies(
+                data=P_DICT[f'y_obs{thing}'],
+                props=PROPS,
+                logger=LOG
+            )
 
-            # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
-            ax.scatter(p_dict['x_obs{i}'.format(i=thing)],
-                       y_data,
-                       c=p_dict['group{i}Color'.format(i=thing)],
-                       marker=p_dict['group{i}Marker'.format(i=thing)],
-                       edgecolor=p_dict['group{i}MarkerColor'.format(i=thing)],
-                       linewidths=0.75,
-                       zorder=10,
-                       **k_dict['k_line']
-                       )
+            # Note that using 'c' to set the color instead of 'color' makes a difference for some
+            # reason.
+            ax.scatter(
+                P_DICT[f'x_obs{thing}'],
+                y_data,
+                color=P_DICT[f'group{thing}Color'],
+                marker=P_DICT[f'group{thing}Marker'],
+                edgecolor=P_DICT[f'group{thing}MarkerColor'],
+                linewidths=0.75,
+                zorder=10,
+                **K_DICT['k_line']
+            )
 
             # =============================== Best Fit Line ===============================
-            if props.get('line{i}BestFit'.format(i=thing), False):
-                chart_tools.format_best_fit_line_segments(ax=ax,
-                                                          dates_to_plot=p_dict['x_obs{i}'.format(i=thing)],
-                                                          line=thing,
-                                                          p_dict=p_dict,
-                                                          logger=log
-                                                          )
+            if PROPS.get(f'line{thing}BestFit', False):
+                chart_tools.format_best_fit_line_segments(
+                    ax=ax,
+                    dates_to_plot=P_DICT[f'x_obs{thing}'],
+                    line=thing,
+                    p_dict=P_DICT,
+                    logger=LOG
+                )
 
-            [p_dict['data_array'].append(node) for node in p_dict['y_obs{i}'.format(i=thing)]]
+            _ = [P_DICT['data_array'].append(node) for node in P_DICT[f'y_obs{thing}']]
 
     # ============================== Y1 Axis Min/Max ==============================
     # Min and Max are not 'None'.
-    chart_tools.format_axis_y1_min_max(p_dict=p_dict, logger=log)
+    chart_tools.format_axis_y1_min_max(p_dict=P_DICT, logger=LOG)
 
     # Transparent Chart Fill
-    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
-        ax.add_patch(patches.Rectangle((0, 0), 1, 1,
-                                       transform=ax.transAxes,
-                                       facecolor=p_dict['faceColor'],
-                                       zorder=1
-                                       )
-                     )
+    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
+        ax.add_patch(
+            patches.Rectangle(
+                (0, 0), 1, 1,
+                transform=ax.transAxes,
+                facecolor=P_DICT['faceColor'],
+                zorder=1
+            )
+        )
 
     # ================================== Legend ===================================
-    if p_dict['showLegend']:
+    if P_DICT['showLegend']:
 
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
@@ -179,92 +185,105 @@ try:
         labels = []
 
         # Set legend group colors
-        # Note that we do this in a slightly different order than other chart types
-        # because we use legend styles for scatter charts differently than other
-        # chart types.
-        num_col = int(p_dict['legendColumns'])
-        iter_colors  = itertools.chain(*[group_colors[i::num_col] for i in range(num_col)])
-        final_colors = [_ for _ in iter_colors]
+        # Note that we do this in a slightly different order than other chart types because we use
+        # legend styles for scatter charts differently than other chart types.
+        num_col = int(P_DICT['legendColumns'])
+        iter_colors  = itertools.chain(*[GROUP_COLORS[i::num_col] for i in range(num_col)])
+        final_colors = list(iter_colors)
 
-        headers = [_.decode('utf-8') for _ in p_dict['headers']]
+        headers = [_.decode('utf-8') for _ in P_DICT['headers']]
         for header in headers:
 
-            if p_dict['group{c}Legend'.format(c=counter)] == "":
+            if P_DICT[f'group{counter}Legend'] == "":
                 labels.append(header)
             else:
-                labels.append(p_dict['group{c}Legend'.format(c=counter)])
+                labels.append(P_DICT[f'group{counter}Legend'])
 
-            legend_styles.append(tuple(plt.plot([],
-                                                color=p_dict['group{c}MarkerColor'.format(c=counter)],
-                                                linestyle='',
-                                                marker=p_dict['group{c}Marker'.format(c=counter)],
-                                                markerfacecolor=final_colors[counter-1],
-                                                markeredgewidth=.8,
-                                                markeredgecolor=p_dict['group{c}MarkerColor'.format(c=counter)]
-                                                )
-                                       )
-                                 )
+            legend_styles.append(
+                tuple(plt.plot(
+                    [],
+                    color=P_DICT[f'group{counter}MarkerColor'],
+                    linestyle='',
+                    marker=P_DICT[f'group{counter}Marker'],
+                    markerfacecolor=final_colors[counter-1],
+                    markeredgewidth=.8,
+                    markeredgecolor=P_DICT[f'group{counter}MarkerColor']
+                )
+                )
+            )
             counter += 1
 
         # Reorder the headers so that they fill by row instead of by column
         iter_headers   = itertools.chain(*[labels[i::num_col] for i in range(num_col)])
-        final_headers = [_ for _ in iter_headers]
+        final_headers = list(iter_headers)
 
-        legend = ax.legend(legend_styles,
-                           final_headers,
-                           loc='upper center',
-                           bbox_to_anchor=(0.5, -0.15),
-                           ncol=int(p_dict['legendColumns']),
-                           numpoints=1,
-                           markerscale=0.6,
-                           prop={'size': float(p_dict['legendFontSize'])}
-                           )
+        legend = ax.legend(
+            legend_styles,
+            final_headers,
+            loc='upper center',
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=int(P_DICT['legendColumns']),
+            numpoints=1,
+            markerscale=0.6,
+            prop={'size': float(P_DICT['legendFontSize'])}
+        )
 
         # Set legend font colors
-        [text.set_color(p_dict['fontColor']) for text in legend.get_texts()]
+        _ = [text.set_color(P_DICT['fontColor']) for text in legend.get_texts()]
 
         num_handles = len(legend.legendHandles)
-        [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
+        _ = [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
         frame = legend.get_frame()
         frame.set_alpha(0)
 
     # ================================= Min / Max =================================
     for thing in range(1, 5, 1):
-        if p_dict['plotGroup{i}Min'.format(i=thing)]:
-            ax.axhline(y=min(p_dict['y_obs{i}'.format(i=thing)]),
-                       color=p_dict['group{i}Color'.format(i=thing)],
-                       **k_dict['k_min']
-                       )
-        if p_dict['plotGroup{i}Max'.format(i=thing)]:
-            ax.axhline(y=max(p_dict['y_obs{i}'.format(i=thing)]),
-                       color=p_dict['group{i}Color'.format(i=thing)],
-                       **k_dict['k_max']
-                       )
-        if plug_dict.get('forceOriginLines', True):
-            ax.axhline(y=0, color=p_dict['spineColor'])
+        if P_DICT[f'plotGroup{thing}Min']:
+            ax.axhline(
+                y=min(P_DICT[f'y_obs{thing}']),
+                color=P_DICT[f'group{thing}Color'],
+                **K_DICT['k_min']
+            )
+        if P_DICT[f'plotGroup{thing}Max']:
+            ax.axhline(
+                y=max(P_DICT[f'y_obs{thing}']),
+                color=P_DICT[f'group{thing}Color'],
+                **K_DICT['k_max']
+            )
+        if PLUG_DICT.get('forceOriginLines', True):
+            ax.axhline(y=0, color=P_DICT['spineColor'])
 
-    chart_tools.format_custom_line_segments(ax=ax, plug_dict=plug_dict, p_dict=p_dict, k_dict=k_dict, logger=log, orient="horiz")
-    chart_tools.format_grids(p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_title(p_dict=p_dict, k_dict=k_dict, loc=(0.5, 0.98))
-    chart_tools.format_axis_x_label(dev=props, p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_axis_y1_label(p_dict=p_dict, k_dict=k_dict, logger=log)
-    chart_tools.format_axis_y_ticks(p_dict=p_dict, k_dict=k_dict, logger=log)
+    chart_tools.format_custom_line_segments(
+        ax=ax,
+        plug_dict=PLUG_DICT,
+        p_dict=P_DICT,
+        k_dict=K_DICT,
+        logger=LOG,
+        orient="horiz"
+    )
+    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
+    chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # Note that subplots_adjust affects the space surrounding the subplots and
-    # not the fig.
-    plt.subplots_adjust(top=0.90,
-                        bottom=0.20,
-                        left=0.10,
-                        right=0.90,
-                        hspace=None,
-                        wspace=None
-                        )
+    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
+    plt.subplots_adjust(
+        top=0.90,
+        bottom=0.20,
+        left=0.10,
+        right=0.90,
+        hspace=None,
+        wspace=None
+    )
 
-    chart_tools.save(logger=log)
+    chart_tools.save(logger=LOG)
 
-except (KeyError, IndexError, ValueError, UnicodeEncodeError) as sub_error:
+except Exception as sub_error:
     tb = traceback.format_exc()
-    chart_tools.log['Critical'].append(u"[{n}] {s}".format(n=chart_name, s=tb))
+    tb_type = sys.exc_info()[1]
+    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type}")
 
-pickle.dump(chart_tools.log, sys.stdout)
+json.dump(LOG, sys.stdout, indent=4)
