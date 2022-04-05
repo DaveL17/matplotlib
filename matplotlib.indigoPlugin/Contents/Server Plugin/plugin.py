@@ -82,14 +82,9 @@ from matplotlib import rcParams               # noqa
 
 try:
     import indigo  # noqa
+#     import pydevd
 except ImportError:
     pass
-
-# Third-party modules
-# try:
-#     import pydevd  # To support remote debugging
-# except ImportError as error:
-#     pass
 
 # My modules
 import DLFramework.DLFramework as Dave           # noqa
@@ -109,13 +104,13 @@ __version__   = "2022.0.1"
 # =============================================================================
 class Plugin(indigo.PluginBase):
     """
-    Title Placeholder
+    Standard Indigo Plugin Class
 
-    :param class indigo.PluginBase:
+    :param indigo.PluginBase:
     """
     def __init__(self, plugin_id="", plugin_display_name="", plugin_version="", plugin_prefs=None):
         """
-        Title Placeholder
+        Plugin initialization
 
         :param str plugin_id:
         :param str plugin_display_name:
@@ -132,6 +127,7 @@ class Plugin(indigo.PluginBase):
         # List of devices and variables (updated in getDeviceConfigUiValues)
         self.dev_var_list          = []
         self.refresh_queue         = Queue()
+        self.debug_level = int(plugin_prefs.get('showDebugLevel', "30"))
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert = Dave.Fogbert(self)           # Plugin functional framework
@@ -157,12 +153,13 @@ class Plugin(indigo.PluginBase):
 
         # ============================= Remote Debug Hook =============================
         # try:
-        #     pydevd.settrace('localhost',
-        #                     port=5678,
-        #                     stdoutToServer=True,
-        #                     stderrToServer=True,
-        #                     suspend=False
-        #                     )
+        #     pydevd.settrace(
+        #         'localhost',
+        #         port=5678,
+        #         stdoutToServer=True,
+        #         stderrToServer=True,
+        #         suspend=False
+        #     )
         # except Exception:
         #     pass
 
@@ -210,33 +207,42 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     def closedPrefsConfigUi(self, values_dict=None, user_cancelled=False):  # noqa
         """
-        Title Placeholder
-
-        Body placeholder
+        Standard Indigo method called when plugin preferences dialog is closed.
 
         :param indigo.Dict values_dict:
         :param bool user_cancelled:
         :return:
         """
         if not user_cancelled:
+            # Ensure that self.pluginPrefs includes any recent changes.
+            for k in values_dict:
+                self.pluginPrefs[k] = values_dict[k]
 
+            # Debug Logging
+            self.debug_level = int(values_dict.get('showDebugLevel', "30"))
+            self.indigo_log_handler.setLevel(self.debug_level)
+            indigo.server.log(
+                f"Debugging on (Level: {DEBUG_LABELS[self.debug_level]} ({self.debug_level})"
+            )
+
+            # Plugin-specific actions
             if values_dict['verboseLogging']:
                 self.plugin_file_handler.setLevel(5)
                 self.logger.warning(
                     "Verbose logging is on. It is best not to leave this turned on for very long."
                 )
             else:
-                self.plugin_file_handler.setLevel(10)
+                self.plugin_file_handler.setLevel(self.debug_level)
                 self.logger.info(
                     "Verbose logging is off.  It is best to leave this turned off unless directed."
                 )
 
-            self.logger.threaddebug("Configuration complete.")
+            self.logger.debug("Plugin prefs saved.")
 
         else:
-            self.logger.threaddebug("User cancelled.")
+            self.logger.debug("Plugin prefs cancelled.")
 
-        return True
+        return values_dict
 
     # =============================================================================
     def deviceStartComm(self, dev=None):  # noqa
@@ -2493,7 +2499,7 @@ class Plugin(indigo.PluginBase):
                         plug_dict['old_prefs'] = None
                         dev_dict  = self.audit_dict_color(_dict_=dev_dict)
                         p_dict    = copy.deepcopy(self.audit_dict_color(_dict_=p_dict))
-                        p_dict['old_prefs']    = None
+                        p_dict['old_prefs'] = None
                         k_dict    = self.audit_dict_color(_dict_=k_dict)
 
                         # Instantiate basic payload sent to the subprocess scripts. Additional

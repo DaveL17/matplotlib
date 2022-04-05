@@ -7,6 +7,7 @@ The constants.py file contains all application constants and is imported as a li
 are denoted as constants by the use of all caps.
 """
 
+
 # =============================================================================
 def __init__():
     """
@@ -15,6 +16,7 @@ def __init__():
     Body placeholder
     :return:
     """
+
 
 CLEAN_LIST = (
     (' am ', ' AM '),
@@ -26,6 +28,14 @@ CLEAN_LIST = (
     (' /', '/'),
     ('/', ' / ')
 )
+
+DEBUG_LABELS = {
+    10: "Debugging Messages",
+    20: "Informational Messages",
+    30: "Warning Messages",
+    40: "Error Messages",
+    50: "Critical Errors Only"
+}
 
 FONT_MENU = [
     'Arial',
