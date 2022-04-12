@@ -1075,10 +1075,14 @@ def save(logger):
             )
             logger['Debug'].append(f"[{payload['props']['name']}] Chart file saved to disk.")
 
+        else:
+            logger['Warning'].append(f"[{payload['props']['name']}] Chart not saved.")
+
         # Note that this garbage collection may be unneeded since the process will end.
         plt.clf()
         plt.close('all')
 
     except RuntimeError as err:
+        # There are too many observations in the CSV data.
         if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
-            logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved.")
+            logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved. [Too many observeations.]")

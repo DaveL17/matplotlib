@@ -55,6 +55,7 @@ try:
         suppress_bar = P_DICT.get(f'suppressBar{b_num}', False)
         # x_labels.append(bar[f"legend_{b_num}"])
         X_TICKS.append(b_num)
+
         y_val = float(bar[f'val_{b_num}'])
         P_DICT['data_array'].append(y_val)
         BAR_COLORS.append(color)

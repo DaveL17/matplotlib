@@ -196,7 +196,8 @@ try:
         counter = 1
         final_headers = []
 
-        headers = [_.decode('utf-8') for _ in P_DICT['headers']]
+        # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
+        headers = [_ for _ in P_DICT['headers']]
 
         for header in headers:
             if P_DICT[f'line{counter}Legend'] == "":

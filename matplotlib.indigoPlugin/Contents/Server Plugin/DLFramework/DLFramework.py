@@ -78,17 +78,22 @@ class Fogbert:
         :return:
         """
         self.plugin.debugLog("DLFramework pluginEnvironment method called.")
+        environment_state = ""
+        spacer = " " * 35
 
-        indigo.server.log(f"{' Initializing New Plugin Session ':{'='}^135}")
-        indigo.server.log(f"{'Plugin name:':<31} {self.plugin.pluginDisplayName}")
-        indigo.server.log(f"{'Plugin version:':<31} {self.plugin.pluginVersion}")
-        indigo.server.log(f"{'Plugin ID:':<31} {self.plugin.pluginId}")
-        indigo.server.log(f"{'Indigo version:':<31} {indigo.server.version}")
-        sys_version = sys.version.replace('\n', '')
-        indigo.server.log(f"{'Python version:':<31} {sys_version}")
-        indigo.server.log(f"{'Mac OS Version:':<31} {platform.mac_ver()[0]}")
-        indigo.server.log(f"{'Process ID:':<31} {os.getpid()}")
-        indigo.server.log("=" * 135)
+        environment_state += f"{' Initializing New Plugin Session ':{'='}^135}\n"
+        environment_state += f"{spacer}{'Plugin name:':<31} {self.plugin.pluginDisplayName}\n"
+        environment_state += f"{spacer}{'Plugin version:':<31} {self.plugin.pluginVersion}\n"
+        environment_state += f"{spacer}{'Plugin ID:':<31} {self.plugin.pluginId}\n"
+        environment_state += f"{spacer}{'Indigo version:':<31} {indigo.server.version}\n"
+        environment_state += f"{spacer}{'Architecture:':<31} {platform.machine()}\n"
+        sys_version = sys.version.replace("\n", "")
+        environment_state += f"{spacer}{'Python version:':<31} {sys_version}\n"
+        environment_state += f"{spacer}{'Mac OS Version:':<31} {platform.mac_ver()[0]}\n"
+        environment_state += f"{spacer}{'Process ID:':<31} {os.getpid()}\n"
+        environment_state += spacer + ("=" * 135) + "\n"
+
+        indigo.server.log(environment_state)
 
     # =============================================================================
     def pluginEnvironmentLogger(self):  # noqa
@@ -101,18 +106,22 @@ class Fogbert:
         :return:
         """
         self.plugin.logger.debug("DLFramework pluginEnvironment method called.")
+        environment_state = ""
+        spacer = " " * 35
 
-        self.plugin.logger.info("")
-        self.plugin.logger.info(f"{' Initializing New Plugin Session ':=^135}")
-        self.plugin.logger.info(f"{'Plugin name:':<31} {self.plugin.pluginDisplayName}")
-        self.plugin.logger.info(f"{'Plugin version:':<31} {self.plugin.pluginVersion}")
-        self.plugin.logger.info(f"{'Plugin ID:':<31} {self.plugin.pluginId}")
-        self.plugin.logger.info(f"{'Indigo version:':<31} {indigo.server.version}")
-        sys_version = sys.version.replace('\n', '')  # backslashes are not allowed in f strings
-        self.plugin.logger.info(f"{'Python version:':<31} {sys_version}")
-        self.plugin.logger.info(f"{'Mac OS Version:':<31} {platform.mac_ver()[0]}")
-        self.plugin.logger.info(f"{'Process ID:':<31} {os.getpid()}")
-        self.plugin.logger.info("=" * 135)
+        environment_state += f"{' Initializing New Plugin Session ':{'='}^135}\n"
+        environment_state += f"{spacer}{'Plugin name:':<31} {self.plugin.pluginDisplayName}\n"
+        environment_state += f"{spacer}{'Plugin version:':<31} {self.plugin.pluginVersion}\n"
+        environment_state += f"{spacer}{'Plugin ID:':<31} {self.plugin.pluginId}\n"
+        environment_state += f"{spacer}{'Indigo version:':<31} {indigo.server.version}\n"
+        environment_state += f"{spacer}{'Architecture:':<31} {platform.machine()}\n"
+        sys_version = sys.version.replace("\n", "")
+        environment_state += f"{spacer}{'Python version:':<31} {sys_version}\n"
+        environment_state += f"{spacer}{'Mac OS Version:':<31} {platform.mac_ver()[0]}\n"
+        environment_state += f"{spacer}{'Process ID:':<31} {os.getpid()}\n"
+        environment_state += spacer + ("=" * 135) + "\n"
+
+        self.plugin.logger.info(environment_state)
 
     # =============================================================================
     def pluginErrorHandler(self, sub_error):  # noqa

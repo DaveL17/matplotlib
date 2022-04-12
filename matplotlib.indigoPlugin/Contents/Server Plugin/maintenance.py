@@ -401,8 +401,7 @@ class Maintain:
         props['isChart'] = is_chart_dict[dev.deviceTypeId]
 
         try:
-            # Convert string bools to true bools
-            # for item in dev.pluginProps.keys():
+            # Convert string bools to true bools for item in dev.pluginProps.keys():
             for item in dev.pluginProps:
                 try:
                     if not isinstance(props[item], bool):
@@ -463,6 +462,21 @@ class Maintain:
                             f"[{dev.name}] Refactoring color property: ({prop})"
                         )
                         props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
+
+                # ============================== Fix Line Styles ==============================
+                # In upgrading matplotlib from X.X.X (Apple's version) to v3.5.1, changes were made
+                # to the allowable options for line styles. The following code resets any
+                # unsupported styles to `solid` to avoid fatal charting errors.
+                for prop in props:
+
+                    # If unsupported style in dev props
+                    if props[prop] in ('steps', 'steps-mid', 'steps-post'):
+                        # Change style to `solid`
+                        self.plugin.logger.warning(
+                            f"Converting deprecated line style setting to solid line style for "
+                            f"device [{dev.name}]."
+                        )
+                        props[prop] = '-'
 
                 # ======================== Reset Legacy Color Settings ========================
                 # Initially, the plugin was constructed with a standard set of colors that could be

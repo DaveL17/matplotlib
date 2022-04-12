@@ -52,6 +52,8 @@ linked to the proper Fantastic Weather devices).
 # TODO: Be sure to use AGG even with the latest version of mpl (3.5).
 # TODO: Matplotlib 2022.0.1 is going to require users to install with pip.
 # TODO: Audit style sheet files -- if dev id no longer exists, delete the style sheet.
+# TODO: Create new STEP chart type as step is no longer a supported line style.
+#     https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post
 # ================================== IMPORTS ==================================
 # Built-in modules
 import ast
@@ -82,7 +84,7 @@ from matplotlib import rcParams               # noqa
 
 try:
     import indigo  # noqa
-#     import pydevd
+    import pydevd
 except ImportError:
     pass
 
@@ -152,16 +154,16 @@ class Plugin(indigo.PluginBase):
             self.plugin_file_handler.setLevel(10)
 
         # ============================= Remote Debug Hook =============================
-        # try:
-        #     pydevd.settrace(
-        #         'localhost',
-        #         port=5678,
-        #         stdoutToServer=True,
-        #         stderrToServer=True,
-        #         suspend=False
-        #     )
-        # except Exception:
-        #     pass
+        try:
+            pydevd.settrace(
+                'localhost',
+                port=5678,
+                stdoutToServer=True,
+                stderrToServer=True,
+                suspend=False
+            )
+        except Exception:
+            pass
 
         self.pluginIsInitializing = False
 
@@ -2748,7 +2750,6 @@ class Plugin(indigo.PluginBase):
 
                         # ============================  Process Result  ============================
                         self.logger.debug(f"[{dev.name}] Sending to chart refresh process.")
-
                         # It's important to use the full path to the Python version to ensure that
                         # we get the version we want.
                         try:
@@ -2758,7 +2759,7 @@ class Plugin(indigo.PluginBase):
                                     stderr=subprocess.PIPE,
                             ) as proc:
 
-                                # Get the results and act on anything
+                                # Get the results and act on anything that's returned.
                                 if proc:
                                     reply, err = proc.communicate()
 
@@ -4091,7 +4092,12 @@ class Plugin(indigo.PluginBase):
         is only called once, when the plugin is first loaded (or reloaded).
         """
         chart_devices = 0
-        csv_engines   = 0
+        csv_engines = 0
+        log_path = indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')
+        matplotlib_environment = ""
+        matplotlib_version = plt.matplotlib.__version__
+        rc_path = plt.matplotlib.matplotlib_fname()
+        spacer = " " * 35
 
         # ========================== Get Plugin Device Load ===========================
         for dev in indigo.devices.iter('self'):
@@ -4100,19 +4106,19 @@ class Plugin(indigo.PluginBase):
             elif dev.deviceTypeId == 'csvEngine':
                 csv_engines += 1
 
-        self.logger.info("")
-        self.logger.info(f"{' Matplotlib Environment ':{'='}^135}")
-        self.logger.info(f"{'Matplotlib version:':<31} {plt.matplotlib.__version__}")
-        self.logger.info(f"{'Numpy version:':<31} {np.__version__}")
-        self.logger.info(f"{'Matplotlib RC Path:':<31} {plt.matplotlib.matplotlib_fname()}")
-        log_path = indigo.server.getLogsFolderPath(pluginId='com.fogbert.indigoplugin.matplotlib')
-        self.logger.info(f"{'Matplotlib Plugin log location:':<31} {log_path}")
-        self.logger.info(f"{'Number of Chart Devices:':<31} {chart_devices}")
-        self.logger.info(f"{'Number of CSV Engine Devices:':<31} {csv_engines}")
+        matplotlib_environment += f"{' Matplotlib Environment ':{'='}^135}\n"
+        matplotlib_environment += f"{spacer}{'Matplotlib version:':<31} {matplotlib_version}\n"
+        matplotlib_environment += f"{spacer}{'Numpy version:':<31} {np.__version__}\n"
+        matplotlib_environment += f"{spacer}{'Matplotlib RC Path:':<31} {rc_path}\n"
+        matplotlib_environment += f"{spacer}{'Matplotlib Plugin log location:':<31} {log_path}\n"
+        matplotlib_environment += f"{spacer}{'Number of Chart Devices:':<31} {chart_devices}\n"
+        matplotlib_environment += f"{spacer}{'Number of CSV Engine Devices:':<31} {csv_engines}\n"
         # rcParams is a dict containing all the initial _matplotlibrc settings
+        matplotlib_environment += spacer + "=" * 135
+        self.logger.info(matplotlib_environment)
+
         self.logger.threaddebug(f"{'Matplotlib base rcParams:':<31} {dict(rcParams)}")
         self.logger.threaddebug(f"{'Initial Plugin Prefs:':<31} {dict(self.pluginPrefs)}")
-        self.logger.info("=" * 135)
 
     # =============================================================================
     def plugin_error_handler(self, sub_error=""):
@@ -4148,7 +4154,8 @@ class Plugin(indigo.PluginBase):
         # ======================= Process Output Queue ========================
         try:
             try:
-                replies = json.loads(replies.decode("utf-8"))
+                # replies = json.loads(replies.decode("utf-8"))
+                replies = json.loads(replies)
             except json.decoder.JSONDecodeError:
                 return
             success = True
