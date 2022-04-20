@@ -59,7 +59,7 @@ class Fogbert:
         :return:
         """
         self.plugin = plugin
-        self.plugin.debugLog("Initializing DLFramework...")
+        self.plugin.logger.debug("Initializing DLFramework...")
         self.pluginPrefs = plugin.pluginPrefs
 
         log_format = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
@@ -77,7 +77,7 @@ class Fogbert:
 
         :return:
         """
-        self.plugin.debugLog("DLFramework pluginEnvironment method called.")
+        self.plugin.logger.debug("DLFramework pluginEnvironment method called.")
         environment_state = ""
         spacer = " " * 35
 
@@ -158,7 +158,7 @@ class Fogbert:
         :param str debug_val:
         :return:
         """
-        self.plugin.debugLog("DLFramework convertDebugLevel method called.")
+        self.plugin.logger.debug("DLFramework convertDebugLevel method called.")
 
         # If the debug value is High/Medium/Low, it is the old style. Covert it to 3/2/1
         if debug_val in ["High", "Medium", "Low"]:

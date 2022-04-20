@@ -191,7 +191,8 @@ try:
         iter_colors  = itertools.chain(*[GROUP_COLORS[i::num_col] for i in range(num_col)])
         final_colors = list(iter_colors)
 
-        headers = [_.decode('utf-8') for _ in P_DICT['headers']]
+        headers = [_ for _ in P_DICT['headers']]
+        # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
         for header in headers:
 
             if P_DICT[f'group{counter}Legend'] == "":

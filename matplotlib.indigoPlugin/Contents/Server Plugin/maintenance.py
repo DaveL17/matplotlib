@@ -453,21 +453,21 @@ class Maintain:
                 except KeyError:
                     pass
 
-                # ============================= Fix Custom Colors =============================
-                # For all chart device types
-                # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
+                # ================================ Fix Device Props ===============================
                 for prop in props:
+                    # ============================= Fix Custom Colors =============================
+                    # For all chart device types
+                    # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
                     if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
                         self.plugin.logger.debug(
                             f"[{dev.name}] Refactoring color property: ({prop})"
                         )
                         props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
 
-                # ============================== Fix Line Styles ==============================
-                # In upgrading matplotlib from X.X.X (Apple's version) to v3.5.1, changes were made
-                # to the allowable options for line styles. The following code resets any
-                # unsupported styles to `solid` to avoid fatal charting errors.
-                for prop in props:
+                    # ============================== Fix Line Styles ==============================
+                    # In upgrading matplotlib from 1.3.1 (Apple's python 2.7 version) to v3.5.1,
+                    # changes were made to the allowable options for line styles. The following code
+                    # resets any unsupported styles to `solid` to avoid fatal charting errors.
 
                     # If unsupported style in dev props
                     if props[prop] in ('steps', 'steps-mid', 'steps-post'):

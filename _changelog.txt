@@ -1,6 +1,10 @@
 v2022.0.1
 - Updates plugin for Indigo 2022.1 and Python 3.
+- Polar charts are back!
 - Standardizes Indigo method implementation.
+- Deprecates `step`, `steps-mid`, and `steps-post` line styles which are no longer supported by matplotlib. Step charts
+  will return in the future as a separate chart type.
+- Fixes bug where Stylesheets folder is not present.
 
 v0.9.52
 - Fixes bug in file save location testing.

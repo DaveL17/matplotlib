@@ -2607,6 +2607,7 @@ class Plugin(indigo.PluginBase):
 
                                     # The following line is used for testing the battery health
                                     # code; it isn't needed in production.
+                                    self.logger.warning("Using dummy battery data for testing.")
                                     device_dict = {
                                         'Device A': 0, 'Device B': 100, 'Device C': 8,
                                         'Device D': 4, 'Device E': 92, 'Device F': 72,
@@ -2733,6 +2734,11 @@ class Plugin(indigo.PluginBase):
                         # Save rcParams as a style sheet for use in subprocess calls. We use a
                         # separate style sheet for each device because each device can have
                         # different styles.
+
+                        # If the "Stylesheets" folder isn't present, create one.
+                        if not os.path.exists("Stylesheets/"):
+                            os.mkdir("Stylesheets/")
+
                         with open(
                                 f"Stylesheets/{dev.id}_stylesheet", 'w', encoding="utf-8"
                         ) as outfile:

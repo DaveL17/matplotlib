@@ -1076,7 +1076,8 @@ def save(logger):
             logger['Debug'].append(f"[{payload['props']['name']}] Chart file saved to disk.")
 
         else:
-            logger['Warning'].append(f"[{payload['props']['name']}] Chart not saved.")
+            if payload['props']['isChart']:
+                logger['Warning'].append(f"[{payload['props']['name']}] Chart not saved.")
 
         # Note that this garbage collection may be unneeded since the process will end.
         plt.clf()
