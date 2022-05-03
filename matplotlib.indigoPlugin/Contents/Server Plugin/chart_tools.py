@@ -70,7 +70,8 @@ def convert_the_data(final_data, data_source, logger):
                         f"Coercing chart data to chart-able values where needed.")
     converter = {
         'true': 1, 'false': 0, 'open': 1, 'closed': 0, 'on': 1, 'off': 0, 'locked': 1,
-        'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1, 'armed': 1, 'disarmed': 0
+        'unlocked': 0, 'up': 1, 'down': 0, '1': 1, '0': 0, 'heat': 1, 'armed': 1, 'disarmed': 0,
+        '- data unavailable -': 'nan', 'data unavailable': 'nan', 'NA': 'nan', 'N/A': 'nan'
     }
     now = dt.datetime.now()
     now_text = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')

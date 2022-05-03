@@ -5,6 +5,7 @@ v2022.0.1
 - Deprecates `step`, `steps-mid`, and `steps-post` line styles which are no longer supported by matplotlib. Step charts
   will return in the future as a separate chart type.
 - Fixes bug where Stylesheets folder is not present.
+- Adds additional logic for instances where data are None values (or otherwise unavailable).
 
 v0.9.52
 - Fixes bug in file save location testing.
