@@ -241,17 +241,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the style of your chart's first area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area1MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -264,32 +254,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the marker style for your chart's first area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea1Min" type="checkbox" defaultValue="false"
@@ -356,17 +321,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="2"
                    tooltip="Select preference for the style of your chart's second area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area2MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -379,32 +334,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="2"
                    tooltip="Select preference for the marker style for your chart's second area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea2Min" type="checkbox" defaultValue="false"
@@ -471,17 +401,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the style of your chart's third area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area3MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -494,32 +414,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the marker style for your chart's third area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea3Min" type="checkbox" defaultValue="false"
@@ -586,17 +481,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="4"
                    tooltip="Select preference for the style of your chart's fourth area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area4MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -609,32 +494,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="4"
                    tooltip="Select preference for the marker style for your chart's fourth area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea4Min" type="checkbox" defaultValue="false"
@@ -701,17 +561,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Select preference for the style of your chart's fifth area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area5MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -724,32 +574,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Select preference for the marker style for your chart's fifth area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea5Min" type="checkbox" defaultValue="false"
@@ -816,17 +641,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="6"
                    tooltip="Select preference for the style of your chart's sixth area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area6MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -839,32 +654,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="6"
                    tooltip="Select preference for the marker style for your chart's sixth area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea6Min" type="checkbox" defaultValue="false"
@@ -931,17 +721,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Select preference for the style of your chart's seventh area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area7MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -954,32 +734,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Select preference for the marker style for your chart's seventh area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea7Min" type="checkbox" defaultValue="false"
@@ -1046,17 +801,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="8"
                    tooltip="Select preference for the style of your chart's eighth area.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultNoneList" dynamicReload="true"/>
             </Field>
 
             <Field id="area8MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -1069,32 +814,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="8"
                    tooltip="Select preference for the marker style for your chart's eighth area.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotArea8Min" type="checkbox" defaultValue="false"
@@ -2125,12 +1845,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="x"
                    tooltip="Select preference for the precision of your chart's X axis.">
                 <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
+                <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
 
             <Field id="customAxisLabelX" type="textfield" defaultValue="X Axis"
@@ -2537,11 +2252,7 @@
             <Field id="precision" type="menu" defaultValue="0"
                    tooltip="Select the desired precision level for this chart.">
                 <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0 (XX)*</Option>
-                    <Option value="1">1 (XX.X)</Option>
-                    <Option value="2">2 (XX.XX)</Option>
-                </List>
+                <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
             <Field id="startAngle" type="menu" defaultValue="90"
                    tooltip="Select where you would like the zero value to be located.">
@@ -3132,17 +2843,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3155,32 +2856,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine1Min" type="checkbox" defaultValue="false"
@@ -3264,17 +2940,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="2"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3287,32 +2953,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="2"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine2Min" type="checkbox" defaultValue="false"
@@ -3396,17 +3037,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the style of your chart's third line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line3MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3419,32 +3050,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the marker style for your chart's third line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine3Min" type="checkbox" defaultValue="false"
@@ -3528,17 +3134,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="4"
                    tooltip="Select preference for the style of your chart's fourth line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line4MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3551,32 +3147,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="4"
                    tooltip="Select preference for the marker style for your chart's fourth line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine4Min" type="checkbox" defaultValue="false"
@@ -3660,17 +3231,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Select preference for the style of your chart's fifth line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line5MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3683,32 +3244,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Select preference for the marker style for your chart's fifth line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine5Min" type="checkbox" defaultValue="false"
@@ -3792,17 +3328,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="6"
                    tooltip="Select preference for the style of your chart's sixth line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line6MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3815,32 +3341,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="6"
                    tooltip="Select preference for the marker style for your chart's sixth line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine6Min" type="checkbox" defaultValue="false"
@@ -3921,17 +3422,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Select preference for the style of your chart's seventh line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line7MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -3944,32 +3435,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Select preference for the marker style for your chart's seventh line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine7Min" type="checkbox" defaultValue="false"
@@ -4050,17 +3516,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="8"
                    tooltip="Select preference for the style of your chart's eighth line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line8MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -4073,32 +3529,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="8"
                    tooltip="Select preference for the marker style for your chart's eighth line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotLine8Min" type="checkbox" defaultValue="false"
@@ -4686,32 +4117,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the marker style for your chart's first group.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotGroup1Min" type="checkbox" defaultValue="false"
@@ -4784,32 +4190,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="2"
                    tooltip="Select preference for the marker style for your chart's second group.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotGroup2Min" type="checkbox" defaultValue="false"
@@ -4882,32 +4263,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the marker style for your chart's third group.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotGroup3Min" type="checkbox" defaultValue="false"
@@ -4980,32 +4336,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="4"
                    tooltip="Select preference for the marker style for your chart's fourth group.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <Field id="plotGroup4Min" type="checkbox" defaultValue="false"
@@ -5237,12 +4568,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="y1"
                    tooltip="Select preference for the precision of your chart's Y axis.">
                 <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
+                <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
 
             <!-- =======================  Y2 Axis Controls  ======================= -->
@@ -5275,12 +4601,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="y2"
                    tooltip="Select preference for the precision of your chart's Y2 axis.">
                 <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
+                <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
 
             <!-- =======================  High Temperature  ======================= -->
@@ -5306,17 +4627,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="ht"
                    tooltip="Select preference for the style of your chart's first line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line1MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -5329,32 +4640,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="ht"
                    tooltip="Select preference for the marker style for your chart's first line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <!-- =======================  Low Temperature  ======================== -->
@@ -5381,17 +4667,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="lt"
                    tooltip="Select preference for the style of your chart's second line.">
                 <Label>Line Style:</Label>
-                <List>
-                    <Option value="--">Dashed</Option>
-                    <Option value=":">Dotted</Option>
-                    <Option value="-.">Dot Dash</Option>
-                    <Option value="-">Solid*</Option>
-<!--                    <Option value="steps">Steps</Option>-->
-<!--                    <Option value="steps-mid">Steps Mid</Option>-->
-<!--                    <Option value="steps-post">Steps Post</Option>-->
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None</Option>
-                </List>
+                <List class="self" filter="" method="generatorLineStyleDefaultSolidList" dynamicReload="true"/>
             </Field>
 
             <Field id="line2MarkerColor" type="colorpicker" defaultValue="FF FF FF"
@@ -5404,32 +4680,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="lt"
                    tooltip="Select preference for the marker style for your chart's second line.">
                 <Label>Marker Style:</Label>
-                <List>
-                    <Option value="o">Circle</Option>
-                    <Option value="D">Diamond</Option>
-                    <Option value="d">Diamond (Thin)</Option>
-                    <Option value="h">Hexagon 1</Option>
-                    <Option value="H">Hexagon 2</Option>
-                    <Option value="-">Horizontal Line</Option>
-                    <Option value="8">Octagon</Option>
-                    <Option value="p">Pentagon</Option>
-                    <Option value="PIX">Pixel</Option>
-                    <Option value="+">Plus</Option>
-                    <Option value=".">Point</Option>
-                    <Option value="*">Star</Option>
-                    <Option value="s">Square</Option>
-                    <Option value="v">Triangle Down</Option>
-                    <Option value="TL">Triangle Left</Option>
-                    <Option value="TR">Triangle Right</Option>
-                    <Option value="1">Tri Down</Option>
-                    <Option value="2">Tri Up</Option>
-                    <Option value="3">Tri Left</Option>
-                    <Option value="4">Tri Right</Option>
-                    <Option value="|">Vertical Line</Option>
-                    <Option value="x">X</Option>
-                    <Option value="-1">%%separator%%</Option>
-                    <Option value="None">None*</Option>
-                </List>
+                <List class="self" filter="" method="generatorMarkerList" dynamicReload="true"/>
             </Field>
 
             <!-- ========================  Precipitation  ========================= -->
@@ -5586,12 +4837,7 @@
                    visibleBindingId="settingsGroup" visibleBindingValue="y1"
                    tooltip="Select preference for the precision of your chart's Y axis.">
                 <Label>Precision:</Label>
-                <List>
-                    <Option value="0">0*</Option>
-                    <Option value="1">1</Option>
-                    <Option value="2">2</Option>
-                    <Option value="3">3</Option>
-                </List>
+                <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
 
             <Field id="precip_precision_label" type="label" fontSize="small" alignWithControl="true"
@@ -5941,7 +5187,5 @@
             </State>
         </States>
         <UiDisplayStateId>onOffState</UiDisplayStateId>
-
     </Device>
-
 </Devices>

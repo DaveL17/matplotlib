@@ -2607,13 +2607,13 @@ class Plugin(indigo.PluginBase):
 
                                     # The following line is used for testing the battery health
                                     # code; it isn't needed in production.
-                                    self.logger.warning("Using dummy battery data for testing.")
-                                    device_dict = {
-                                        'Device A': 0, 'Device B': 100, 'Device C': 8,
-                                        'Device D': 4, 'Device E': 92, 'Device F': 72,
-                                        'Device G': 47, 'Device H': 68, 'Device I': 0,
-                                        'Device J': 47
-                                    }
+                                    # self.logger.warning("Using dummy battery data for testing.")
+                                    # device_dict = {
+                                    #     'Device A': 0, 'Device B': 100, 'Device C': 8,
+                                    #     'Device D': 4, 'Device E': 92, 'Device F': 72,
+                                    #     'Device G': 47, 'Device H': 68, 'Device I': 0,
+                                    #     'Device J': 47
+                                    # }
 
                                 except Exception as sub_error:
                                     self.plugin_error_handler(sub_error=traceback.format_exc())
@@ -3766,6 +3766,104 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceList()
 
     # =============================================================================
+    def generatorPrecisionList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+        """
+        Returns a list of value precision options for pulldown menus.
+
+        :param str fltr:
+        :param indigo.Dict values_dict:
+        :param str type_id:
+        :param int target_id:
+        """
+        precision = [
+            ("0", "0 (#)*"),
+            ("1", "1 (#.#)"),
+            ("2", "2 (#.##)"),
+            ("3", "3 (#.###)"),
+        ]
+        return precision
+
+    # =============================================================================
+    def generatorLineStyleDefaultNoneList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+        """
+        Returns a list of Matplotlib line styles for pulldown menus.
+
+        :param str fltr:
+        :param indigo.Dict values_dict:
+        :param str type_id:
+        :param int target_id:
+        """
+        line_styles = [
+            ("--", "Dashed"),
+            (":", "Dotted"),
+            ("-.", "Dot Dash"),
+            ("-", "Solid"),
+            ("-1", "%%separator%%"),
+            ("None", "None*"),
+        ]
+        return line_styles
+
+    # =============================================================================
+    def generatorLineStyleDefaultSolidList(
+            self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+        """
+        Returns a list of Matplotlib line styles for pulldown menus.
+
+        :param str fltr:
+        :param indigo.Dict values_dict:
+        :param str type_id:
+        :param int target_id:
+        """
+        line_styles = [
+            ("--", "Dashed"),
+            (":", "Dotted"),
+            ("-.", "Dot Dash"),
+            ("-", "Solid*"),
+            ("-1", "%%separator%%"),
+            ("None", "None"),
+        ]
+        return line_styles
+
+    # =============================================================================
+    def generatorMarkerList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+        """
+        Returns a list of Matplotlib Markers for pulldown menus.
+
+        :param str fltr:
+        :param indigo.Dict values_dict:
+        :param str type_id:
+        :param int target_id:
+        """
+        marker_list = [
+            ("o", "Circle"),
+            ("D", "Diamond"),
+            ("d", "Diamond(Thin)"),
+            ("h", "Hexagon 1"),
+            ("H", "Hexagon 2"),
+            ("-", "Horizontal Line"),
+            ("8", "Octagon"),
+            ("p", "Pentagon"),
+            ("PIX", "Pixel"),
+            ("+", "Plus"),
+            (".", "Point"),
+            ("*", "Star"),
+            ("s", "Square"),
+            ("v", "Triangle Down"),
+            ("TL", "Triangle Left"),
+            ("TR", "Triangle Right"),
+            ("1", "Tri Down"),
+            ("2", "Tri Up"),
+            ("3", "Tri Left"),
+            ("4", "Tri Right"),
+            ("|", "Vertical Line"),
+            ("x", "X"),
+            ("-1", "%%separator%%"),
+            ("None", "None*")
+        ]
+
+        return marker_list
+
+# =============================================================================
     def latestDevVarList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Title Placeholder

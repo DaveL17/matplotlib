@@ -6,6 +6,7 @@ v2022.0.1
   will return in the future as a separate chart type.
 - Fixes bug where Stylesheets folder is not present.
 - Adds additional logic for instances where data are None values (or otherwise unavailable).
+- Streamlines Devices.xml (~800 lines moved to dynamic list callbacks).
 
 v0.9.52
 - Fixes bug in file save location testing.
