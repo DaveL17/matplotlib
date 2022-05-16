@@ -1070,6 +1070,7 @@ def save(logger):
     try:
         if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
             plt.tight_layout()
+            plt.subplots_adjust(top=0.90)  # TODO: adjust title placement
             plt.savefig(
                 f"{payload['p_dict']['chartPath']}{payload['p_dict']['fileName']}",
                 **payload['k_dict']['k_plot_fig']

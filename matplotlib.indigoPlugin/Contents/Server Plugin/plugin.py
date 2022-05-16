@@ -54,6 +54,7 @@ linked to the proper Fantastic Weather devices).
 # TODO: Audit style sheet files -- if dev id no longer exists, delete the style sheet.
 # TODO: Create new STEP chart type as step is no longer a supported line style.
 #     https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post
+# TODO: Tighten the space between chart title and figure.
 # ================================== IMPORTS ==================================
 # Built-in modules
 import ast
@@ -100,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.0.1"
+__version__   = "2022.1.1"
 
 
 # =============================================================================

@@ -1,3 +1,9 @@
+v2022.1.1
+- Removes extra space between title and plot figure.
+
+v2022.0.2
+- Removes dummy testing data for battery charts.
+
 v2022.0.1
 - Updates plugin for Indigo 2022.1 and Python 3.
 - Polar charts are back!
