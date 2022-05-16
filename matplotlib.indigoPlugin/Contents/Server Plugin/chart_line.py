@@ -294,16 +294,6 @@ try:
     chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.90,
-        bottom=0.20,
-        left=0.10,
-        right=0.90,
-        hspace=None,
-        wspace=None
-    )
-
     chart_tools.save(logger=LOG)
 
 except Exception as sub_error:

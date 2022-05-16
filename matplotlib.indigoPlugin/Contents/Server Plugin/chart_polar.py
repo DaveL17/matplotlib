@@ -267,16 +267,6 @@ try:
             logger=LOG
         )
 
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.85,
-        bottom=0.15,
-        left=0.15,
-        right=0.85,
-        hspace=None,
-        wspace=None
-    )
-
     # Set the tick label size
     font_color = PLUG_DICT['fontColor']
     if P_DICT['customSizeFont']:

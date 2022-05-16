@@ -350,16 +350,6 @@ try:
         # add more subplots.
         subplot = np.delete(subplot, 0)
 
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.90,
-        bottom=0.20,
-        left=0.10,
-        right=0.90,
-        hspace=None,
-        wspace=None
-    )
-
     chart_tools.save(logger=LOG)
 
 except Exception as sub_error:

@@ -1068,9 +1068,17 @@ def save(logger):
     :return:
     """
     try:
+        top_margin    = 0.9
+        bottom_margin = 0.2
+        if payload['props']['chart_type'] == 'calendar':
+            bottom_margin = 0.34
+        elif payload['props']['chart_type'] == 'composite forecast':
+            top_margin = 0.93
+            bottom_margin = 0.05
+
         if payload['p_dict']['chartPath'] != '' and payload['p_dict']['fileName'] != '':
             plt.tight_layout()
-            plt.subplots_adjust(top=0.90)  # TODO: adjust title placement
+            plt.subplots_adjust(top=top_margin, bottom=bottom_margin)
             plt.savefig(
                 f"{payload['p_dict']['chartPath']}{payload['p_dict']['fileName']}",
                 **payload['k_dict']['k_plot_fig']

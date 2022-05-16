@@ -1,3 +1,6 @@
+v2022.1.2
+- Adds option to refresh individual chart to `Redraw Charts Now...` Menu Item.
+
 v2022.1.1
 - Removes extra space between title and plot figure.
 

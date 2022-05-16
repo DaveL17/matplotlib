@@ -207,24 +207,14 @@ try:
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.90,
-        bottom=0.20,
-        left=0.10,
-        right=0.90,
-        hspace=None,
-        wspace=None
-    )
-
     try:
         chart_tools.save(logger=LOG)
 
     except OverflowError as err:
         if "date value out of range" in traceback.format_exc(err):
             LOG['Critical'].append(
-                f"[{PAYLOAD['props']['name']}] Chart not saved. Try enabling Display  Zero Bars "
-                f"in device settings."
+                f"[{PAYLOAD['props']['name']}] Chart not saved. Try enabling Display Zero Bars in"
+                f"device settings."
             )
 
 except Exception as sub_error:

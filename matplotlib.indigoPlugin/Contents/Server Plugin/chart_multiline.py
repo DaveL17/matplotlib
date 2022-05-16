@@ -149,16 +149,6 @@ try:
     # =============================== Format Title ================================
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98), align='center')
 
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.98,
-        bottom=0.05,
-        left=0.02,
-        right=0.98,
-        hspace=None,
-        wspace=None
-    )
-
     chart_tools.save(logger=LOG)
 
 except Exception as sub_error:

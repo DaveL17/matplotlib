@@ -93,7 +93,7 @@ try:
 
     # ============================= Format Plot Area ==============================
     # Reduce whitespace around figure
-    plt.subplots_adjust(left=0, right=1.0, top=1.0, bottom=0)
+
     # RGBA setting background as transparent
     plt.rcParams.update({"savefig.facecolor": (0.0, 0.0, 1.0, 0.0)})
 

@@ -203,16 +203,6 @@ try:
                 zorder=1)
         )
 
-    plt.subplots_adjust(
-        top=0.98,
-        bottom=0.05,
-        left=0.02,
-        right=0.98,
-        hspace=None,
-        wspace=None
-    )
-
-    plt.tight_layout()
     chart_tools.save(logger=LOG)
 
 except Exception as sub_error:

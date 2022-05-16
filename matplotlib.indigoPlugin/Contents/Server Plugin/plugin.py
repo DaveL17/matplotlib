@@ -54,7 +54,7 @@ linked to the proper Fantastic Weather devices).
 # TODO: Audit style sheet files -- if dev id no longer exists, delete the style sheet.
 # TODO: Create new STEP chart type as step is no longer a supported line style.
 #     https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post
-# TODO: Tighten the space between chart title and figure.
+
 # ================================== IMPORTS ==================================
 # Built-in modules
 import ast
@@ -101,7 +101,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.1"
+__version__   = "2022.1.2"
 
 
 # =============================================================================
@@ -4047,6 +4047,26 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     # =============================================================================
+    def getRefreshList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+        """
+
+        :param str fltr:
+        :param indigo.Dict values_dict:
+        :param str type_id:
+        :param int target_id:
+        """
+
+        # TODO: add a separator to this list.
+        menu = [('all', 'All Charts'), ('auto', 'Skip Manual Charts')]
+
+        [menu.append((dev.id, dev.name))
+         for dev in indigo.devices.iter(filter="self")
+         if dev.pluginProps['isChart']
+         ]
+
+        return menu
+
+    # =============================================================================
     def getForecastSource(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Return a list of WUnderground devices for forecast chart devices
@@ -4368,12 +4388,16 @@ class Plugin(indigo.PluginBase):
             self.logger.info("Redraw Charts Now: Skipping manual charts.")
 
         # Refresh all charts regardless
-        else:
+        elif values_dict['allCharts'] == 'all':
             devices_to_refresh = [
                 dev for dev in indigo.devices.iter('self') if
                 dev.enabled and dev.deviceTypeId != 'csvEngine'
             ]
             self.logger.info("Redraw Charts Now: Redrawing all charts.")
+
+        # Refresh selected chart device
+        else:
+            devices_to_refresh = [indigo.devices[int(values_dict['allCharts'])]]
 
         # Put the request in the queue
         self.refresh_queue.put(devices_to_refresh)

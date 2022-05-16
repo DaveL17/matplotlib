@@ -457,17 +457,6 @@ try:
 
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
-    plt.tight_layout(pad=1)
-
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    plt.subplots_adjust(
-        top=0.90,
-        bottom=0.20,
-        left=0.10,
-        right=0.90,
-        hspace=None,
-        wspace=None
-    )
 
     # With the upgrade to matplotlib 3.5.1, tick labels were automatically being assigned to `ax`
     # (even though 'ax' is not overtly referenced). Therefore, we set them to an empty list to
