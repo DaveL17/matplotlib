@@ -1,5 +1,5 @@
 # ![Logo](https://github.com/DaveL17/matplotlib/wiki/img/img_MatplotlibLogo.png)
-# ![shield](https://img.shields.io/github/release/DaveL17/matplotlib.svg) ![indigo-version](https://img.shields.io/badge/Indigo-7.0+-blueviolet.svg) ![indigo-version](https://img.shields.io/badge/Python-2.7-darkgreen.svg)
+# ![shield](https://img.shields.io/github/release/DaveL17/matplotlib.svg) ![indigo-version](https://img.shields.io/badge/Indigo-2022.1+-blueviolet.svg) ![indigo-version](https://img.shields.io/badge/Python-3.10-darkgreen.svg)
 
 The Matplotlib plugin allows you to easily create attractive charts for display on Indigo Home Control Server control pages. The plugin also includes a facility to create necessary CSV data for display.
 
@@ -7,7 +7,18 @@ The Matplotlib plugin allows you to easily create attractive charts for display 
 - Easily create visually appealing charts for Indigo control pages.
 - Seamlessly manage attributes like color, fonts, sizes (and more!) for all charts at once.
 - Customize individual charts with markers, annotations, minimums and maximums, and user-defined constants.
-- Chart types Include: Line Charts, Bar Charts, Polar Charts, Multiline Text Charts, and Fantastic Weather Plugin Charts.
+- Chart types Include: 
+  - Area Charts, 
+  - Bar Charts (Horizontal), 
+  - Bar Charts (Vertical Flow), 
+  - Bar Charts (Vertical Stock), 
+  - Battery Health Charts,
+  - Line Charts,
+  - Multiline Text Charts, and
+  - Polar Charts, 
+  - Radial Bar Charts, 
+  - Scatter Charts, 
+  - Weather Charts.
 - Chart data that is created with the plugin, or incorporate your own (CSV).
 - Charts update automatically.
 

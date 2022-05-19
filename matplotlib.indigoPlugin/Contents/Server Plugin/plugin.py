@@ -44,13 +44,6 @@ linked to the proper Fantastic Weather devices).
 # TODO: Move multiline text font size to theme size
 # TODO: Make sure any existing processes have been closed with communicate(), before starting a new
 #       one.  (Too many open files error.)
-# TODO: Text idea of throwing up a dialog box when new version of plugin installed.  Use version
-#       number key of last one viewed.
-# TODO: Fix Calendar device sizing issue.  It's sizing off the traceback now. Fix that by addressing
-#       the custom size issue and by adding settings to the device definition to allow size control
-#       (it doesn't have that now.)
-# TODO: Be sure to use AGG even with the latest version of mpl (3.5).
-# TODO: Matplotlib 2022.0.1 is going to require users to install with pip.
 # TODO: Audit style sheet files -- if dev id no longer exists, delete the style sheet.
 # TODO: Create new STEP chart type as step is no longer a supported line style.
 #     https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post
@@ -101,7 +94,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.2"
+__version__   = "2022.1.3"
 
 
 # =============================================================================

@@ -58,8 +58,6 @@ try:
     today  = dt.datetime.today()
     cal    = my_cal.monthdatescalendar(today.year, today.month)
 
-    # TODO: the custom height and Width aren't supported, so the dimensions have essentially become
-    #       hard-coded.
     try:
         height = int(PROPS.get('customSizeHeight', 200)) / int(plt.rcParams['savefig.dpi'])
     except ValueError:
