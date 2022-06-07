@@ -81,7 +81,7 @@ class Fogbert:
         environment_state = ""
         spacer = " " * 35
 
-        environment_state += f"{' Initializing New Plugin Session ':{'='}^135}\n"
+        environment_state += f"{' Plugin Environment Information ':{'='}^135}\n"
         environment_state += f"{spacer}{'Plugin name:':<31} {self.plugin.pluginDisplayName}\n"
         environment_state += f"{spacer}{'Plugin version:':<31} {self.plugin.pluginVersion}\n"
         environment_state += f"{spacer}{'Plugin ID:':<31} {self.plugin.pluginId}\n"
@@ -100,7 +100,7 @@ class Fogbert:
         """
         The pluginEnvironmentLogger method prints selected information about the pluginEnvironment
         that the plugin is running in. It pulls some of this information from the calling plugin
-        and some from the server pluginEnvironment. This method differs from the pluginEnvironment
+        and some from the server pluginEnvironment. This method differs from the pluginEnvironment()
         method in that it leverages Indigo's logging hooks using the Python Logger framework.
 
         :return:
@@ -109,7 +109,7 @@ class Fogbert:
         environment_state = ""
         spacer = " " * 35
 
-        environment_state += f"{' Initializing New Plugin Session ':{'='}^135}\n"
+        environment_state += f"{' Plugin Environment Information ':{'='}^135}\n"
         environment_state += f"{spacer}{'Plugin name:':<31} {self.plugin.pluginDisplayName}\n"
         environment_state += f"{spacer}{'Plugin version:':<31} {self.plugin.pluginVersion}\n"
         environment_state += f"{spacer}{'Plugin ID:':<31} {self.plugin.pluginId}\n"

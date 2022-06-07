@@ -125,6 +125,7 @@
                 <Label>Label:</Label>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
@@ -1001,6 +1002,7 @@
                 <Label>Label:</Label>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
@@ -1373,7 +1375,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -1790,7 +1791,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -1913,6 +1913,8 @@
                    tooltip="Enter the numbers to be used for the Y Axis ticks, separated by commas. Leave blank to use automatic ticks.">
                 <Label>Tick Locations:</Label>
             </Field>
+
+            <Template file="Templates/y_axis_rotate.xml" />
 
             <!-- ============================  Bar 1  ============================= -->
             <Field id="bar1Source" type="menu" defaultValue=""
@@ -2665,7 +2667,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -2724,6 +2725,7 @@
                 <Label>Label:</Label>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!--
@@ -4008,6 +4010,7 @@
                 <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!-- Not currently used. -->
@@ -4536,6 +4539,7 @@
                 <Label>Label</Label>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!-- =======================  Y1 Axis Controls  ======================= -->
@@ -4823,6 +4827,7 @@
                 <List class="self" filter="" method="get_axis_list" dynamicReload="true"/>
             </Field>
 
+            <Template file="Templates/x_axis_rotate.xml" />
             <Template file="Templates/x_axis_bins.xml" />
 
             <!-- =======================  Y1 Axis Controls  ======================= -->

@@ -13,6 +13,11 @@
 	<CallbackMethod>commsUnkillAll</CallbackMethod>
 </MenuItem>
 
+    <MenuItem id="print_environment_info" uiPath="plugin_tools">
+        <Name>Display Plugin Information</Name>
+        <CallbackMethod>log_plugin_environment</CallbackMethod>
+    </MenuItem>
+
 <MenuItem id="titleSeparator" type="separator"/>
 
 <!-- ======================  Advanced Settings  ======================= -->

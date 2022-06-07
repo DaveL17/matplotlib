@@ -249,13 +249,21 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
         custom_size_font    = p_dict.get('customSizeFont', False)  # Use custom font sizes?  Bool
         custom_axis_label_x = p_dict.get('customAxisLabelX', '')
         custom_font_size    = int(p_dict.get('customTickFontSize', '8'))
+        rotate              = int(p_dict.get('xAxisRotate', 0))
         show_legend         = p_dict.get('showLegend', False)  # Show legend?  Bool
+
+        h_align = {'-90': 'left', '-45': 'left', '0': 'center', '45': 'right', '90': 'right'}
 
         # The label of the X axis ticks (not the axis label)
         if custom_size_font:
-            plt.xticks(fontname=font_main, fontsize=custom_font_size)
+            plt.xticks(
+                fontname=font_main, fontsize=custom_font_size, rotation=rotate,
+                ha=h_align[str(rotate)]
+            )
         else:
-            plt.xticks(fontname=font_main, fontsize=font_size)
+            plt.xticks(
+                fontname=font_main, fontsize=font_size, rotation=rotate, ha=h_align[str(rotate)]
+            )
 
         if not show_legend:
             # The label of the X axis (not the tick labels)
@@ -568,14 +576,22 @@ def format_axis_y1_label(p_dict, k_dict, logger):
     """
 
     font_main = p_dict.get('fontMain', 'Arial')  # Main font style
+    rotate = int(p_dict.get('yAxisRotate', 0))
+    v_align = {'-90': 'center', '-45': 'bottom', '0': 'center', '45': 'top', '90': 'center'}
 
     try:
         plt.ylabel(p_dict.get('customAxisLabelY', ''), **k_dict['k_y_axis_font'])
 
         if p_dict['customSizeFont']:
-            plt.yticks(fontname=font_main, fontsize=int(p_dict['customTickFontSize']))
+            plt.yticks(
+                fontname=font_main, fontsize=int(p_dict['customTickFontSize']), rotation=rotate,
+                va=v_align[str(rotate)]
+            )
         else:
-            plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
+            plt.yticks(
+                fontname=font_main, fontsize=int(p_dict['tickFontSize']), rotation=rotate,
+                va=v_align[str(rotate)]
+            )
 
     except (ValueError, TypeError):
         name = payload['props']['name']

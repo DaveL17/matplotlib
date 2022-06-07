@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="xAxisRotate" type="menu" defaultValue="0" visibleBindingId="settingsGroup" visibleBindingValue="x"
+           tooltip="Rotate the label on the X axis.">
+        <Label>Rotate Tick Labels:</Label>
+        <List>
+            <Option value="90">90 Degrees</Option>
+            <Option value="45">45 Degrees</Option>
+            <Option value="0">No rotation*</Option>
+            <Option value="-45">-45 Degrees</Option>
+            <Option value="-90">-90 Degrees</Option>
+        </List>
+    </Field>
+
+</Template>

@@ -20,34 +20,6 @@ linked to the proper Fantastic Weather devices).
 #   ultimately destroy the process when it's finished. These two steps seem to allow the plugin to
 #   run indefinitely without running out of resources.
 
-# =================================== TO DO ===================================
-
-# TODO: NEW -- "Error" chart with min/max/avg
-# TODO: NEW -- Floating bar chart
-# TODO: NEW -- Generic weather forecast charts to support any weather services and drop support for
-#              WU and FW.
-# TODO: NEW -- Standard chart types with pre-populated data that link to types of Indigo devices.
-# TODO: NEW -- Chart with axes (scales) 3 and 4.
-#       (see: https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
-# TODO: Try to address annotation collisions.
-# TODO: Allow scripting control or a tool to repopulate color controls so that you can change all
-#       bars/lines/scatter etc. in one go.
-# TODO: Consider adding a leading zero obs when date range limited data is less than the specified
-#       date range (so the chart always shows the specified date range.)
-# TODO: When the number of bars to be plotted is less than the number of bars requested (because
-#       there isn't enough data), the bars plot funny.
-# TODO: Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process
-#       and don't even cycle the plugin when the location is gone.
-# TODO: Change chart features based on underlying data. (i.e., stock bar chart)
-# TODO: Move more code out of plugin.py
-# TODO: Move multiline text font color to theme color
-# TODO: Move multiline text font size to theme size
-# TODO: Make sure any existing processes have been closed with communicate(), before starting a new
-#       one.  (Too many open files error.)
-# TODO: Audit style sheet files -- if dev id no longer exists, delete the style sheet.
-# TODO: Create new STEP chart type as step is no longer a supported line style.
-#     https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post
-
 # ================================== IMPORTS ==================================
 # Built-in modules
 import ast
@@ -127,11 +99,7 @@ class Plugin(indigo.PluginBase):
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert = Dave.Fogbert(self)           # Plugin functional framework
-        self.Fogbert.pluginEnvironmentLogger()      # Log universal pluginEnvironment information
         self.maintain = maintenance.Maintain(self)  # Maintenance of plugin props and device prefs
-
-        # =========================== Log More Plugin Info ============================
-        self.pluginEnvironmentLogger()  # Additional information relative to this plugin
 
         # ============================= Initialize Logger =============================
         fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
@@ -148,18 +116,25 @@ class Plugin(indigo.PluginBase):
             self.plugin_file_handler.setLevel(10)
 
         # ============================= Remote Debug Hook =============================
-        try:
-            pydevd.settrace(
-                'localhost',
-                port=5678,
-                stdoutToServer=True,
-                stderrToServer=True,
-                suspend=False
-            )
-        except Exception:
-            pass
+        # try:
+        #     pydevd.settrace(
+        #         'localhost',
+        #         port=5678,
+        #         stdoutToServer=True,
+        #         stderrToServer=True,
+        #         suspend=False
+        #     )
+        # except Exception:
+        #     pass
 
         self.pluginIsInitializing = False
+
+    def log_plugin_environment(self):
+        """
+        Log pluginEnvironment information when plugin is first started
+        """
+        self.Fogbert.pluginEnvironment()
+        self.pluginEnvironmentLogger()
 
     # =============================================================================
     def __del__(self):
@@ -4370,6 +4345,11 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         self.skipRefreshDateUpdate = True
+        error_msg_dict = indigo.Dict()
+
+        if not values_dict['allCharts']:
+            error_msg_dict['allCharts'] = "Required"
+            return False, values_dict, error_msg_dict
 
         # Skip charts set to manual updates
         if values_dict['allCharts'] == 'auto':

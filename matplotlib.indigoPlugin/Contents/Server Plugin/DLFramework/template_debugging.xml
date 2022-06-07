@@ -28,7 +28,7 @@
     <Field id="space07" type="label" fontSize="mini" alignWithControl="True">
         <Label>Debugging Messages - Step by step plugin logging.
 Informational Messages - Useful information about plugin health.
-Warning Messages - Typically temporary conditions.
+Warning Messages - Typically temporary conditions (recommended).
 Error Messages - Conditions you might want to address.
 Critical Errors Only - Critical errors should probably be reported.
         </Label>

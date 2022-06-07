@@ -134,7 +134,6 @@ try:
 
     chart_tools.format_axis_x_min_max(p_dict=P_DICT, logger=LOG)
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
-    chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # ===========================  Transparent Border  ============================
     # Add a patch so that we can have transparent charts but a filled plot area.
@@ -202,6 +201,7 @@ try:
     chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     try:
         chart_tools.save(logger=LOG)

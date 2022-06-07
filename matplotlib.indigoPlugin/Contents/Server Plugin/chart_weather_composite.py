@@ -67,6 +67,7 @@ try:
         """
         s_plot.set_title(title, **K_DICT['k_title_font'])  # The subplot title
         chart_tools.format_axis_x_ticks(ax=s_plot, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+        chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
         chart_tools.format_axis_y(ax=s_plot, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
         # =================================== Grids ===================================
