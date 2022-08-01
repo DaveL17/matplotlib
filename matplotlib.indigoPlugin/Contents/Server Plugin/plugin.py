@@ -66,7 +66,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.3"
+__version__   = "2022.1.4"
 
 
 # =============================================================================
@@ -475,17 +475,17 @@ class Plugin(indigo.PluginBase):
                     values_dict['xAxisBins']            = 'daily'
                     values_dict['xAxisLabelFormat']     = '%A'
 
-            # ========================= Composite Forecast Device =========================
-            if type_id == "compositeForecastDevice":
-                values_dict['lineColor']        = "00 00 FF"
-                values_dict['lineMarkerColor']  = "FF 00 00"
-                values_dict['xAxisLabelFormat'] = "%A"
+                # ========================= Composite Forecast Device =========================
+                if type_id == "compositeForecastDevice":
+                    values_dict['lineColor']        = "00 00 FF"
+                    values_dict['lineMarkerColor']  = "FF 00 00"
+                    values_dict['xAxisLabelFormat'] = "%A"
 
-            if self.pluginPrefs.get('enableCustomLineSegments', False):
-                values_dict['enableCustomLineSegmentsSetting'] = True
-                self.logger.threaddebug("Enabling advanced feature: Custom Line Segments.")
-            else:
-                values_dict['enableCustomLineSegmentsSetting'] = False
+                if self.pluginPrefs.get('enableCustomLineSegments', False):
+                    values_dict['enableCustomLineSegmentsSetting'] = True
+                    self.logger.threaddebug("Enabling advanced feature: Custom Line Segments.")
+                else:
+                    values_dict['enableCustomLineSegmentsSetting'] = False
 
             return values_dict
 
@@ -3335,7 +3335,7 @@ class Plugin(indigo.PluginBase):
             )
 
             self.logger.info(f"[{dev.name}] CSV data updated successfully.")
-            dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+            dev.updateStateImageOnServer(indigo.kStateImageSel.WindowSensorClosed)
 
         except UnboundLocalError:
             self.logger.critical(

@@ -450,33 +450,33 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
     :param dict logger:
     """
 
-    custom_ticks_marks = p_dict['customTicksY'].strip()
-    custom_ticks_labels = p_dict['customTicksLabelY'].strip()
+    # custom_ticks_marks = p_dict['customTicksY'].strip()
+    # custom_ticks_labels = p_dict['customTicksLabelY'].strip()
+    custom_ticks_marks = [_.strip() for _ in p_dict['customTicksY']]
+    custom_ticks_labels = [_.strip() for _ in p_dict['customTicksLabelY']]
 
     try:
         # Get the default tick values and labels (which we'll replace as needed.)
         marks, labels = plt.yticks()
 
         # If the user has not set custom tick values or labels, we're done.
-        if custom_ticks_marks.lower() in ('none', '') \
-                and custom_ticks_labels.lower() in ('none', ''):
+        if len(custom_ticks_marks) == 0 and len(custom_ticks_labels)  == 0:
             return
 
         # If tick locations defined but tick labels are empty, let's use the tick
         # locations as the tick labels
-        if custom_ticks_marks.lower() not in ('none', '') \
-                and custom_ticks_labels.lower() in ('none', ''):
+        if len(custom_ticks_marks) > 0 and len(custom_ticks_labels)  == 0:
             custom_ticks_labels = custom_ticks_marks
 
         # Replace default Y tick values with the custom ones.
-        if custom_ticks_marks.lower() not in ('none', '') \
-                and not custom_ticks_marks.isspace():
-            marks = [float(_) for _ in custom_ticks_marks.split(",")]
+        # if custom_ticks_marks.lower() not in ('none', '') \
+        #         and not custom_ticks_marks.isspace():
+        #     marks = [float(_) for _ in custom_ticks_marks.split(",")]
 
         # Replace the default Y tick labels with the custom ones.
-        if custom_ticks_labels.lower() not in ('none', '') \
-                and not custom_ticks_labels.isspace():
-            labels = [f"{_.strip()}" for _ in custom_ticks_labels.split(",")]
+        # if custom_ticks_labels.lower() not in ('none', '') \
+        #         and not custom_ticks_labels.isspace():
+        #     labels = [f"{_.strip()}" for _ in custom_ticks_labels.split(",")]
 
         plt.yticks(marks, labels)
 

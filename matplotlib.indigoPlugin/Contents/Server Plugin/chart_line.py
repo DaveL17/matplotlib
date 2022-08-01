@@ -100,7 +100,7 @@ try:
             # ============================= Adjustment Factor =============================
             # Allows user to shift data on the Y axis (for example, to display multiple binary
             # sources on the same chart.)
-            if PROPS[f'line{line}adjuster'] != "":
+            if PROPS.get(f'line{line}adjuster', "") != "":
                 temp_list = []
                 for obs in P_DICT[f'y_obs{line}']:
                     expr = f"{obs}{PROPS[f'line{line}adjuster']}"
@@ -113,7 +113,7 @@ try:
 
             try:
                 limit = float(PROPS['limitDataRangeLength'])
-            except ValueError:
+            except (ValueError, KeyError):
                 limit = 0
 
             if limit > 0:

@@ -37,7 +37,7 @@ DATES_TO_PLOT    = ()
 FORECAST_LENGTH  = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
 HEIGHT           = int(PROPS['height'])
 HUMIDITY         = ()
-PRESCRIPTION     = ()
+PRECIPITATION    = ()
 PRESSURE         = ()
 TEMPERATURE_HIGH = ()
 TEMPERATURE_LOW  = ()
@@ -122,9 +122,9 @@ try:
             WIND_SPEED       += (STATE_DICT[f'd0{_}_windSpeed'],)
             WIND_BEARING     += (STATE_DICT[f'd0{_}_windBearing'],)
             try:
-                PRESCRIPTION    += (STATE_DICT[f'd0{_}_precipTotal'],)
+                PRECIPITATION    += (STATE_DICT[f'd0{_}_precipTotal'],)
             except KeyError:
-                PRESCRIPTION    += (STATE_DICT[f'd0{_}_pop'],)
+                PRECIPITATION    += (STATE_DICT[f'd0{_}_pop'],)
 
         x1 = [dt.datetime.strptime(_, '%Y-%m-%d') for _ in DATES_TO_PLOT]
         x_offset = dt.timedelta(hours=6)
@@ -145,9 +145,9 @@ try:
             WIND_BEARING     += (STATE_DICT[f'h{_}_windBearing'],)
 
             try:
-                PRESCRIPTION    += (STATE_DICT[f'h{_}_precipIntensity'],)
+                PRECIPITATION    += (STATE_DICT[f'h{_}_precipIntensity'],)
             except KeyError:
-                PRESCRIPTION    += (STATE_DICT[f'h{_}_precip'],)
+                PRECIPITATION    += (STATE_DICT[f'h{_}_precip'],)
 
         x1 = [dt.datetime.fromtimestamp(_) for _ in DATES_TO_PLOT]
         x_offset = dt.timedelta(hours=1)
@@ -310,7 +310,7 @@ try:
     # ============================ Precipitation Line =============================
     # Precip intensity is in inches of liquid rain per hour. using a line chart.
     if 'show_precipitation' in axes:
-        subplot[0].plot(x1, PRESCRIPTION, color=P_DICT['lineColor'])
+        subplot[0].plot(x1, PRECIPITATION, color=P_DICT['lineColor'])
         format_subplot(subplot[0], title='total precipitation')
         transparent_chart_fill(subplot[0])
 
@@ -329,9 +329,11 @@ try:
         subplot = np.delete(subplot, 0)
 
     # ============================= Precipitation Bar =============================
-    # Precip intensity is in inches of liquid rain per hour using a bar chart.
+    # Precip intensity is in inches of liquid rain per hour using a bar chart. Note that the bar
+    # chart needs Z-order of 2 in order for the bars to be visible. This isn't needed for line
+    # charts.
     if 'show_precipitation_bar' in axes:
-        subplot[0].bar(x1, PRESCRIPTION, width=0.4, align='center', color=P_DICT['lineColor'])
+        subplot[0].bar(x1, PRECIPITATION, width=0.4, align='center', color=P_DICT['lineColor'], zorder=2)
         format_subplot(subplot[0], title='total precipitation')
         transparent_chart_fill(subplot[0])
 

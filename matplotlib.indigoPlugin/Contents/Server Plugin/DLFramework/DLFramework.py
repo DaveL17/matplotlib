@@ -235,6 +235,24 @@ class Fogbert:
 
     # =============================================================================
     @staticmethod
+    def deviceAndVariableListClean():  # noqa
+        """
+        Returns a list of tuples containing Indigo devices and variables for use in config dialogs
+        (etc.)
+
+        :return: [(ID, "(D) Name"), (ID, "(V) Name")]
+        """
+        devices_and_variables_list = []
+        _ = [devices_and_variables_list.append((dev.id, f"(D) {dev.name}"))
+             for dev in indigo.devices
+             ]
+        _ = [devices_and_variables_list.append((var.id, f"(V) {var.name}"))
+             for var in indigo.variables
+             ]
+        return devices_and_variables_list
+
+    # =============================================================================
+    @staticmethod
     def launchWebPage(launch_url):  # noqa
         """
         The launchWebPage method is used to direct a call to the registered default browser and

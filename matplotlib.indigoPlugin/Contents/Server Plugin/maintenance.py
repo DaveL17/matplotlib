@@ -354,8 +354,7 @@ class Maintain:
             'yAxisPrecision'
         )
 
-        # Iterate the keys to delete and delete them if they exist
-        # for key in prefs.keys():
+        # Iterate the keys to delete and delete them if they exist for key in prefs.keys():
         for key in prefs:
             if key in list_of_keys_to_remove:
                 list_of_removed_keys.append(key)

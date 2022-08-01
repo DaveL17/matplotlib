@@ -32,7 +32,7 @@ LOG['Threaddebug'].append("chart_area.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append("!!! FOO !!!")
+    LOG['Threaddebug'].append(PAYLOAD)
 
 
 def __init__():

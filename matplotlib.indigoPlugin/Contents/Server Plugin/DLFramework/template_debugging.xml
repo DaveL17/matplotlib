@@ -10,7 +10,7 @@
     <Field id="separator01" type="separator"/>
 
     <Field id="space06" type="label" fontSize="small" alignWithControl="True">
-        <Label>Always be careful when posting debug output to the forums or other public places. You should review it to ensure that it doesn't contain sensitive information.</Label>
+        <Label>Always be careful when posting debug output to the forums or other public places. You should review any output to ensure that it doesn't contain sensitive information.</Label>
     </Field>
     
     <Field id="showDebugLevel" type="menu" defaultValue="30" tooltip="Controls the amount of debug information written to the log.">

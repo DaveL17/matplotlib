@@ -86,7 +86,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -944,7 +943,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -2436,7 +2434,7 @@
                 <List class="self" filter="" method="get_battery_device_list"/>
             </Field>
 
-            <Field id="excludedDevicesLabel" type="label" alignWithControl="true" fontSize="small" 
+            <Field id="excludedDevicesLabel" type="label" alignWithControl="true" fontSize="small"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Indigo ID numbers, separated by a comma.">
                 <Label>Select the devices you want to exclude from the chart (for example, you may want to exclude USB-powered devices.) To select multiple devices, hold the Command (&#x2318;) key while selecting.</Label>
@@ -3667,32 +3665,32 @@
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="numberOfCharacters" type="textfield" defaultValue="100" 
+            <Field id="numberOfCharacters" type="textfield" defaultValue="100"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Enter the number of characters desired for each line of text.">
                 <Label>Characters:</Label>
             </Field>
 
-            <Field id="cleanTheText" type="checkbox" defaultValue="true" 
+            <Field id="cleanTheText" type="checkbox" defaultValue="true"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="If enabled, the plugin will try to remove whitespace from the text.">
                 <Label>Clean Text?</Label>
                 <Description>Yes/No</Description>
             </Field>
 
-            <Field id="figureWidth" type="textfield" defaultValue="700" 
+            <Field id="figureWidth" type="textfield" defaultValue="700"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Enter the desired width of your figure (pixels).">
                 <Label>Figure Width:</Label>
             </Field>
 
-            <Field id="figureHeight" type="textfield" defaultValue="300" 
+            <Field id="figureHeight" type="textfield" defaultValue="300"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Enter the desired height of your figure (pixels).">
                 <Label>Figure Height:</Label>
             </Field>
 
-            <Field id="textColor" type="colorpicker" defaultValue="FF 33 00" 
+            <Field id="textColor" type="colorpicker" defaultValue="FF 33 00"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Select preference for the text color of your plot.">
                 <Label>Font Color:</Label>
@@ -3710,7 +3708,7 @@
                 <Label>Placeholder:</Label>
             </Field>
 
-            <Field id="chartTitle" type="textfield" defaultValue="Title" 
+            <Field id="chartTitle" type="textfield" defaultValue="Title"
                    visibleBindingId="settingsGroup" visibleBindingValue="dsp"
                    tooltip="Enter the title of your chart (optional).">
                 <Label>Chart Title:</Label>
@@ -3830,7 +3828,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="xHideLabels" defaultValue="false" type="checkbox"
@@ -3962,7 +3959,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showLegend" type="checkbox" defaultValue="false"
@@ -4489,7 +4485,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="showDaytime" type="checkbox" defaultValue="true"
@@ -4769,7 +4764,7 @@
 
             <Template file="Templates/refresh_interval.xml" />
 
-            <Field id="forecastSourceDevice" type="menu" defaultValue="" 
+            <Field id="forecastSourceDevice" type="menu" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
                    tooltip="Select source device for the weather forecast chart.">
                 <Label>Source Device:</Label>
@@ -4796,7 +4791,6 @@
             </Field>
 
             <Template file="Templates/custom_title_font_size.xml" />
-
             <Template file="Templates/custom_tick_font_size.xml" />
 
             <Field id="chartTitle" type="textfield" defaultValue="Title"
