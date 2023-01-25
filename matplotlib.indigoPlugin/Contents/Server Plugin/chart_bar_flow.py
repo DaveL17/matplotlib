@@ -33,12 +33,12 @@ LOG['Threaddebug'].append("chart_bar_flow.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
     num_obs = P_DICT['numObs']
 
@@ -147,10 +147,12 @@ try:
             _ = [P_DICT['data_array'].append(node) for node in y_obs[num_obs * -1:]]
 
             # If annotations desired, plot those too.
-            if P_DICT[f'bar{thing}Annotate']:
+            annotate = P_DICT[f'bar{thing}Annotate']
+            precision = int(PROPS.get(f'bar{thing}AnnotationPrecision', "0"))
+            if annotate:
                 for xy in zip(DATES_TO_DICT, annotation_values):
                     ax.annotate(
-                        xy[1],
+                        f"{float(xy[1]):.{precision}f}",
                         xy=xy,
                         xytext=(0, 0),
                         zorder=10,
@@ -181,7 +183,8 @@ try:
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-        headers = [_ for _ in P_DICT['headers']]
+        headers = P_DICT['headers']
+        # headers = [_ for _ in P_DICT['headers']]
         # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
         for header in headers:
             if P_DICT[f'bar{counter}Legend'] == "":

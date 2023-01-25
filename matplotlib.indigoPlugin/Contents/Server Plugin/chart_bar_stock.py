@@ -34,12 +34,12 @@ LOG['Threaddebug'].append("chart_bar_stock.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
     ax = chart_tools.make_chart_figure(
         width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
@@ -115,9 +115,13 @@ try:
 
         # ===============================  Annotations  ===============================
         # If annotations desired, plot those too.
-        if bar[f'annotate_{b_num}'] and not suppress_bar:
+        annotate = P_DICT[f'bar{b_num}Annotate']
+        precision = int(PROPS.get(f'bar{b_num}AnnotationPrecision', "0"))
+        # if bar[f'annotate_{b_num}'] and not suppress_bar:
+        if annotate and bar[f'annotate_{b_num}'] and not suppress_bar:
             ax.annotate(
-                ANNOTATION_VALUE[b_num - 1],
+                # ANNOTATION_VALUE[b_num - 1],
+                f"{float(ANNOTATION_VALUE[b_num - 1]):.{precision}f}",
                 xy=(b_num, y_val),
                 xytext=(0, 0),
                 zorder=10,

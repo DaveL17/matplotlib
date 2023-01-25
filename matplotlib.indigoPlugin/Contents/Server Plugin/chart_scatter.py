@@ -32,12 +32,12 @@ LOG['Threaddebug'].append("chart_scatter.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
 
     ax = chart_tools.make_chart_figure(
@@ -191,7 +191,8 @@ try:
         iter_colors  = itertools.chain(*[GROUP_COLORS[i::num_col] for i in range(num_col)])
         final_colors = list(iter_colors)
 
-        headers = [_ for _ in P_DICT['headers']]
+        headers = P_DICT['headers']
+        # headers = [_ for _ in P_DICT['headers']]
         # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
         for header in headers:
 

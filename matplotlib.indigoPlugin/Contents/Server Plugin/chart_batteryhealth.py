@@ -35,7 +35,7 @@ LOG['Threaddebug'].append("chart_batteryhealth.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
     rgb = P_DICT['cautionColor'].replace(' ', '').replace('#', '')

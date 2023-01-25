@@ -50,12 +50,12 @@ plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 DPI              = int(plt.rcParams['savefig.dpi'])
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
 
     def format_subplot(s_plot, title="Title"):

@@ -16,7 +16,7 @@ import webbrowser
 try:
     import indigo  # noqa
 except ImportError:
-    pass
+    ...
 
 # =================================== HEADER ==================================
 __author__ = "DaveL17"
@@ -134,7 +134,7 @@ class Fogbert:
 
             self.pluginErrorHandler(traceback.format_exc())
 
-        
+
         :param traceback object sub_error:
         :return:
         """
@@ -305,7 +305,7 @@ class Fogbert:
         Compare current Indigo version to the minimum version required to successfully run the
         plugin.
 
-        
+
         :param int min_ver:
         :return:
         """
@@ -404,7 +404,7 @@ class evalExpr:  # noqa
         Title Placeholder
 
         Body placeholder
-        
+
         :param plugin:
         :return:
         """
@@ -417,7 +417,7 @@ class evalExpr:  # noqa
         Title Placeholder
 
         Body placeholder
-        
+
         :param str expr:
         :return:
         """
@@ -429,7 +429,7 @@ class evalExpr:  # noqa
         Title Placeholder
 
         Body placeholder
-        
+
         :param node:
         :return:
         """

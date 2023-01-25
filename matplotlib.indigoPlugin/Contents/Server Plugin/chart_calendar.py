@@ -28,12 +28,12 @@ LOG['Threaddebug'].append("chart_calendar.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
     fmt = {
         'short': {

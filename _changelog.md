@@ -1,3 +1,17 @@
+#### v2022.1.5
+- Charts
+  - Annotation value precision controls added to Area, Bar Flow Vertical, Bar Stock Horizontal, Bar Stock Vertical, 
+    Line, Weather Forecast devices.
+  - Fixed bug in annotation display for weather forecast devices.
+- Theme Manager
+  - Changes behavior of Save Theme action to allow updates to existing themes without having to create a new theme.
+  - Fixed bug in Theme Manager Rename action.
+- Custom Line Segments
+  - Deprecates `step`, `steps-mid`, and `steps-post` line styles which are no longer supported by Matplotlib.
+  - Fixed bug that caused custom line segments to not be plotted.
+- Code refinements.
+- Minor UI refinements.
+
 #### v2022.1.4
 - Converts `feature_requests.txt` to `_feature_requests.md`.
 - Adds foundation for API `3.1`.
@@ -8,7 +22,7 @@
   configuration dialog is opened.
 
 #### v2022.1.3
-- Adds control to rotate X axis labels (charts: area, bar (horizontal stock), bar (vertical flow), bar (vertical stock),
+- Adds control to rotate X-axis labels (charts: area, bar (horizontal stock), bar (vertical flow), bar (vertical stock),
   line, scatter, weather forecast, weather forecast composite)
 - Fixes bug where user executes `Redraw Charts Now...` Menu Item without first selecting an option.
 - Adds `_to_do_list.md` and changes changelog to markdown.
@@ -74,7 +88,7 @@
 - Fixes bug in A axis tick formatting for quarter- and half-hour increments.
 
 #### v0.9.41
-- Sorts x axis label color bug for stock bar charts.
+- Sorts x-axis label color bug for stock bar charts.
 
 #### v0.9.40
 - Refinements to PluginConfig.xml
@@ -97,7 +111,7 @@
 - Significant refinements to how settings are displayed in chart configuration dialogs.
 - Changes default bar width for all charts to 0.8.
 - Moves chart config dialog warning text to template.
-- Reduces runconcurrentThread sleep from 15 to 1.
+- Reduces `runconcurrentThread()` sleep from 15 to 1.
 
 #### v0.9.36
 - Improves color collision auditing so only those chart elements where a source is defined will be checked (doesn't
@@ -282,7 +296,7 @@
 - Fixes broken link to repo.
 
 #### v0.8.30
-- Fixes bug where y axis min not formatted properly when set automatically.
+- Fixes bug where y-axis min not formatted properly when set automatically.
 - Improves error handling in csv_refresh_process.
 - Code refinements.
 
@@ -671,7 +685,7 @@
 #### v0.6.05
 - Fixes bug in Scatter Chart devices to plot points when marker is set to None. (This is a bug in matplotlib, plugin
   overrides the behavior).
-- Fixes bug in naming of PluginConfig.xml (which caused problems on systems set up as case-sensitive.
+- Fixes bug in naming of PluginConfig.xml (which caused problems on systems set up as case-sensitive).
 
 #### v0.6.04
 - New Feature: optional 'best fit line' for line and scatter charts.
@@ -679,7 +693,7 @@
 - Significantly reduces the amount of information written to the log unless verbose logging is enabled.
 
 #### v0.6.03
-- Improves placement of legend for 10 day and 24 hour forecast devices.
+- Improves placement of legend for 10 day and 24-hour forecast devices.
 - Base CSV file now created at the time new item added to CSV engine.
 
 #### v0.6.02
@@ -839,7 +853,7 @@
 - Renames "Extra Wide" controls to "Special Size" to better reflect that the settings not only control width and
   height, but can also be smaller or larger than the standard size.
 - Fixes bug where certain data file names with unicode characters would cause an error.
-- Moves support URL to Github.
+- Moves support URL to GitHub.
 - Various code refinements.
 
 #### v0.3.02
@@ -854,7 +868,7 @@
 - Fixes (?) all instances where the plugin will save a CSV value of 'None' would be saved to the file (changes it to
   'NaN').
 - Refines annotations to increase readability -- especially during annotation collisions.
-- Refines plotting of 10 Day weather forecast devices to always place higher display priority on high temperature line.
+- Refines plotting of 10-Day weather forecast devices to always place higher display priority on high temperature line.
 - Simplifies code used to plot max, min and custom line segments (minor speed improvement). Affects bar and line charts.
 
 #### v0.2.04

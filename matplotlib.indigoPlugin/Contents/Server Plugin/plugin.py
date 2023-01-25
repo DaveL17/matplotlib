@@ -4,21 +4,19 @@
 matplotlib plugin
 author: DaveL17
 
-The matplotlib plugin is used to produce various types of charts and graphics for use on Indigo
-control pages. The key benefits of the plugin are its ability to make global changes to all
-generated charts (i.e., fonts, colors) and its relative simplicity. It contains direct support for
-some automated charts (for example, it can create Fantastic Weather plugin forecast charts if
-linked to the proper Fantastic Weather devices).
+The matplotlib plugin is used to produce various types of charts and graphics for use on Indigo control pages. The key
+benefits of the plugin are its ability to make global changes to all generated charts (i.e., fonts, colors) and its
+relative simplicity. It contains direct support for some automated charts (for example, it can create Fantastic Weather
+plugin forecast charts if linked to the proper Fantastic Weather devices).
 """
 
 # =================================== Notes ===================================
 # - Memory Leak
-#   There is a known issue with the version of Matplotlib shipping at the time this plugin was
-#   developed that caused a memory leak that would ultimately cause the plugin to crash. Two
-#   significant steps were taken to address this. First, we import 'matplotlib.use('AGG')' which is
-#   thought to isolate the leak. Second, we run each plot update in its own process and then
-#   ultimately destroy the process when it's finished. These two steps seem to allow the plugin to
-#   run indefinitely without running out of resources.
+#   There is a known issue with the version of Matplotlib shipping at the time this plugin was developed that
+#   caused a memory leak that would ultimately cause the plugin to crash. Two significant steps were taken to address
+#   this. First, we import 'matplotlib.use('AGG')' which is thought to isolate the leak. Second, we run each plot
+#   update in its own process and then ultimately destroy the process when it's finished. These two steps seem to allow
+#   the plugin to run indefinitely without running out of resources.
 
 # ================================== IMPORTS ==================================
 # Built-in modules
@@ -52,7 +50,7 @@ try:
     import indigo  # noqa
     import pydevd
 except ImportError:
-    pass
+    ...
 
 # My modules
 import DLFramework.DLFramework as Dave           # noqa
@@ -66,7 +64,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.4"
+__version__   = "2022.1.5"
 
 
 # =============================================================================
@@ -102,8 +100,8 @@ class Plugin(indigo.PluginBase):
         self.maintain = maintenance.Maintain(self)  # Maintenance of plugin props and device prefs
 
         # ============================= Initialize Logger =============================
-        fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin_file_handler.setFormatter(logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S'))
+        log_format = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(message)s'
+        self.plugin_file_handler.setFormatter(logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S'))
         self.debug_level = int(self.pluginPrefs.get('showDebugLevel', '30'))
         self.indigo_log_handler.setLevel(self.debug_level)
 
@@ -116,16 +114,16 @@ class Plugin(indigo.PluginBase):
             self.plugin_file_handler.setLevel(10)
 
         # ============================= Remote Debug Hook =============================
-        # try:
-        #     pydevd.settrace(
-        #         'localhost',
-        #         port=5678,
-        #         stdoutToServer=True,
-        #         stderrToServer=True,
-        #         suspend=False
-        #     )
-        # except Exception:
-        #     pass
+        try:
+            pydevd.settrace(
+                'localhost',
+                port=5678,
+                stdoutToServer=True,
+                stderrToServer=True,
+                suspend=False
+            )
+        except Exception:
+            ...
 
         self.pluginIsInitializing = False
 
@@ -226,8 +224,8 @@ class Plugin(indigo.PluginBase):
         :return:
         """
         self.logger.debug(f"[{dev.name}] Starting chart device.")
-        # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global
-        # is in its proper state.
+        # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global is in its proper
+        # state.
         self.pluginIsShuttingDown = False
         self.maintain.clean_props(dev)
         dev.stateListOrDisplayStateIdChanged()
@@ -291,9 +289,8 @@ class Plugin(indigo.PluginBase):
         try:
 
             # ===========================  CSV Engine Defaults  ===========================
-            # Put certain props in a state that we expect when the config dialog is first opened.
-            # These settings are regardless of whether the device has been initially configured or
-            # not.
+            # Put certain props in a state that we expect when the config dialog is first opened. These settings are
+            # regardless of whether the device has been initially configured or not.
             if type_id == "csvEngine":
                 values_dict['addItemFieldsCompleted'] = False
                 values_dict['addKey']                 = ""
@@ -313,16 +310,15 @@ class Plugin(indigo.PluginBase):
                 return values_dict
 
             # ======================  Open Config on Chart Controls  ======================
-            # Ensure that every time a device config dialog is opened, it reverts to the 'Chart
-            # Controls' settings group.
+            # Ensure that every time a device config dialog is opened, it reverts to the 'Chart Controls' settings
+            # group.
             if 'settingsGroup' in values_dict:
                 values_dict['settingsGroup'] = "ch"
 
             # ========================== Set Config UI Defaults ===========================
-            # For new devices, force certain defaults in case they don't carry from Devices.xml.
-            # This seems to be especially important for menu items built with callbacks and
-            # colorpicker controls that don't accept defaultValue (Indigo version 7.5 adds support
-            # for colorpicker defaultValue).
+            # For new devices, force certain defaults in case they don't carry from Devices.xml. This seems to be
+            # especially important for menu items built with callbacks and colorpicker controls that don't accept
+            # defaultValue (Indigo version 7.5 adds support for colorpicker defaultValue).
             if not dev.configured:
                 values_dict['refreshInterval'] = '900'
 
@@ -574,13 +570,13 @@ class Plugin(indigo.PluginBase):
 
         :return:
         """
-        # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this
-        # dict will be empty. Subsequent calls will pass the established dict.
+        # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
+        # Subsequent calls will pass the established dict.
         plugin_prefs = self.pluginPrefs
         self.logger.threaddebug(f"Getting plugin Prefs: {dict(plugin_prefs)}")
 
-        # Establish a set of defaults for select plugin settings. Only those settings that are
-        # populated dynamically need to be set here (the others can be set directly by the XML.)
+        # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically
+        # need to be set here (the others can be set directly by the XML.)
         defaults_dict = {
             'backgroundColor': '00 00 00',
             'backgroundColorOther': '00 00 00',
@@ -598,9 +594,8 @@ class Plugin(indigo.PluginBase):
             'tickFontSize': '8'
         }
 
-        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair
-        # based on the defaults_dict above. This should only be necessary the first time the plugin
-        # is configured.
+        # Try to assign the value from plugin_prefs. If it doesn't work, add the key, value pair based on the
+        # defaults_dict above. This should only be necessary the first time the plugin is configured.
         for key, value in defaults_dict.items():
             plugin_prefs[key] = plugin_prefs.get(key, value)
 
@@ -703,8 +698,7 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict[path_prop] = "The path must end with a forward slash '/'."
 
         # =============================== Chart Colors ================================
-        # Inspects various color controls and sets them to default when the value is not valid hex
-        # (A-F, 0-9).
+        # Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9).
         color_dict = {
             'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF",
             'backgroundColor': "00 00 00", 'faceColor': "00 00 00",
@@ -732,7 +726,7 @@ class Plugin(indigo.PluginBase):
             try:
                 values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
             except AttributeError:
-                pass
+                ...
 
             try:
                 if float(values_dict[dimension_prop]) < 75:
@@ -743,8 +737,7 @@ class Plugin(indigo.PluginBase):
                 error_msg_dict[dimension_prop] = "The dimension value must be a real number."
 
         # ============================= Chart Resolution ==============================
-        # Note that chart resolution includes a warning feature that will pass the value after the
-        # warning is cleared.
+        # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
         try:
             # If value is null, a null string, or all whitespace.
             if not values_dict['chartResolution'] or \
@@ -760,9 +753,6 @@ class Plugin(indigo.PluginBase):
                     "It is recommended that you enter a value of 80 or more for best results."
                 )
 
-            else:
-                pass
-
         except ValueError:
             error_msg_dict['chartResolution'] = "The chart resolution value must be greater than 0."
 
@@ -775,8 +765,8 @@ class Plugin(indigo.PluginBase):
 
         if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = (
-                "Configuration Errors\n\nThere are one or more settings that need to be corrected. "
-                "Fields requiring attention will be highlighted."
+                "Configuration Errors\n\nThere are one or more settings that need to be corrected. Fields requiring "
+                "attention will be highlighted."
             )
             return False, values_dict, error_msg_dict
 
@@ -796,7 +786,7 @@ class Plugin(indigo.PluginBase):
                         )
                 # Missing keys will be config dialog format props like labels and separators
                 except KeyError:
-                    pass
+                    ...
 
             if config_changed:
                 self.logger.threaddebug(f"values_dict changed: {changed_keys}")
@@ -864,24 +854,21 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
                     for tick in custom_ticks:
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -930,9 +917,8 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
 
                     for tick in custom_ticks:
@@ -940,16 +926,14 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -997,9 +981,8 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
 
                     for tick in custom_ticks:
@@ -1007,16 +990,14 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -1047,8 +1028,7 @@ class Plugin(indigo.PluginBase):
                         except ValueError:
                             if not val.lower() in ['true', 'false']:
                                 error_msg_dict[source] = (
-                                    "The selected variable value can not be charted due to its "
-                                    "value."
+                                    "The selected variable value can not be charted due to its value."
                                 )
                                 values_dict['settingsGroup'] = str(n)
 
@@ -1095,9 +1075,8 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
 
                     for tick in custom_ticks:
@@ -1105,16 +1084,14 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -1146,8 +1123,7 @@ class Plugin(indigo.PluginBase):
                         except ValueError:
                             if not val.lower() in ['true', 'false']:
                                 error_msg_dict[source] = (
-                                    "The selected variable value can not be charted due to its "
-                                    "value."
+                                    "The selected variable value can not be charted due to its value."
                                 )
                                 values_dict['settingsGroup'] = f"{n}"
 
@@ -1180,7 +1156,7 @@ class Plugin(indigo.PluginBase):
         # ============================== Calendar Chart ===============================
         # There are currently no unique validation steps needed for calendar devices
         if type_id == 'calendarChartingDevice':
-            pass
+            ...
 
         # ================================ CSV Engine =================================
         if type_id == 'csvEngine':
@@ -1266,8 +1242,7 @@ class Plugin(indigo.PluginBase):
                 try:
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
-                    error_msg_dict['customTicksY'] = ("All custom tick locations must be numeric "
-                                                      "values.")
+                    error_msg_dict['customTicksY'] = "All custom tick locations must be numeric values."
                     values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
@@ -1280,9 +1255,8 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
 
                     for tick in custom_ticks:
@@ -1290,16 +1264,14 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -1317,8 +1289,7 @@ class Plugin(indigo.PluginBase):
                     raise ValueError
             except ValueError:
                 error_msg_dict['numberOfCharacters'] = (
-                    "The number of characters must be a positive number greater than zero "
-                    "(integer)."
+                    "The number of characters must be a positive number greater than  (integer)."
                 )
                 values_dict['settingsGroup'] = "dsp"
 
@@ -1329,8 +1300,7 @@ class Plugin(indigo.PluginBase):
                         raise ValueError
                 except ValueError:
                     error_msg_dict[prop] = (
-                        "The figure width and height must be positive whole numbers greater than "
-                        "zero (pixels)."
+                        "The figure width and height must be positive whole numbers greater than zero (pixels)."
                     )
                     values_dict['settingsGroup'] = "dsp"
 
@@ -1387,8 +1357,7 @@ class Plugin(indigo.PluginBase):
                 try:
                     custom_ticks = [float(_) for _ in custom_ticks]
                 except ValueError:
-                    error_msg_dict['customTicksY'] = ("All custom tick locations must be numeric "
-                                                      "values.")
+                    error_msg_dict['customTicksY'] = "All custom tick locations must be numeric values."
                     values_dict['settingsGroup'] = "y"
 
                 # Ensure tick labels and values are the same length.
@@ -1401,9 +1370,8 @@ class Plugin(indigo.PluginBase):
                     )
                     values_dict['settingsGroup'] = "y"
 
-                # Ensure all custom Y tick locations are within bounds. User has elected to change
-                # at least one Y axis boundary (if both upper and lower bounds are set to 'None',
-                # we move on).
+                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
+                # boundary (if both upper and lower bounds are set to 'None', we move on).
                 if not all(default_y_axis):
 
                     for tick in custom_ticks:
@@ -1411,16 +1379,14 @@ class Plugin(indigo.PluginBase):
                         if values_dict['yAxisMin'].lower() != 'none' \
                                 and not tick >= float(values_dict['yAxisMin']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
                         if values_dict['yAxisMax'].lower() != 'none' \
                                 and not tick <= float(values_dict['yAxisMax']):
                             error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y "
-                                "axis."
+                                "All custom tick locations must be within the boundaries of the Y axis."
                             )
                             values_dict['settingsGroup'] = "y"
 
@@ -1437,9 +1403,7 @@ class Plugin(indigo.PluginBase):
         if type_id == 'compositeForecastDevice':
 
             if not values_dict['forecastSourceDevice']:
-                error_msg_dict['forecastSourceDevice'] = (
-                    "You must select a weather forecast source device."
-                )
+                error_msg_dict['forecastSourceDevice'] = "You must select a weather forecast source device."
                 values_dict['settingsGroup'] = "ch"
 
             for _ in (
@@ -1459,7 +1423,7 @@ class Plugin(indigo.PluginBase):
 
                 except ValueError:
                     if values_dict[_] in ("", "None"):
-                        pass
+                        ...
                     else:
                         error_msg_dict[_] = "The value must be empty, 'None', or a numeric value."
                         values_dict['settingsGroup'] = "y1"
@@ -1478,9 +1442,7 @@ class Plugin(indigo.PluginBase):
                 if custom_dimension_prop in values_dict \
                         and values_dict[custom_dimension_prop] != 'None' \
                         and float(values_dict[custom_dimension_prop]) < 75:
-                    error_msg_dict[custom_dimension_prop] = (
-                        "The chart dimension value must be greater than 75 pixels."
-                    )
+                    error_msg_dict[custom_dimension_prop] = "The chart dimension value must be greater than 75 pixels."
             except ValueError:
                 error_msg_dict[custom_dimension_prop] = (
                     "The chart dimension value must be a real number greater than 75 pixels."
@@ -1565,8 +1527,8 @@ class Plugin(indigo.PluginBase):
         """
         Dummy callback method to force dialog refreshes
 
-        The purpose of the dummyCallback method is to provide something for configuration dialogs
-        to call in order to force a refresh of any dynamic controls (dynamicReload=True).
+        The purpose of the dummyCallback method is to provide something for configuration dialogs to call in order to
+        force a refresh of any dynamic controls (dynamicReload=True).
 
         :param str type_id:
         :param indigo.Dict values_dict:
@@ -1578,8 +1540,8 @@ class Plugin(indigo.PluginBase):
         """
         Called by an Indigo Action item.
 
-        Allows the plugin to call the charts_refresh() method from an Indigo Action
-        item. This action will refresh all charts.
+        Allows the plugin to call the charts_refresh() method from an Indigo Action item. This action will refresh all
+        charts.
 
         :param indigo.PluginAction plugin_action:
         """
@@ -1595,9 +1557,9 @@ class Plugin(indigo.PluginBase):
         """
         Save advanced settings menu items to plugin props for storage
 
-        The advancedSettingsExecuted() method is a place where advanced settings will be
-        controlled. This method takes the returned values and sends them to the pluginPrefs for
-        permanent storage. Note that valuesDict here is for the menu, not all plugin prefs.
+        The advancedSettingsExecuted() method is a place where advanced settings will be controlled. This method takes
+        the returned values and sends them to the pluginPrefs for permanent storage. Note that valuesDict here is for
+        the menu, not all plugin prefs.
 
         :param indigo.Dict values_dict:
         :param int menu_id:
@@ -1615,8 +1577,8 @@ class Plugin(indigo.PluginBase):
         """
         Write advanced settings menu selections to the log
 
-        The advancedSettingsMenu() method is called when actions are taken within the Advanced
-        Settings Menu item from the plugin menu.
+        The advancedSettingsMenu() method is called when actions are taken within the Advanced Settings Menu item from
+        the plugin menu.
 
         :param indigo.Dict values_dict:
         :param str type_id:
@@ -1629,9 +1591,8 @@ class Plugin(indigo.PluginBase):
         """
         Creates any missing CSV files before beginning
 
-        Iterate through all existing CSV Engine devices. It doesn't matter if the device is
-        enabled or not, since we're only creating the file if it doesn't exist, and we're only
-        going to add the header to the file.
+        Iterate through all existing CSV Engine devices. It doesn't matter if the device is enabled or not, since we're
+        only creating the file if it doesn't exist, and we're only going to add the header to the file.
 
         :return:
         """
@@ -1646,8 +1607,7 @@ class Plugin(indigo.PluginBase):
                     full_path = data_path + column_dict[thing][0] + ".csv"
 
                     # ============================= Create (if needed) ============================
-                    # If the appropriate CSV file doesn't exist, create it and write the header
-                    # line.
+                    # If the appropriate CSV file doesn't exist, create it and write the header line.
                     if not os.path.isdir(data_path):
                         try:
                             os.makedirs(data_path)
@@ -1679,16 +1639,14 @@ class Plugin(indigo.PluginBase):
         """
         Audit device properties to ensure they match the current config.
 
-        The audit_device_props method performs two functions. It compares the current device config
-        XML layout to the current dev.pluginProps, and (1) where the current config has fields that
-        are missing from the device, they will be _added_ to the device (checkboxes will be coerced
-        to boolean based on the defaultValue attribute if specified; unspecified, the value will be
-        set to False.) and (2) where the current pluginProps contains keys that are not in the
-        config, they will be _removed_ from the device. The method will return True if it has run
-        error free; False on exception. Note that this method should _not_ be called from
-        deviceStartComm() as it will cause an infinite loop--the call to
-        dev.replacePluginPropsOnServer() from this method automatically calls deviceStartComm().
-        It is recommended that the method be called from plugin's startup() method.
+        The audit_device_props method performs two functions. It compares the current device config XML layout to the
+        current dev.pluginProps, and (1) where the current config has fields that are missing from the device, they
+        will be _added_ to the device (checkboxes will be coerced to boolean based on the defaultValue attribute if
+        specified; unspecified, the value will be set to False.) and (2) where the current pluginProps contains keys
+        that are not in the config, they will be _removed_ from the device. The method will return True if it has run
+        error free; False on exception. Note that this method should _not_ be called from deviceStartComm() as it will
+        cause an infinite loop--the call to dev.replacePluginPropsOnServer() from this method automatically calls
+        deviceStartComm(). It is recommended that the method be called from plugin's startup() method.
 
         :return:
         """
@@ -1725,9 +1683,8 @@ class Plugin(indigo.PluginBase):
                         # If the XML field is not in the device's current props dict
                         if field_id not in props:
 
-                            # Coerce checkbox default values to bool. Everything that comes in from
-                            # the XML is a string; everything that's not converted will be sent as
-                            # a string.
+                            # Coerce checkbox default values to bool. Everything that comes in from the XML is a
+                            # string; everything that's not converted will be sent as a string.
                             if field_type.lower() == 'checkbox':
                                 if default_value.lower() == 'true':
                                     default_value = True
@@ -1779,7 +1736,7 @@ class Plugin(indigo.PluginBase):
                 if re.search(pattern, _dict_[k]):
                     _dict_[k] = self.fix_rgb(color=_dict_[k])
                 else:
-                    pass
+                    ...
 
             # k_dict is a dict of dicts, so we need to go one level lower.
             elif isinstance(_dict_[k], dict):
@@ -1788,13 +1745,13 @@ class Plugin(indigo.PluginBase):
                         if re.search(pattern, _dict_[k][k1]):
                             _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
                         else:
-                            pass
+                            ...
                     if isinstance(_dict_[k][k1], dict):
                         for k11 in _dict_[k][k1]:
                             if re.search(pattern, str(_dict_[k][k1][k11])):
                                 _dict_[k][k1][k11] = self.fix_rgb(color=_dict_[k][k1][k11])
                             else:
-                                pass
+                                ...
 
         return _dict_
 
@@ -1803,9 +1760,9 @@ class Plugin(indigo.PluginBase):
         """
         Audit plugin save locations to ensure validity
 
-        The audit_save_paths() method will attempt to access the configured paths (CSV save
-        location, chart save location) to ensure that they are accessible to the plugin. It will
-        attempt to write to the paths and warn the user if unsuccessful.
+        The audit_save_paths() method will attempt to access the configured paths (CSV save location, chart save
+        location) to ensure that they are accessible to the plugin. It will attempt to write to the paths and warn the
+        user if unsuccessful.
 
         :return:
         """
@@ -1825,8 +1782,8 @@ class Plugin(indigo.PluginBase):
                 except (IOError, OSError):
                     self.plugin_error_handler(sub_error=traceback.format_exc())
                     self.logger.critical(
-                        "Target folder doesn't exist and the plugin is unable to create it. See "
-                        "plugin log for more information."
+                        "Target folder doesn't exist and the plugin is unable to create it. See plugin log for more "
+                        "information."
                     )
 
         # Test to ensure that each path is writeable.
@@ -1843,25 +1800,19 @@ class Plugin(indigo.PluginBase):
         indigo_ver = self.versStrToTuple(indigo.server.version)[0]
         current_save_path = self.pluginPrefs['chartPath']
 
-        if current_save_path.startswith(
-                '/Library/Application Support/Perceptive Automation/Indigo'
-        ):
+        if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
 
             if indigo_ver <= 7:
-                new_save_path = (
-                        indigo.server.getInstallFolderPath() +
-                        "/IndigoWebServer/images/controls/"
-                )
+                # new_save_path = indigo.server.getInstallFolderPath() + "/IndigoWebServer/images/controls/" # TODO
+                new_save_path = f"{indigo.server.getInstallFolderPath()}/IndigoWebServer/images/controls/"
 
                 if new_save_path != current_save_path:
                     self.logger.warning(f"Charts are being saved to: {current_save_path})")
                     self.logger.warning(f"You may want to change the save path to: {new_save_path}")
 
             elif indigo_ver == 2021:
-                new_save_path = (
-                        indigo.server.getInstallFolderPath() +
-                        "/Web Assets/images/controls/static/"
-                )
+                # new_save_path = indigo.server.getInstallFolderPath() + "/Web Assets/images/controls/static/" # TODO
+                new_save_path = f"{indigo.server.getInstallFolderPath()}/Web Assets/images/controls/static/"
 
                 if new_save_path != current_save_path:
                     self.logger.warning(f"Charts are being saved to: {current_save_path})")
@@ -1891,8 +1842,8 @@ class Plugin(indigo.PluginBase):
         :param indigo.Device dev:
         :return:
         """
-        # We can't access Indigo objects from the subprocess, so we need to get all the information
-        # we need before calling the process.
+        # We can't access Indigo objects from the subprocess, so we need to get all the information we need before
+        # calling the process.
 
         bars_data = []  # data for all bars (all data should be serializable).
 
@@ -1934,7 +1885,7 @@ class Plugin(indigo.PluginBase):
 
             except ValueError:
                 # the bar[X]source field could be empty, so let's ignore it
-                pass
+                ...
 
         return bars_data
 
@@ -1943,8 +1894,7 @@ class Plugin(indigo.PluginBase):
         """
         Refreshes all the plugin chart devices.
 
-        Iterate through each chart device and refresh the image. Only enabled chart devices will be
-        refreshed.
+        Iterate through each chart device and refresh the image. Only enabled chart devices will be refreshed.
 
         :param list dev_list: list of devices to be refreshed.
         """
@@ -1991,9 +1941,7 @@ class Plugin(indigo.PluginBase):
                 plt.rcParams['font.weight']      = 'normal'
                 plt.rcParams['grid.linestyle']   = self.pluginPrefs.get('gridStyle', ':')
                 plt.rcParams['lines.linewidth']  = float(self.pluginPrefs.get('lineWeight', '1'))
-                plt.rcParams['savefig.dpi']      = (
-                    int(self.pluginPrefs.get('chartResolution', '100'))
-                )
+                plt.rcParams['savefig.dpi']      = int(self.pluginPrefs.get('chartResolution', '100'))
                 plt.rcParams['xtick.bottom']     = 'True'
                 plt.rcParams['xtick.labelsize']  = int(self.pluginPrefs.get('tickFontSize', '8'))
                 plt.rcParams['xtick.major.size'] = int(self.pluginPrefs.get('tickSize', '8'))
@@ -2006,21 +1954,11 @@ class Plugin(indigo.PluginBase):
                 plt.rcParams['ytick.right']      = 'False'
 
                 # Color values need a couple of adjustments.
-                plt.rcParams['grid.color']  = self.fix_rgb(
-                    color=self.pluginPrefs.get('gridColor', '88 88 88')
-                )
-                plt.rcParams['xtick.color'] = self.fix_rgb(
-                    color=self.pluginPrefs.get('tickColor', '88 88 88')
-                )
-                plt.rcParams['ytick.color'] = self.fix_rgb(
-                    color=self.pluginPrefs.get('tickColor', '88 88 88')
-                )
-                plt.rcParams['xtick.labelcolor'] = self.fix_rgb(
-                    color=p_dict.get('fontColor', '88 88 88')
-                )
-                plt.rcParams['ytick.labelcolor'] = self.fix_rgb(
-                    color=p_dict.get('fontColor', '88 88 88')
-                )
+                plt.rcParams['grid.color']  = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
+                plt.rcParams['xtick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+                plt.rcParams['ytick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+                plt.rcParams['xtick.labelcolor'] = self.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
+                plt.rcParams['ytick.labelcolor'] = self.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
 
                 # ============================= Background color ==============================
                 # backgroundColorOther is the transparent background config setting
@@ -2085,7 +2023,7 @@ class Plugin(indigo.PluginBase):
 
                     except KeyError:
                         # Not all devices may support this feature.
-                        pass
+                        ...
 
                     # ================================== kwargs ===================================
                     k_dict['k_battery'] = {
@@ -2184,8 +2122,8 @@ class Plugin(indigo.PluginBase):
                         'visible': True
                     }
 
-                    # If the user has selected transparent in the plugin menu, we account for that
-                    # here when setting up the kwargs for savefig().
+                    # If the user has selected transparent in the plugin menu, we account for that here when setting up
+                    # the kwargs for savefig().
                     if p_dict['transparent_charts']:
                         k_dict['k_plot_fig'] = {
                             'bbox_extra_artists': None,
@@ -2217,13 +2155,12 @@ class Plugin(indigo.PluginBase):
                     p_dict.update(dev.pluginProps)
 
                     for _ in (
-                        'bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array',
-                        'dates_to_plot', 'headers', 'wind_direction', 'wind_speed', 'x_obs1',
-                        'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6', 'x_obs7', 'x_obs8',
-                        'y_obs1', 'y_obs1_max', 'y_obs1_min', 'y_obs2', 'y_obs2_max', 'y_obs2_min',
-                        'y_obs3', 'y_obs3_max', 'y_obs3_min', 'y_obs4', 'y_obs4_max', 'y_obs4_min',
-                        'y_obs5', 'y_obs5_max', 'y_obs5_min', 'y_obs6', 'y_obs6_max', 'y_obs6_min',
-                        'y_obs7', 'y_obs7_max', 'y_obs7_min', 'y_obs8', 'y_obs8_max', 'y_obs8_min'
+                        'bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers',
+                        'wind_direction', 'wind_speed', 'x_obs1', 'x_obs2', 'x_obs3', 'x_obs4', 'x_obs5', 'x_obs6',
+                        'x_obs7', 'x_obs8', 'y_obs1', 'y_obs1_max', 'y_obs1_min', 'y_obs2', 'y_obs2_max', 'y_obs2_min',
+                        'y_obs3', 'y_obs3_max', 'y_obs3_min', 'y_obs4', 'y_obs4_max', 'y_obs4_min', 'y_obs5',
+                        'y_obs5_max', 'y_obs5_min', 'y_obs6', 'y_obs6_max', 'y_obs6_min', 'y_obs7', 'y_obs7_max',
+                        'y_obs7_min', 'y_obs8', 'y_obs8_max', 'y_obs8_min'
                     ):
                         p_dict[_] = []
 
@@ -2240,19 +2177,19 @@ class Plugin(indigo.PluginBase):
 
                         except KeyError:
                             # Only some devices will have their own numObs.
-                            pass
+                            ...
 
                         except ValueError as sub_error:
                             self.plugin_error_handler(sub_error=traceback.format_exc())
                             self.logger.warning(
-                                f"[{dev.name}] The number of observations must be a positive "
-                                f"number: {sub_error}. See plugin log for more information."
+                                f"[{dev.name}] The number of observations must be a positive number: {sub_error}. See "
+                                f"plugin log for more information."
                             )
 
                         # =========================== Custom Square Size ===========================
                         try:
                             if p_dict['customSizePolar'] == 'None':
-                                pass
+                                ...
 
                             else:
                                 p_dict['sqChartSize'] = float(p_dict['customSizePolar'])
@@ -2264,7 +2201,7 @@ class Plugin(indigo.PluginBase):
                                 f"{sub_error}")
 
                         except KeyError:
-                            pass
+                            ...
 
                         # ============================ Extra Wide Chart ============================
                         try:
@@ -2278,11 +2215,10 @@ class Plugin(indigo.PluginBase):
 
                         except KeyError:
                             # Not all devices will have these keys
-                            pass
+                            ...
 
                         # =============================== Custom Size ==============================
-                        # If the user has specified a custom size, let's override
-                        # with their custom setting.
+                        # If the user has specified a custom size, let's override with their custom setting.
                         if p_dict.get('customSizeChart', False):
                             try:
                                 if p_dict['customSizeHeight'] != 'None':
@@ -2293,7 +2229,7 @@ class Plugin(indigo.PluginBase):
 
                             except KeyError:
                                 # Not all devices will have these keys
-                                pass
+                                ...
 
                         # ============================= Best Fit Lines =============================
                         # Set the defaults for best fit lines in p_dict.
@@ -2302,13 +2238,12 @@ class Plugin(indigo.PluginBase):
                                 best_fit_color = dev.pluginProps[f'line{_}BestFitColor']
                                 p_dict[f'line{_}BestFitColor'] = best_fit_color
                             except KeyError:
-                                pass
+                                ...
 
                         # ============================= Phantom Labels =============================
-                        # Since users may or may not include axis labels and because we want to
-                        # ensure that all plot areas present in the same way, we need to create
-                        # 'phantom' labels that are plotted but not visible.  Setting the font
-                        # color to 'None' will effectively hide them.
+                        # Since users may or may not include axis labels and because we want to ensure that all plot
+                        # areas present in the same way, we need to create 'phantom' labels that are plotted but not
+                        # visible.  Setting the font color to 'None' will effectively hide them.
                         try:
                             if p_dict['customAxisLabelX'].isspace() or \
                                     p_dict['customAxisLabelX'] == '':
@@ -2320,7 +2255,7 @@ class Plugin(indigo.PluginBase):
                                 }
                         except KeyError:
                             # Not all devices will contain these keys
-                            pass
+                            ...
 
                         try:
                             if p_dict['customAxisLabelY'].isspace() or \
@@ -2333,7 +2268,7 @@ class Plugin(indigo.PluginBase):
                                 }
                         except KeyError:
                             # Not all devices will contain these keys
-                            pass
+                            ...
 
                         try:
                             # Not all devices that get to this point will support Y2.
@@ -2351,30 +2286,28 @@ class Plugin(indigo.PluginBase):
                                     }
                         except KeyError:
                             # Not all devices will contain these keys
-                            pass
+                            ...
 
                         # =============================== Annotations ==============================
-                        # If the user wants annotations, we need to hide the line markers as we
-                        # don't want to plot one on top of the other.
+                        # If the user wants annotations, we need to hide the line markers as we don't want to plot one
+                        # on top of the other.
                         for line in range(1, 9, 1):
                             try:
                                 if p_dict[f'line{line}Annotate'] and \
                                         p_dict[f'line{line}Marker'] != 'None':
                                     p_dict[f'line{line}Marker'] = 'None'
                                     self.logger.warning(
-                                        f"[{dev.name}] Line {line} marker is suppressed to display "
-                                        f"annotations. To see the marker, disable annotations for "
-                                        f"this line."
+                                        f"[{dev.name}] Line {line} marker is suppressed to display  annotations. To "
+                                        f"see the marker, disable annotations for this line."
                                     )
+                            # Not all devices will contain these keys
                             except KeyError:
-                                # Not all devices will contain these keys
-                                pass
+                                ...
 
                         # ============================== Line Markers ==============================
-                        # Some line markers need to be adjusted due to their inherent value. For
-                        # example, matplotlib uses '<', '>' and '.' as markers but storing these
-                        # values will blow up the XML.  So we need to convert them. (See
-                        # self.formatMarkers() method.)
+                        # Some line markers need to be adjusted due to their inherent value. For example, matplotlib
+                        # uses '<', '>' and '.' as markers but storing these values will blow up the XML.  So we need
+                        # to convert them. (See self.formatMarkers() method.)
                         p_dict = self.format_markers(p_dict=p_dict)
 
                         # Note that the logging of p_dict and k_dict are handled within the thread.
@@ -2388,9 +2321,8 @@ class Plugin(indigo.PluginBase):
                         dev_dict['id']    = dev.id
 
                         # =========================  Custom Line Segments  =========================
-                        # We support substitutions in custom line segments settings. These need to
-                        # be converted in the main plugin thread because they can't be converted
-                        # within the subprocess.
+                        # We support substitutions in custom line segments settings. These need to be converted in the
+                        # main plugin thread because they can't be converted within the subprocess.
                         _ = [
                             "areaChartingDevice",
                             "barChartingDevice",
@@ -2402,16 +2334,13 @@ class Plugin(indigo.PluginBase):
                         ]
                         try:
                             if (p_dict['enableCustomLineSegments'] and
-                                    dev.deviceTypeId in _ and
-                                    p_dict['customLineSegments'] not in ("", "None")
-                            ):
+                               dev.deviceTypeId in _ and
+                               p_dict['customLineSegments'] not in ("", "None")):
 
                                 try:
-                                    # constants_to_plot will be (val, rgb) or ((val, rgb), (val,
-                                    # rgb)), Since we can't mutate a tuple, we listify it first
-                                    constants_to_plot = (
-                                        ast.literal_eval(p_dict['customLineSegments'])
-                                    )
+                                    # constants_to_plot will be (val, rgb) or ((val, rgb), (val, rgb)), Since we can't
+                                    # mutate a tuple, we listify it first.
+                                    constants_to_plot = ast.literal_eval(p_dict['customLineSegments'])
                                     substituted_constants = ()
 
                                     # If val start with '%%' perform a substitution on it
@@ -2428,13 +2357,13 @@ class Plugin(indigo.PluginBase):
 
                                 except (ValueError, IndexError):
                                     self.logger.warning(
-                                        "Problem with custom line segments. Please ensure setting "
-                                        "is in the proper format."
+                                        "Problem with custom line segments. Please ensure setting is in the proper "
+                                        "format."
                                     )
 
                         # Not all devices support custom line segments
                         except KeyError:
-                            pass
+                            ...
                         except SyntaxError:
                             self.logger.warning(
                                 f"[{dev.name}] Custom Line Segments entry is invalid. Skipping."
@@ -2458,12 +2387,12 @@ class Plugin(indigo.PluginBase):
                         if dev.deviceTypeId == 'rcParamsDevice':
                             self.rc_params_device_update(dev=dev)
 
-                        # For the time being, we're running each device through its own process
-                        # synchronously; parallel processing may come later.
+                        # For the time being, we're running each device through its own process synchronously; parallel
+                        # processing may come later.
                         #
-                        # NOTE: elements passed to a subprocess have to be serializable. Indigo
-                        # device and plugin objets are not serializable, so we create a proxy to
-                        # send to the process. Therefore, devices can't be changed in the processes.
+                        # NOTE: elements passed to a subprocess have to be serializable. Indigo device and plugin
+                        # objects are not serializable, so we create a proxy to send to the process. Therefore, devices
+                        # can't be changed in the processes.
 
                         # Audit values in p_dict and k_dict to ensure they're in the proper format.
                         plug_dict = copy.deepcopy(self.audit_dict_color(_dict_=plug_dict))
@@ -2473,8 +2402,8 @@ class Plugin(indigo.PluginBase):
                         p_dict['old_prefs'] = None
                         k_dict    = self.audit_dict_color(_dict_=k_dict)
 
-                        # Instantiate basic payload sent to the subprocess scripts. Additional
-                        # key/value pairs may be added below before payload is sent.
+                        # Instantiate basic payload sent to the subprocess scripts. Additional key/value pairs may be
+                        # added below before payload is sent.
                         raw_payload = {
                             'prefs': plug_dict,
                             'props': dev_dict,
@@ -2486,9 +2415,8 @@ class Plugin(indigo.PluginBase):
                         # =============================== Area Charts ==============================
                         if dev.deviceTypeId == "areaChartingDevice":
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native
-                            # formats. We wait until this point to convert it because some devices
-                            # add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
+                            # this point to convert it because some devices add additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2497,9 +2425,8 @@ class Plugin(indigo.PluginBase):
                         # ===============================  Flow Bar  ===============================
                         if dev.deviceTypeId == 'barChartingDevice':
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native
-                            # formats. We wait until this point to convert it because some devices
-                            # add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
+                            # this point to convert it because some devices add additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2510,9 +2437,8 @@ class Plugin(indigo.PluginBase):
 
                             raw_payload['data'] = self.chart_stock_bar(dev=dev)
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native
-                            # formats. We wait until this point to convert it because some devices
-                            # add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
+                            # this point to convert it because some devices add additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2523,9 +2449,8 @@ class Plugin(indigo.PluginBase):
 
                             raw_payload['data'] = self.chart_stock_bar(dev=dev)
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native
-                            # formats. We wait until this point to convert it because some devices
-                            # add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
+                            # this point to convert it because some devices add additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2546,14 +2471,13 @@ class Plugin(indigo.PluginBase):
                             else:
                                 raw_payload['data'] = float(indigo.variables[source_id].value)
 
-                            # Convert scale value if it's a substitution. The substitution value
-                            # should be valid because we checked it in validation.
+                            # Convert scale value if it's a substitution. The substitution value should be valid
+                            # because we checked it in validation.
                             if scale.startswith('%%'):
                                 raw_payload['scale'] = self.substitute(scale)
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native
-                            # formats. We wait until this point to convert it because some devices
-                            # add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
+                            # this point to convert it because some devices add additional device-specific data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2574,8 +2498,8 @@ class Plugin(indigo.PluginBase):
                                             and batt_dev.id not in exclude_list:
                                         device_dict[batt_dev.name] = batt_dev.states['batteryLevel']
 
-                                    # The following line is used for testing the battery health
-                                    # code; it isn't needed in production.
+                                    # The following line is used for testing the battery health code; it isn't needed
+                                    # in production.
                                     # self.logger.warning("Using dummy battery data for testing.")
                                     # device_dict = {
                                     #     'Device A': 0, 'Device B': 100, 'Device C': 8,
@@ -2619,9 +2543,8 @@ class Plugin(indigo.PluginBase):
                                 plt.rcParams['text.color'] = p_dict['textColor']
                                 plt.rcParams['patch.facecolor'] = p_dict['faceColor']
 
-                                # Get the text to plot. We do this here, so we don't need to send
-                                # all the devices and variables to the method (the process does not
-                                # have access to the Indigo server).
+                                # Get the text to plot. We do this here, so we don't need to send all the devices and
+                                # variables to the method (the process doesn't have access to the Indigo server).
                                 if int(p_dict['thing']) in indigo.devices:
                                     dev_id = int(p_dict['thing'])
                                     raw_payload['data'] = (
@@ -2629,17 +2552,12 @@ class Plugin(indigo.PluginBase):
                                     )
 
                                 elif int(p_dict['thing']) in indigo.variables:
-                                    raw_payload['data'] = (
-                                        f"{indigo.variables[int(p_dict['thing'])].value}"
-                                    )
+                                    raw_payload['data'] = f"{indigo.variables[int(p_dict['thing'])].value}"
 
                                 else:
-                                    raw_payload['data'] = (
-                                        "Unable to reconcile plot text. Confirm device settings."
-                                    )
+                                    raw_payload['data'] = "Unable to reconcile plot text. Confirm device settings."
                                     self.logger.info(
-                                        "Presently, the plugin only supports device state and "
-                                        "variable values."
+                                        "Presently, the plugin only supports device state and variable values."
                                     )
 
                                 path_to_file = 'chart_multiline.py'
@@ -2662,15 +2580,9 @@ class Plugin(indigo.PluginBase):
                         # ========================= Weather Forecast Charts ========================
                         if dev.deviceTypeId == "forecastChartingDevice":
 
-                            dev_type = indigo.devices[
-                                int(p_dict['forecastSourceDevice'])
-                            ].deviceTypeId
-                            state_list = dict(indigo.devices[
-                                                  int(p_dict['forecastSourceDevice'])
-                                              ].states)
-                            sun_rise_set = [str(indigo.server.calculateSunrise()),
-                                            str(indigo.server.calculateSunset())
-                                            ]
+                            dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
+                            state_list = dict(indigo.devices[int(p_dict['forecastSourceDevice'])].states)
+                            sun_rise_set = [str(indigo.server.calculateSunrise()), str(indigo.server.calculateSunset())]
 
                             raw_payload['dev_type']     = dev_type
                             raw_payload['state_list']   = state_list
@@ -2680,29 +2592,23 @@ class Plugin(indigo.PluginBase):
                         # ========================= Weather Composite Charts =======================
                         if dev.deviceTypeId == "compositeForecastDevice":
 
-                            dev_type = (
-                                indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
-                            )
-                            state_list = (
-                                indigo.devices[int(p_dict['forecastSourceDevice'])].states
-                            )
+                            dev_type = indigo.devices[int(p_dict['forecastSourceDevice'])].deviceTypeId
+                            state_list = indigo.devices[int(p_dict['forecastSourceDevice'])].states
 
                             raw_payload['dev_type']   = dev_type
                             raw_payload['state_list'] = dict(state_list)
                             path_to_file = 'chart_weather_composite.py'
 
-                        # Convert any nested indigo.Dict and indigo.List objects to native
-                        # formats. We wait until this point to convert it because some devices add
-                        # additional device-specific data.
+                        # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until this
+                        # point to convert it because some devices add additional device-specific data.
                         raw_payload = convert_to_native(raw_payload)
 
                         # Serialize the payload
                         payload = json.dumps(raw_payload, indent=4, separators=(',', ': '))
 
                         # =========================  Process Style Sheet  ==========================
-                        # Save rcParams as a style sheet for use in subprocess calls. We use a
-                        # separate style sheet for each device because each device can have
-                        # different styles.
+                        # Save rcParams as a style sheet for use in subprocess calls. We use a separate style sheet for
+                        # each device because each device can have different styles.
 
                         # If the "Stylesheets" folder isn't present, create one.
                         if not os.path.exists("Stylesheets/"):
@@ -2712,8 +2618,8 @@ class Plugin(indigo.PluginBase):
                                 f"Stylesheets/{dev.id}_stylesheet", 'w', encoding="utf-8"
                         ) as outfile:
                             for k, v in rcParams.items():
-                                # matplotlib stylesheets require lists to NOT have `[` or `]`, and
-                                # values separated by commas. Empty string for empty list.
+                                # matplotlib stylesheets require lists to NOT have `[` or `]`, and values separated by
+                                # commas. Empty string for empty list.
                                 if isinstance(v, list):
                                     if len(v) > 0:
                                         v = ', '.join(str(_) for _ in v)
@@ -2725,8 +2631,8 @@ class Plugin(indigo.PluginBase):
 
                         # ============================  Process Result  ============================
                         self.logger.debug(f"[{dev.name}] Sending to chart refresh process.")
-                        # It's important to use the full path to the Python version to ensure that
-                        # we get the version we want.
+                        # It's important to use the full path to the Python version to ensure that we get the version
+                        # we want.
                         try:
                             with subprocess.Popen(
                                     ['/usr/local/bin/python3', path_to_file, payload, ],
@@ -2744,19 +2650,14 @@ class Plugin(indigo.PluginBase):
 
                         # Parse the output log
                         result = self.process_plotting_log(device=dev, replies=reply, errors=err)
-                        # If we have manually asked for all charts to update, don't refresh the last
-                        # update time so that the charts will update on their own at the next
-                        # refresh cycle.
+                        # If we have manually asked for all charts to update, don't refresh the last update time so
+                        # that the charts will update on their own at the next refresh cycle.
                         if 'chartLastUpdated' in dev.states and not self.skipRefreshDateUpdate:
-                            device_states.append(
-                                {'key': 'chartLastUpdated', 'value': f"{dt.datetime.now()}"}
-                            )
+                            device_states.append({'key': 'chartLastUpdated', 'value': f"{dt.datetime.now()}"})
 
                         # All has gone well.
                         if not result and dev.deviceTypeId not in ('rcParamsDevice',):
-                            device_states.append(
-                                {'key': 'onOffState', 'value': True, 'uiValue': "Error"}
-                            )
+                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': "Error"})
                         elif dev.deviceTypeId:
                             refresh_interval = dev.pluginProps.get('refreshInterval', 900)
                             if int(refresh_interval) == 0 \
@@ -2768,17 +2669,14 @@ class Plugin(indigo.PluginBase):
                             else:
                                 ui_value = " "
 
-                            device_states.append(
-                                {'key': 'onOffState', 'value': True, 'uiValue': ui_value}
-                            )
+                            device_states.append({'key': 'onOffState', 'value': True, 'uiValue': ui_value})
 
                         dev.updateStatesOnServer(device_states)
 
                     except RuntimeError as sub_error:
                         self.plugin_error_handler(sub_error=traceback.format_exc())
                         self.logger.critical(
-                            f"[{dev.name}] Critical Error: {sub_error}. See plugin log for more "
-                            f"information."
+                            f"[{dev.name}] Critical Error: {sub_error}. See plugin log for more information."
                         )
                         self.logger.critical("Skipping device.")
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
@@ -2788,10 +2686,7 @@ class Plugin(indigo.PluginBase):
 
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
-                self.logger.critical(
-                    # f"[{dev.name}] Error: {sub_error}. See plugin log for more information.")
-                    f"Error: {sub_error}. See plugin log for more information.")
-                # dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
+                self.logger.critical(f"Error: {sub_error}. See plugin log for more information.")
 
     # =============================================================================
     def commsKillAll(self):  # noqa
@@ -2809,8 +2704,7 @@ class Plugin(indigo.PluginBase):
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(
-                    f"Exception when trying to kill all comms. Error: {sub_error}. See plugin log "
-                    f"for more information."
+                    f"Exception when trying to kill all comms. Error: {sub_error}. See plugin log for more information."
                 )
 
     # =============================================================================
@@ -2828,8 +2722,7 @@ class Plugin(indigo.PluginBase):
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(
-                    f"Exception when trying to kill all comms. Error: {sub_error}. "
-                    f"See plugin log for more information."
+                    f"Exception when trying to kill all comms. Error: {sub_error}. See plugin log for more information."
                 )
 
     # =============================================================================
@@ -2849,8 +2742,8 @@ class Plugin(indigo.PluginBase):
                 # Get the list of CSV file titles
                 column_dict = ast.literal_eval(dev.pluginProps['columnDict'])
 
-                # Build a dictionary where the file title is the key and the value is a list of
-                # devices that point to that title for a source.
+                # Build a dictionary where the file title is the key and the value is a list of devices that point to
+                # that title for a source.
                 for key in column_dict:
                     title = column_dict[key][0]
 
@@ -2864,8 +2757,8 @@ class Plugin(indigo.PluginBase):
         for title_name in titles:
             if len(titles[title_name]) > 1:
                 self.logger.warning(
-                    f"Audit CSV data files: CSV filename [{title_name}] referenced by more than "
-                    f"one CSV Engine device: {titles[title_name]}"
+                    f"Audit CSV data files: CSV filename [{title_name}] referenced by more than one CSV Engine device: "
+                    f"{titles[title_name]}"
                 )
 
     # =============================================================================
@@ -2873,8 +2766,8 @@ class Plugin(indigo.PluginBase):
         """
         Add new item to CSV engine
 
-        The csv_item_add() method is called when the user clicks on the 'Add Item' button in the
-        CSV Engine config dialog.
+        The csv_item_add() method is called when the user clicks on the 'Add Item' button in the CSV Engine config
+        dialog.
 
         :param indigo.Dict values_dict:
         :param str type_id:
@@ -2902,9 +2795,7 @@ class Plugin(indigo.PluginBase):
                 )
 
             if values_dict['addState'] == "":
-                error_msg_dict['addState'] = (
-                    "Please select a value source for your CSV data element."
-                )
+                error_msg_dict['addState'] = "Please select a value source for your CSV data element."
 
             # Create a list of existing keys with the 'k' lopped off
             _ = [lister.append(key.lstrip('k')) for key in sorted(column_dict)]
@@ -2913,9 +2804,7 @@ class Plugin(indigo.PluginBase):
             # Generate the next key
             next_key = f'k{int(max(num_lister)) + 1}'
             # Save the tuple of properties
-            column_dict[next_key] = (
-                values_dict['addValue'], values_dict['addSource'], values_dict['addState']
-            )
+            column_dict[next_key] = values_dict['addValue'], values_dict['addSource'], values_dict['addState']
 
             # Remove any empty entries as they're not going to do any good anyway.
             new_dict = {}
@@ -2932,8 +2821,7 @@ class Plugin(indigo.PluginBase):
         except AttributeError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error adding CSV item: {sub_error}. See plugin log for more "
-                f"information."
+                f"[{dev.name}] Error adding CSV item: {sub_error}. See plugin log for more information."
             )
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
@@ -2959,8 +2847,8 @@ class Plugin(indigo.PluginBase):
         """
         Deletes items from the CSV Engine configuration dialog
 
-        The csv_item_delete() method is called when the user clicks on the "Delete Item" button in
-        the CSV Engine config dialog.
+        The csv_item_delete() method is called when the user clicks on the "Delete Item" button in the CSV Engine
+        config dialog.
 
         :param indigo.Dict values_dict:
         :param str type_id:
@@ -2979,8 +2867,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error deleting CSV item: {sub_error}. See plugin log for more "
-                f"information."
+                f"[{dev.name}] Error deleting CSV item: {sub_error}. See plugin log for more information."
             )
 
         values_dict['csv_item_list'] = ""
@@ -3021,8 +2908,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error generating CSV item list: {sub_error}. See plugin log for "
-                f"more information."
+                f"[{dev.name}] Error generating CSV item list: {sub_error}. See plugin log for more information."
             )
             prop_list = []
 
@@ -3054,8 +2940,7 @@ class Plugin(indigo.PluginBase):
             if key != previous_key:
                 if key in column_dict:
                     error_msg_dict['editKey'] = (
-                        f"New key ({key}) already exists in the global properties, please use a "
-                        f"different key value"
+                        f"New key ({key}) already exists in the global properties, please use a  different key value"
                     )
                     values_dict['editKey']   = previous_key
                 else:
@@ -3078,8 +2963,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error updating CSV item: {sub_error}. See plugin log for more "
-                f"information."
+                f"[{dev.name}] Error updating CSV item: {sub_error}. See plugin log for more information."
             )
 
         # Remove any empty entries as they're not going to do any good anyway.
@@ -3100,9 +2984,9 @@ class Plugin(indigo.PluginBase):
         """
         Populates CSV engine controls for updates and deletions
 
-        The csv_item_select() method is called when the user actually selects something within the
-        CSV engine Item List dropdown menu. When the user selects an item from the Item List, we
-        populate the Title, ID, and Data controls with the relevant Item properties.
+        The csv_item_select() method is called when the user actually selects something within the CSV engine Item List
+        dropdown menu. When the user selects an item from the Item List, we populate the Title, ID, and Data controls
+        with the relevant Item properties.
 
         :param indigo.Dict values_dict:
         :param str type_id:
@@ -3123,8 +3007,8 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] There was an error establishing a connection with the item you "
-                f"chose: {sub_error}. See plugin log for more information."
+                f"[{dev.name}] There was an error establishing a connection with the item you  chose: {sub_error}. See "
+                f"plugin log for more information."
             )
         return values_dict
 
@@ -3132,6 +3016,7 @@ class Plugin(indigo.PluginBase):
     def csv_refresh(self):
         """
         Refreshes data for all CSV custom devices
+
         The csv_refresh() method manages CSV files through CSV Engine custom devices.
         """
         if not self.pluginIsShuttingDown:
@@ -3203,8 +3088,8 @@ class Plugin(indigo.PluginBase):
 
                     except OSError:
                         self.logger.critical(
-                            f"[{dev.name}] Target data folder either doesn't exist or the plugin "
-                            f"is unable to access/create it."
+                            f"[{dev.name}] Target data folder either doesn't exist or the plugin is unable to "
+                            f"access/create it."
                         )
 
                 if not os.path.isfile(full_path):
@@ -3218,8 +3103,8 @@ class Plugin(indigo.PluginBase):
 
                     except IOError:
                         self.logger.critical(
-                            f"[{dev.name}] The plugin is unable to access the data storage "
-                            f"location. See plugin log for more information."
+                            f"[{dev.name}] The plugin is unable to access the data storage location. See plugin log "
+                            f"for more information."
                         )
 
                 # =============================== Create Backup ===============================
@@ -3231,8 +3116,8 @@ class Plugin(indigo.PluginBase):
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
                     self.logger.error(
-                        f"[{dev.name}] Unable to backup CSV file: {sub_error}. See plugin log for "
-                        f"more information.")
+                        f"[{dev.name}] Unable to backup CSV file: {sub_error}. See plugin log for more information."
+                    )
 
                 # ================================= Load Data =================================
                 # Read CSV data into data frame
@@ -3257,12 +3142,12 @@ class Plugin(indigo.PluginBase):
                     cut_off = dt.datetime.now() - dt.timedelta(hours=delta)
                     time_data = [row for row in data if date_parse(row[0]) >= cut_off]
 
-                    # If all records are older than the delta, return the original data (so there's
-                    # something to chart) and send a warning to the log.
+                    # If all records are older than the delta, return the original data (so there's something to chart)
+                    # and send a warning to the log.
                     if len(time_data) == 0:
                         self.logger.debug(
-                            f"[{dev.name} - {column_names[0][1]}] all CSV data are older than the "
-                            f"time limit. Returning original data."
+                            f"[{dev.name} - {column_names[0][1]}] all CSV data are older than the time limit. Returning"
+                            f" original data."
                         )
                     else:
                         data = time_data
@@ -3274,8 +3159,8 @@ class Plugin(indigo.PluginBase):
 
                     if not value[1]:
                         self.logger.warning(
-                            "Found CSV Data element with missing source ID. Please check to ensure "
-                            "all CSV sources are properly configured."
+                            "Found CSV Data element with missing source ID. Please check to ensure all CSV sources are "
+                            "properly configured."
                         )
 
                     elif int(value[1]) in indigo.devices:
@@ -3286,8 +3171,9 @@ class Plugin(indigo.PluginBase):
 
                     else:
                         self.logger.critical(
-                            f"The settings for CSV Engine data element '{value[0]}' are not valid: "
-                            f"[dev: {value[1]}, state/value: {value[2]}]")
+                            f"The settings for CSV Engine data element '{value[0]}' are not valid: [dev: {value[1]}, "
+                            f"state/value: {value[2]}]"
+                        )
 
                     # Give matplotlib something it can chew on if the value to be saved is 'None'
                     if state_to_write in ('None', None, ""):
@@ -3308,8 +3194,8 @@ class Plugin(indigo.PluginBase):
                     self.logger.error(f"[{dev.name}] Invalid CSV definition: {sub_error}")
 
                 # ============================= Limit for Length ==============================
-                # The data frame (with the newest observation included) may now be too long. If it
-                # is, we trim it for length.
+                # The data frame (with the newest observation included) may now be too long. If it is, we trim it for
+                # length.
                 if 0 <= target_lines < len(data):
                     data = data[len(data) - target_lines:]
 
@@ -3338,10 +3224,7 @@ class Plugin(indigo.PluginBase):
             dev.updateStateImageOnServer(indigo.kStateImageSel.WindowSensorClosed)
 
         except UnboundLocalError:
-            self.logger.critical(
-                f"[{dev.name}] Unable to reach storage location. Check connections and "
-                f"permissions."
-            )
+            self.logger.critical(f"[{dev.name}] Unable to reach storage location. Check connections and permissions.")
         except ValueError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.critical(f"[{dev.name}] Error: {sub_error}")
@@ -3357,10 +3240,9 @@ class Plugin(indigo.PluginBase):
         """
         Perform a manual refresh of a single CSV Device
 
-        The csv_refresh_device_action() method will allow for the update of a single CSV Engine
-        device. This method will update all CSV sources associated with the selected CSV Engine
-        device each time the Action item is called. Only CSV Engine devices set to a manual refresh
-        interval will be presented.
+        The csv_refresh_device_action() method will allow for the update of a single CSV Engine device. This method
+        will update all CSV sources associated with the selected CSV Engine device each time the Action item is called.
+        Only CSV Engine devices set to a manual refresh interval will be presented.
 
         :param indigo.PluginAction plugin_action:
         :param indigo.Device dev:
@@ -3389,11 +3271,10 @@ class Plugin(indigo.PluginBase):
         """
         Perform a manual refresh of a single CSV Source
 
-        The csv_refresh_source_action() method will allow for the update of a single CSV source
-        from a CSV Engine device. When creating a new Action item, the user selects a target CSV
-        Engine device and then the available CSV sources will be displayed. The user selects a
-        single CSV source that will be updated each time the Action is called. Only CSV Engine
-        devices set to a manual refresh interval will be presented.
+        The csv_refresh_source_action() method will allow for the update of a single CSV source from a CSV Engine
+        device. When creating a new Action item, the user selects a target CSV Engine device and then the available CSV
+        sources will be displayed. The user selects a single CSV source that will be updated each time the Action is
+        called. Only CSV Engine devices set to a manual refresh interval will be presented.
 
         :param indigo.PluginAction plugin_action:
         :param indigo.Device dev:
@@ -3419,10 +3300,9 @@ class Plugin(indigo.PluginBase):
         """
         Construct a list of devices and variables for the CSV engine
 
-        Constructs a list of devices and variables for the user to select within the CSV engine
-        configuration dialog box. Devices and variables are listed in alphabetical order with
-        devices first and then variables. Devices are prepended with '(D)' and variables with
-        '(V)'. Category labels are also included for visual clarity.
+        Constructs a list of devices and variables for the user to select within the CSV engine configuration dialog
+        box. Devices and variables are listed in alphabetical order with devices first and then variables. Devices are
+        prepended with '(D)' and variables with '(V)'. Category labels are also included for visual clarity.
 
         :param str type_id:
         :param indigo.Dict values_dict:
@@ -3464,10 +3344,9 @@ class Plugin(indigo.PluginBase):
         """
         Construct a list of devices and variables for the CSV engine
 
-        Constructs a list of devices and variables for the user to select within the CSV engine
-        configuration dialog box. Devices and variables are listed in alphabetical order with
-        devices first and then variables. Devices are prepended with '(D)' and variables with
-        '(V)'. Category labels are also included for visual clarity.
+        Constructs a list of devices and variables for the user to select within the CSV engine configuration dialog
+        box. Devices and variables are listed in alphabetical order with devices first and then variables. Devices are
+        prepended with '(D)' and variables with '(V)'. Category labels are also included for visual clarity.
 
         :param str type_id:
         :param indigo.Dict values_dict:
@@ -3514,8 +3393,7 @@ class Plugin(indigo.PluginBase):
         """
         Return a list of CSV Engine devices set to manual refresh
 
-        The get_csv_device_list() method returns a list of CSV Engine devices with a manual refresh
-        interval.
+        The get_csv_device_list() method returns a list of CSV Engine devices with a manual refresh interval.
 
         :param int fltr:
         :param indigo.Dict values_dict:
@@ -3534,8 +3412,7 @@ class Plugin(indigo.PluginBase):
         """
         Return a list of CSV sources from CSV Engine devices set to manual refresh
 
-        The get_csv_source_list() method returns a list of CSV sources for the target CSV Engine
-        device.
+        The get_csv_source_list() method returns a list of CSV sources for the target CSV Engine device.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3561,9 +3438,9 @@ class Plugin(indigo.PluginBase):
         """
         Formulates list of device states for CSV engine
 
-        Once a user selects a device or variable within the CSV engine configuration dialog, we
-        need to obtain the relevant device states to chose from. If the user selects a variable,
-        we simply return the variable value identifier. The return is a list of tuples of the form:
+        Once a user selects a device or variable within the CSV engine configuration dialog, we need to obtain the
+        relevant device states to chose from. If the user selects a variable, we simply return the variable value
+        identifier. The return is a list of tuples of the form:
 
         :param str type_id:
         :param indigo.Dict values_dict:
@@ -3579,8 +3456,7 @@ class Plugin(indigo.PluginBase):
                         and values_dict['addSourceFilter'] == "V":
                     result = [('None', 'Please select a data source first')]
 
-                # User has selected an Indigo device element and the filter is set to Devices only
-                # or Show All.
+                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
                 elif int(values_dict['addSource']) in indigo.devices \
                         and values_dict['addSourceFilter'] != "V":
                     dev = indigo.devices[int(values_dict['addSource'])]
@@ -3608,9 +3484,9 @@ class Plugin(indigo.PluginBase):
         """
         Formulates list of device states for CSV engine
 
-        Once a user selects a device or variable within the CSV engine configuration dialog, we
-        need to obtain the relevant device states to chose from. If the user selects a variable, we
-        simply return the variable value identifier. The return is a list of tuples of the form:
+        Once a user selects a device or variable within the CSV engine configuration dialog, we need to obtain the
+        relevant device states to chose from. If the user selects a variable, we simply return the variable value
+        identifier. The return is a list of tuples of the form:
 
         :param str type_id:
         :param indigo.Dict values_dict:
@@ -3620,14 +3496,12 @@ class Plugin(indigo.PluginBase):
         result = None
         if values_dict['editSource'] != '':
             try:
-                # User has selected an Indigo device element and then set the filter to Variables
-                # only.
+                # User has selected an Indigo device element and then set the filter to Variables only.
                 if int(values_dict['editSource']) in indigo.devices \
                         and values_dict['editSourceFilter'] == "V":
                     result = [('None', 'Please select a data source first')]
 
-                # User has selected an Indigo device element and the filter is set to Devices only
-                # or Show All.
+                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
                 elif int(values_dict['editSource']) in indigo.devices \
                         and values_dict['editSourceFilter'] != "V":
                     dev = indigo.devices[int(values_dict['editSource'])]
@@ -3660,8 +3534,8 @@ class Plugin(indigo.PluginBase):
         :param str color:
         :return:
         """
-        # FIXME - once migration is complete, can remove the hash from this method (don't add one)
-        #         and delete the truncation elsewhere (to remove the hash).
+        # FIXME - once migration is complete, can remove the hash from this method (don't add one) and delete the
+        #         truncation elsewhere (to remove the hash).
         rgb_fixed = color.replace(' ', '').replace('#', '')
         return f"#{rgb_fixed}"
 
@@ -3671,17 +3545,16 @@ class Plugin(indigo.PluginBase):
         """
         Format matplotlib markers
 
-        The Devices.xml file cannot contain '<' or '>' as a value, as this conflicts with the
-        construction of the XML code. Matplotlib needs these values for select built-in marker
-        styles, so we need to change them to what MPL is expecting.
+        The Devices.xml file cannot contain '<' or '>' as a value, as this conflicts with the construction of the XML
+        code. Matplotlib needs these values for select built-in marker styles, so we need to change them to what MPL is
+        expecting.
 
         :param dict p_dict:
         """
         markers     = (
-            'area1Marker', 'area2Marker', 'area3Marker', 'area4Marker', 'area5Marker',
-            'area6Marker', 'area7Marker', 'area8Marker', 'line1Marker', 'line2Marker',
-            'line3Marker', 'line4Marker', 'line5Marker', 'line6Marker', 'line7Marker',
-            'line8Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker'
+            'area1Marker', 'area2Marker', 'area3Marker', 'area4Marker', 'area5Marker', 'area6Marker', 'area7Marker',
+            'area8Marker', 'line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker', 'line6Marker',
+            'line7Marker', 'line8Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker'
         )
 
         marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
@@ -3691,7 +3564,7 @@ class Plugin(indigo.PluginBase):
                 if p_dict[marker] in marker_dict:
                     p_dict[marker] = marker_dict[p_dict[marker]]
             except KeyError:
-                pass
+                ...
 
         return p_dict
 
@@ -3700,10 +3573,10 @@ class Plugin(indigo.PluginBase):
         """
         Returns device states list or variable 'value'.
 
-        Returns a list of device states or 'value' for a variable, based on ID transmitted in the
-        filter attribute. The generatorDeviceStates() method returns a list of device states each
-        list includes only states for the selected device. If a variable id is provided, the list
-        returns one element. The lists are generated in the DLFramework module.
+        Returns a list of device states or 'value' for a variable, based on ID transmitted in the filter attribute. The
+        generatorDeviceStates() method returns a list of device states each list includes only states for the selected
+        device. If a variable id is provided, the list returns one element. The lists are generated in the DLFramework
+        module.
 
         Returns:
           [('dev state name', 'dev state name'), ('dev state name', 'dev state name')]
@@ -3722,10 +3595,9 @@ class Plugin(indigo.PluginBase):
         """
         Returns a list of Indigo variables.
 
-        Provides a list of Indigo variables for various dropdown menus. The method is agnostic
-        whether the variable is enabled or disabled. The method returns a list of tuples in the
-        form:  [(dev.id, dev.name), (dev.id, dev.name)]. The list is generated within the
-        DLFramework module.
+        Provides a list of Indigo variables for various dropdown menus. The method is agnostic whether the variable is
+        enabled or disabled. The method returns a list of tuples in the form: [(dev.id, dev.name), (dev.id, dev.name)].
+        The list is generated within the DLFramework module.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3852,11 +3724,10 @@ class Plugin(indigo.PluginBase):
         """
         Create a list of devices and variables for config menu controls
 
-        Provides a list of Indigo devices and variables for various dropdown menus. The method is
-        agnostic whether the devices and variables are enabled or disabled. All devices are listed
-        first and then all variables. The method returns a list of tuples in the form:
-        [(dev.id, dev.name), (var.id, var.name)]. It prepends (D) or (V) to make it easier to
-        distinguish between the two. The list is generated within the DLFramework module.
+        Provides a list of Indigo devices and variables for various dropdown menus. The method is agnostic whether the
+        devices and variables are enabled or disabled. All devices are listed first and then all variables. The method
+        returns a list of tuples in the form: [(dev.id, dev.name), (var.id, var.name)]. It prepends (D) or (V) to make
+        it easier to distinguish between the two. The list is generated within the DLFramework module.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3870,10 +3741,9 @@ class Plugin(indigo.PluginBase):
         """
         Returns a list of Indigo variables.
 
-        Provides a list of Indigo variables for various dropdown menus. The method is agnostic
-        whether the variable is enabled or disabled. The method returns a list of tuples in the
-        form:  [(var.id, var.name), (var.id, var.name)]. The list is generated within the
-        DLFramework module.
+        Provides a list of Indigo variables for various dropdown menus. The method is agnostic whether the variable is
+        enabled or disabled. The method returns a list of tuples in the form: [(var.id, var.name), (var.id, var.name)].
+        The list is generated within the DLFramework module.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3888,8 +3758,8 @@ class Plugin(indigo.PluginBase):
         """
         Returns a list of axis formats.
 
-        Returns a list of Python date formatting strings for use in plotting date labels. The list
-        does not include all Python format specifiers.
+        Returns a list of Python date formatting strings for use in plotting date labels. The list does not include all
+        Python format specifiers.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3926,18 +3796,16 @@ class Plugin(indigo.PluginBase):
         """
         Create a list of battery-powered devices
 
-        Creates a list of tuples that contains the device ID and device name of all Indigo devices
-        that report a batterLevel device property that is not None. If no devices meet the criteria,
-        a single tuple is returned as a place-holder.
+        Creates a list of tuples that contains the device ID and device name of all Indigo devices that report a
+        batterLevel device property that is not None. If no devices meet the criteria, a single tuple is returned as a
+        place-holder.
 
         :param str fltr:
         :param indigo.Dict values_dict:
         :param str type_id:
         :param int target_id:
         """
-        batt_list = [
-            (dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None
-        ]
+        batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
 
         if len(batt_list) == 0:
             batt_list = [(-1, 'No battery devices detected.'), ]
@@ -3949,9 +3817,8 @@ class Plugin(indigo.PluginBase):
         """
         Get list of CSV files for various dropdown menus.
 
-        Generates a list of CSV source files that are located in the folder specified within the
-        plugin configuration dialog. If the method is unable to find any CSV files, an empty list
-        is returned.
+        Generates a list of CSV source files that are located in the folder specified within the plugin configuration
+        dialog. If the method is unable to find any CSV files, an empty list is returned.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -3975,8 +3842,7 @@ class Plugin(indigo.PluginBase):
 
         except IOError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error(
-                f"Error generating file list: {sub_error}. See plugin log for more information.")
+            self.logger.error(f"Error generating file list: {sub_error}. See plugin log for more information.")
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
@@ -3986,9 +3852,8 @@ class Plugin(indigo.PluginBase):
         """
         Provide a list of font names for various dropdown menus.
 
-        Note that these are the fonts that Matplotlib can see, not necessarily all the fonts
-        installed on the system. If matplotlib can't find any fonts, then a default list of fonts
-        that matplotlib supports natively are provided.
+        Note that these are the fonts that Matplotlib can see, not necessarily all the fonts installed on the system.
+        If matplotlib can't find any fonts, then a default list of fonts that matplotlib supports natively are provided.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -4006,8 +3871,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"Error building font list.  Returning generic list. {sub_error}. See plugin log "
-                f"for more information."
+                f"Error building font list.  Returning generic list. {sub_error}. See plugin log for more information."
             )
 
             font_menu = FONT_MENU
@@ -4039,9 +3903,9 @@ class Plugin(indigo.PluginBase):
         """
         Return a list of WUnderground devices for forecast chart devices
 
-        Generates and returns a list of potential forecast devices for the forecast devices type.
-        Presently, the plugin only works with WUnderground devices, but the intention is to expand
-        the list of compatible devices going forward.
+        Generates and returns a list of potential forecast devices for the forecast devices type. Presently, the plugin
+        only works with WUnderground devices, but the intention is to expand the list of compatible devices going
+        forward.
 
         :param str fltr:
         :param indigo.Dict values_dict:
@@ -4050,8 +3914,8 @@ class Plugin(indigo.PluginBase):
         """
         forecast_source_menu = []
 
-        # We accept both WUnderground (legacy) and Fantastic Weather devices. We have to construct
-        # these one at a time. Note the typo in the bundle identifier is correct.
+        # We accept both WUnderground (legacy) and Fantastic Weather devices. We have to construct these one at a time.
+        # Note the typo in the bundle identifier is correct.
         try:
             for dev in indigo.devices.iter("com.fogbert.indigoplugin.fantasticwWeather"):
                 if dev.deviceTypeId in ('Daily', 'Hourly'):
@@ -4064,8 +3928,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"Error getting list of forecast devices: {sub_error}. See plugin log for more "
-                f"information."
+                f"Error getting list of forecast devices: {sub_error}. See plugin log for more information."
             )
 
         self.logger.threaddebug(
@@ -4080,9 +3943,8 @@ class Plugin(indigo.PluginBase):
         """
         Plugin API handler
 
-        A container for simple API calls to the matplotlib plugin. All payload elements are
-        required, although kwargs can be an empty dict if no kwargs desired. If caller is waiting
-        for a result (recommended), returns a dict.
+        A container for simple API calls to the matplotlib plugin. All payload elements are required, although kwargs
+        can be an empty dict if no kwargs desired. If caller is waiting for a result (recommended), returns a dict.
         Receives::
             payload = {
                 'x_values': [1, 2, 3],
@@ -4103,10 +3965,10 @@ class Plugin(indigo.PluginBase):
         """
         self.logger.info(f"Scripting payload: {dict(plugin_action.PROPS)}")
 
-        # TODO: take a look at broadcast messages and whether this is something else that can be
-        #       made to work in this neighborhood.
-        # TODO: this worked well up until where the "real" device would get its data.
-        #       Need to make the API shim device work with existing get data steps.
+        # TODO: take a look at broadcast messages and whether this is something else that can be made to work in this
+        #       neighborhood.
+        # TODO: this worked well up until where the "real" device would get its data. Need to make the API shim device
+        #       work with existing get data steps.
         # # Instantiate an instance of an ApiDevice for data from the API call.
         # my_device = ApiDevice()
         #
@@ -4171,9 +4033,8 @@ class Plugin(indigo.PluginBase):
                 return {'success': False, 'message': sub_error}
 
         if caller_waiting_for_result:
-            # Note! returns from actions that were called by calls to indigo.executeAction()
-            # can't be Bools, indigo.Dict -- and likely other types. Strings and the following
-            # dict will work.
+            # Note! returns from actions that were called by calls to indigo.executeAction() can't be Bools,
+            # indigo.Dict -- and likely other types. Strings and the following dict will work.
             return {'success': True, 'message': "Success"}
 
     # =============================================================================
@@ -4181,8 +4042,8 @@ class Plugin(indigo.PluginBase):
         """
         Log information about the plugin resource environment.
 
-        Write select information about the environment that the plugin is running in. This method
-        is only called once, when the plugin is first loaded (or reloaded).
+        Write select information about the environment that the plugin is running in. This method is only called once,
+        when the plugin is first loaded (or reloaded).
         """
         chart_devices = 0
         csv_engines = 0
@@ -4207,7 +4068,7 @@ class Plugin(indigo.PluginBase):
         matplotlib_environment += f"{spacer}{'Number of Chart Devices:':<31} {chart_devices}\n"
         matplotlib_environment += f"{spacer}{'Number of CSV Engine Devices:':<31} {csv_engines}\n"
         # rcParams is a dict containing all the initial _matplotlibrc settings
-        matplotlib_environment += spacer + "=" * 135
+        matplotlib_environment += f"{spacer}{'='*135}"
         self.logger.info(matplotlib_environment)
 
         self.logger.threaddebug(f"{'Matplotlib base rcParams:':<31} {dict(rcParams)}")
@@ -4218,9 +4079,9 @@ class Plugin(indigo.PluginBase):
         """
         Centralized handling of traceback messages
 
-        Centralized handling of traceback messages formatted for pretty display in the plugin log
-        file. If sent here, they will not be displayed in the Indigo Events log. Use the following
-        syntax to send exceptions here:  self.pluginErrorHandler(traceback.format_exc())
+        Centralized handling of traceback messages formatted for pretty display in the plugin log file. If sent here,
+        they will not be displayed in the Indigo Events log. Use the following syntax to send exceptions here:
+        self.pluginErrorHandler(traceback.format_exc())
 
         :param str sub_error:  String version of traceback message.
         """
@@ -4237,8 +4098,8 @@ class Plugin(indigo.PluginBase):
         """
         Process output of multiprocessing queue messages
 
-        The processLogQueue() method accepts a multiprocessing queue that contains log messages.
-        The method parses those messages across the various self.logger.* calls.
+        The processLogQueue() method accepts a multiprocessing queue that contains log messages. The method parses
+        those messages across the various self.logger.* calls.
 
         :param indigo.Device device:
         :param bytes replies:
@@ -4247,7 +4108,6 @@ class Plugin(indigo.PluginBase):
         # ======================= Process Output Queue ========================
         try:
             try:
-                # replies = json.loads(replies.decode("utf-8"))
                 replies = json.loads(replies)
             except json.decoder.JSONDecodeError:
                 return
@@ -4267,9 +4127,7 @@ class Plugin(indigo.PluginBase):
 
             if not success:
                 device.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
-                self.logger.critical(
-                    f"[{device.name}] error producing chart. See logs for more information."
-                )
+                self.logger.critical(f"[{device.name}] error producing chart. See logs for more information.")
             else:
                 device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
                 self.logger.info(f"[{device.name}] chart refreshed.")
@@ -4277,7 +4135,7 @@ class Plugin(indigo.PluginBase):
             return success
 
         except EOFError:
-            pass
+            ...
 
         # Process any special output.
         if len(errors) > 0:
@@ -4286,8 +4144,8 @@ class Plugin(indigo.PluginBase):
 
             elif "'numpy.float64' object cannot be interpreted as an index" in errors:
                 self.logger.critical(
-                    f"[{device.name}] Unfortunately, your version of Matplotlib doesn't support "
-                    f"Polar chart plotting. Disabling device."
+                    f"[{device.name}] Unfortunately, your version of Matplotlib doesn't support Polar chart plotting. "
+                    f"Disabling device."
                 )
                 indigo.device.enable(device, False)
 
@@ -4301,9 +4159,8 @@ class Plugin(indigo.PluginBase):
         """
         Update rcParams device with updated state values
 
-        Push the rcParams settings to the rcParams Device. The state names have already been created
-        by getDeviceStateList() which will ensure that future rcParams will be picked up if they're
-        ever added to the file.
+        Push the rcParams settings to the rcParams Device. The state names have already been created by
+        getDeviceStateList() which will ensure that future rcParams will be picked up if they're ever added to the file.
 
         :param indigo.Device dev: indigo device instance
         """
@@ -4322,9 +4179,8 @@ class Plugin(indigo.PluginBase):
         """
         Refreshes an individual plugin chart device.
 
-        Process Indigo Action item call for a chart refresh. Passes the id of the device called
-        from the action. This method is a handler to pass along the action call. The action will
-        refresh only the specified chart.
+        Process Indigo Action item call for a chart refresh. Passes the id of the device called from the action. This
+        method is a handler to pass along the action call. The action will refresh only the specified chart.
 
         :param indigo.PluginAction plugin_action:
         """
@@ -4418,10 +4274,8 @@ class Plugin(indigo.PluginBase):
         :param int type_id:
         :param int target_id:
         """
-        full_path = (
-                indigo.server.getInstallFolderPath() +
-                "/Preferences/Plugins/matplotlib plugin themes.json"
-        )
+        full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
+
         with open(full_path, 'r', encoding='utf-8') as f:
             infile = json.load(f)
 
@@ -4436,10 +4290,10 @@ class Plugin(indigo.PluginBase):
         :param indigo.Dict values_dict:
         :param int menu_item_id:
         """
-        # Don't need to trap user cancel since this callback won't be called if user cancels. There
-        # is no way to trap the cancel.
-        self.logger.warning(f"{values_dict}")
-        self.logger.warning(f"{menu_item_id}")
+        # Don't need to trap user cancel since this callback won't be called if user cancels. There is no way to trap
+        # the cancel.
+        self.logger.debug(f"{values_dict}")
+        self.logger.debug(f"{menu_item_id}")
 
         # ==========================  Apply Theme Settings  ===========================
         for key in [
@@ -4458,10 +4312,7 @@ class Plugin(indigo.PluginBase):
 
         :param indigo.PluginAction plugin_action:
         """
-        full_path = (
-                indigo.server.getInstallFolderPath() +
-                "/Preferences/Plugins/matplotlib plugin themes.json"
-        )
+        full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         selected_theme = plugin_action.PROPS['targetTheme']
 
         # ==============================  Get the Theme  ==============================
@@ -4488,10 +4339,7 @@ class Plugin(indigo.PluginBase):
         :param int menu_item_id:
         """
         error_msg_dict = indigo.Dict()
-        full_path = (
-                indigo.server.getInstallFolderPath() +
-                "/Preferences/Plugins/matplotlib plugin themes.json"
-        )
+        full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         selected_theme = values_dict['allThemes']
 
         # ===============================  Validation  ================================
@@ -4539,8 +4387,8 @@ class Plugin(indigo.PluginBase):
         elif values_dict['menu'] == 'rename':
             result = self.theme_rename(values_dict, menu_item_id)
         elif values_dict['menu'] == 'save':
-            values_dict['allThemes'] = "select"
             result = self.theme_save(values_dict, menu_item_id)
+            values_dict['allThemes'] = "select"
 
         return result
 
@@ -4553,10 +4401,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.Dict values_dict:
         :param int menu_item_id:
         """
-        full_path = (
-                indigo.server.getInstallFolderPath() +
-                "/Preferences/Plugins/matplotlib plugin themes.json"
-        )
+        full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         old_name = values_dict['allThemes']
         new_name = values_dict['newThemeName']
         error_msg_dict = indigo.Dict()
@@ -4568,10 +4413,10 @@ class Plugin(indigo.PluginBase):
         if len(old_name) == 1 and len(new_name) == 0:
             error_msg_dict['newThemeName'] = "You must enter a new theme name."
 
-        if len(values_dict) > 0:
+        if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = (
-                "Configuration Errors\n\nThere are one or more settings that need to be corrected. "
-                "Fields requiring attention will be highlighted."
+                "Configuration Errors\n\nThere are one or more settings that need to be corrected. Fields requiring "
+                "attention will be highlighted."
             )
             return values_dict, error_msg_dict
 
@@ -4587,6 +4432,7 @@ class Plugin(indigo.PluginBase):
             json.dump(infile, f, indent=4, sort_keys=True)
 
         values_dict['menu'] = 'select'
+        values_dict['newThemeName'] = ""
         return values_dict
 
     # =============================================================================
@@ -4597,10 +4443,8 @@ class Plugin(indigo.PluginBase):
         :param indigo.Dict values_dict:
         :param int menu_item_id:
         """
-        full_path = (
-                indigo.server.getInstallFolderPath() +
-                "/Preferences/Plugins/matplotlib plugin themes.json"
-        )
+        self.logger.debug("theme_save")
+        full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         new_theme_name = values_dict['newTheme']
         error_msg_dict = indigo.Dict()
 
@@ -4614,13 +4458,13 @@ class Plugin(indigo.PluginBase):
             error_msg_dict['newTheme'] = "You must specify a theme name."
 
         # Save name already used
-        if values_dict['newTheme'] in infile:
-            error_msg_dict['newTheme'] = "You must specify a unique name."
+        # if values_dict['newTheme'] in infile:
+        #     error_msg_dict['newTheme'] = "You must specify a unique name."
 
-        if len(values_dict) > 0:
+        if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = (
-                "Configuration Errors\n\nThere are one or more settings that need to be corrected. "
-                "Fields requiring attention will be highlighted."
+                "Configuration Errors\n\nThere are one or more settings that need to be corrected.  Fields requiring "
+                "attention will be highlighted."
             )
             return values_dict, error_msg_dict
 
@@ -4629,10 +4473,9 @@ class Plugin(indigo.PluginBase):
         # Populate the theme dict
         for key in self.pluginPrefs:
             if key in [
-                'backgroundColor', 'backgroundColorOther', 'faceColor', 'faceColorOther',
-                'fontColor', 'fontColorAnnotation', 'fontMain', 'gridColor', 'gridStyle',
-                'legendFontSize', 'lineWeight', 'mainFontSize', 'spineColor', 'tickColor',
-                'tickFontSize', 'tickSize'
+                'backgroundColor', 'backgroundColorOther', 'faceColor', 'faceColorOther', 'fontColor',
+                'fontColorAnnotation', 'fontMain', 'gridColor', 'gridStyle', 'legendFontSize', 'lineWeight',
+                'mainFontSize', 'spineColor', 'tickColor', 'tickFontSize', 'tickSize'
             ]:
                 # infile[new_theme_name][key] = self.pluginPrefs[key]
                 infile[new_theme_name][key] = values_dict[key]
@@ -4707,9 +4550,9 @@ class MakeChart:
         """
         Cleans long strings of whitespace and formats certain characters
 
-        The clean_string(self, val) method is used to scrub multiline text elements in order to try
-        to make them more presentable. The need is easily seen by looking at the rough text that is
-        provided by the U.S. National Weather Service, for example.
+        The clean_string(self, val) method is used to scrub multiline text elements in order to try to make them more
+        presentable. The need is easily seen by looking at the rough text that is provided by the U.S. National Weather
+        Service, for example.
 
         :param str val:
         :return str val:
@@ -4731,8 +4574,8 @@ class MakeChart:
         :return:
         """
         operators = {
-            ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow:
-            op.pow, ast.BitXor: op.xor, ast.USub: op.neg
+            ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
+            ast.BitXor: op.xor, ast.USub: op.neg
         }
 
         if isinstance(mode, ast.Num):  # <number>
@@ -4745,6 +4588,7 @@ class MakeChart:
             raise TypeError(mode)
 
         return result
+
 
 # =============================================================================
 class ApiDevice:
@@ -4784,8 +4628,8 @@ class ApiDevice:
         Title Placeholder
         """
         return (
-            "A Matplotlib Plugin API shim device. Used to pass scripting payload to the plugin by "
-            "simulating a built-in device type. See Plugin Wiki for more information."
+            "A Matplotlib Plugin API shim device. Used to pass scripting payload to the plugin by simulating a built-"
+            "in device type. See Plugin Wiki for more information."
         )
 
     # =============================================================================
@@ -4822,8 +4666,7 @@ class ApiDevice:
         :param item:
         :return:
         """
-        # Update object attributes based on item payload. Item is a list of dicts
-        # {'key': k, 'value': v, 'uiValue': uiv}
+        # Update object attributes based on item payload. Item is a list of dicts {'key': k, 'value': v, 'uiValue': uiv}
         for thing in item:
             self.states[thing['key']] = thing['value']
 

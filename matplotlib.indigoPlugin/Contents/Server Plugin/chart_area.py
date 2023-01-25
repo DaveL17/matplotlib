@@ -32,11 +32,11 @@ LOG['Threaddebug'].append("chart_area.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 
 def __init__():
-    pass
+    ...
 
 
 try:
@@ -147,10 +147,12 @@ try:
                 # it (i.e., tup[n][0] + tup[n-1][0] + tup[n-2][0]
                 Y_OBS_TUPLE_REL[f'y_obs{area}'] = [sum(t) for t in zip(*tup)]
 
-            if P_DICT[f'area{area}Annotate']:
+            annotate = P_DICT[f'area{area}Annotate']
+            precision = int(PROPS.get(f'area{area}AnnotationPrecision', "0"))
+            if annotate:
                 for xy in zip(P_DICT[f'x_obs{area}'], Y_OBS_TUPLE_REL[f'y_obs{area}']):
                     ax.annotate(
-                        f"{xy[1]}",
+                        f"{float(xy[1]):.{precision}f}",
                         xy=xy,
                         xytext=(0, 0),
                         zorder=10,
@@ -194,7 +196,8 @@ try:
         counter = 1
         final_headers = []
 
-        headers = [_ for _ in P_DICT['headers']]
+        headers = P_DICT['headers']
+        # headers = [_ for _ in P_DICT['headers']]
         # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
 
         for header in headers:

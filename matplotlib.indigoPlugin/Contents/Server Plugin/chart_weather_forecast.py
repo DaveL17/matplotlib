@@ -37,7 +37,7 @@ LOG['Threaddebug'].append("chart_weather_forecast.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
@@ -199,10 +199,12 @@ try:
             )
 
         # Precipitation bar annotations
-        if P_DICT['line3Annotate']:
+        annotate = P_DICT['line3Annotate']
+        precision = int(PROPS.get(f'line{line}AnnotationPrecision', "0"))
+        if annotate:
             for xy in zip(dates_to_plot, P_DICT['y_obs3']):
                 ax1.annotate(
-                    f'{xy[1]}.0f',
+                    f'{xy[1]:.{precision}f}',
                     xy=(xy[0], 5),
                     xytext=(0, 0),
                     zorder=10,
@@ -350,10 +352,12 @@ try:
 
             _ = [P_DICT['data_array'].append(node) for node in P_DICT[f'y_obs{line}']]
 
-            if P_DICT[f'line{line}Annotate']:
+            annotate = P_DICT[f'line{line}Annotate']
+            precision = int(PROPS.get(f'line{line}AnnotationPrecision', "0"))
+            if annotate:
                 for xy in zip(dates_to_plot, P_DICT[f'y_obs{line}']):
                     ax2.annotate(
-                        f'{xy[1]}.0f',
+                        f'{xy[1]:.{precision}f}',
                         xy=xy,
                         xytext=(0, 0),
                         zorder=(11 - line),

@@ -1,9 +1,8 @@
 # noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
-maintenance is a container for code that makes specific to consolidate methods used throughout all
-Indigo plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for
-each plugin.
+maintenance is a container for code that makes specific to consolidate methods used throughout all Indigo plugins with
+the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for each plugin.
 """
 
 # Built-in Modules
@@ -14,7 +13,7 @@ import re
 try:
     import indigo
 except ImportError:
-    pass
+    ...
 
 # My modules
 
@@ -55,8 +54,8 @@ class Maintain:
         """
         Remove legacy keys from non-chart device prefs
 
-        None of the keys listed here should be present in device types using this method to clean
-        their prefs. If they exist, delete them.
+        None of the keys listed here should be present in device types using this method to clean their prefs. If they
+        exist, delete them.
         -----
         :param unicode dev_name:
         :param dict prefs:
@@ -409,11 +408,11 @@ class Maintain:
                         elif props[item] in ('True', 'true'):
                             props[item] = True
                 except AttributeError:
-                    pass
+                    ...
 
-            # Note that we check for the existence of the device state before trying to update it
-            # due to how Indigo processes devices when their source plugin has been changed (i.e.,
-            # assigning an existing device to a new plugin instance.)
+            # Note that we check for the existence of the device state before trying to update it due to how Indigo
+            # processes devices when their source plugin has been changed (i.e., assigning an existing device to a new
+            # plugin instance.)
             if 'onOffState' in dev.states:
 
                 refresh_interval = dev.pluginProps.get('refreshInterval', 900)
@@ -450,7 +449,7 @@ class Maintain:
                     if props['customTickFontSize'] == "":
                         props['customTickFontSize'] = '8'
                 except KeyError:
-                    pass
+                    ...
 
                 # ================================ Fix Device Props ===============================
                 for prop in props:
@@ -464,9 +463,9 @@ class Maintain:
                         props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
 
                     # ============================== Fix Line Styles ==============================
-                    # In upgrading matplotlib from 1.3.1 (Apple's python 2.7 version) to v3.5.1,
-                    # changes were made to the allowable options for line styles. The following code
-                    # resets any unsupported styles to `solid` to avoid fatal charting errors.
+                    # In upgrading matplotlib from 1.3.1 (Apple's python 2.7 version) to v3.5.1, changes were made to
+                    # the allowable options for line styles. The following code resets any unsupported styles to
+                    # `solid` to avoid fatal charting errors.
 
                     # If unsupported style in dev props
                     if props[prop] in ('steps', 'steps-mid', 'steps-post'):
@@ -478,11 +477,10 @@ class Maintain:
                         props[prop] = '-'
 
                 # ======================== Reset Legacy Color Settings ========================
-                # Initially, the plugin was constructed with a standard set of colors that could be
-                # overwritten by electing to set a custom color value. With the inclusion of the
-                # color picker control, this was no longer needed. So we try to set the color field
-                # to the custom value. This block is for device color preferences. They should be
-                # updated whether the device is enabled in the Indigo UI or not.
+                # Initially, the plugin was constructed with a standard set of colors that could be overwritten by
+                # electing to set a custom color value. With the inclusion of the color picker control, this was no
+                # longer needed. So we try to set the color field to the custom value. This block is for device color
+                # preferences. They should be updated whether the device is enabled in the Indigo UI or not.
                 if '#custom' in props.values() or 'custom' in props.values():
                     for prop in props:
                         if 'color' in prop.lower():
@@ -500,31 +498,31 @@ class Maintain:
 
                 # ============================== Fix Area Props ===============================
                 if dev.deviceTypeId == 'areaChartingDevice':
-                    pass
+                    ...
 
                 # ===========================  Fix Flow Bar Props  ============================
                 if dev.deviceTypeId == 'barChartingDevice':
-                    pass
+                    ...
 
                 # ===========================  Fix Stock Bar Props  ===========================
                 if dev.deviceTypeId == 'barStockChartingDevice':
-                    pass
+                    ...
 
                 # ===========================  Fix Stock Bar Props  ===========================
                 if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
-                    pass
+                    ...
 
                 # ==========================  Fix Radial Bar Props  ===========================
                 if dev.deviceTypeId == 'radialBarChartingDevice':
-                    pass
+                    ...
 
                 # ========================= Fix Battery Health Props ==========================
                 if dev.deviceTypeId == 'batteryHealthDevice':
-                    pass
+                    ...
 
                 # ============================ Fix Calendar Props =============================
                 if dev.deviceTypeId == 'calendarChartingDevice':
-                    pass
+                    ...
 
                 # ============================== Fix Line Props ===============================
                 if dev.deviceTypeId == 'lineChartingDevice':
@@ -538,11 +536,11 @@ class Maintain:
 
                 # ========================= Fix Multiline Text Props ==========================
                 if dev.deviceTypeId == 'multiLineText':
-                    pass
+                    ...
 
                 # ============================== Fix Polar Props ==============================
                 if dev.deviceTypeId == 'polarChartingDevice':
-                    pass
+                    ...
 
                 # ============================= Fix Scatter Props =============================
                 if dev.deviceTypeId == 'scatterChartingDevice':
@@ -556,11 +554,11 @@ class Maintain:
 
                 # ============================ Fix Forecast Props =============================
                 if dev.deviceTypeId == 'forecastChartingDevice':
-                    pass
+                    ...
 
                 # =============== Establish Refresh Interval for Legacy Devices ===============
-                # Establish refresh interval for legacy devices. If the prop isn't present, we set
-                # it equal to the user's current global refresh rate.
+                # Establish refresh interval for legacy devices. If the prop isn't present, we set it equal to the
+                # user's current global refresh rate.
                 # if 'refreshInterval' not in props.keys():
                 if 'refreshInterval' not in props:
                     self.plugin.logger.debug(

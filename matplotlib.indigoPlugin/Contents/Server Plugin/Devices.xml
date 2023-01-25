@@ -219,6 +219,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="area1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="area1Legend" type="textfield" defaultValue="Area 1"
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -297,6 +308,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="area2Legend" type="textfield" defaultValue="Area 2"
@@ -379,6 +401,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="area3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="area3Legend" type="textfield" defaultValue="Area 3"
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -457,6 +490,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area4AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area4Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="area4Legend" type="textfield" defaultValue="Area 4"
@@ -539,6 +583,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="area5AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area5Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="area5Legend" type="textfield" defaultValue="Area 5"
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -617,6 +672,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area6AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area6Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="area6Legend" type="textfield" defaultValue="Area 6"
@@ -699,6 +765,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="area7AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area7Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="area7Legend" type="textfield" defaultValue="Area 7"
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Enter text for legend entry. If blank, the data column header will be used.">
@@ -777,6 +854,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="area8AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="area8Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="area8Legend" type="textfield" defaultValue="Area 8"
@@ -1089,6 +1177,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar1Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the color of your chart's first bar.">
@@ -1135,6 +1234,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar2Color" type="colorpicker" defaultValue="FF FF FF"
@@ -1185,6 +1295,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar3Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the color of your chart's third bar.">
@@ -1231,6 +1352,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar4AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar4Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar4Color" type="colorpicker" defaultValue="FF FF FF"
@@ -1494,6 +1626,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar1Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the color of your chart's first bar.">
@@ -1534,6 +1677,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar2Color" type="colorpicker" defaultValue="FF FF FF"
@@ -1578,6 +1732,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar3Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the color of your chart's third bar.">
@@ -1618,6 +1783,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar4AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar4Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar4Color" type="colorpicker" defaultValue="FF FF FF"
@@ -1937,6 +2113,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar1Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Select preference for the color of your chart's first bar.">
@@ -1977,6 +2164,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar2Color" type="colorpicker" defaultValue="FF FF FF"
@@ -2021,6 +2219,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="bar3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="bar3Color" type="colorpicker" defaultValue="FF FF FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Select preference for the color of your chart's third bar.">
@@ -2061,6 +2270,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="bar4AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="bar4Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="bar4Color" type="colorpicker" defaultValue="FF FF FF"
@@ -2584,8 +2804,8 @@
     <!-- =====================  Line Charting Device  ===================== -->
     <Device id="lineChartingDevice" type="custom">
         <Name>Line Chart</Name>
-
         <ConfigUI>
+
             <SupportURL>https://github.com/DaveL17/matplotlib/wiki/devices</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="true" hidden="true"/>
@@ -2820,6 +3040,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line1Fill" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="1"
                    tooltip="Check to fill below this line.">
@@ -2915,6 +3146,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="line2Fill" type="checkbox" defaultValue="false"
@@ -3014,6 +3256,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line3Fill" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="3"
                    tooltip="Check to fill below this line.">
@@ -3109,6 +3362,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line4AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line4Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="line4Fill" type="checkbox" defaultValue="false"
@@ -3208,6 +3472,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line5AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line5Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line5Fill" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="5"
                    tooltip="Check to fill below this line.">
@@ -3305,6 +3580,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line6AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line6Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line6Fill" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="6"
                    tooltip="Check to fill below this line.">
@@ -3399,6 +3685,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line7AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line7Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line7Fill" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="7"
                    tooltip="Check to fill below this line.">
@@ -3491,6 +3788,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line8AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line8Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="line8Fill" type="checkbox" defaultValue="false"
@@ -4616,6 +4924,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line1AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line1Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line1Color" type="colorpicker" defaultValue="FF 33 33"
                    visibleBindingId="settingsGroup" visibleBindingValue="ht"
                    tooltip="Select preference for the color of your chart's first line.">
@@ -4656,6 +4975,17 @@
                 <Description>Yes/No</Description>
             </Field>
 
+            <Field id="line2AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line2Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
+            </Field>
+
             <Field id="line2Color" type="colorpicker" defaultValue="00 00 FF"
                    visibleBindingId="settingsGroup" visibleBindingValue="lt"
                    tooltip="Select preference for the color of your chart's second line.">
@@ -4688,6 +5018,17 @@
                    tooltip="Check to plot the data value on the chart.">
                 <Label>Annotate?</Label>
                 <Description>Yes/No</Description>
+            </Field>
+
+            <Field id="line3AnnotationPrecision" type="menu" defaultValue="0" visibleBindingId="line3Annotate"
+                   visibleBindingValue="true" tooltip="Controls the precision of the annotation value.">
+                <Label>Annotation Precision:</Label>
+                <List>
+                    <Option value="0">0 (#)*</Option>
+                    <Option value="1">1 (#.#)</Option>
+                    <Option value="2">2 (#.##)</Option>
+                    <Option value="3">3 (#.###)</Option>
+                </List>
             </Field>
 
             <Field id="line3Color" type="colorpicker" defaultValue="99 CC FF"
@@ -4988,7 +5329,7 @@
             </Field>
 
             <Field id="refreshIntervalLabel" type="label" hidden="false" fontSize="small" alignWithControl="true">
-                <Label>Enter the desired frequency of CSV updates (in seconds). Leave empty or enter a value of zero to elect manual refresh only.</Label>
+                <Label>Enter the desired frequency of CSV updates (in seconds). Enter zero or Leave empty to elect manual refresh only.</Label>
             </Field>
 
             <Field id="addItemLabel" type="label" alignText="right">

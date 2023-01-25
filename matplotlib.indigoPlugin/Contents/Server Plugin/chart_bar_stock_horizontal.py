@@ -34,7 +34,7 @@ LOG['Threaddebug'].append("chart_bar_stock.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
@@ -119,9 +119,12 @@ try:
 
         # ===============================  Annotations  ===============================
         # If annotations desired, plot those too.
-        if bar[f'annotate_{b_num}'] and not suppress_bar:
+        annotate = P_DICT[f'bar{b_num}Annotate']
+        precision = int(PROPS.get(f'bar{b_num}AnnotationPrecision', "0"))
+        if annotate and bar[f'annotate_{b_num}'] and not suppress_bar:
             ax.annotate(
-                ANNOTATION_VALUES[b_num - 1],
+                # ANNOTATION_VALUES[b_num - 1],
+                f"{float(ANNOTATION_VALUES[b_num - 1]):.{precision}f}",
                 xy=(x_val, b_num),
                 xytext=(0, 0),
                 zorder=10,
@@ -154,7 +157,8 @@ try:
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-        headers = [_ for _ in Y_LABELS]
+        headers = Y_LABELS
+        # headers = [_ for _ in Y_LABELS]
         # headers = [_.decode('utf-8') for _ in Y_LABELS]
         for header in headers:
             if P_DICT[f'bar{counter}Legend'] == "":

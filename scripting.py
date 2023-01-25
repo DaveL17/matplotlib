@@ -7,7 +7,7 @@ The scripting module is used as a plugin API for creating simple charts on deman
 try:
     import indigo
 except ImportError:
-    pass
+    ...
 
 
 matplotlibPlugin = indigo.server.getPlugin("com.fogbert.indigoplugin.matplotlib")

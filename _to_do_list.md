@@ -1,6 +1,8 @@
 ### TODO 
+- x
 
 #### NEW
+- Combination device (line/bar to replicate weather devices).
 - "Error" chart with min/max/avg
 - Floating bar chart
 - Generic weather forecast charts to support any weather services and drop support for WU and FW.

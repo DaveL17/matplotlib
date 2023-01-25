@@ -30,13 +30,12 @@ LOG['Threaddebug'].append("chart_line.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
 
 if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(PAYLOAD)
-
+    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 
     def __init__():
-        pass
+        ...
 
     ax = chart_tools.make_chart_figure(
         width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
@@ -164,10 +163,12 @@ try:
                 )
 
             # ================================ Annotations ================================
-            if P_DICT[f'line{line}Annotate']:
+            annotate = P_DICT[f'line{line}Annotate']
+            precision = int(PROPS.get(f'line{line}AnnotationPrecision', "0"))
+            if annotate:
                 for xy in zip(P_DICT[f'x_obs{line}'], P_DICT[f'y_obs{line}']):
                     ax.annotate(
-                        xy[1],
+                        f"{float(xy[1]):.{precision}f}",
                         xy=xy,
                         xytext=(0, 0),
                         zorder=10,
@@ -196,8 +197,9 @@ try:
         counter = 1
         final_headers = []
 
+        headers = P_DICT['headers']
+        # headers = [_ for _ in P_DICT['headers']]
         # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
-        headers = [_ for _ in P_DICT['headers']]
 
         for header in headers:
             if P_DICT[f'line{counter}Legend'] == "":

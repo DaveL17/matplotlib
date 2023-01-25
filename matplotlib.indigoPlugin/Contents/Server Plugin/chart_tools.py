@@ -31,14 +31,13 @@ from matplotlib import ticker as mtick
 # Collection of logging messages.
 LOG = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
-# Unpack the payload data. The first element of the payload is the name of this script (we don't
-# need that). As long as size isn't a limitation we will always send the entire payload as element
-# 1.
+# Unpack the payload data. The first element of the payload is the name of this script (we don't need that). As long
+# as size isn't a limitation we will always send the entire payload as element 1.
 try:
     payload = json.loads(sys.argv[1].encode("utf-8"))
     LOG['Debug'].append(f"[{payload['props']['name']}] payload unpacked successfully.")
 except IndexError:
-    pass
+    ...
 
 
 def __init__():
@@ -55,11 +54,10 @@ def convert_the_data(final_data, data_source, logger):
     """
     Convert data into form that matplotlib can understand
 
-    Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for plotting. We do
-    this on the fly, and we don't change the underlying data in any way. Further, some data can be
-    presented that should not be charted. For example, the WUnderground plugin will present '-99.0'
-    when WUnderground is not able to deliver a rational value. Therefore, we convert '-99.0' to NaN
-    values.
+    Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for plotting. We do this on the fly, and
+    we don't change the underlying data in any way. Further, some data can be presented that should not be charted. For
+    example, the WUnderground plugin will present '-99.0' when WUnderground is not able to deliver a rational value.
+    Therefore, we convert '-99.0' to NaN values.
     -----
     :param logger:
     :param list final_data: the data to be charted
@@ -90,14 +88,14 @@ def convert_the_data(final_data, data_source, logger):
             return True
 
         except ValueError:
-            pass
+            ...
 
         try:
             unicodedata.numeric(s)
             return True
 
         except (TypeError, ValueError):
-            pass
+            ...
 
         return False
 
@@ -105,13 +103,12 @@ def convert_the_data(final_data, data_source, logger):
         if value[1].lower() in converter:
             value[1] = converter[value[1].lower()]
 
-    # We have converted all nonsense numbers to '-99.0'. Let's replace those with
-    # 'NaN' for charting.
+    # We have converted all nonsense numbers to '-99.0'. Let's replace those with 'NaN' for charting.
     final_data = [[n[0], 'NaN'] if n[1] == '-99.0' else n for n in final_data]
 
     # ================================ Process CSV ================================
-    # If the CSV file is missing data or is completely empty, we generate a phony one and alert the
-    # user. This helps avoid nasty surprises down the line.
+    # If the CSV file is missing data or is completely empty, we generate a phony one and alert the user. This helps
+    # avoid nasty surprises down the line.
 
     # ============================= CSV File is Empty =============================
     # Adds header and one observation. Length of CSV file goes from zero to two.
@@ -137,8 +134,8 @@ def convert_the_data(final_data, data_source, logger):
     headers = final_data[0]
     del final_data[0]
 
-    # Data element contains an invalid string element. All proper strings like 'off' and 'true'
-    # should already have been converted with self.convert_the_data() above.
+    # Data element contains an invalid string element. All proper strings like 'off' and 'true' should already have
+    # been converted with self.convert_the_data() above.
     final_data = [(item[0], 'NaN') if not is_number(item[1]) else item for item in final_data]
 
     # Put the header row back in.
@@ -184,6 +181,7 @@ def eval_(mode):
         raise TypeError(mode)
 
     return value
+
 
 # =============================================================================
 def fix_rgb(color):
@@ -234,8 +232,8 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
     """
     Format X axis label visibility and properties
 
-    If the user chooses to display a legend, we don't want an axis label because they will fight
-    with each other for space.
+    If the user chooses to display a legend, we don't want an axis label because they will fight with each other for
+    space.
     -----
     :param dict logger:
     :param dict dev: device props
@@ -298,9 +296,8 @@ def format_axis_x_min_max(p_dict, logger):
     """
     Format x-axis range limits
 
-    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set
-    to behave weirdly at times. This block is meant to overcome that weirdness for something more
-    desirable.
+    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly
+    at times. This block is meant to overcome that weirdness for something more desirable.
     -----
     :param dict p_dict: plotting parameters
     :param dict logger:
@@ -313,8 +310,8 @@ def format_axis_x_min_max(p_dict, logger):
         x_min_wanted = p_dict['xAxisMin']
         x_max_wanted = p_dict['xAxisMax']
 
-        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by
-        # using a number that's very nearly zero.
+        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
+        # very nearly zero.
         if x_min == 0:
             x_min = 0.000001
 
@@ -354,8 +351,7 @@ def format_axis_x_scale(x_axis_bins, logger):
     """
     Format X axis scale based on user setting
 
-    The format_axis_x_scale() method sets the bins for the X axis. Presently, we assume a date-based
-    X axis.
+    The format_axis_x_scale() method sets the bins for the X axis. Presently, we assume a date-based X axis.
     -----
     :param dict logger:
     :param list x_axis_bins:
@@ -463,8 +459,7 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
         if len(custom_ticks_marks) == 0 and len(custom_ticks_labels)  == 0:
             return
 
-        # If tick locations defined but tick labels are empty, let's use the tick
-        # locations as the tick labels
+        # If tick locations defined but tick labels are empty, let's use the tick locations as the tick labels
         if len(custom_ticks_marks) > 0 and len(custom_ticks_labels)  == 0:
             custom_ticks_labels = custom_ticks_marks
 
@@ -537,7 +532,7 @@ def format_axis_y(ax, p_dict, k_dict, logger):
                     ax.tick_params(labelleft=False)
 
         except KeyError:
-            pass
+            ...
 
         return ax
 
@@ -610,9 +605,8 @@ def format_axis_y1_min_max(p_dict, logger):
     """
     Format Y1 axis range limits
 
-    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set
-    to behave weirdly at times. This block is meant to overcome that weirdness for something more
-    desirable.
+    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly
+    at times. This block is meant to overcome that weirdness for something more desirable.
     -----
     :param dict p_dict: plotting parameters
     :param dict logger:
@@ -625,8 +619,8 @@ def format_axis_y1_min_max(p_dict, logger):
         y_min_wanted = p_dict['yAxisMin']
         y_max_wanted = p_dict['yAxisMax']
 
-        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by
-        # using a number that's very nearly zero.
+        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
+        # very nearly zero.
         if y_min == 0:
             y_min = 0.000001
 
@@ -695,8 +689,8 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
     """
     Adds best fit line segments to plots
 
-    The format_best_fit_line_segments method provides a utility to add "best fit lines" to select
-    types of charts (best fit lines are not appropriate for all chart types).
+    The format_best_fit_line_segments method provides a utility to add "best fit lines" to select types of charts (best
+    fit lines are not appropriate for all chart types).
     -----
     :param class 'matplotlib.axes.AxesSubplot' ax:
     :return numpy.ndarray dates_to_plot:
@@ -744,10 +738,8 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
     :param dict logger:
     :param str orient: orientation of custom line segments
     """
-
-    # Plot the custom lines if needed.  Note that these need to be plotted after the legend is
-    # established, otherwise some characteristics of the min/max lines will take over the legend
-    # props.
+    # Note that these need to be plotted after the legend is established, otherwise some characteristics of the min/max
+    # lines will take over the legend props.
 
     if p_dict['verboseLogging']:
         logger['Debug'].append(f"[{payload['props']['name']}] Formatting custom line segments.")
@@ -759,38 +751,37 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
             constants_to_plot = p_dict['customLineSegments']
             cls = ax
 
-            # If a single tuple comes in, we need to tuple the tuple.  (a, b) --> ((a, b),)
-            if not isinstance(constants_to_plot[0], tuple):
-                constants_to_plot = (constants_to_plot,)
+            # If a single list comes in, we need to list the list.  (a, b) --> ((a, b),)
+            if not any(isinstance(el, list) for el in constants_to_plot):
+                constants_to_plot = [constants_to_plot, ]
 
             for element in constants_to_plot:
-
                 # ===============================  Horizontal  ================================
                 if orient == 'horiz':
-                    if isinstance(element, tuple):
-                        cls = ax.axhline(
-                            element[0],
-                            color=element[1],
-                            linestyle=p_dict['customLineStyle'],
-                            marker='',
-                            **k_dict['k_custom']
-                        )
+                    # if isinstance(element, tuple):
+                    cls = ax.axhline(
+                        element[0],
+                        color=element[1],
+                        linestyle=p_dict['customLineStyle'],
+                        marker='',
+                        **k_dict['k_custom']
+                    )
 
-                    # If we want to promote custom line segments, we need to add them to the list
-                    # that's used to calculate the Y axis limits.
+                    # If we want to promote custom line segments, we need to add them to the list that's used to
+                    # calculate the Y axis limits.
                     if plug_dict.get('promoteCustomLineSegments', False):
                         p_dict['data_array'].append(element[0])
 
                 # ================================  Vertical  =================================
                 elif orient == 'vert':
-                    if isinstance(element, tuple):
-                        cls = ax.axvline(
-                            element[0],
-                            color=element[1],
-                            linestyle=p_dict['customLineStyle'],
-                            marker='',
-                            **k_dict['k_custom']
-                        )
+                    # if isinstance(element, tuple):
+                    cls = ax.axvline(
+                        element[0],
+                        color=element[1],
+                        linestyle=p_dict['customLineStyle'],
+                        marker='',
+                        **k_dict['k_custom']
+                    )
 
                     if plug_dict.get('promoteCustomLineSegments', False):
                         p_dict['data_array'].append(element[0])
@@ -906,8 +897,8 @@ def get_data(data_source, logger):
     """
     Retrieve data from CSV file.
 
-    Reads data from source CSV file and returns a list of tuples for charting. The data are
-    provided as unicode strings [('formatted date', 'observation'), ...]
+    Reads data from source CSV file and returns a list of tuples for charting. The data are provided as unicode strings
+    [('formatted date', 'observation'), ...]
     -----
     :param unicode data_source:
     :param dict logger:
@@ -932,8 +923,7 @@ def get_data(data_source, logger):
 
         return final_data
 
-    # If we can't find the target CSV file, we create a phony proxy which the plugin can process
-    # without dying.
+    # If we can't find the target CSV file, we create a phony proxy which the plugin can process without dying.
     except Exception as sub_error:
         final_data.extend([('timestamp', 'placeholder'), (now_text, 0)])
         logger['Warning'].append(
@@ -993,8 +983,8 @@ def make_chart_figure(width, height, p_dict):
     """
     Create the matplotlib figure object and create the main axes element.
 
-    Create the figure object for charting and include one axes object. The method also add a few
-    customizations when defining the objects.
+    Create the figure object for charting and include one axes object. The method also add a few customizations when
+    defining the objects.
     -----
     :param float width:
     :param float height:
@@ -1020,9 +1010,8 @@ def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
     """
     Prune data to display subset of available data
 
-    The prune_data() method is used to show a subset of available data. Users enter a number of
-    days into a device config dialog, the method then drops any observations that are outside that
-    window.
+    The prune_data() method is used to show a subset of available data. Users enter a number of days into a device
+    config dialog, the method then drops any observations that are outside that window.
     -----
     :rtype: object
     :param list x_data:
@@ -1056,8 +1045,8 @@ def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
     final_x = x_obs_d[idx].tolist()
     final_y = y_obs_d[idx].tolist()
 
-    # If final_x is of length zero, no observations fit the requested time
-    # mask. We return empty lists so that there's something to chart.
+    # If final_x is of length zero, no observations fit the requested time mask. We return empty lists so that there's
+    # something to chart.
     if len(final_x) == 0:
         logger['Warning'].append(
             f"[{payload['props']['name']}] All data outside time series limits. No observations "
@@ -1112,4 +1101,4 @@ def save(logger):
     except RuntimeError as err:
         # There are too many observations in the CSV data.
         if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
-            logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved. [Too many observeations.]")
+            logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved. [Too many observations.]")
