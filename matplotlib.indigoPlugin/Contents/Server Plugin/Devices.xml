@@ -2896,7 +2896,7 @@
 
             <Field id="filterAnomalies" type="textfield" defaultValue="0"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+                   tooltip="The number of standard deviations to contain anomalous data. Set to zero (the default) to display all data.">
                 <Label>Hide Anomalies:</Label>
             </Field>
 
@@ -4279,7 +4279,7 @@
             <!-- Filter Anomalies -->
             <Field id="filterAnomalies" type="textfield" defaultValue="0"
                    visibleBindingId="settingsGroup" visibleBindingValue="ch"
-                   tooltip="If checked, the plugin will hide anomalous data when plotting charts.">
+                   tooltip="The number of standard deviations to contain anomalous data. Set to zero (the default) to display all data.">
                 <Label>Hide Anomalies:</Label>
                 <CallbackMethod>dummyCallback</CallbackMethod>
                 <Description/>

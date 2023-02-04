@@ -1,5 +1,5 @@
 ### TODO 
-- x
+- 
 
 #### NEW
 - Combination device (line/bar to replicate weather devices).
@@ -11,6 +11,7 @@
   [See example](https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 - Create new STEP chart type as step is no longer a supported line style. 
   [See example](https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post)
+
 #### Refinements
 - Try to address annotation collisions.
 - Allow scripting control or a tool to repopulate color controls so that you can change all bars/lines/scatter etc. in 

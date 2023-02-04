@@ -55,6 +55,7 @@ except ImportError:
 # My modules
 import DLFramework.DLFramework as Dave           # noqa
 import maintenance                               # noqa
+import validate                                  # noqa
 from constants import *                          # noqa
 from plugin_defaults import kDefaultPluginPrefs  # noqa
 
@@ -64,7 +65,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.5"
+__version__   = "2022.1.6"
 
 
 # =============================================================================
@@ -108,22 +109,21 @@ class Plugin(indigo.PluginBase):
         # Set private log handler based on plugin preference
         if self.pluginPrefs.get('verboseLogging', False):
             self.plugin_file_handler.setLevel(5)
-            self.logger.warning(
-                "Verbose logging is on. It is best to leave this turned off unless directed.")
+            self.logger.warning("Verbose logging is on. It is best to leave this turned off unless directed.")
         else:
             self.plugin_file_handler.setLevel(10)
 
         # ============================= Remote Debug Hook =============================
-        try:
-            pydevd.settrace(
-                'localhost',
-                port=5678,
-                stdoutToServer=True,
-                stderrToServer=True,
-                suspend=False
-            )
-        except Exception:
-            ...
+        # try:
+        #     pydevd.settrace(
+        #         'localhost',
+        #         port=5678,
+        #         stdoutToServer=True,
+        #         stderrToServer=True,
+        #         suspend=False
+        #     )
+        # except Exception:
+        #     ...
 
         self.pluginIsInitializing = False
 
@@ -685,84 +685,24 @@ class Plugin(indigo.PluginBase):
 
         self.debug_level = int(values_dict.get('showDebugLevel', 30))
         self.indigo_log_handler.setLevel(self.debug_level)
-
         self.logger.threaddebug("Validating plugin configuration parameters.")
 
         # ================================ Data Paths =================================
-        for path_prop in ('chartPath', 'dataPath'):
-            try:
-                if not values_dict[path_prop].endswith('/'):
-                    error_msg_dict[path_prop] = "The path must end with a forward slash '/'."
-
-            except AttributeError:
-                error_msg_dict[path_prop] = "The path must end with a forward slash '/'."
+        error_msg_dict = validate.data_paths(values_dict, error_msg_dict)
 
         # =============================== Chart Colors ================================
-        # Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9).
-        color_dict = {
-            'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF",
-            'backgroundColor': "00 00 00", 'faceColor': "00 00 00",
-            'gridColor': "88 88 88", 'spineColor': "88 88 88", 'tickColor': "88 88 88",
-        }
-
-        for item in color_dict:
-            if re.search(r"^[0-9A-Fa-f]+$", values_dict[item].replace(" ", "")) is None:
-                values_dict[item] = color_dict[item]
-                self.logger.warning(
-                    f"Invalid color code found in plugin preferences [{item}], resetting to "
-                    f"default."
-                )
+        validate.chart_colors(values_dict)
 
         # ============================= Chart Dimensions ==============================
-        for dimension_prop in (
-                'rectChartHeight',
-                'rectChartWidth',
-                'rectChartWideHeight',
-                'rectChartWideWidth',
-                'sqChartSize'
-        ):
-
-            # Remove any spaces
-            try:
-                values_dict[dimension_prop] = values_dict[dimension_prop].replace(" ", "")
-            except AttributeError:
-                ...
-
-            try:
-                if float(values_dict[dimension_prop]) < 75:
-                    error_msg_dict[dimension_prop] = (
-                        "The dimension value must be greater than 75 pixels."
-                    )
-            except ValueError:
-                error_msg_dict[dimension_prop] = "The dimension value must be a real number."
+        values_dict, error_msg_dict = validate.chart_dimensions(values_dict, error_msg_dict)
 
         # ============================= Chart Resolution ==============================
-        # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
-        try:
-            # If value is null, a null string, or all whitespace.
-            if not values_dict['chartResolution'] or \
-                    values_dict['chartResolution'] == "" or \
-                    str(values_dict['chartResolution']).isspace():
-                values_dict['chartResolution'] = "100"
-                self.logger.warning("No resolution value entered. Resetting resolution to 100 DPI.")
-
-            # If warning flag and the value is potentially too small.
-            elif values_dict['dpiWarningFlag'] and 0 < int(values_dict['chartResolution']) < 80:
-                values_dict['dpiWarningFlag'] = False
-                error_msg_dict['dpiWarningFlag'] = (
-                    "It is recommended that you enter a value of 80 or more for best results."
-                )
-
-        except ValueError:
-            error_msg_dict['chartResolution'] = "The chart resolution value must be greater than 0."
+        values_dict, error_msg_dict = validate.chart_resolution(values_dict, error_msg_dict)
 
         # ================================ Line Weight ================================
-        try:
-            if float(values_dict['lineWeight']) <= 0:
-                error_msg_dict['lineWeight'] = "The line weight value must be greater than zero."
-        except ValueError:
-            error_msg_dict['lineWeight'] = "The line weight value must be a real number."
+        values_dict, error_msg_dict = validate.line_weight(values_dict, error_msg_dict)
 
+        # ============================== There are errors ==============================
         if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = (
                 "Configuration Errors\n\nThere are one or more settings that need to be corrected. Fields requiring "
@@ -770,6 +710,7 @@ class Plugin(indigo.PluginBase):
             )
             return False, values_dict, error_msg_dict
 
+        # ============================ There are no errors =============================
         else:
             # TODO: consider adding this feature to DLFramework and including in all plugins.
             # ============================== Log All Changes ==============================
@@ -781,9 +722,8 @@ class Plugin(indigo.PluginBase):
                 try:
                     if values_dict[key] != self.pluginPrefs[key]:
                         config_changed = True
-                        changed_keys += (
-                            f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}",
-                        )
+                        changed_keys += f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}",
+
                 # Missing keys will be config dialog format props like labels and separators
                 except KeyError:
                     ...
@@ -827,50 +767,7 @@ class Plugin(indigo.PluginBase):
                         values_dict['settingsGroup'] = str(area)
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-
-                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = (
-                        "All custom tick locations must be numeric values."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-                    for tick in custom_ticks:
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
         # ================================  Flow Bar  =================================
         if type_id == 'barChartingDevice':
@@ -890,52 +787,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-
-                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = (
-                        "All custom tick locations must be numeric values."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-
-                    for tick in custom_ticks:
-                        # Ensure all custom tick locations are within bounds.
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
         # ================================  Stock Bar  ================================
         if type_id == 'barStockChartingDevice':
@@ -954,52 +806,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-
-                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = (
-                        "All custom tick locations must be numeric values."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-
-                    for tick in custom_ticks:
-                        # Ensure all custom tick locations are within bounds.
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
             # Test the selected values to ensure that they can be charted (int, float, bool)
             for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
@@ -1049,51 +856,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['settingsGroup'] = "ch"
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = (
-                        "All custom tick locations must be numeric values."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-
-                    for tick in custom_ticks:
-                        # Ensure all custom tick locations are within bounds.
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
             # Test the selected values to ensure that they can be charted (int, float, bool)
             for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
@@ -1231,49 +994,7 @@ class Plugin(indigo.PluginBase):
                     values_dict['settingsGroup'] = str(area)
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-                default_y_axis = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = "All custom tick locations must be numeric values."
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-
-                    for tick in custom_ticks:
-                        # Ensure all custom tick locations are within bounds.
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
@@ -1346,49 +1067,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['settingsGroup'] = "1"
 
             # =============================== Custom Ticks ================================
-            # Ensure all custom tick locations are numeric, within bounds and of the same length.
-            if values_dict['customTicksY'].lower() not in ("", 'none'):
-                custom_ticks       = values_dict['customTicksY'].replace(' ', '')
-                custom_ticks       = custom_ticks.split(',')
-                custom_tick_labels = values_dict['customTicksLabelY'].split(',')
-                default_y_axis     = (values_dict['yAxisMin'], values_dict['yAxisMax'])
-                default_y_axis     = [x.lower() == 'none' for x in default_y_axis]
-
-                try:
-                    custom_ticks = [float(_) for _ in custom_ticks]
-                except ValueError:
-                    error_msg_dict['customTicksY'] = "All custom tick locations must be numeric values."
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure tick labels and values are the same length.
-                if len(custom_tick_labels) != len(custom_ticks):
-                    error_msg_dict['customTicksLabelY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    error_msg_dict['customTicksY'] = (
-                        "Custom tick labels and custom tick locations must be the same length."
-                    )
-                    values_dict['settingsGroup'] = "y"
-
-                # Ensure all custom Y tick locations are within bounds. User has elected to change at least one Y axis
-                # boundary (if both upper and lower bounds are set to 'None', we move on).
-                if not all(default_y_axis):
-
-                    for tick in custom_ticks:
-                        # Ensure all custom tick locations are within bounds.
-                        if values_dict['yAxisMin'].lower() != 'none' \
-                                and not tick >= float(values_dict['yAxisMin']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
-
-                        if values_dict['yAxisMax'].lower() != 'none' \
-                                and not tick <= float(values_dict['yAxisMax']):
-                            error_msg_dict['customTicksY'] = (
-                                "All custom tick locations must be within the boundaries of the Y axis."
-                            )
-                            values_dict['settingsGroup'] = "y"
+            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
 
         # =============================== Weather Chart ===============================
         if type_id == 'forecastChartingDevice':
@@ -2245,8 +1924,7 @@ class Plugin(indigo.PluginBase):
                         # areas present in the same way, we need to create 'phantom' labels that are plotted but not
                         # visible.  Setting the font color to 'None' will effectively hide them.
                         try:
-                            if p_dict['customAxisLabelX'].isspace() or \
-                                    p_dict['customAxisLabelX'] == '':
+                            if p_dict['customAxisLabelX'].isspace() or p_dict['customAxisLabelX'] == '':
                                 p_dict['customAxisLabelX'] = 'null'
                                 k_dict['k_x_axis_font'] = {
                                     'color': 'None',
@@ -2258,8 +1936,7 @@ class Plugin(indigo.PluginBase):
                             ...
 
                         try:
-                            if p_dict['customAxisLabelY'].isspace() or \
-                                    p_dict['customAxisLabelY'] == '':
+                            if p_dict['customAxisLabelY'].isspace() or p_dict['customAxisLabelY'] == '':
                                 p_dict['customAxisLabelY'] = 'null'
                                 k_dict['k_y_axis_font'] = {
                                     'color': 'None',
@@ -2273,8 +1950,7 @@ class Plugin(indigo.PluginBase):
                         try:
                             # Not all devices that get to this point will support Y2.
                             if 'customAxisLabelY2' in p_dict:
-                                if p_dict['customAxisLabelY2'].isspace() \
-                                        or p_dict['customAxisLabelY2'] == '':
+                                if p_dict['customAxisLabelY2'].isspace() or p_dict['customAxisLabelY2'] == '':
                                     p_dict['customAxisLabelY2'] = 'null'
                                     k_dict['k_y2_axis_font'] = {
                                         'color': 'None',
@@ -2293,8 +1969,7 @@ class Plugin(indigo.PluginBase):
                         # on top of the other.
                         for line in range(1, 9, 1):
                             try:
-                                if p_dict[f'line{line}Annotate'] and \
-                                        p_dict[f'line{line}Marker'] != 'None':
+                                if p_dict[f'line{line}Annotate'] and p_dict[f'line{line}Marker'] != 'None':
                                     p_dict[f'line{line}Marker'] = 'None'
                                     self.logger.warning(
                                         f"[{dev.name}] Line {line} marker is suppressed to display  annotations. To "
@@ -4220,7 +3895,7 @@ class Plugin(indigo.PluginBase):
         elif values_dict['allCharts'] == 'all':
             devices_to_refresh = [
                 dev for dev in indigo.devices.iter('self') if
-                dev.enabled and dev.deviceTypeId != 'csvEngine'
+                dev.enabled and dev.deviceTypeId not in ['csvEngine', 'rcParamsDevice']
             ]
             self.logger.info("Redraw Charts Now: Redrawing all charts.")
 

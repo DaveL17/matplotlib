@@ -24,7 +24,6 @@ __license__   = "MIT"
 __title__     = "maintenance"
 __version__   = "0.1.02"
 
-
 class Maintain:
     """
     Title Placeholder
@@ -41,14 +40,13 @@ class Maintain:
         """
         self.plugin = plugin
         self.pluginPrefs = plugin.pluginPrefs
+        self.my_logger = logging.getLogger("Plugin.Maintain")
 
-        fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt,
-                                                                       datefmt='%Y-%m-%d %H:%M:%S'
-                                                                       )
-                                                     )
+        # fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
+        # self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt,datefmt='%Y-%m-%d %H:%M:%S'))
 
-        self.plugin.logger.threaddebug("Initializing maintenance framework.")
+        # my_logger.threaddebug("Initializing maintenance framework.")
+        self.my_logger.debug("Initializing maintenance framework.x")
 
     def clean_prefs(self, dev_name, prefs):
         """
@@ -361,9 +359,9 @@ class Maintain:
 
         # Log list of removed keys
         if list_of_removed_keys:
-            self.plugin.logger.debug(
-                f"[{dev_name}] Performing maintenance - removing unneeded  keys: "
-                f"{list_of_removed_keys}")
+            self.my_logger.debug(
+                f"[{dev_name}] Performing maintenance - removing unneeded  keys: {list_of_removed_keys}"
+            )
 
         return prefs
 
@@ -375,7 +373,6 @@ class Maintain:
 
         :return:
         """
-
         props = dev.pluginProps
 
         # ================================ All Devices ================================
@@ -423,9 +420,7 @@ class Maintain:
                     ui_value = 'Manual'
                 else:
                     ui_value = " "
-                dev.updateStatesOnServer(
-                    [{'key': 'onOffState', 'value': True, 'uiValue': ui_value}]
-                )
+                dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': ui_value}])
 
             # ============================= Non-chart Devices =============================
             if dev.deviceTypeId in ('csvEngine', 'rcParamsDevice'):
@@ -437,7 +432,7 @@ class Maintain:
             # If chartLastUpdated is empty, set it to the epoch
             if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
                 dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
-                self.plugin.logger.threaddebug("CSV last update unknown. Coercing update.")
+                self.my_logger.threaddebug("CSV last update unknown. Coercing update.")
 
             # =============================== Chart Devices ===============================
             elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
@@ -457,9 +452,7 @@ class Maintain:
                     # For all chart device types
                     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
                     if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
-                        self.plugin.logger.debug(
-                            f"[{dev.name}] Refactoring color property: ({prop})"
-                        )
+                        self.my_logger.debug(f"[{dev.name}] Refactoring color property: ({prop})")
                         props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
 
                     # ============================== Fix Line Styles ==============================
@@ -470,9 +463,8 @@ class Maintain:
                     # If unsupported style in dev props
                     if props[prop] in ('steps', 'steps-mid', 'steps-post'):
                         # Change style to `solid`
-                        self.plugin.logger.warning(
-                            f"Converting deprecated line style setting to solid line style for "
-                            f"device [{dev.name}]."
+                        self.my_logger.warning(
+                            f"Converting deprecated line style setting to solid line style for device [{dev.name}]."
                         )
                         props[prop] = '-'
 
@@ -486,7 +478,7 @@ class Maintain:
                         if 'color' in prop.lower():
                             if props[prop] in ('#custom', 'custom'):
 
-                                self.plugin.logger.debug(
+                                self.my_logger.debug(
                                     "Resetting legacy device preferences for custom colors to new "
                                     "color picker.")
 
@@ -559,17 +551,15 @@ class Maintain:
                 # =============== Establish Refresh Interval for Legacy Devices ===============
                 # Establish refresh interval for legacy devices. If the prop isn't present, we set it equal to the
                 # user's current global refresh rate.
-                # if 'refreshInterval' not in props.keys():
                 if 'refreshInterval' not in props:
-                    self.plugin.logger.debug(
-                        "Adding refresh interval to legacy device. Set to 900 seconds.")
+                    self.my_logger.debug("Adding refresh interval to legacy device. Set to 900 seconds.")
                     props['refreshInterval'] = self.pluginPrefs.get('refreshInterval', 900)
 
             # ============================= Update the Server =============================
             dev.replacePluginPropsOnServer(props)
 
             if self.plugin.pluginPrefs['verboseLogging']:
-                self.plugin.logger.threaddebug(f"[{dev.name}] prefs cleaned.")
+                self.my_logger.threaddebug(f"[{dev.name}] prefs cleaned.")
 
         except Exception as err:
             indigo.server.log(str(err), isError=True)

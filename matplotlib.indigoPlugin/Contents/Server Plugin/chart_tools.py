@@ -446,12 +446,9 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
     :param dict logger:
     """
 
-    # custom_ticks_marks = p_dict['customTicksY'].strip()
-    # custom_ticks_labels = p_dict['customTicksLabelY'].strip()
-    custom_ticks_marks = [_.strip() for _ in p_dict['customTicksY']]
-    custom_ticks_labels = [_.strip() for _ in p_dict['customTicksLabelY']]
-
     try:
+        custom_ticks_marks = [float(_) for _ in p_dict['customTicksY'].split(',')]
+        custom_ticks_labels = [_ for _ in p_dict['customTicksLabelY'].split(',')]
         # Get the default tick values and labels (which we'll replace as needed.)
         marks, labels = plt.yticks()
 
@@ -464,14 +461,12 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
             custom_ticks_labels = custom_ticks_marks
 
         # Replace default Y tick values with the custom ones.
-        # if custom_ticks_marks.lower() not in ('none', '') \
-        #         and not custom_ticks_marks.isspace():
-        #     marks = [float(_) for _ in custom_ticks_marks.split(",")]
+        if custom_ticks_marks not in ('none', ''):
+            marks = custom_ticks_marks
 
         # Replace the default Y tick labels with the custom ones.
-        # if custom_ticks_labels.lower() not in ('none', '') \
-        #         and not custom_ticks_labels.isspace():
-        #     labels = [f"{_.strip()}" for _ in custom_ticks_labels.split(",")]
+        if custom_ticks_labels not in ('none', ''):
+            labels = custom_ticks_labels
 
         plt.yticks(marks, labels)
 

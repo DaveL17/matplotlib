@@ -1,3 +1,11 @@
+#### v2022.1.6
+- Fixed bug where custom Y axis tick marks and locations were sometimes not plotted properly.
+- Fixed bug where `rcParamsDevice` devices were not skipped when user elects to redraw all charts from the plugin menu.
+- Adds module filename to chart error tracebacks to make it easier to find the error.
+- Adds new module `validate` and moves validation code to that module.
+- Code refinements.
+- Minor UI refinements.
+ 
 #### v2022.1.5
 - Charts
   - Annotation value precision controls added to Area, Bar Flow Vertical, Bar Stock Horizontal, Bar Stock Vertical, 

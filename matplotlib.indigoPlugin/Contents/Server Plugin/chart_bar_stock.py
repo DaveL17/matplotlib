@@ -225,6 +225,6 @@ except Exception as sub_error:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.split('/')[-1]}")
 
 json.dump(LOG, sys.stdout, indent=4)
