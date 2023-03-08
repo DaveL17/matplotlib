@@ -48,7 +48,7 @@ from matplotlib import rcParams               # noqa
 
 try:
     import indigo  # noqa
-    import pydevd
+    import pydevd  # noqa
 except ImportError:
     ...
 
@@ -65,7 +65,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2022.1.6"
+__version__   = "2022.1.7"
 
 
 # =============================================================================
@@ -114,16 +114,16 @@ class Plugin(indigo.PluginBase):
             self.plugin_file_handler.setLevel(10)
 
         # ============================= Remote Debug Hook =============================
-        # try:
-        #     pydevd.settrace(
-        #         'localhost',
-        #         port=5678,
-        #         stdoutToServer=True,
-        #         stderrToServer=True,
-        #         suspend=False
-        #     )
-        # except Exception:
-        #     ...
+        try:
+            pydevd.settrace(
+                'localhost',
+                port=5678,
+                stdoutToServer=True,
+                stderrToServer=True,
+                suspend=False
+            )
+        except Exception:
+            ...
 
         self.pluginIsInitializing = False
 
@@ -614,10 +614,10 @@ class Plugin(indigo.PluginBase):
 
         while True:
             if not self.pluginIsShuttingDown:
-                self.refresh_the_charts_queue()
-                self.csv_refresh()
-                self.charts_refresh()
-                self.sleep(1)
+                self.refresh_the_charts_queue()  # check to see if anything is in the queue.
+                self.csv_refresh()  # iterate plugin devices to see if any need updating.
+                self.charts_refresh()  # refresh plugin devices that need updating.
+                self.sleep(10)
 
     # =============================================================================
     @staticmethod
@@ -722,7 +722,7 @@ class Plugin(indigo.PluginBase):
                 try:
                     if values_dict[key] != self.pluginPrefs[key]:
                         config_changed = True
-                        changed_keys += f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}",
+                        changed_keys += (f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}"),
 
                 # Missing keys will be config dialog format props like labels and separators
                 except KeyError:
@@ -2238,7 +2238,7 @@ class Plugin(indigo.PluginBase):
                                 path_to_file = 'chart_multiline.py'
 
                             except OSError as err:
-                                if "Argument list too long" in err:
+                                if "Argument list too long" in str(err):
                                     self.logger.critical("Text source too long.")
 
                         # ============================== Polar Charts ==============================
@@ -2924,7 +2924,7 @@ class Plugin(indigo.PluginBase):
         :param bool caller_waiting_for_result:
         :return:
         """
-        dev = indigo.devices[int(plugin_action.PROPS['targetDevice'])]
+        dev = indigo.devices[int(plugin_action.props['targetDevice'])]
 
         if dev.enabled:
 
@@ -2956,11 +2956,11 @@ class Plugin(indigo.PluginBase):
         :param bool caller_waiting_for_result:
         :return:
         """
-        dev_id = int(plugin_action.PROPS['targetDevice'])
+        dev_id = int(plugin_action.props['targetDevice'])
         dev    = indigo.devices[dev_id]
 
         if dev.enabled:
-            target_source = plugin_action.PROPS['targetSource']
+            target_source = plugin_action.props['targetSource']
             temp_dict     = ast.literal_eval(dev.pluginProps['columnDict'])
             payload       = {target_source: temp_dict[target_source]}
 
@@ -3095,17 +3095,21 @@ class Plugin(indigo.PluginBase):
         :param int target_id:
         :return:
         """
-        if not values_dict:
-            result = []
+        try:
+            if not values_dict:
+                result = []
 
-        # Once user selects a device ( see get_csv_device_list() ), populate the dropdown menu.
-        else:
-            target_device = int(values_dict['targetDevice'])
-            dev           = indigo.devices[target_device]
-            dev_dict      = ast.literal_eval(dev.pluginProps['columnDict'])
-            result        = [(k, dev_dict[k][0]) for k in dev_dict]
+            # Once user selects a device ( see get_csv_device_list() ), populate the dropdown menu.
+            else:
+                target_device = int(values_dict.get('targetDevice', 0))
+                dev           = indigo.devices[target_device]
+                dev_dict      = ast.literal_eval(dev.pluginProps['columnDict'])
+                result        = [(k, dev_dict[k][0]) for k in dev_dict]
 
-        return result
+            return result
+
+        except KeyError:
+            return []
 
     # =============================================================================
     @staticmethod
@@ -3282,7 +3286,8 @@ class Plugin(indigo.PluginBase):
         return self.Fogbert.deviceList()
 
     # =============================================================================
-    def generatorPrecisionList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+    @staticmethod
+    def generatorPrecisionList(fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Returns a list of value precision options for pulldown menus.
 
@@ -3300,7 +3305,8 @@ class Plugin(indigo.PluginBase):
         return precision
 
     # =============================================================================
-    def generatorLineStyleDefaultNoneList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+    @staticmethod
+    def generatorLineStyleDefaultNoneList(fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Returns a list of Matplotlib line styles for pulldown menus.
 
@@ -3320,8 +3326,8 @@ class Plugin(indigo.PluginBase):
         return line_styles
 
     # =============================================================================
-    def generatorLineStyleDefaultSolidList(
-            self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+    @staticmethod
+    def generatorLineStyleDefaultSolidList(fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Returns a list of Matplotlib line styles for pulldown menus.
 
@@ -3341,7 +3347,8 @@ class Plugin(indigo.PluginBase):
         return line_styles
 
     # =============================================================================
-    def generatorMarkerList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+    @staticmethod
+    def generatorMarkerList(fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
         Returns a list of Matplotlib Markers for pulldown menus.
 
@@ -3554,7 +3561,8 @@ class Plugin(indigo.PluginBase):
         return sorted(font_menu)
 
     # =============================================================================
-    def getRefreshList(self, fltr="", values_dict=None, type_id="", target_id=0):  # noqa
+    @staticmethod
+    def getRefreshList(fltr="", values_dict=None, type_id="", target_id=0):  # noqa
         """
 
         :param str fltr:
@@ -3638,7 +3646,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.Device dev:
         :param bool caller_waiting_for_result:
         """
-        self.logger.info(f"Scripting payload: {dict(plugin_action.PROPS)}")
+        self.logger.info(f"Scripting payload: {dict(plugin_action.props)}")
 
         # TODO: take a look at broadcast messages and whether this is something else that can be made to work in this
         #       neighborhood.
@@ -3684,11 +3692,11 @@ class Plugin(indigo.PluginBase):
         bk_color     = self.pluginPrefs.get('backgroundColor', '#000000')
 
         # =============================  Unpack Payload  ==============================
-        x_values  = plugin_action.PROPS['x_values']
-        y_values  = plugin_action.PROPS['y_values']
-        kwargs    = plugin_action.PROPS['kwargs']
-        path_name = plugin_action.PROPS['path']
-        file_name = plugin_action.PROPS['filename']
+        x_values  = plugin_action.props['x_values']
+        y_values  = plugin_action.props['y_values']
+        kwargs    = plugin_action.props['kwargs']
+        path_name = plugin_action.props['path']
+        file_name = plugin_action.props['filename']
 
         try:
             fig = plt.figure(1, figsize=(width / dpi, height / dpi))
@@ -3988,7 +3996,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.PluginAction plugin_action:
         """
         full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
-        selected_theme = plugin_action.PROPS['targetTheme']
+        selected_theme = plugin_action.props['targetTheme']
 
         # ==============================  Get the Theme  ==============================
         with open(full_path, 'r', encoding='utf-8') as f:

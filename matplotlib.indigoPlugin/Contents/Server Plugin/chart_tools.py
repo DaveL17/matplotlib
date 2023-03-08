@@ -470,18 +470,10 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
 
         plt.yticks(marks, labels)
 
-    except (KeyError, ValueError):
+    except (AttributeError, KeyError, ValueError):
         logger['Threaddebug'].append(
-            f"[{payload['props']['name']}] Problem formatting Y axis  ticks: customAxisLabelY = "
+            f"[{payload['props']['name']}] Problem formatting Y axis ticks: customAxisLabelY = "
             f"{p_dict['customAxisLabelY']}"
-        )
-        logger['Threaddebug'].append(
-            f"[{payload['props']['name']}] Problem formatting Y1 axis label: k_y_axis_font = "
-            f"{k_dict['k_y_axis_font']}"
-        )
-        logger['Threaddebug'].append(
-            f"[{payload['props']['name']}] Problem formatting Y1 axis label: customTicksY = "
-            f"{p_dict['customTicksY']}"
         )
 
 

@@ -1,3 +1,8 @@
+#### v2022.1.7
+- Fixes bug where `Matplotlib Paramters Device` incorrectly labelled in error state.
+- Fixes bug `PluginAction' object has no attribute 'PROPS'`.
+- Fixes bug where Refresh CSV Device Action returned an error when no such devices exist.
+
 #### v2022.1.6
 - Fixed bug where custom Y axis tick marks and locations were sometimes not plotted properly.
 - Fixed bug where `rcParamsDevice` devices were not skipped when user elects to redraw all charts from the plugin menu.
