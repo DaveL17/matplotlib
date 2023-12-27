@@ -1,3 +1,7 @@
+#### v2023.0.1
+- Changes to prepare for Indigo `v2023.2`.
+- Code enhancements.
+
 #### v2022.1.7
 - Fixes bug where `Matplotlib Paramters Device` incorrectly labelled in error state.
 - Fixes bug `PluginAction' object has no attribute 'PROPS'`.
@@ -436,7 +440,7 @@
 
 #### v0.7.54
 - Fixes float error in the duration value for CSV refreshes.
-- Moves dev prop maintenance routine to deviceStartComm.
+- Moves dev prop maintenance routine to device_start_comm.
 
 #### v0.7.53
 - Adds tests to alert the user that they're saving charts to the wrong location (when the Indigo version is updated.)
@@ -559,7 +563,7 @@
   settings are retained.
 
 #### v0.7.24
-- Synchronize self.pluginPrefs in closedPrefsConfigUi().
+- Synchronize self.pluginPrefs in closed_prefs_config_ui().
 
 #### v0.7.23
 - Adds choice to set bar width to make it simpler for first time device creation. If the value is set to zero, the

@@ -58,12 +58,15 @@ try:
         ...
 
 
-    def format_subplot(s_plot, title="Title"):
+    def format_subplot(s_plot, title: str="Title"):
         """
         Title Placeholder
 
         Note that we have to set these for each subplot as it's rendered or else the settings will
         only be applied to the last subplot rendered.
+
+        :param s_plot:
+        :param str title:
         """
         s_plot.set_title(title, **K_DICT['k_title_font'])  # The subplot title
         chart_tools.format_axis_x_ticks(ax=s_plot, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
@@ -158,7 +161,6 @@ try:
         sharex='all',
         figsize=(WIDTH / DPI, HEIGHT * num_axes / DPI)
     )
-
 
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.99))
 

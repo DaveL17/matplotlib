@@ -11,7 +11,7 @@ import re
 
 # Third-party Modules
 try:
-    import indigo
+    import indigo  # noqa
 except ImportError:
     ...
 
@@ -22,20 +22,20 @@ __build__     = "Unused"
 __copyright__ = "Copyright 2017-2019 DaveL17"
 __license__   = "MIT"
 __title__     = "maintenance"
-__version__   = "0.1.02"
+__version__   = "0.1.03"
 
 class Maintain:
     """
-    Title Placeholder
+    Various plugin maintenance utilities
 
-    Body placeholder
+    Maintain is a container for code that makes specific to consolidate methods used throughout all Indigo
+    plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for each plugin.
     """
 
     def __init__(self, plugin):
         """
-        Title Placeholder
+        Constructor
 
-        Body placeholder
         :param plugin:
         """
         self.plugin = plugin
@@ -48,14 +48,14 @@ class Maintain:
         # my_logger.threaddebug("Initializing maintenance framework.")
         self.my_logger.debug("Initializing maintenance framework.x")
 
-    def clean_prefs(self, dev_name, prefs):
+    def clean_prefs(self, dev_name: str, prefs: dict):
         """
         Remove legacy keys from non-chart device prefs
 
         None of the keys listed here should be present in device types using this method to clean their prefs. If they
         exist, delete them.
         -----
-        :param unicode dev_name:
+        :param str dev_name:
         :param dict prefs:
         :return:
         """
@@ -365,12 +365,12 @@ class Maintain:
 
         return prefs
 
-    def clean_props(self, dev):
+    def clean_props(self, dev: indigo.Device):
         """
         Remove legacy keys from device prefs
 
         -----
-
+        :param indigo.Device dev:
         :return:
         """
         props = dev.pluginProps

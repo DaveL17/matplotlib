@@ -61,7 +61,7 @@ try:
                 f"in the device configuration menu."
             )
 
-        # Plot the bars. If 'suppressBar{thing} is True, we skip it.
+        # Plot the bars. If 'suppressBar{thing}' is True, we skip it.
         if P_DICT[f'bar{thing}Source'] not in ("", "None") and not suppress_bar:
 
             # If the bar color is the same as the background color, alert the user.

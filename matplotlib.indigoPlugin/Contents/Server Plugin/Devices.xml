@@ -1123,7 +1123,7 @@
             </Field>
 
             <Field id="yAxisMin" type="textfield" defaultValue="None"
-                   visibleBindingId="settingsGroup" visibleBindingValue="truye"
+                   visibleBindingId="settingsGroup" visibleBindingValue="y"
                    tooltip="The minimum Y axis value.">
                 <Label>Min:</Label>
             </Field>

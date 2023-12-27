@@ -8,6 +8,11 @@ TODO: move other validation code here.
 import re
 import logging
 
+try:
+    import indigo  # noqa
+except ImportError:
+    pass
+
 my_logger = logging.getLogger("Plugin")
 
 
@@ -20,8 +25,12 @@ def __init__():
 
 
 # =============================== Chart Colors ================================+
-def chart_colors(values_dict):
-    """Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9)."""
+def chart_colors(values_dict: indigo.Dict):
+    """
+    Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9).
+
+    :param indigo.Dict values_dict:
+    """
     # TODO: check to see whether this dict is up to date.
     color_dict = {
         'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF", 'backgroundColor': "00 00 00",
@@ -37,7 +46,13 @@ def chart_colors(values_dict):
 
 
 # ============================= Chart Dimensions ==============================
-def chart_dimensions(values_dict, error_msg_dict):
+def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+    """
+
+    :param indigo.Dict values_dict:
+    :param indigo.Dict error_msg_dict:
+    :return:
+    """
     for dimension_prop in (
             'rectChartHeight',
             'rectChartWidth',
@@ -64,7 +79,13 @@ def chart_dimensions(values_dict, error_msg_dict):
 
 # ============================= Chart Resolution ==============================
 # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
-def chart_resolution(values_dict, error_msg_dict):
+def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+    """
+
+    :param values_dict:
+    :param error_msg_dict:
+    :return:
+    """
     try:
         # If value is null, a null string, or all whitespace.
         if not values_dict['chartResolution'] or \
@@ -86,8 +107,13 @@ def chart_resolution(values_dict, error_msg_dict):
 
 
 # ================================ Data Paths ==================================
-def data_paths(values_dict, error_dict):
-    """Ensure the data path value is valid."""
+def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict):
+    """
+    Ensure the data path value is valid.
+
+    :param indigo.Dict values_dict:
+    :param indigo.Dict error_dict:
+    """
     for path_prop in ('chartPath', 'dataPath'):
         try:
             if not values_dict[path_prop].endswith('/'):
@@ -102,7 +128,13 @@ def data_paths(values_dict, error_dict):
 
 # ================================ Line Weight =================================
 # Line weight is a hidden prop in PluginConfig.xml and may no longer be needed.  fixme
-def line_weight(values_dict, error_msg_dict):
+def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+    """
+
+    :param indigo.Dict values_dict:
+    :param indigo.Dict error_msg_dict:
+    :return:
+    """
     try:
         if float(values_dict['lineWeight']) <= 0:
             error_msg_dict['lineWeight'] = "The line weight value must be greater than zero."
@@ -117,8 +149,13 @@ def line_weight(values_dict, error_msg_dict):
 # ==============================================================================
 
 # =============================== Custom Ticks =================================
-def custom_ticks(values_dict, error_dict):
-    """ Ensure all custom tick locations are numeric, within bounds, and of the same length. """
+def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict):
+    """
+    Ensure all custom tick locations are numeric, within bounds, and of the same length.
+
+    :param indigo.Dict values_dict:
+    :param indigo.Dict error_dict:
+    """
 
     my_ticks = values_dict['customTicksY'].split(',')  # Make a list from a string.
     my_tick_labels = values_dict['customTicksLabelY'].split(',')  # Make a list from a string.

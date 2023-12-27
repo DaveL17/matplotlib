@@ -1,5 +1,6 @@
 ### TODO 
-- 
+- Vertical bar stock charts don't allow for setting annotation precision for bar 5.  Others?  see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
+- Do we still have to use x-axis label OR legend (but not both?) see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
 
 #### NEW
 - Combination device (line/bar to replicate weather devices).
@@ -11,6 +12,7 @@
   [See example](https://matplotlib.org/3.1.1/gallery/ticks_and_spines/multiple_yaxis_with_spines.html)
 - Create new STEP chart type as step is no longer a supported line style. 
   [See example](https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.axes.Axes.step.html?highlight=steps%20post)
+- Add secondary X-axis tick labels to relevant charts. See https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
 
 #### Refinements
 - Try to address annotation collisions.

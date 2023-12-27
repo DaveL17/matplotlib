@@ -117,7 +117,6 @@ try:
         # If annotations desired, plot those too.
         annotate = P_DICT[f'bar{b_num}Annotate']
         precision = int(PROPS.get(f'bar{b_num}AnnotationPrecision', "0"))
-        # if bar[f'annotate_{b_num}'] and not suppress_bar:
         if annotate and bar[f'annotate_{b_num}'] and not suppress_bar:
             ax.annotate(
                 # ANNOTATION_VALUE[b_num - 1],

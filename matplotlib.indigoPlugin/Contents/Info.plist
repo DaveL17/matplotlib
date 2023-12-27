@@ -3,13 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>PluginVersion</key>
-	<string>2022.1.7</string>
+	<string>2023.0.1</string>
 	<key>ServerApiVersion</key>
 	<string>3.0</string>
-	<key>IwsApiVersion</key>
-	<string>1.0.0</string>
-	<key>LoadPriority</key>
-	<integer>105</integer>
 	<key>CFBundleDisplayName</key>
 	<string>Matplotlib</string>
 	<key>CFBundleName</key>

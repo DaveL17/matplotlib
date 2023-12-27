@@ -344,7 +344,7 @@ try:
                 P_DICT[f'y_obs{line}'],
                 color=P_DICT[f'line{line}Color'],
                 linestyle=P_DICT[f'line{line}Style'],
-                marker=P_DICT[f'line{line}Marker'],\
+                marker=P_DICT[f'line{line}Marker'],
                 markerfacecolor=P_DICT[f'line{line}MarkerColor'],
                 zorder=(10 - line),
                 **K_DICT['k_line']
@@ -364,8 +364,7 @@ try:
                         **K_DICT['k_annotation']
                     )
 
-    # Take a snapshot of the data for some computations below (P_DICT['data_array'] can be modified
-    # elsewhere.
+    # Take a snapshot of the data for some computations below (P_DICT['data_array']) can be modified elsewhere.
     just_the_data = deepcopy(P_DICT['data_array'])
 
     chart_tools.format_axis_x_ticks(ax=ax2, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)

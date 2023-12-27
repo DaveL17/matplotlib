@@ -50,7 +50,7 @@ def __init__():
 
 
 # =============================================================================
-def convert_the_data(final_data, data_source, logger):
+def convert_the_data(final_data: list, data_source: str, logger: dict):
     """
     Convert data into form that matplotlib can understand
 
@@ -59,9 +59,9 @@ def convert_the_data(final_data, data_source, logger):
     example, the WUnderground plugin will present '-99.0' when WUnderground is not able to deliver a rational value.
     Therefore, we convert '-99.0' to NaN values.
     -----
-    :param logger:
     :param list final_data: the data to be charted
     :param str data_source:
+    :param dict logger:
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] "
@@ -212,9 +212,9 @@ def format_axis(ax_obj):
     ax_cells = ax_props['children']
     for cell in ax_cells:
         cell.set_facecolor(payload['p_dict']['faceColor'])
-        cell._text.set_color(payload['p_dict']['fontColor'])
-        cell._text.set_fontname(payload['p_dict']['fontMain'])
-        cell._text.set_fontsize(int(payload['props']['fontSize']))
+        cell._text.set_color(payload['p_dict']['fontColor'])  # noqa
+        cell._text.set_fontname(payload['p_dict']['fontMain'])  # noqa
+        cell._text.set_fontsize(int(payload['props']['fontSize']))  # noqa
         cell.set_linewidth(int(plt.rcParams['lines.linewidth']))
 
         # This may not be supportable without including fonts with the plugin.
@@ -680,11 +680,11 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
     fit lines are not appropriate for all chart types).
     -----
     :param class 'matplotlib.axes.AxesSubplot' ax:
-    :return numpy.ndarray dates_to_plot:
+    :param numpy.ndarray dates_to_plot:
     :param int line:
     :param dict p_dict: plotting parameters
-    :return ax:
     :param dict logger:
+    :return ax:
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Formatting best fit line segments.")
@@ -922,7 +922,7 @@ def get_data(data_source, logger):
 
 
 # =============================================================================
-def hide_anomalies(data, props=True, logger=[]):
+def hide_anomalies(data: tuple=None, props: dict=None, logger: dict=None):
     """Detect outliers in data and replace them with 'NaN'.
 
     Credit: https://gist.github.com/wmlba/89bc2f4556b8ee397ca7a5017b497657#file-outlier_std-py

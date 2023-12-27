@@ -183,10 +183,10 @@ try:
     if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
         ax.add_patch(
             patches.Rectangle(
-            (0, 0), 1, 1,
-            transform=ax.transAxes,
-            facecolor=P_DICT['faceColor'],
-            zorder=1
+                (0, 0), 1, 1,
+                transform=ax.transAxes,
+                facecolor=P_DICT['faceColor'],
+                zorder=1
             )
         )
 

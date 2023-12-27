@@ -3,7 +3,7 @@ Contains plugin default preferences.
 """
 
 try:
-    import indigo
+    import indigo  # noqa
 except ImportError:
     ...
 
