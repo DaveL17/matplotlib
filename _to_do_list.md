@@ -1,4 +1,3 @@
-### TODO 
 - Vertical bar stock charts don't allow for setting annotation precision for bar 5.  Others?  see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
 - Do we still have to use x-axis label OR legend (but not both?) see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
 
