@@ -1654,13 +1654,12 @@ class Plugin(indigo.PluginBase):
                         'zorder': 25
                     }
                     k_dict['k_annotation_battery'] = {
-                        'bbox': dict(
-                            boxstyle='round,pad=0.3',
-                            facecolor=p_dict['faceColor'],
-                            edgecolor=p_dict['spineColor'],
-                            alpha=0.75,
-                            linewidth=0.5
-                        ),
+                        'bbox': {'alpha': 0.75,
+                                 'boxstyle': 'round,pad=0.3',
+                                 'edgecolor': p_dict['spineColor'],
+                                 'facecolor': p_dict['faceColor'],
+                                 'linewidth': 0.5,
+                                 },
                         'color': p_dict['fontColorAnnotation'],
                         'ha': 'center',
                         'textcoords': 'data',
@@ -1669,13 +1668,13 @@ class Plugin(indigo.PluginBase):
                         'zorder': 25
                         }
                     k_dict['k_annotation'] = {
-                        'bbox': dict(
-                            boxstyle='round,pad=0.3',
-                            facecolor=p_dict['faceColor'],
-                            edgecolor=p_dict['spineColor'],
-                            alpha=0.75,
-                            linewidth=0.5
-                        ),
+                        'bbox':
+                            {'alpha': 0.75,
+                             'boxstyle': 'round,pad=0.3',
+                             'facecolor': p_dict['faceColor'],
+                             'edgecolor': p_dict['spineColor'],
+                             'linewidth': 0.5
+                             },
                         'color': p_dict['fontColorAnnotation'],
                         'ha': 'center',
                         'textcoords': 'offset points',
@@ -3241,7 +3240,7 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     @staticmethod
-    def generatorLineStyleDefaultSolidList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> List:  # noqa
+    def generatorLineStyleDefaultSolidList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """
         Returns a list of Matplotlib line styles for pulldown menus.
 
@@ -3473,17 +3472,16 @@ class Plugin(indigo.PluginBase):
     @staticmethod
     def getRefreshList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """
+        Generate a list of all chart devices and construct a menu item list for the "Redraw Charts Now..." menu item.
 
         :param str fltr:
         :param indigo.Dict values_dict:
         :param str type_id:
         :param int target_id:
         """
+        menu = [('all', 'All Charts'), ('auto', 'Skip Manual Charts'), ('-1', '%%separator%%')]
 
-        # TODO: add a separator to this list.
-        menu = [('all', 'All Charts'), ('auto', 'Skip Manual Charts')]
-
-        [menu.append((dev.id, dev.name)) for dev in indigo.devices.iter(filter="self") if dev.pluginProps['isChart']]
+        _ = [menu.append((dev.id, dev.name)) for dev in indigo.devices.iter(filter="self") if dev.pluginProps['isChart']]
 
         return menu
 
@@ -3855,7 +3853,7 @@ class Plugin(indigo.PluginBase):
         indigo.server.log('Snapshot written to user home directory.')
 
     # =============================================================================
-    def themeNameGenerator(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> List:  # noqa
+    def themeNameGenerator(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """
         Generate a list of theme names from the json file for UI controls
 

@@ -283,12 +283,10 @@ try:
                 ha="center",
                 rotation=(_[2] * -1) + 90,
                 color=P_DICT['lineMarkerColor'],
-                bbox=dict(
-                    boxstyle="larrow, pad=0.3",
-                    fc=P_DICT['lineMarkerColor'],
-                    ec="none",
-                    alpha=0.75
-                )
+                bbox={'boxstyle': "larrow, pad=0.3",
+                      'fc': P_DICT['lineMarkerColor'],
+                      'ec': "none",
+                      'alpha': 0.75}
             )
 
         subplot[0].set_xlim(min(x1) - x_offset, max(x1) + x_offset)
@@ -358,6 +356,6 @@ except Exception as sub_error:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.split('/')[-1]}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
 
 json.dump(LOG, sys.stdout, indent=4)

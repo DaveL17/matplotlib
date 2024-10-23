@@ -8,10 +8,7 @@ TODO: move other validation code here.
 import re
 import logging
 
-try:
-    import indigo  # noqa
-except ImportError:
-    pass
+import indigo  # noqa
 
 my_logger = logging.getLogger("Plugin")
 
@@ -32,6 +29,8 @@ def chart_colors(values_dict: indigo.Dict) -> None:
     :param indigo.Dict values_dict:
     """
     # TODO: check to see whether this dict is up to date.
+    # TODO: update 2024-10-23 - this may need to be refactored because color controls have been moved to the theme
+    #       manager.
     color_dict = {
         'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF", 'backgroundColor': "00 00 00",
         'faceColor': "00 00 00", 'gridColor': "88 88 88", 'spineColor': "88 88 88", 'tickColor': "88 88 88",
@@ -40,7 +39,7 @@ def chart_colors(values_dict: indigo.Dict) -> None:
     for item in color_dict:
         if re.search(r"^[0-9A-Fa-f]+$", values_dict[item].replace(" ", "")) is None:
             values_dict[item] = color_dict[item]
-            my_logger.warning(f"Invalid color code found in plugin preferences [{item}], resetting to default.")
+            my_logger.warning("Invalid color code found in plugin preferences [%s], resetting to default." % item)
 
     my_logger.debug("Plugin config: chart colors validated.")
 

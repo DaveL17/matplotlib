@@ -167,7 +167,7 @@ try:
                 horizontalalignment='center',
                 verticalalignment='center',
                 transform=ax.transAxes,
-                bbox=dict(facecolor='red', alpha='0.5')
+                bbox={"facecolor": 'red', "alpha": '0.5'}
             )
 
         ax.yaxis.set_ticks(ticks)
@@ -277,6 +277,6 @@ except Exception as sub_error:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.split('/')[-1]}")
+    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
 
 json.dump(LOG, sys.stdout, indent=4)

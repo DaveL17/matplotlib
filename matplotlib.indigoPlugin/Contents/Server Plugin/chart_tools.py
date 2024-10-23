@@ -449,7 +449,7 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
 
     try:
         custom_ticks_marks = [float(_) for _ in p_dict['customTicksY'].split(',')]
-        custom_ticks_labels = [_ for _ in p_dict['customTicksLabelY'].split(',')]
+        custom_ticks_labels = list(p_dict['customTicksLabelY'].split(','))
         # Get the default tick values and labels (which we'll replace as needed.)
         marks, labels = plt.yticks()
 
