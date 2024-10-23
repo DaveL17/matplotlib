@@ -21,10 +21,10 @@ except ImportError:
 # =================================== HEADER ==================================
 __author__ = "DaveL17"
 __build__ = "Unused"
-__copyright__ = "Copyright 2017-2022 DaveL17"
+__copyright__ = "Copyright 2024 DaveL17"
 __license__ = "MIT"
 __title__ = "DLFramework"
-__version__ = "0.1.05"
+__version__ = "0.1.08"
 
 # supported operators for eval expressions
 OPERATORS = {
@@ -39,6 +39,7 @@ OPERATORS = {
     ast.RShift: None,
     ast.Invert: None,
 }
+LOG_FORMAT = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
 
 
 # =============================================================================
@@ -61,19 +62,9 @@ class Fogbert:
         self.plugin = plugin
         self.plugin.logger.debug("Initializing DLFramework...")
         self.pluginPrefs = plugin.pluginPrefs
+        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt=LOG_FORMAT, datefmt='%Y-%m-%d %H:%M:%S'))
 
-        log_format = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt=log_format, datefmt='%Y-%m-%d %H:%M:%S'))
-
-    # =============================================================================
-    def pluginEnvironment(self):  # noqa
-        """
-        The pluginEnvironment method prints selected information about the pluginEnvironment that the plugin is running
-        in. It pulls some of this information from the calling plugin and some from the server pluginEnvironment. It
-        uses the legacy "indigo.server.log" method to write to the log.
-
-        :return:
-        """
+    def environment(self) -> str:
         self.plugin.logger.debug("DLFramework pluginEnvironment method called.")
         environment_state = ""
         spacer = " " * 35
@@ -90,10 +81,21 @@ class Fogbert:
         environment_state += f"{spacer}{'Process ID:':<31} {os.getpid()}\n"
         environment_state += spacer + ("=" * 135) + "\n"
 
+        return environment_state
+    # =============================================================================
+    def pluginEnvironment(self) -> None:  # noqa
+        """
+        The pluginEnvironment method prints selected information about the pluginEnvironment that the plugin is running
+        in. It pulls some of this information from the calling plugin and some from the server pluginEnvironment. It
+        uses the built-in "indigo.server.log" method to write to the log.
+
+        :return:
+        """
+        environment_state: str = self.environment()
         indigo.server.log(environment_state)
 
     # =============================================================================
-    def pluginEnvironmentLogger(self):  # noqa
+    def pluginEnvironmentLogger(self) -> None:  # noqa
         """
         The pluginEnvironmentLogger method prints selected information about the pluginEnvironment that the plugin is
         running in. It pulls some of this information from the calling plugin and some from the server
@@ -102,22 +104,7 @@ class Fogbert:
 
         :return:
         """
-        self.plugin.logger.debug("DLFramework pluginEnvironment method called.")
-        environment_state = ""
-        spacer = " " * 35
-
-        environment_state += f"{' Plugin Environment Information ':{'='}^135}\n"
-        environment_state += f"{spacer}{'Plugin name:':<31} {self.plugin.pluginDisplayName}\n"
-        environment_state += f"{spacer}{'Plugin version:':<31} {self.plugin.pluginVersion}\n"
-        environment_state += f"{spacer}{'Plugin ID:':<31} {self.plugin.pluginId}\n"
-        environment_state += f"{spacer}{'Indigo version:':<31} {indigo.server.version}\n"
-        environment_state += f"{spacer}{'Architecture:':<31} {platform.machine()}\n"
-        sys_version = sys.version.replace("\n", "")
-        environment_state += f"{spacer}{'Python version:':<31} {sys_version}\n"
-        environment_state += f"{spacer}{'Mac OS Version:':<31} {platform.mac_ver()[0]}\n"
-        environment_state += f"{spacer}{'Process ID:':<31} {os.getpid()}\n"
-        environment_state += spacer + ("=" * 135) + "\n"
-
+        environment_state: str = self.environment()
         self.plugin.logger.info(environment_state)
 
     # =============================================================================
@@ -143,7 +130,7 @@ class Fogbert:
         self.plugin.logger.critical("!" * 80)
 
     # =============================================================================
-    def convertDebugLevel(self, debug_val):  # noqa
+    def convertDebugLevel(self, debug_val: str = "") -> int:  # noqa
         """
         The convertDebugLevel method is used to standardize the various implementations of debug level settings across
         plugins. Its main purpose is to convert an old string-based setting to account for older plugin versions. Over
@@ -156,18 +143,19 @@ class Fogbert:
 
         # If the debug value is High/Medium/Low, it is the old style. Covert it to 3/2/1
         if debug_val in ["High", "Medium", "Low"]:
-            if debug_val == "High":
-                debug_val = 3
-            elif debug_val == "Medium":
-                debug_val = 2
-            else:
-                debug_val = 1
+            match debug_val:
+                case "High":
+                    debug_val = 3
+                case "Medium":
+                    debug_val = 2
+                case _:
+                    debug_val = 1
 
         return debug_val
 
     # =============================================================================
     @staticmethod
-    def deviceList(dev_filter=None):  # noqa
+    def deviceList(dev_filter: str = "") -> list:  # noqa
         """
         Returns a list of tuples containing Indigo devices for use in config dialogs (etc.)
 
@@ -180,7 +168,7 @@ class Fogbert:
 
     # =============================================================================
     @staticmethod
-    def deviceListEnabled(dev_filter=None):  # noqa
+    def deviceListEnabled(dev_filter: str = "") -> list:  # noqa
         """
         Returns a list of tuples containing Indigo devices for use in config dialogs (etc.) Returns enabled devices
         only.
@@ -189,15 +177,23 @@ class Fogbert:
         :return: [(ID, "Name"), (ID, "Name")]
         """
         devices_list = [('None', 'None')]
-        _ = [devices_list.append((dev.id, dev.name))
-             for dev in indigo.devices.iter(dev_filter)
-             if dev.enabled
-             ]
+        _ = [devices_list.append((dev.id, dev.name)) for dev in indigo.devices.iter(dev_filter) if dev.enabled]
         return devices_list
+
+    @staticmethod
+    def time_list() -> list:
+        """
+        Generate a list of hours for plugin control menus
+
+        Creates a list of times for use in setting salutation settings of the form:[(0, "00:00"), (1, "01:00"), ...]
+
+        :return list:
+        """
+        return [(hour, f"{hour:02.0f}:00") for hour in range(0, 24)]
 
     # =============================================================================
     @staticmethod
-    def variableList():  # noqa
+    def variableList() -> list:  # noqa
         """
         Returns a list of tuples containing Indigo variables for use in config dialogs (etc.)
 
@@ -209,7 +205,7 @@ class Fogbert:
 
     # =============================================================================
     @staticmethod
-    def deviceAndVariableList():  # noqa
+    def deviceAndVariableList() -> list:  # noqa
         """
         Returns a list of tuples containing Indigo devices and variables for use in config dialogs
         (etc.)
@@ -217,36 +213,28 @@ class Fogbert:
         :return: [(ID, "(D) Name"), (ID, "(V) Name")]
         """
         devices_and_variables_list = []
-        _ = [devices_and_variables_list.append((dev.id, f"(D) {dev.name}"))
-             for dev in indigo.devices
-             ]
-        _ = [devices_and_variables_list.append((var.id, f"(V) {var.name}"))
-             for var in indigo.variables
-             ]
+        _ = [devices_and_variables_list.append((dev.id, f"(D) {dev.name}")) for dev in indigo.devices]
+        _ = [devices_and_variables_list.append((var.id, f"(V) {var.name}")) for var in indigo.variables]
         devices_and_variables_list.append(('-1', '%%separator%%'),)
         devices_and_variables_list.append(('None', 'None'),)
         return devices_and_variables_list
 
     # =============================================================================
     @staticmethod
-    def deviceAndVariableListClean():  # noqa
+    def deviceAndVariableListClean() -> list:  # noqa
         """
         Returns a list of tuples containing Indigo devices and variables for use in config dialogs (etc.)
 
         :return: [(ID, "(D) Name"), (ID, "(V) Name")]
         """
         devices_and_variables_list = []
-        _ = [devices_and_variables_list.append((dev.id, f"(D) {dev.name}"))
-             for dev in indigo.devices
-             ]
-        _ = [devices_and_variables_list.append((var.id, f"(V) {var.name}"))
-             for var in indigo.variables
-             ]
+        _ = [devices_and_variables_list.append((dev.id, f"(D) {dev.name}")) for dev in indigo.devices]
+        _ = [devices_and_variables_list.append((var.id, f"(V) {var.name}")) for var in indigo.variables]
         return devices_and_variables_list
 
     # =============================================================================
     @staticmethod
-    def launchWebPage(launch_url):  # noqa
+    def launchWebPage(launch_url: str = "") -> None:  # noqa
         """
         The launchWebPage method is used to direct a call to the registered default browser and open the page
         referenced by the parameter 'URL'.
@@ -258,7 +246,7 @@ class Fogbert:
 
     # =============================================================================
     @staticmethod
-    def generatorStateOrValue(dev_id):  # noqa
+    def generatorStateOrValue(dev_id: int = 0) -> list:  # noqa
         """
         The generator_state_or_value() method returns a list to populate the relevant device states or variable value
         to populate a menu control.
@@ -291,7 +279,7 @@ class Fogbert:
             return [(0, 'Pick a Device or Variable')]
 
     # =============================================================================
-    def audit_server_version(self, min_ver):
+    def audit_server_version(self, min_ver: int = 0) -> None:
         """
         Audit Indigo Version
 
@@ -309,19 +297,19 @@ class Fogbert:
         self.plugin.logger.debug("Indigo server version OK.")
 
     # =============================================================================
-    def audit_os_version(self, min_ver):
+    def audit_os_version(self, min_ver: int = 0) -> None:
         """
         Audit Operating System Version
 
         Compare current OS version to the minimum version required to successfully run the plugin. Thanks to
         FlyingDiver for improved audit code.
 
-        :param float min_ver:
+        :param int min_ver:
         :return:
         """
         # minimum allowable version. i.e., (10, 13)
-        min_ver = tuple(map(int, (str(min_ver).split("."))))
-        mac_os = platform.mac_ver()[0]
+        min_ver     = tuple(map(int, (str(min_ver).split("."))))
+        mac_os      = platform.mac_ver()[0]
         current_ver = tuple(map(int, (str(mac_os).split("."))))  # current version. i.e., (11, 4)
 
         if current_ver < min_ver:
@@ -348,7 +336,7 @@ class Formatter:
         self.pluginPrefs = plugin.pluginPrefs
 
     # =============================================================================
-    def dateFormat(self):  # noqa
+    def dateFormat(self) -> str:  # noqa
         """
         The dateFormat method takes the user configuration preference for date and time display and converts them to a
         valid datetime() format specifier.
@@ -364,7 +352,7 @@ class Formatter:
         return date_formatter[self.pluginPrefs['uiDateFormat']]
 
     # =============================================================================
-    def timeFormat(self):  # noqa
+    def timeFormat(self) -> str:  # noqa
         """
         The timeFormat method takes the user configuration preference for date and time display and converts them to a
         valid datetime() format specifier.
@@ -372,7 +360,10 @@ class Formatter:
         :return:
         """
 
-        time_formatter = {'military': '%H:%M', 'standard': '%I:%M', 'standard_am_pm': '%I:%M %p'}
+        time_formatter = {
+            'military': '%H:%M',
+            'standard': '%I:%M',
+            'standard_am_pm': '%I:%M %p'}
         return time_formatter[self.pluginPrefs['uiTimeFormat']]
 
 
@@ -399,7 +390,7 @@ class evalExpr:  # noqa
         self.pluginPrefs = plugin.pluginPrefs
 
     # =============================================================================
-    def eval_expr(self, expr):
+    def eval_expr(self, expr: int):
         """
         Title Placeholder
 
@@ -427,30 +418,15 @@ class evalExpr:  # noqa
             if isinstance(node, ast.Num):  # <number>
                 value = node.n
             elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
-                value = OPERATORS[type(node.op)](self.__eval(node.left), self.__eval(node.right))
+                value = OPERATORS.get(type(node.op))(self.__eval(node.left), self.__eval(node.right))  # noqa
             elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
-                value = OPERATORS[type(node.op)](self.__eval(node.operand))
+                value = OPERATORS.get(type(node.op))(self.__eval(node.operand))  # noqa
             else:
+                raise TypeError(node)
+            if not value:
+                # value will be none if the operator provided is not in the "approved" OPERATORS.
                 raise TypeError(node)
 
             return value
         except (TypeError, KeyError):
             self.plugin.logger.critical("That expression is not allowed.")
-
-
-class DummyClass:
-    """
-    Dummy class used for testing.
-    """
-    @staticmethod
-    def dave(at1="foo", at2=0):
-        """
-        This docstring is loosely formatted to `PEP 287` with a nod towards PyCharm reStructured Text rendering.
-
-        :param str at1: This is a string attribute.
-        :param int at2: This is an integer attribute.
-        :return: True | False
-        """
-        x = at1 + "x"
-        y = at2 + 1
-        return True

@@ -2,10 +2,7 @@
 Contains plugin default preferences.
 """
 
-try:
-    import indigo  # noqa
-except ImportError:
-    ...
+import indigo  # noqa
 
 INSTALL_PATH = indigo.server.getInstallFolderPath()
 

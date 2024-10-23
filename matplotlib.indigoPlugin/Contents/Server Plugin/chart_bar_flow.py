@@ -42,10 +42,7 @@ try:
 
     num_obs = P_DICT['numObs']
 
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
-
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     for thing in range(1, 5, 1):

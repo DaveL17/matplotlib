@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Template>
-
+    <!-- This template is no longer needed because Indigo will notify users of plugin updates. -->
     <Field id="notificationsHeaderSpace" type="label" fontSize="mini"/>
 
     <Field id="notificationsLabel" type="label" alignText="right">

@@ -3,11 +3,10 @@
 """
 Creates a composite weather chart
 
-The composite weather chart is a dynamic chart that allows users to add or remove weather charts at
-will.  For example, the user could create one chart that contains subplots for high temperature,
-wind, and precipitation. Using the chart configuration dialog, the user would be able to add or
-remove elements and the chart would adjust accordingly (additional sublplots will be added or
-removed as needed.)
+The composite weather chart is a dynamic chart that allows users to add or remove weather charts at will.  For example,
+the user could create one chart that contains subplots for high temperature, wind, and precipitation. Using the chart
+configuration dialog, the user would be able to add or remove elements and the chart would adjust accordingly
+(additional sublplots will be added or removed as needed.)
 """
 
 # Built-in Modules
@@ -58,12 +57,12 @@ try:
         ...
 
 
-    def format_subplot(s_plot, title: str="Title"):
+    def format_subplot(s_plot, title: str = "Title"):
         """
         Title Placeholder
 
-        Note that we have to set these for each subplot as it's rendered or else the settings will
-        only be applied to the last subplot rendered.
+        Note that we have to set these for each subplot as it's rendered or else the settings will only be applied to
+        the last subplot rendered.
 
         :param s_plot:
         :param str title:
@@ -331,9 +330,8 @@ try:
         subplot = np.delete(subplot, 0)
 
     # ============================= Precipitation Bar =============================
-    # Precip intensity is in inches of liquid rain per hour using a bar chart. Note that the bar
-    # chart needs Z-order of 2 in order for the bars to be visible. This isn't needed for line
-    # charts.
+    # Precip intensity is in inches of liquid rain per hour using a bar chart. Note that the bar chart needs Z-order of
+    # 2 in order for the bars to be visible. This isn't needed for line charts.
     if 'show_precipitation_bar' in axes:
         subplot[0].bar(x1, PRECIPITATION, width=0.4, align='center', color=P_DICT['lineColor'], zorder=2)
         format_subplot(subplot[0], title='total precipitation')
@@ -351,8 +349,7 @@ try:
         labels = subplot[0].get_xticklabels() + subplot[0].get_yticklabels()
         _ = [label.set_fontname(P_DICT['fontMain']) for label in labels]
 
-        # We don't use the subplot variable after this; but this command will be important if we
-        # add more subplots.
+        # We don't use the subplot variable after this; but this command will be important if we add more subplots.
         subplot = np.delete(subplot, 0)
 
     chart_tools.save(logger=LOG)

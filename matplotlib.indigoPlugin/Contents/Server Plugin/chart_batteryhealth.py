@@ -3,8 +3,8 @@
 """
 Creates the battery health charts
 
-The chart_battery_health method creates battery health charts. These chart types are dynamic and
-are created "on the fly" rather than through direct user input.
+The chart_battery_health method creates battery health charts. These chart types are dynamic and are created "on the
+fly" rather than through direct user input.
 """
 
 # Built-in Modules
@@ -79,13 +79,10 @@ try:
     y_values = np.arange(len(Y_TEXT))
 
     # Create the chart figure
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
 
     # =============================== Plot the Bars ===============================
-    # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting
-    # it off the origin.
+    # We add 1 to the y_axis pushes the bar to spot 1 instead of spot 0 -- getting it off the origin.
     rects = ax.barh(
         (y_values + 1),
         X_VALUES,
@@ -175,8 +172,8 @@ try:
             minor=False
         )
 
-    # Mark devices that have a battery level of zero by coloring their y-axis label using the same
-    # warning color that is used for the bar.
+    # Mark devices that have a battery level of zero by coloring their y-axis label using the same warning color that
+    # is used for the bar.
     if dead_ones:
         counter = 0
         for key, value in sorted(DATA.items(), reverse=True):

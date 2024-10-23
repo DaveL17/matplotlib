@@ -40,10 +40,7 @@ try:
         ...
 
 
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
-
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
@@ -54,8 +51,8 @@ try:
         # If the group is suppressed, remind the user they suppressed it.
         if suppress_group:
             LOG['Info'].append(
-                f"[{CHART_NAME}] Group {thing} is suppressed by user setting. You can re-enable "
-                f"it in the device configuration menu."
+                f"[{CHART_NAME}] Group {thing} is suppressed by user setting. You can re-enable it in the device "
+                f"configuration menu."
             )
 
         # ============================== Plot the Points ==============================
@@ -72,8 +69,8 @@ try:
             # Add group color to list for later use
             GROUP_COLORS.append(P_DICT[f'group{thing}Color'])
 
-            # There is a bug in matplotlib (fixed in newer versions) where points would not plot if
-            # marker set to 'none'. This overrides the behavior.
+            # There is a bug in matplotlib (fixed in newer versions) where points would not plot if marker set to
+            # 'none'. This overrides the behavior.
             if P_DICT[f'group{thing}Marker'] == 'None':
                 P_DICT[f'group{thing}Marker'] = '.'
                 P_DICT[f'group{thing}MarkerColor'] = P_DICT[f'group{thing}Color']
@@ -95,8 +92,8 @@ try:
                 P_DICT[f'y_obs{thing}'].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
-            # Allows user to shift data on the Y axis (for example, to display multiple binary
-            # sources on the same chart.)
+            # Allows user to shift data on the Y axis (for example, to display multiple binary sources on the same
+            # chart.)
             if PROPS[f'group{thing}adjuster'] != "":
                 temp_list = []
                 for obs in P_DICT[f'y_obs{thing}']:
@@ -136,8 +133,7 @@ try:
                 logger=LOG
             )
 
-            # Note that using 'c' to set the color instead of 'color' makes a difference for some
-            # reason.
+            # Note that using 'c' to set the color instead of 'color' makes a difference for some reason.
             ax.scatter(
                 P_DICT[f'x_obs{thing}'],
                 y_data,
@@ -185,8 +181,8 @@ try:
         labels = []
 
         # Set legend group colors
-        # Note that we do this in a slightly different order than other chart types because we use
-        # legend styles for scatter charts differently than other chart types.
+        # Note that we do this in a slightly different order than other chart types because we use legend styles for
+        # scatter charts differently than other chart types.
         num_col = int(P_DICT['legendColumns'])
         iter_colors  = itertools.chain(*[GROUP_COLORS[i::num_col] for i in range(num_col)])
         final_colors = list(iter_colors)

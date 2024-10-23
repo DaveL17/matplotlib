@@ -45,7 +45,7 @@ DaveL17 - Check to ensure that the path is valid and reachable (writeable) by th
 #### 2019-01-21  Autolog  [COMPLETE]
 Another useful feature to add to the mix, especially if you are going to roll-your-own rather than using pandas, would 
 be to be able to specify a period on the CSV file. My TRV plugin is creating CSV files for the measurements over the 
-last say 24 hours. At times I would like to view the last 3 hours in more detail. The only reasonable way to do this 
+last say 24 hours. At times, I would like to view the last 3 hours in more detail. The only reasonable way to do this 
 at the moment is to create 2 sets of CSV file. If you could specify a period in the chart then that would save having 
 to do this. My processing adds an entry to the CSV file for the start of the period (based on the last one dropped 
 off) so that graph lines are always generated from the graph origin.
@@ -80,7 +80,7 @@ looks like it doesn't match the Indigo version (there is some introspection of t
 happens if the original path is in the Indigo folder tree).  `v0.7.53`
 
 #### 2019-02-12  Autolog  [COMPLETE]
-It would be useful to able to specify the text colour when selecting Show Battery Level. At the moment if you select 
+It would be useful to be able to specify the text colour when selecting Show Battery Level. At the moment if you select 
 a light green colour for the Healthy colour then the white text gets lost.
 
 DaveL17 - annotations feature added to Battery Health devices in `v0.7.45`.
@@ -102,7 +102,7 @@ DaveL17 - this feature was added with build `v0.7.13`.
 #### 2018-12-18  Autolog  [COMPLETE]
 In the CSV Engine you can specify the number of Observations that you wish to keep in your CSV file.
 
-It would also be useful to able to specify a user specified data retention period (e.g. 24 hours) so that older 
+It would also be useful to be able to specify a user specified data retention period (e.g. 24 hours) so that older 
 entries get dropped off. This would then make it easy to display graphs for the last 24 hours for example.
 
 DaveL17 - this feature was added with build `v0.7.11`.

@@ -1,3 +1,7 @@
+#### v2023.1.0
+- Adds boolean return to `refreshAChartAction` to honor scripting requests that include a `waitUntilDone` attribute.
+- Minor Wiki edits.
+
 #### v2023.0.1
 - Changes to prepare for Indigo `v2023.2`.
 - Code enhancements.
@@ -893,7 +897,7 @@
 - Adds device-specific custom font sizes to support retina/non-retina displays.
 - Tweaks weather forecast device to increase separation between low temperature line and precipitation bar annotations.
 - Fixes bug in Matplotlib Action item.
-- CSV Engine: changed "Source Title" to "Title",  changed "Source Device" to "ID", changed "Source State" to "Data" to
+- CSV Engine: changed "Source Title" to "Title", changed "Source Device" to "ID", changed "Source State" to "Data" (to
   be more descriptive of devices and variable data sources).
 
 #### v0.2.03

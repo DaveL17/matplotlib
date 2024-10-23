@@ -153,7 +153,7 @@ def eval_expr(expr):
     :param expr:
     :return:
     """
-    LOG['Debug'].append(f"[{payload['props']['name']}] Evaluating expressions.")
+    # LOG['Debug'].append(f"[{payload['props']['name']}] Evaluating expressions.")
     return eval_(ast.parse(expr, mode='eval').body)
 
 
@@ -284,7 +284,8 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
         )
 
     except RuntimeError as err:
-        if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+        # if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+        if "exceeds Locator.MAXTICKS" in traceback.format_exc():  # removes payload
             logger['Critical'].append(
                 f"[{payload['props']['name']}] Chart data will produce too many X axis ticks. "
                 f"Check source data."
@@ -922,7 +923,7 @@ def get_data(data_source, logger):
 
 
 # =============================================================================
-def hide_anomalies(data: tuple=None, props: dict=None, logger: dict=None):
+def hide_anomalies(data: tuple = None, props: dict = None, logger: dict = None):
     """Detect outliers in data and replace them with 'NaN'.
 
     Credit: https://gist.github.com/wmlba/89bc2f4556b8ee397ca7a5017b497657#file-outlier_std-py
@@ -964,6 +965,7 @@ def hide_anomalies(data: tuple=None, props: dict=None, logger: dict=None):
         value = data
 
     return value
+
 
 # =============================================================================
 def make_chart_figure(width, height, p_dict):
@@ -1087,5 +1089,6 @@ def save(logger):
 
     except RuntimeError as err:
         # There are too many observations in the CSV data.
-        if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+        # if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
+        if "exceeds Locator.MAXTICKS" in traceback.format_exc():  # removes payload
             logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved. [Too many observations.]")

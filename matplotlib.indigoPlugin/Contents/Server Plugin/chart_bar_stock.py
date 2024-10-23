@@ -41,10 +41,7 @@ try:
     def __init__():
         ...
 
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
-
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
@@ -64,22 +61,22 @@ try:
         # If the bar color is the same as the background color, alert the user.
         if color == P_DICT['backgroundColor'] and not suppress_bar:
             LOG['Warning'].append(
-                f"[{CHART_NAME}] Area {b_num} color is the same as the  background color (so you "
-                f"may not be able to see it)."
+                f"[{CHART_NAME}] Area {b_num} color is the same as the  background color (so you may not be able to "
+                f"see it)."
             )
 
         # =============================  Bar Suppressed  ==============================
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             LOG['Info'].append(
-                f"[{CHART_NAME}] Bar {b_num} is suppressed by user setting. You can re-enable it "
-                f"in the device configuration menu."
+                f"[{CHART_NAME}] Bar {b_num} is suppressed by user setting. You can re-enable it in the device "
+                f"configuration menu."
             )
 
         # ============================  Display Zero Bars  ============================
-        # Early versions of matplotlib will truncate leading and trailing bars where the value is
-        # zero. With this setting, we replace the Y values of zero with a very small positive value
-        # (0 becomes 1e-06). We get a slice of the original data for annotations.
+        # Early versions of matplotlib will truncate leading and trailing bars where the value is zero. With this
+        # setting, we replace the Y values of zero with a very small positive value (0 becomes 1e-06). We get a slice
+        # of the original data for annotations.
         # annotation_values.append(y_val)
         ANNOTATION_VALUE.append(bar[f'val_{b_num}'])
         if P_DICT.get('showZeroBars', False):
@@ -95,9 +92,7 @@ try:
                 width = float(P_DICT['barWidth'])
         except ValueError:
             width = 0.8
-            LOG['Warning'].append(
-                f"[{CHART_NAME}] Problem setting bar width. Check value ({P_DICT['barWidth']})."
-            )
+            LOG['Warning'].append(f"[{CHART_NAME}] Problem setting bar width. Check value ({P_DICT['barWidth']}).")
 
         # ==============================  Plot the Bar  ===============================
         # Plot the bars. If 'suppressBar{thing} is True, we skip it.
@@ -156,8 +151,7 @@ try:
         )
 
     # ============================= Legend Properties =============================
-    # Legend should be plotted before any other lines are plotted (like averages or custom line
-    # segments).
+    # Legend should be plotted before any other lines are plotted (like averages or custom line segments).
     if P_DICT['showLegend']:
 
         # Amend the headers if there are any custom legend entries defined.
@@ -214,10 +208,10 @@ try:
         chart_tools.save(logger=LOG)
 
     except OverflowError as err:
-        if "date value out of range" in traceback.format_exc(err):
+        # if "date value out of range" in traceback.format_exc(err):
+        if "date value out of range" in traceback.format_exc():  # deletes the payload
             LOG['Critical'].append(
-                f"[{PAYLOAD['props']['name']}] Chart not saved. Try enabling Display Zero Bars in"
-                f"device settings."
+                f"[{PAYLOAD['props']['name']}] Chart not saved. Try enabling Display Zero Bars in device settings."
             )
 
 except Exception as sub_error:

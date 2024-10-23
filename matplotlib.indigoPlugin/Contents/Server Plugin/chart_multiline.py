@@ -46,9 +46,9 @@ try:
         """
         Cleans long strings of whitespace and formats certain characters
 
-        The clean_string(self, val) method is used to scrub multiline text elements in order to
-        try to make them more presentable. The need is easily seen by looking at the rough text
-        that is provided by the U.S. National Weather Service, for example.
+        The clean_string(self, val) method is used to scrub multiline text elements in order to try to make them more
+        presentable. The need is easily seen by looking at the rough text that is provided by the U.S. National Weather
+        Service, for example.
         -----
         :param unicode val:
         :return val:
@@ -106,8 +106,8 @@ try:
         TEXT_TO_PLOT = P_DICT['defaultText']
 
     else:
-        # The clean_string method tries to remove some potential ugliness from the text to be
-        # plotted. It's optional--defaulted to on. No need to call this if the default text is used.
+        # The clean_string method tries to remove some potential ugliness from the text to be plotted. It's optional--
+        # defaulted to on. No need to call this if the default text is used.
         if P_DICT['cleanTheText']:
             TEXT_TO_PLOT = clean_string(val=TEXT_TO_PLOT)
 

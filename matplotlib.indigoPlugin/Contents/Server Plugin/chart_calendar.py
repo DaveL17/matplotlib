@@ -2,8 +2,7 @@
 
 """
 Creates the calendar charts
-Given the unique nature of calendar charts, we use a separate method to
-construct them.
+Given the unique nature of calendar charts, we use a separate method to construct them.
 """
 
 # Built-in Modules

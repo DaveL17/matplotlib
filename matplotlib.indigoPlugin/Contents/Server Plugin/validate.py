@@ -25,7 +25,7 @@ def __init__():
 
 
 # =============================== Chart Colors ================================+
-def chart_colors(values_dict: indigo.Dict):
+def chart_colors(values_dict: indigo.Dict) -> None:
     """
     Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9).
 
@@ -46,7 +46,7 @@ def chart_colors(values_dict: indigo.Dict):
 
 
 # ============================= Chart Dimensions ==============================
-def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
     """
 
     :param indigo.Dict values_dict:
@@ -79,7 +79,7 @@ def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
 
 # ============================= Chart Resolution ==============================
 # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
-def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
     """
 
     :param values_dict:
@@ -107,7 +107,7 @@ def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
 
 
 # ================================ Data Paths ==================================
-def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict):
+def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict) -> dict:
     """
     Ensure the data path value is valid.
 
@@ -128,7 +128,7 @@ def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict):
 
 # ================================ Line Weight =================================
 # Line weight is a hidden prop in PluginConfig.xml and may no longer be needed.  fixme
-def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
+def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
     """
 
     :param indigo.Dict values_dict:
@@ -149,7 +149,7 @@ def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict):
 # ==============================================================================
 
 # =============================== Custom Ticks =================================
-def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict):
+def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict) -> tuple:
     """
     Ensure all custom tick locations are numeric, within bounds, and of the same length.
 

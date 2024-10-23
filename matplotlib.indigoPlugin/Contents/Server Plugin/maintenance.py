@@ -24,12 +24,13 @@ __license__   = "MIT"
 __title__     = "maintenance"
 __version__   = "0.1.03"
 
+
 class Maintain:
     """
     Various plugin maintenance utilities
 
-    Maintain is a container for code that makes specific to consolidate methods used throughout all Indigo
-    plugins with the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for each plugin.
+    Maintain is a container for code that makes specific to consolidate methods used throughout all Indigo plugins with
+    the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for each plugin.
     """
 
     def __init__(self, plugin):
@@ -41,11 +42,6 @@ class Maintain:
         self.plugin = plugin
         self.pluginPrefs = plugin.pluginPrefs
         self.my_logger = logging.getLogger("Plugin.Maintain")
-
-        # fmt = '%(asctime)s.%(msecs)03d\t%(levelname)-10s\t%(name)s.%(funcName)-28s %(msg)s'
-        # self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt,datefmt='%Y-%m-%d %H:%M:%S'))
-
-        # my_logger.threaddebug("Initializing maintenance framework.")
         self.my_logger.debug("Initializing maintenance framework.x")
 
     def clean_prefs(self, dev_name: str, prefs: dict):
@@ -432,7 +428,7 @@ class Maintain:
             # If chartLastUpdated is empty, set it to the epoch
             if dev.deviceTypeId != 'csvEngine' and dev.states['chartLastUpdated'] == "":
                 dev.updateStateOnServer(key='chartLastUpdated', value='1970-01-01 00:00:00.000000')
-                self.my_logger.threaddebug("CSV last update unknown. Coercing update.")
+                self.my_logger.debug("CSV last update unknown. Coercing update.")
 
             # =============================== Chart Devices ===============================
             elif dev.deviceTypeId not in ('csvEngine', 'rcParamsDevice'):
@@ -559,7 +555,7 @@ class Maintain:
             dev.replacePluginPropsOnServer(props)
 
             if self.plugin.pluginPrefs['verboseLogging']:
-                self.my_logger.threaddebug(f"[{dev.name}] prefs cleaned.")
+                self.my_logger.debug(f"[{dev.name}] prefs cleaned.")
 
         except Exception as err:
             indigo.server.log(str(err), isError=True)

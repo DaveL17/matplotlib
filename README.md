@@ -1,7 +1,9 @@
 # ![Logo](https://github.com/DaveL17/matplotlib/wiki/img/img_MatplotlibLogo.png)
 # ![shield](https://img.shields.io/github/release/DaveL17/matplotlib.svg) ![indigo-version](https://img.shields.io/badge/Indigo-2022.1+-blueviolet.svg) ![indigo-version](https://img.shields.io/badge/Python-3.10-darkgreen.svg)
 
-The Matplotlib plugin allows you to easily create attractive charts for display on Indigo Home Control Server control pages. The plugin also includes a facility to create necessary CSV data for display.
+The Matplotlib plugin allows you to easily create attractive charts for display on Indigo 
+Smart Home Software Platform control pages. The plugin also includes a facility to create 
+necessary CSV data for display.
 
 *Highlights:*  
 - Easily create visually appealing charts for Indigo control pages.

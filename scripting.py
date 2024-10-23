@@ -4,10 +4,7 @@
 The scripting module is used as a plugin API for creating simple charts on demand.
 
 """
-try:
-    import indigo
-except ImportError:
-    ...
+import indigo  # noqa
 
 
 matplotlibPlugin = indigo.server.getPlugin("com.fogbert.indigoplugin.matplotlib")
@@ -22,11 +19,7 @@ payload = {'x_values': [1, 2, 3],
            'filename': 'chart_filename.png'
            }
 try:
-    result = matplotlibPlugin.executeAction('refreshTheChartsAPI',
-                                            deviceId=0,
-                                            waitUntilDone=True,
-                                            props=payload
-                                            )
+    result = matplotlibPlugin.executeAction('refreshTheChartsAPI', deviceId=0, waitUntilDone=True, props=payload)
     if result is not None:
         indigo.server.log(result['message'])
 except Exception as err:

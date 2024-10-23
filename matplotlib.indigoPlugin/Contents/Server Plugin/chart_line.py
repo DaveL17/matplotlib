@@ -37,8 +37,7 @@ try:
     def __init__():
         ...
 
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
 
     # ============================== Format X Ticks ===============================
     ax.tick_params(axis='x', **K_DICT['k_major_x'])
@@ -60,8 +59,8 @@ try:
         # If the line is suppressed, remind the user they suppressed it.
         if suppress_line:
             LOG['Info'].append(
-                f"[{CHART_NAME}] Line {line} is suppressed by user setting. You can re-enable it "
-                f"in the device configuration menu."
+                f"[{CHART_NAME}] Line {line} is suppressed by user setting. You can re-enable it in the device "
+                f"configuration menu."
             )
 
         # ============================== Plot the Lines ===============================
@@ -71,8 +70,8 @@ try:
             # If line color is the same as the background color, alert the user.
             if P_DICT[f'line{line}Color'] == P_DICT['backgroundColor'] and not suppress_line:
                 LOG['Warning'].append(
-                    f"[{CHART_NAME}] Area {line} color is the same as the background color (so "
-                    f"you may not be able to see it)."
+                    f"[{CHART_NAME}] Area {line} color is the same as the background color (so you may not be able to "
+                    f"see it)."
                 )
 
             # Add line color to list for later use
@@ -97,8 +96,8 @@ try:
                 P_DICT[f'y_obs{line}'].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
-            # Allows user to shift data on the Y axis (for example, to display multiple binary
-            # sources on the same chart.)
+            # Allows user to shift data on the Y axis (for example, to display multiple binary sources on the same
+            # chart.)
             if PROPS.get(f'line{line}adjuster', "") != "":
                 temp_list = []
                 for obs in P_DICT[f'y_obs{line}']:
@@ -128,9 +127,7 @@ try:
                 P_DICT[f'x_obs{line}'], P_DICT[f'y_obs{line}'] = prune
 
             # ======================== Convert Dates for Charting =========================
-            P_DICT[f'x_obs{line}'] = chart_tools.format_dates(
-                list_of_dates=P_DICT[f'x_obs{line}'], logger=LOG
-            )
+            P_DICT[f'x_obs{line}'] = chart_tools.format_dates(list_of_dates=P_DICT[f'x_obs{line}'], logger=LOG)
 
             # ===========================  Hide Anomalous Data  ===========================
             y_data = chart_tools.hide_anomalies(
@@ -241,8 +238,7 @@ try:
 
         if P_DICT[f'line{line}Source'] not in ("", "None") and not suppress_line:
 
-            # Note that we do these after the legend is drawn so that these lines don't
-            # affect the legend.
+            # Note that we do these after the legend is drawn so that these lines don't affect the legend.
 
             # =============================== Best Fit Line ===============================
             if PROPS.get(f'line{line}BestFit', False):

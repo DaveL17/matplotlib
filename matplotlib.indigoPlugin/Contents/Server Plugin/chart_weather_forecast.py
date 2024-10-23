@@ -3,9 +3,9 @@
 """
 Creates the weather charts
 
-Given the unique nature of weather chart construction, we have a separate method for these charts.
-Note that it is not currently possible within the multiprocessing framework used to query the
-Indigo server, so we need to send everything we need through the method call.
+Given the unique nature of weather chart construction, we have a separate method for these charts. Note that it is not
+currently possible within the multiprocessing framework used to query the Indigo server, so we need to send everything
+we need through the method call.
 """
 
 # Built-in Modules
@@ -49,18 +49,14 @@ try:
         :return:
         """
 
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
-
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     dates_to_plot = P_DICT['dates_to_plot']
 
     for line in range(1, 4, 1):
 
         if P_DICT[f'line{line}Color'] == P_DICT['backgroundColor']:
             LOG['Debug'].append(
-                f"[{CHART_NAME}] A line color is the same as the background color (so you will not "
-                f"be able to see it)."
+                f"[{CHART_NAME}] A line color is the same as the background color (so you will not be able to see it)."
             )
 
     # ========================== Fantastic Hourly Device ==========================
@@ -104,13 +100,12 @@ try:
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
-            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust
-            # slightly if that's the case.
+            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
+            # case.
             if set(P_DICT['y_obs3']) == {0.0}:
                 P_DICT['y_obs3'][0] = 1.0
 
-            # Note that the trailing comma is required to ensure that Matplotlib interprets the
-            # legend as a tuple.
+            # Note that the trailing comma is required to ensure that Matplotlib interprets the legend as a tuple.
             P_DICT['headers_1'] = ('Temperature',)
             P_DICT['headers_2'] = ('Precipitation',)
 
@@ -128,8 +123,8 @@ try:
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
-            # Note that bar plots behave strangely if all the y obs are zero. We need to adjust
-            # slightly if that's the case.
+            # Note that bar plots behave strangely if all the y obs are zero. We need to adjust slightly if that's the
+            # case.
             if set(P_DICT['y_obs3']) == {0.0}:
                 P_DICT['y_obs3'][0] = 100.0
 
@@ -151,8 +146,8 @@ try:
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
-            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust
-            # slightly if that's the case.
+            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
+            # case.
             if set(P_DICT['y_obs3']) == {0.0}:
                 P_DICT['y_obs3'][0] = 1.0
 
@@ -161,8 +156,8 @@ try:
 
     else:
         LOG['Warning'].append(
-            f"[{CHART_NAME}] This device type only supports Fantastic Weather (v0.1.05 or later) "
-            f"and WUnderground forecast devices."
+            f"[{CHART_NAME}] This device type only supports Fantastic Weather (v0.1.05 or later) and WUnderground "
+            f"forecast devices."
         )
 
     if PLUG_DICT['verboseLogging']:
@@ -174,8 +169,8 @@ try:
     chart_tools.format_axis_y(ax=ax1, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # ============================ Precipitation Bars =============================
-    # The width of the bars is a percentage of a day, so we need to account for instances where the
-    # unit of time could be hours to months or years.
+    # The width of the bars is a percentage of a day, so we need to account for instances where the unit of time could
+    # be hours to months or years.
 
     # Plot precipitation bars
     if P_DICT['y_obs3']:
@@ -252,15 +247,14 @@ try:
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # =============================== Y1 Axis Label ===============================
-    # Note we're plotting Y2 label on ax1. We do this because we want the precipitation bars to be
-    # under the temperature plot, but we want the precipitation scale to be on the right side.
+    # Note we're plotting Y2 label on ax1. We do this because we want the precipitation bars to be under the
+    # temperature plot, but we want the precipitation scale to be on the right side.
     plt.ylabel(P_DICT['customAxisLabelY2'], **K_DICT['k_y_axis_font'])
     ax1.yaxis.set_label_position('right')
 
     # ============================= Legend Properties =============================
-    # (note that we need a separate instance of this code for each subplot. This one controls the
-    # precipitation subplot.) Legend should be plotted before any other lines are plotted (like
-    # averages or custom line segments).
+    # (note that we need a separate instance of this code for each subplot. This one controls the precipitation
+    # subplot.) Legend should be plotted before any other lines are plotted (like averages or custom line segments).
 
     if P_DICT['showLegend']:
         headers = list(P_DICT['headers_2'])
@@ -301,14 +295,12 @@ try:
         min_dates_to_plot = np.amin(dates_to_plot)
         max_dates_to_plot = np.amax(dates_to_plot)
 
-        # We will only highlight daytime if the current values for sunrise and sunset fall within
-        # the limits of dates_to_plot. We add and subtract one second for each to account for
-        # microsecond rounding.
+        # We will only highlight daytime if the current values for sunrise and sunset fall within the limits of
+        # dates_to_plot. We add and subtract one second for each to account for microsecond rounding.
         if (min_dates_to_plot - 1) < sun_rise < (max_dates_to_plot + 1) and \
                 (min_dates_to_plot - 1) < sun_set < (max_dates_to_plot + 1):
 
-            # If sunrise is less than sunset, they are on the same day, so we fill in between the
-            # two.
+            # If sunrise is less than sunset, they are on the same day, so we fill in between the two.
             if sun_rise < sun_set:
                 ax1.axvspan(sun_rise, sun_set, color=P_DICT['daytimeColor'], alpha=0.15, zorder=1)
 
@@ -379,8 +371,8 @@ try:
 
     plt.autoscale(enable=True, axis='x', tight=None)
 
-    # Note that we plot the bar plot so that it will be under the line plot, but we still want the
-    # temperature scale on the left and the percentages on the right.
+    # Note that we plot the bar plot so that it will be under the line plot, but we still want the temperature scale on
+    # the left and the percentages on the right.
     ax1.yaxis.tick_right()
     ax2.yaxis.tick_left()
 
@@ -420,17 +412,16 @@ try:
     plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
     # =============================== Y2 Axis Label ===============================
-    # Note we're plotting Y1 label on ax2. We do this because we want the temperature lines to be
-    # over the precipitation bars, but we want the temperature scale to be on the left side.
+    # Note we're plotting Y1 label on ax2. We do this because we want the temperature lines to be over the
+    # precipitation bars, but we want the temperature scale to be on the left side.
 
     # Note we're plotting Y1 label on ax2
     plt.ylabel(P_DICT['customAxisLabelY'], **K_DICT['k_y_axis_font'])
     ax2.yaxis.set_label_position('left')
 
     # ============================= Legend Properties =============================
-    # (note that we need a separate instance of this code for each subplot. This one controls the
-    # Temperatures subplot.) Legend should be plotted before any other lines are plotted (like
-    # averages or custom line segments).
+    # (note that we need a separate instance of this code for each subplot. This one controls the Temperatures
+    # subplot.) Legend should be plotted before any other lines are plotted (like averages or custom line segments).
 
     if P_DICT['showLegend']:
         headers = list(P_DICT['headers_1'])
@@ -445,8 +436,7 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)
 
-    # We are setting these values here in a special way because it's apparently the only way to
-    # overcome twinx.
+    # We are setting these values here in a special way because it's apparently the only way to overcome twinx.
     for tick in ax1.yaxis.get_major_ticks():
         tick.label1.set_fontname(PLUG_DICT['fontMain'])
         tick.label2.set_fontname(PLUG_DICT['fontMain'])
@@ -461,9 +451,8 @@ try:
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # With the upgrade to matplotlib 3.5.1, tick labels were automatically being assigned to `ax`
-    # (even though 'ax' is not overtly referenced). Therefore, we set them to an empty list to
-    # suppress them.
+    # With the upgrade to matplotlib 3.5.1, tick labels were automatically being assigned to `ax` (even though 'ax' is
+    # not overtly referenced). Therefore, we set them to an empty list to suppress them.
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
     ax1.tick_params(which='minor', bottom=False)

@@ -3,11 +3,10 @@
 """
 Creates the polar charts
 
-Note that the polar chart device can be used for other things, but it is coded like a wind rose
-which makes it easier to understand what's happening. Note that it would be possible to convert
-wind direction names (north-northeast) to an ordinal degree value, however, it would be very
-difficult to contend with the possible international Unicode values that could be passed to the
-device. Better to make it the responsibility of the user to convert their data to degrees.
+Note that the polar chart device can be used for other things, but it is coded like a wind rose which makes it easier
+to understand what's happening. Note that it would be possible to convert wind direction names (north-northeast) to an
+ordinal degree value, however, it would be very difficult to contend with the possible international Unicode values
+that could be passed to the device. Better to make it the responsibility of the user to convert their data to degrees.
 """
 
 # Built-in Modules
@@ -75,25 +74,24 @@ try:
         len_wind_dir = len(P_DICT['wind_direction'])
         len_wind_spd = len(P_DICT['wind_speed'])
 
-        # If the number of observations we have is greater than the number we want, we need to
-        # slice the lists to use the last n observations.
+        # If the number of observations we have is greater than the number we want, we need to slice the lists to use
+        # the last n observations.
         if len_wind_dir > num_obs:
             P_DICT['wind_direction'] = P_DICT['wind_direction'][num_obs * -1:]
 
         if len_wind_spd > num_obs:
             P_DICT['wind_speed'] = P_DICT['wind_speed'][num_obs * -1:]
 
-        # If at this point we still don't have an equal number of observations for both theta and
-        # radii, we shouldn't plot the chart.
+        # If at this point we still don't have an equal number of observations for both theta and radii, we shouldn't
+        # plot the chart.
         if len(P_DICT['wind_direction']) != len(P_DICT['wind_speed']):
             LOG['Warning'].append(
                 f"[{CHART_NAME}] Insufficient number of observations to plot. Skipped."
             )
             sys.exit()
 
-        # Create the array of grey scale for the intermediate lines and set the last one red. (MPL
-        # will accept string values '0' - '1' as grey scale, so we create a number of greys based
-        # on 1.0 / number of observations.)
+        # Create the array of grey scale for the intermediate lines and set the last one red. (MPL will accept string
+        # values '0' - '1' as grey scale, so we create a number of greys based on 1.0 / number of observations.)
         color_increment = 1.0 / num_obs
         color = color_increment
         for item in range(0, num_obs, 1):
@@ -128,13 +126,12 @@ try:
         ax.set_facecolor(P_DICT['faceColor'])
 
         # ============================== Create the Plot ==============================
-        # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the grid
-        # defaults to z = 2.)
+        # Note: zorder of the plot must be >2.01 for the plot to be above the grid (the grid defaults to z = 2.)
         for w in wind:
             ax.plot((0, w[0]), (0, w[1]), color=w[2], linewidth=2, zorder=3)
 
-        # Right-size the grid (must be done after the plot), and customize the tick labels. The
-        # default covers anything over 50.
+        # Right-size the grid (must be done after the plot), and customize the tick labels. The default covers anything
+        # over 50.
         ticks = np.arange(20, 100, 20)
         grids = range(20, 120, 20)
 
@@ -183,9 +180,8 @@ try:
             ax.axes.yaxis.set_ticklabels([])
 
         # ========================== Current Obs / Max Wind ===========================
-        # Note that we reduce the value of the circle plot so that it appears when transparent
-        # charts are enabled (otherwise the circle is obscured). The transform can be done one of
-        # two ways: access the private attribute:
+        # Note that we reduce the value of the circle plot so that it appears when transparent charts are enabled
+        # (otherwise the circle is obscured). The transform can be done one of two ways: access the private attribute:
         # "ax.transData._b", or "ax.transProjectionAffine + ax.transAxes".
         fig = plt.gcf()
         max_wind_circle = plt.Circle(
@@ -242,8 +238,7 @@ try:
             fig.gca().add_artist(patch)
 
         # ============================= Legend Properties =============================
-        # Legend should be plotted before any other lines are plotted (like averages or custom line
-        # segments).
+        # Legend should be plotted before any other lines are plotted (like averages or custom line segments).
 
         if P_DICT['showLegend']:
             legend = ax.legend(

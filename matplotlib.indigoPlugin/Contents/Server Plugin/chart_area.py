@@ -40,10 +40,7 @@ def __init__():
 
 
 try:
-    ax = chart_tools.make_chart_figure(
-        width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
-    )
-
+    ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
@@ -54,8 +51,8 @@ try:
         # If the area is suppressed, remind the user they suppressed it.
         if suppress_area:
             LOG['Info'].append(
-                f"[{CHART_NAME}] Area {area} is suppressed by user setting. You can re-enable it "
-                f"in the device configuration menu."
+                f"[{CHART_NAME}] Area {area} is suppressed by user setting. You can re-enable it in the device "
+                f"configuration menu."
             )
 
         # ============================== Plot the Areas ===============================
@@ -65,8 +62,8 @@ try:
             # If area color is the same as the background color, alert the user.
             if P_DICT[f'area{area}Color'] == P_DICT['backgroundColor'] and not suppress_area:
                 LOG['Warning'].append(
-                    f"[{CHART_NAME}] Area {area} color is the same as the background color (so "
-                    f"you may not be able to see it)."
+                    f"[{CHART_NAME}] Area {area} color is the same as the background color (so you may not be able to "
+                    f"see it)."
                 )
 
             data_path   = PLUG_DICT['dataPath']
@@ -86,8 +83,8 @@ try:
                 P_DICT[f'y_obs{area}'].append(float(element[1]))
 
             # ============================= Adjustment Factor =============================
-            # Allows user to shift data on the Y axis (for example, to display multiple binary
-            # sources on the same chart.)
+            # Allows user to shift data on the Y axis (for example, to display multiple binary sources on the same
+            # chart.)
             if PROPS[f'area{area}adjuster'] != "":
                 temp_list = []
                 for obs in P_DICT[f'y_obs{area}']:
@@ -119,32 +116,28 @@ try:
                 )
 
             # ======================== Convert Dates for Charting =========================
-            P_DICT[f'x_obs{area}'] = \
-                chart_tools.format_dates(list_of_dates=P_DICT[f'x_obs{area}'], logger=LOG)
+            P_DICT[f'x_obs{area}'] = chart_tools.format_dates(list_of_dates=P_DICT[f'x_obs{area}'], logger=LOG)
 
             _ = [P_DICT['data_array'].append(node) for node in P_DICT[f'y_obs{area}']]
 
-            # We need to plot all the stacks at once, so we create some tuples to hold the data we
-            # need later.
+            # We need to plot all the stacks at once, so we create some tuples to hold the data we need later.
             Y_OBS_TUPLE += (P_DICT[f'y_obs{area}'],)
             Y_COLORS_TUPLE += (P_DICT[f'area{area}Color'],)
             X_OBS = P_DICT[f'x_obs{area}']
 
             # ================================ Annotations ================================
-
             # New annotations code begins here - DaveL17 2019-06-05
             for _ in range(1, area + 1, 1):
 
                 tup = ()
 
-                # We start with the ordinal list and create a tuple to hold all the lists that
-                # come before it.
+                # We start with the ordinal list and create a tuple to hold all the lists that come before it.
                 for k in range(_, 0, -1):
 
                     tup += (P_DICT[f'y_obs{area}'],)
 
-                # The relative value is the sum of each list element plus the ones that come before
-                # it (i.e., tup[n][0] + tup[n-1][0] + tup[n-2][0]
+                # The relative value is the sum of each list element plus the ones that come before it
+                # (i.e., tup[n][0] + tup[n-1][0] + tup[n-2][0]
                 Y_OBS_TUPLE_REL[f'y_obs{area}'] = [sum(t) for t in zip(*tup)]
 
             annotate = P_DICT[f'area{area}Annotate']
@@ -171,9 +164,9 @@ try:
     )
 
     # ============================== Y1 Axis Min/Max ==============================
-    # Min and Max are not 'None'. The p_dict['data_array'] contains individual data points and
-    # doesn't take into account the additive nature of the plot. Therefore, we get the axis scaling
-    # values from the plot and then use those for min/max.
+    # Min and Max are not 'None'. The p_dict['data_array'] contains individual data points and doesn't take into
+    # account the additive nature of the plot. Therefore, we get the axis scaling values from the plot and then use
+    # those for min/max.
     _ = [P_DICT['data_array'].append(node) for node in ax.get_ylim()]
 
     chart_tools.format_axis_y1_min_max(p_dict=P_DICT, logger=LOG)
@@ -245,8 +238,7 @@ try:
         suppress_area = P_DICT.get(f'suppressArea{area}', False)
 
         if P_DICT[f'area{area}Source'] not in ("", "None") and not suppress_area:
-            # Note that we do these after the legend is drawn so that these areas don't affect the
-            # legend.
+            # Note that we do these after the legend is drawn so that these areas don't affect the legend.
 
             # We need to reload the dates to ensure that they match the area being plotted
             # dates_to_plot = self.format_dates(p_dict[f'x_obs{area}'])
@@ -283,8 +275,8 @@ try:
                 )
 
             # ================================== Markers ==================================
-            # Note that stackplots don't support markers, so we need to plot a line (with no width)
-            # on the plot to receive the markers.
+            # Note that stackplots don't support markers, so we need to plot a line (with no width) on the plot to
+            # receive the markers.
             if P_DICT[f'area{area}Marker'] != 'None':
                 ax.plot_date(
                     P_DICT[f'x_obs{area}'],
