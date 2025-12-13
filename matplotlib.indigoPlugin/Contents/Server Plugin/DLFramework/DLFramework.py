@@ -412,11 +412,9 @@ class evalExpr:  # noqa
         :return:
         """
 
-        # See https://stackoverflow.com/q/71353183/2827397 (and the accompanying answer) for an explanation of the code
-        # inspection warnings thrown by this method.
         try:
-            if isinstance(node, ast.Num):  # <number>
-                value = node.n
+            if isinstance(node, ast.Constant):  # <number> or other constant
+                value = node.value
             elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
                 value = OPERATORS.get(type(node.op))(self.__eval(node.left), self.__eval(node.right))  # noqa
             elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
@@ -426,7 +424,6 @@ class evalExpr:  # noqa
             if not value:
                 # value will be none if the operator provided is not in the "approved" OPERATORS.
                 raise TypeError(node)
-
             return value
         except (TypeError, KeyError):
             self.plugin.logger.critical("That expression is not allowed.")
