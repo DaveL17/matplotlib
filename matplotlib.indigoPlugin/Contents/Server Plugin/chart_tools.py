@@ -171,8 +171,8 @@ def eval_(mode):
         ast.BitXor: op.xor, ast.USub: op.neg
     }
 
-    if isinstance(mode, ast.Num):  # <number>
-        value = mode.n
+    if isinstance(mode, ast.Constant):  # <number> or other constant
+        value = mode.value
     elif isinstance(mode, ast.BinOp):  # <left> <operator> <right>
         value = operators[type(mode.op)](eval_(mode=mode.left), eval_(mode=mode.right))
     elif isinstance(mode, ast.UnaryOp):  # <operator> <operand> e.g., -1
@@ -885,7 +885,7 @@ def get_data(data_source, logger):
     """
     Retrieve data from CSV file.
 
-    Reads data from source CSV file and returns a list of tuples for charting. The data are provided as unicode strings
+    Reads data from source CSV file and returns a list of tuples for charting. The data are provided as strings
     [('formatted date', 'observation'), ...]
     -----
     :param unicode data_source:

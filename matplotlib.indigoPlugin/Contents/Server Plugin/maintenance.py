@@ -374,21 +374,23 @@ class Maintain:
 
         # ================================ All Devices ================================
         # Set whether it's a chart device or not
-        is_chart_dict = {'areaChartingDevice': True,
-                         'barChartingDevice': True,
-                         'barStockChartingDevice': True,
-                         'barStockHorizontalChartingDevice': True,
-                         'radialBarChartingDevice': True,
-                         'batteryHealthDevice': True,
-                         'calendarChartingDevice': True,
-                         'csvEngine': False,
-                         'compositeForecastDevice': True,
-                         'forecastChartingDevice': True,
-                         'lineChartingDevice': True,
-                         'multiLineText': True,
-                         'polarChartingDevice': True,
-                         'rcParamsDevice': False,
-                         'scatterChartingDevice': True}
+        is_chart_dict = {
+            'areaChartingDevice': True,
+            'barChartingDevice': True,
+            'barStockChartingDevice': True,
+            'barStockHorizontalChartingDevice': True,
+            'radialBarChartingDevice': True,
+            'batteryHealthDevice': True,
+            'calendarChartingDevice': True,
+            'csvEngine': False,
+            'compositeForecastDevice': True,
+            'forecastChartingDevice': True,
+            'lineChartingDevice': True,
+            'multiLineText': True,
+            'polarChartingDevice': True,
+            'rcParamsDevice': False,
+            'scatterChartingDevice': True
+        }
 
         props['isChart'] = is_chart_dict[dev.deviceTypeId]
 

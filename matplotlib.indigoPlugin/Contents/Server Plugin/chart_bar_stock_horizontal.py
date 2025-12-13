@@ -66,8 +66,8 @@ try:
         # If the bar color is the same as the background color, alert the user.
         if color == P_DICT['backgroundColor'] and not suppress_bar:
             LOG['Warning'].append(
-                f"[{CHART_NAME}] Area {b_num} color is the same as the background color (so you  may not be able to see "
-                f"it)."
+                f"[{CHART_NAME}] Area {b_num} color is the same as the background color (so you  may not be able to "
+                f"see it)."
             )
 
         # =============================  Bar Suppressed  ==============================
@@ -102,7 +102,7 @@ try:
             )
 
         # ==============================  Plot the Bar  ===============================
-        # Plot the bars. If 'suppressBar{thing} is True, we skip it.
+        # Plot the bars. If `suppressBar{thing}` is True, we skip it.
         if not suppress_bar:
             ax.barh(
                 b_num,

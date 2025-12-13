@@ -95,7 +95,7 @@ try:
             LOG['Warning'].append(f"[{CHART_NAME}] Problem setting bar width. Check value ({P_DICT['barWidth']}).")
 
         # ==============================  Plot the Bar  ===============================
-        # Plot the bars. If 'suppressBar{thing} is True, we skip it.
+        # Plot the bars. If 'suppressBar{thing}` is True, we skip it.
         if not suppress_bar:
             ax.bar(
                 b_num,

@@ -104,17 +104,6 @@ try:
     highlight_color = P_DICT.get('todayHighlight', '#555555')
     days_rows.get_celld()[highlight_date].set_facecolor(highlight_color)
 
-    # =============================  Plot the Chart  ==============================
-    # Note that subplots_adjust affects the space surrounding the subplots and not the fig.
-    # plt.subplots_adjust(
-    #     top=0.97,
-    #     bottom=0.34,
-    #     left=0.02,
-    #     right=0.98,
-    #     hspace=None,
-    #     wspace=None
-    # )
-
     chart_tools.save(logger=LOG)
 
 except Exception as sub_error:

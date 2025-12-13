@@ -49,8 +49,6 @@ try:
 
         suppress_bar = P_DICT.get(f'suppressBar{thing}', False)
 
-        # p_dict[f"bar{thing}Color"] = chart_tools.fix_rgb(p_dict[f"bar{thing}Color"])
-
         # If the bar is suppressed, remind the user they suppressed it.
         if suppress_bar:
             LOG['Info'].append(
@@ -113,8 +111,8 @@ try:
             # Convert the date strings for charting.
             DATES_TO_DICT = chart_tools.format_dates(list_of_dates=DATES_TO_DICT, logger=LOG)
 
-            # If the user sets the width to 0, this will perform an introspection of the dates to
-            # plot and get the minimum of the difference between the dates.
+            # If the user sets the width to 0, this will perform an introspection of the dates to plot and get the
+            # minimum of the difference between the dates.
             try:
                 if float(P_DICT['barWidth']) == 0.0:
                     width = np.min(np.diff(DATES_TO_DICT)) * 0.8
@@ -123,9 +121,9 @@ try:
             except ValueError as sub_error:
                 width = 0.8
 
-            # Early versions of matplotlib will truncate leading and trailing bars where the value
-            # is zero. With this setting, we replace the Y values of zero with a very small positive
-            # value (0 becomes 1e-06). We get a slice of the original data for annotations.
+            # Early versions of matplotlib will truncate leading and trailing bars where the value is zero. With this
+            # setting, we replace the Y values of zero with a very small positive value (0 becomes 1e-06). We get a
+            # slice of the original data for annotations.
             annotation_values = y_obs[:]
             if P_DICT.get('showZeroBars', False):
                 y_obs[num_obs * -1:] = [1e-06 if _ == 0 else _ for _ in y_obs[num_obs * -1:]]
@@ -172,8 +170,7 @@ try:
         )
 
     # ============================= Legend Properties =============================
-    # Legend should be plotted before any other lines are plotted (like averages or custom line
-    # segments).
+    # Legend should be plotted before any other lines are plotted (like averages or custom line segments).
 
     if P_DICT['showLegend']:
 

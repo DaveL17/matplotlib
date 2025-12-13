@@ -118,12 +118,13 @@ try:
                 y_obs = P_DICT[f'y_obs{line}']
                 new_old = PROPS['limitDataRange']
 
-                prune = chart_tools.prune_data(x_data=dates_to_plot,
-                                               y_data=y_obs,
-                                               limit=limit,
-                                               new_old='None',
-                                               logger=LOG
-                                               )
+                prune = chart_tools.prune_data(
+                    x_data=dates_to_plot,
+                    y_data=y_obs,
+                    limit=limit,
+                    new_old='None',
+                    logger=LOG
+                )
                 P_DICT[f'x_obs{line}'], P_DICT[f'y_obs{line}'] = prune
 
             # ======================== Convert Dates for Charting =========================
@@ -193,10 +194,7 @@ try:
         # Amend the headers if there are any custom legend entries defined.
         counter = 1
         final_headers = []
-
         headers = P_DICT['headers']
-        # headers = [_ for _ in P_DICT['headers']]
-        # headers = [_.decode('utf-8') for _ in P_DICT['headers']]
 
         for header in headers:
             if P_DICT[f'line{counter}Legend'] == "":
@@ -239,7 +237,6 @@ try:
         if P_DICT[f'line{line}Source'] not in ("", "None") and not suppress_line:
 
             # Note that we do these after the legend is drawn so that these lines don't affect the legend.
-
             # =============================== Best Fit Line ===============================
             if PROPS.get(f'line{line}BestFit', False):
                 chart_tools.format_best_fit_line_segments(

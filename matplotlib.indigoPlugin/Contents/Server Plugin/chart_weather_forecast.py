@@ -77,8 +77,8 @@ try:
             # Convert the date strings for charting.
             dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
-            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust
-            # slightly if that's the case.
+            # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
+            # case.
             if set(P_DICT['y_obs3']) == {0.0}:
                 P_DICT['y_obs3'][0] = 1.0
 
