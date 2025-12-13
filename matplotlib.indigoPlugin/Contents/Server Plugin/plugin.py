@@ -11,12 +11,8 @@ plugin forecast charts if linked to the proper Fantastic Weather devices).
 """
 
 # =================================== Notes ===================================
-# - Memory Leak
-#   There is a known issue with the version of Matplotlib shipping at the time this plugin was developed that
-#   caused a memory leak that would ultimately cause the plugin to crash. Two significant steps were taken to address
-#   this. First, we import 'matplotlib.use('AGG')' which is thought to isolate the leak. Second, we run each plot
-#   update in its own process and then ultimately destroy the process when it's finished. These two steps seem to allow
-#   the plugin to run indefinitely without running out of resources.
+# We run each plot update in its own process to isolate resources and prevent any potential memory accumulation over
+# long-running sessions.
 
 # ================================== IMPORTS ==================================
 # Built-in modules
@@ -65,7 +61,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2025.1.0"
+__version__   = "2025.2.0"
 
 
 # =============================================================================
@@ -85,6 +81,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.Dict plugin_prefs:
         """
         super().__init__(plugin_id, plugin_display_name, plugin_version, plugin_prefs)
+        indigo.server.log(f"{type(plugin_prefs)}")
 
         # ============================ Instance Attributes =============================
         self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process

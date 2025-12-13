@@ -283,7 +283,7 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
             f"[{payload['props']['name']}] Problem formatting X labels.\n{err}"
         )
 
-    except RuntimeError as err:
+    except RuntimeError:
         # if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
         if "exceeds Locator.MAXTICKS" in traceback.format_exc():  # removes payload
             logger['Critical'].append(

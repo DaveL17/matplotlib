@@ -65,6 +65,13 @@ class Fogbert:
         self.plugin.plugin_file_handler.setFormatter(logging.Formatter(fmt=LOG_FORMAT, datefmt='%Y-%m-%d %H:%M:%S'))
 
     def environment(self) -> str:
+        """
+        Title placeholder
+
+        Body placeholder
+
+        :return:
+        """
         self.plugin.logger.debug("DLFramework pluginEnvironment method called.")
         environment_state = ""
         spacer = " " * 35
@@ -390,7 +397,7 @@ class evalExpr:  # noqa
         self.pluginPrefs = plugin.pluginPrefs
 
     # =============================================================================
-    def eval_expr(self, expr: int):
+    def eval_expr(self, expr: str):
         """
         Title Placeholder
 
@@ -414,16 +421,12 @@ class evalExpr:  # noqa
 
         try:
             if isinstance(node, ast.Constant):  # <number> or other constant
-                value = node.value
-            elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
-                value = OPERATORS.get(type(node.op))(self.__eval(node.left), self.__eval(node.right))  # noqa
-            elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
-                value = OPERATORS.get(type(node.op))(self.__eval(node.operand))  # noqa
-            else:
-                raise TypeError(node)
-            if not value:
-                # value will be none if the operator provided is not in the "approved" OPERATORS.
-                raise TypeError(node)
-            return value
+                return node.value
+            if isinstance(node, ast.BinOp):  # <left> <operator> <right>
+                return OPERATORS.get(type(node.op))(self.__eval(node.left), self.__eval(node.right))  # noqa
+            if isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+                return OPERATORS.get(type(node.op))(self.__eval(node.operand))  # noqa
+            raise TypeError(node)
         except (TypeError, KeyError):
             self.plugin.logger.critical("That expression is not allowed.")
+            return node
