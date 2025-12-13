@@ -5,7 +5,7 @@
 	<key>PluginVersion</key>
 	<string>2025.2.0</string>
 	<key>ServerApiVersion</key>
-	<string>3.0</string>
+	<string>3.8</string>
 	<key>CFBundleDisplayName</key>
 	<string>Matplotlib</string>
 	<key>CFBundleName</key>
