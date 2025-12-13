@@ -1,6 +1,7 @@
 #### v2025.2.0
 - Addresses Matplotlib API known changes in upgrade from (3.8.2 -> 3.10.7).
 - Improves exception logging for cases where a charted value is not a valid number.
+- Code cleanup.
 
 #### v2025.1.0
 - Stability and performance improvements.

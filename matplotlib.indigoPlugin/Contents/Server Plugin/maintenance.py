@@ -355,8 +355,9 @@ class Maintain:
 
         # Log list of removed keys
         if list_of_removed_keys:
+            # pylint: disable=logging-not-lazy
             self.my_logger.debug(
-                "[%s] Performing maintenance - removing unneeded keys: %s" % dev_name, list_of_removed_keys
+                "[%s] Performing maintenance - removing unneeded keys: %s" % (dev_name, list_of_removed_keys)
             )
 
         return prefs
@@ -448,7 +449,8 @@ class Maintain:
                     # For all chart device types
                     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
                     if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
-                        self.my_logger.debug("[%s] Refactoring color property: (%s)" % dev.name, prop)
+                        # pylint: disable=logging-not-lazy
+                        self.my_logger.debug("[%s] Refactoring color property: (%s)" % (dev.name, prop))
                         props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
 
                     # ============================== Fix Line Styles ==============================
@@ -459,6 +461,7 @@ class Maintain:
                     # If unsupported style in dev props
                     if props[prop] in ('steps', 'steps-mid', 'steps-post'):
                         # Change style to `solid`
+                        # pylint: disable=logging-not-lazy
                         self.my_logger.warning(
                             "Converting deprecated line style setting to solid line style for device [%s]." %
                             dev.name
@@ -556,7 +559,7 @@ class Maintain:
             dev.replacePluginPropsOnServer(props)
 
             if self.plugin.pluginPrefs['verboseLogging']:
-                self.my_logger.debug("[%s] prefs cleaned." % dev.name)
+                self.my_logger.debug("[%s] prefs cleaned." % dev.name)   # pylint: disable=logging-not-lazy
 
         except Exception as err:
             indigo.server.log(str(err), isError=True)
