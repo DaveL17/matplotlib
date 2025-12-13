@@ -248,8 +248,8 @@ try:
                 ncol=2,
                 prop={'size': float(P_DICT['legendFontSize'])}
             )
-            legend.legendHandles[0].set_color(P_DICT['currentWindColor'])
-            legend.legendHandles[1].set_color(P_DICT['maxWindColor'])
+            legend.legend_handles[0].set_color(P_DICT['currentWindColor'])
+            legend.legend_handles[1].set_color(P_DICT['maxWindColor'])
             _ = [text.set_color(P_DICT['fontColor']) for text in legend.get_texts()]
             frame = legend.get_frame()
             frame.set_alpha(0)

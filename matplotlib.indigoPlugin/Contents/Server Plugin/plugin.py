@@ -32,6 +32,7 @@ import shutil
 import subprocess
 import threading
 import traceback
+from typing import Any, Union
 import datetime as dt
 import operator as op
 import xml.etree.ElementTree as eTree
@@ -52,11 +53,11 @@ except ImportError:
     ...
 
 # My modules
-import DLFramework.DLFramework as Dave           # noqa
-import maintenance                               # noqa
-import validate                                  # noqa
-from constants import *                          # noqa
-from plugin_defaults import kDefaultPluginPrefs  # noqa
+import DLFramework.DLFramework as Dave                     # noqa
+import maintenance                                         # noqa
+import validate                                            # noqa
+from constants import CLEAN_LIST, DEBUG_LABELS, FONT_MENU  # noqa
+from plugin_defaults import kDefaultPluginPrefs            # noqa
 
 # =================================== HEADER ==================================
 __author__    = Dave.__author__
@@ -64,7 +65,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2024.1.0"
+__version__   = "2025.1.0"
 
 
 # =============================================================================
@@ -149,7 +150,7 @@ class Plugin(indigo.PluginBase):
         dev = indigo.devices[dev_id]
 
         if not user_cancelled:
-            self.logger.threaddebug(f"[{dev.name}] Final device values_dict: {values_dict}")
+            self.logger.threaddebug("[%s] Final device values_dict: %s" % (dev.name, values_dict))
             self.logger.threaddebug("Configuration complete.")
         else:
             self.logger.threaddebug("User cancelled.")
@@ -203,7 +204,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.Device dev:
         :return:
         """
-        self.logger.debug(f"[{dev.name}] Starting chart device.")
+        self.logger.debug("[%s] Starting chart device." % dev.name)
         # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global is in its proper
         # state.
         self.pluginIsShuttingDown = False
@@ -264,7 +265,7 @@ class Plugin(indigo.PluginBase):
         dev = indigo.devices[int(dev_id)]
         self.dev_var_list = self.generatorDeviceAndVariableList()
 
-        self.logger.threaddebug(f"[{dev.name}] Getting device config props: {values_dict}")
+        self.logger.threaddebug("[%s] Getting device config props: %s" % (dev.name, values_dict))
 
         try:
 
@@ -467,7 +468,7 @@ class Plugin(indigo.PluginBase):
 
         except KeyError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.warning(f"[{dev.name}] Error: {sub_error}. See plugin log for more information.")
+            self.logger.warning("[%s] Error: %s. See plugin log for more information." % (dev.name, sub_error))
 
         return True, values_dict
 
@@ -507,7 +508,7 @@ class Plugin(indigo.PluginBase):
         settings       = indigo.Dict()
         error_msg_dict = indigo.Dict()
 
-        self.logger.threaddebug(f"Getting menu action config prefs: {dict(settings)}")
+        self.logger.threaddebug("Getting menu action config prefs: %s" % dict(settings))
 
         # =========================  Advanced Settings Menu  ==========================
         if menu_id not in ["refreshChartsNow", "themeManager"]:
@@ -541,7 +542,7 @@ class Plugin(indigo.PluginBase):
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
         plugin_prefs = self.pluginPrefs
-        self.logger.threaddebug(f"Getting plugin Prefs: {dict(plugin_prefs)}")
+        self.logger.threaddebug("Getting plugin Prefs: %s" % dict(plugin_prefs))
 
         # Establish a set of defaults for select plugin settings. Only those settings that are populated dynamically
         # need to be set here (the others can be set directly by the XML.)
@@ -690,7 +691,7 @@ class Plugin(indigo.PluginBase):
                 try:
                     if values_dict[key] != self.pluginPrefs[key]:
                         config_changed = True
-                        changed_keys += (f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}"),
+                        changed_keys += ((f"{key}", f"Old: {self.pluginPrefs[key]}", f"New: {values_dict[key]}"),)
 
                 # Missing keys will be config dialog format props like labels and separators
                 except KeyError:
@@ -799,7 +800,7 @@ class Plugin(indigo.PluginBase):
                         try:
                             float(val)
                         except ValueError:
-                            if not val.lower() in ['true', 'false']:
+                            if val.lower() not in ['true', 'false']:
                                 error_msg_dict[source] = "The selected variable can not be charted due to its value."
                                 values_dict['settingsGroup'] = str(n)
 
@@ -846,7 +847,7 @@ class Plugin(indigo.PluginBase):
                         try:
                             float(val)
                         except ValueError:
-                            if not val.lower() in ['true', 'false']:
+                            if val.lower() not in ['true', 'false']:
                                 error_msg_dict[source] = "The selected variable can not be charted due to its value."
                                 values_dict['settingsGroup'] = f"{n}"
 
@@ -1130,9 +1131,9 @@ class Plugin(indigo.PluginBase):
         :param int dev_id:
         :return:
         """
-        self.logger.info(f"v: {values_dict}")
-        self.logger.info(f"t: {type_id}")
-        self.logger.info(f"d: {dev_id}")
+        self.logger.info("v: %s" % values_dict)
+        self.logger.info("t: %s" % type_id)
+        self.logger.info("d: %s" % dev_id)
         return True, values_dict
 
     # =============================================================================
@@ -1193,7 +1194,7 @@ class Plugin(indigo.PluginBase):
         self.pluginPrefs['snappyConfigMenus']         = values_dict['snappyConfigMenus']
         self.pluginPrefs['forceOriginLines']          = values_dict['forceOriginLines']
 
-        self.logger.threaddebug(f"Advanced settings menu final prefs: {dict(values_dict)}")
+        self.logger.threaddebug("Advanced settings menu final prefs: %s" % dict(values_dict))
         return True
 
     # =============================================================================
@@ -1208,7 +1209,7 @@ class Plugin(indigo.PluginBase):
         :param str type_id:
         :param int dev_id:
         """
-        self.logger.threaddebug(f"Advanced settings menu final prefs: {dict(values_dict)}")
+        self.logger.threaddebug("Advanced settings menu final prefs: %s" % dict(values_dict))
 
     # =============================================================================
     def audit_csv_health(self) -> None:
@@ -1237,24 +1238,15 @@ class Plugin(indigo.PluginBase):
                             os.makedirs(data_path)
                             self.logger.warning("Target data folder doesn't exist. Creating it.")
 
-                        # TODO: IOError is a subclass of OSerror and is redundant in this context.
-                        # except IOError:
-                        #     self.plugin_error_handler(sub_error=traceback.format_exc())
-                        #     self.logger.critical(
-                        #         f"[{dev.name}] Target data folder doesn't exist and the plugin is  unable to create "
-                        #         f"it. See plugin log for more information."
-                        #     )
-                        #
                         except OSError:
                             self.plugin_error_handler(sub_error=traceback.format_exc())
                             self.logger.critical(
-                                f"[{dev.name}] The plugin is unable to access the data storage "
-                                f"location. See plugin log for more information."
+                                "[%s] The plugin is unable to access the data storage location. See plugin log for "
+                                "more information." % dev.name
                             )
 
                     if not os.path.isfile(full_path):
-                        self.logger.warning(
-                            f"CSV file doesn't exist. Creating a new one: {full_path}")
+                        self.logger.warning("CSV file doesn't exist. Creating a new one: %s" % full_path)
                         with open(full_path, 'w', encoding='utf-8') as csv_file:
                             csv_file.write(f"Timestamp,{column_dict[thing][2]}\n")
                             csv_file.close()
@@ -1319,8 +1311,8 @@ class Plugin(indigo.PluginBase):
 
                             props[field_id] = default_value
                             self.logger.debug(
-                                f"[{dev.name}] missing prop [{field_id}] will be added. Value set "
-                                f"[{default_value}]"
+                                "[%s] missing prop [%s] will be added. Value set [%s]" %
+                                dev.name, field_id, default_value
                             )
 
                 # =========================== Match Config to Props ===========================
@@ -1329,8 +1321,7 @@ class Plugin(indigo.PluginBase):
                 for key in props:
                     if key not in fields:
 
-                        self.logger.debug(
-                            f"[{dev.name}] prop obsolete prop [{key}] will be removed")
+                        self.logger.debug("[%s] prop obsolete prop [%s] will be removed" % (dev.name, key))
                         del props[key]
 
                 # Now that we're done, let's save the updated dict back to the device.
@@ -1339,11 +1330,48 @@ class Plugin(indigo.PluginBase):
             return True
 
         except Exception as sub_error:
-            self.logger.warning(f"Audit device props error: {sub_error}")
+            self.logger.warning("Audit device props error: %s" % sub_error)
 
             return False
 
     # =============================================================================
+    # def audit_dict_color(self, _dict_: dict) -> dict:
+    #     """
+    #     Title Placeholder
+    #
+    #     Body placeholder
+    #
+    #     :param dict _dict_:
+    #     """
+    #     # TODO: this method can be flattened
+    #
+    #     pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
+    #     # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
+    #     for k in _dict_:
+    #         if isinstance(_dict_[k], str):
+    #             if re.search(pattern, _dict_[k]):
+    #                 _dict_[k] = self.fix_rgb(color=_dict_[k])
+    #             else:
+    #                 ...
+    #
+    #         # k_dict is a dict of dicts, so we need to go one level lower.
+    #         elif isinstance(_dict_[k], dict):
+    #             for k1 in _dict_[k]:
+    #                 if isinstance(_dict_[k][k1], str):
+    #                     if re.search(pattern, _dict_[k][k1]):
+    #                         _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
+    #                     else:
+    #                         ...
+    #                 if isinstance(_dict_[k][k1], dict):
+    #                     for k11 in _dict_[k][k1]:
+    #                         if re.search(pattern, str(_dict_[k][k1][k11])):
+    #                             _dict_[k][k1][k11] = self.fix_rgb(color=_dict_[k][k1][k11])
+    #                         else:
+    #                             ...
+    #
+    #     return _dict_
+
+    # TODO: this is the flattened version. Delete above code if working
     def audit_dict_color(self, _dict_: dict) -> dict:
         """
         Title Placeholder
@@ -1352,33 +1380,16 @@ class Plugin(indigo.PluginBase):
 
         :param dict _dict_:
         """
-        # TODO: this method can be flattened
+        pattern = r"[0-9A-Fa-f]{2} [0-9A-Fa-f]{2} [0-9A-Fa-f]{2}"
 
-        pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
-        # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
-        for k in _dict_:
-            if isinstance(_dict_[k], str):
-                if re.search(pattern, _dict_[k]):
-                    _dict_[k] = self.fix_rgb(color=_dict_[k])
-                else:
-                    ...
+        def process_value(value):
+            if isinstance(value, str):
+                return self.fix_rgb(color=value) if re.search(pattern, value) else value
+            elif isinstance(value, dict):
+                return {k: process_value(v) for k, v in value.items()}
+            return value
 
-            # k_dict is a dict of dicts, so we need to go one level lower.
-            elif isinstance(_dict_[k], dict):
-                for k1 in _dict_[k]:
-                    if isinstance(_dict_[k][k1], str):
-                        if re.search(pattern, _dict_[k][k1]):
-                            _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
-                        else:
-                            ...
-                    if isinstance(_dict_[k][k1], dict):
-                        for k11 in _dict_[k][k1]:
-                            if re.search(pattern, str(_dict_[k][k1][k11])):
-                                _dict_[k][k1][k11] = self.fix_rgb(color=_dict_[k][k1][k11])
-                            else:
-                                ...
-
-        return _dict_
+        return {k: process_value(v) for k, v in _dict_.items()}
 
     # =============================================================================
     def audit_save_paths(self) -> None:
@@ -1415,11 +1426,9 @@ class Plugin(indigo.PluginBase):
         self.logger.debug("Auditing path IO.")
         for path_name in path_list:
             if os.access(path_name, os.W_OK):
-                self.logger.debug(f"   Path OK: {path_name}")
+                self.logger.debug("   Path OK: %s" % path_name)
             else:
-                self.logger.critical(
-                    f"   Plugin doesn't have the proper rights to write to the path: {path_name}"
-                )
+                self.logger.critical("   Plugin doesn't have the proper rights to write to the path: %s" % path_name)
 
         # ================ Compare Save Path to Current Indigo Version ================
         indigo_ver = self.versStrToTuple(indigo.server.version)[0]
@@ -1432,16 +1441,16 @@ class Plugin(indigo.PluginBase):
                 new_save_path = f"{indigo.server.getInstallFolderPath()}/IndigoWebServer/images/controls/"
 
                 if new_save_path != current_save_path:
-                    self.logger.warning(f"Charts are being saved to: {current_save_path})")
-                    self.logger.warning(f"You may want to change the save path to: {new_save_path}")
+                    self.logger.warning("Charts are being saved to: %s)" % current_save_path)
+                    self.logger.warning("You may want to change the save path to: %s" % new_save_path)
 
             elif indigo_ver == 2021:
                 # new_save_path = indigo.server.getInstallFolderPath() + "/Web Assets/images/controls/static/" # TODO
                 new_save_path = f"{indigo.server.getInstallFolderPath()}/Web Assets/images/controls/static/"
 
                 if new_save_path != current_save_path:
-                    self.logger.warning(f"Charts are being saved to: {current_save_path})")
-                    self.logger.warning(f"You may want to change the save path to: {new_save_path}")
+                    self.logger.warning("Charts are being saved to: %s)" % current_save_path)
+                    self.logger.warning("You may want to change the save path to: %s" % new_save_path)
 
     # =============================================================================
     @staticmethod
@@ -1458,7 +1467,7 @@ class Plugin(indigo.PluginBase):
                 outfile.write(json.dumps({}, indent=4))
 
     # =============================================================================
-    def chart_stock_bar(self, dev: indigo.Device = None) -> dict:
+    def chart_stock_bar(self, dev: indigo.Device = None) -> list:
         """
         Title Placeholder
 
@@ -1523,7 +1532,7 @@ class Plugin(indigo.PluginBase):
 
         :param list dev_list: list of devices to be refreshed.
         """
-        def convert_to_native(obj: (indigo.Dict, indigo.List)):
+        def convert_to_native(obj: Union[indigo.Dict, indigo.List]):
             """
             Convert any indigo.Dict and indigo.List objects to native formats.
 
@@ -1554,7 +1563,7 @@ class Plugin(indigo.PluginBase):
             path_to_file = ""
 
             # A dict of plugin preferences (we set defaults and override with pluginPrefs).
-            p_dict  = dict(self.pluginPrefs)
+            p_dict: dict[str, Any]  = dict(self.pluginPrefs)
 
             try:
                 # ============================  p_dict Overrides  =============================
@@ -1628,7 +1637,7 @@ class Plugin(indigo.PluginBase):
                 for dev in dev_list:
                     # A list of state/value pairs used to feed updateStatesOnServer()
                     device_states = []
-                    self.logger.debug(f"Updating chart: [{dev.name}]")
+                    self.logger.debug("Updating chart: [%s]" % dev.name)
                     dev.updateStatesOnServer(
                         [{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
@@ -1800,8 +1809,8 @@ class Plugin(indigo.PluginBase):
                         except ValueError as sub_error:
                             self.plugin_error_handler(sub_error=traceback.format_exc())
                             self.logger.warning(
-                                f"[{dev.name}] The number of observations must be a positive number: {sub_error}. See "
-                                f"plugin log for more information."
+                                "[%s] The number of observations must be a positive number: %s. See plugin log for "
+                                "more information." % (dev.name, sub_error)
                             )
 
                         # =========================== Custom Square Size ===========================
@@ -1815,8 +1824,8 @@ class Plugin(indigo.PluginBase):
                         except ValueError as sub_error:
                             self.plugin_error_handler(sub_error=traceback.format_exc())
                             self.logger.warning(
-                                f"[{dev.name}] Custom size must be a positive number or None: "
-                                f"{sub_error}")
+                                "[%s] Custom size must be a positive number or None: %s" % (dev.name, sub_error)
+                            )
 
                         except KeyError:
                             ...
@@ -1911,8 +1920,8 @@ class Plugin(indigo.PluginBase):
                                 if p_dict[f'line{line}Annotate'] and p_dict[f'line{line}Marker'] != 'None':
                                     p_dict[f'line{line}Marker'] = 'None'
                                     self.logger.warning(
-                                        f"[{dev.name}] Line {line} marker is suppressed to display  annotations. To "
-                                        f"see the marker, disable annotations for this line."
+                                        "[%s] Line %s marker is suppressed to display  annotations. To "
+                                        "see the marker, disable annotations for this line." % (dev.name, line)
                                     )
                             # Not all devices will contain these keys
                             except KeyError:
@@ -1979,7 +1988,7 @@ class Plugin(indigo.PluginBase):
                         except KeyError:
                             ...
                         except SyntaxError:
-                            self.logger.warning(f"[{dev.name}] Custom Line Segments entry is invalid. Skipping.")
+                            self.logger.warning("[%s] Custom Line Segments entry is invalid. Skipping." % dev.name)
 
                         # =================================================
                         # Convert these indigo.List(s) to Python lists.
@@ -2070,24 +2079,36 @@ class Plugin(indigo.PluginBase):
 
                         # ===========================  Stock Radial Bar  ===========================
                         if dev.deviceTypeId == 'radialBarChartingDevice':
-
                             source_id = int(dev.pluginProps['bar1Source'])
                             source_value = dev.pluginProps['bar1Value']
                             scale = dev.pluginProps['scale']
 
                             # The data value to chart.
                             if source_id in indigo.devices:
-                                raw_payload['data'] = float(indigo.devices[source_id].states[source_value])
+                                try:
+                                    val = indigo.devices[source_id].states[source_value]
+                                    raw_payload['data'] = float(val)
+                                except ValueError:
+                                    self.logger.warning(
+                                        f"Could not convert device {source_id} value to a float [{val}]"
+                                    )
                             else:
-                                raw_payload['data'] = float(indigo.variables[source_id].value)
+                                try:
+                                    val = indigo.variables[source_id].value
+                                    raw_payload['data'] = float(val)
+                                except ValueError:
+                                    self.logger.warning(
+                                        f"Could not convert variable {source_id} value to a float [{val}]"
+                                    )
 
                             # Convert scale value if it's a substitution. The substitution value should be valid
                             # because we checked it in validation.
                             if scale.startswith('%%'):
                                 raw_payload['scale'] = self.substitute(scale)
 
-                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until
-                            # this point to convert it because some devices add additional device-specific data.
+                            # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait
+                            # until this point to convert it because some devices add additional device-specific
+                            # data.
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
@@ -2118,7 +2139,9 @@ class Plugin(indigo.PluginBase):
 
                                 except Exception as sub_error:
                                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                                    self.logger.error(f"[{batt_dev.name}] Error reading battery devices: {sub_error}")
+                                    self.logger.error(
+                                        "[%s] Error reading battery devices: %s" % batt_dev.name, sub_error
+                                    )
 
                             if not device_dict:
                                 device_dict['No Battery Devices'] = 0
@@ -2229,7 +2252,7 @@ class Plugin(indigo.PluginBase):
                                 outfile.write(f"{k}: {v}\n")
 
                         # ============================  Process Result  ============================
-                        self.logger.debug(f"[{dev.name}] Sending to chart refresh process.")
+                        self.logger.debug("[%s] Sending to chart refresh process." % dev.name)
                         # It's important to use the full path to the Python version to ensure that we get the version
                         # we want.
                         try:
@@ -2245,7 +2268,7 @@ class Plugin(indigo.PluginBase):
 
                         except (TypeError, ValueError):
                             self.logger.exception("")
-                            self.logger.debug(f"Payload raised error: {payload}")
+                            self.logger.debug("Payload raised error: %s" % payload)
 
                         # Parse the output log
                         result = self.process_plotting_log(dev=dev, replies=reply, errors=err)
@@ -2275,7 +2298,7 @@ class Plugin(indigo.PluginBase):
                     except RuntimeError as sub_error:
                         self.plugin_error_handler(sub_error=traceback.format_exc())
                         self.logger.critical(
-                            f"[{dev.name}] Critical Error: {sub_error}. See plugin log for more information."
+                            "[%s] Critical Error: %s. See plugin log for more information." % (dev.name, sub_error)
                         )
                         self.logger.critical("Skipping device.")
                         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
@@ -2285,7 +2308,7 @@ class Plugin(indigo.PluginBase):
 
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
-                self.logger.critical(f"Error: {sub_error}. See plugin log for more information.")
+                self.logger.critical("Error: %s. See plugin log for more information." % sub_error)
 
     # =============================================================================
     def commsKillAll(self) -> None:  # noqa
@@ -2303,7 +2326,8 @@ class Plugin(indigo.PluginBase):
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(
-                    f"Exception when trying to kill all comms. Error: {sub_error}. See plugin log for more information."
+                    "Exception when trying to kill all comms. Error: %s. See plugin log for more information." %
+                    sub_error
                 )
 
     # =============================================================================
@@ -2321,7 +2345,8 @@ class Plugin(indigo.PluginBase):
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(
-                    f"Exception when trying to kill all comms. Error: {sub_error}. See plugin log for more information."
+                    "Exception when trying to kill all comms. Error: %s. See plugin log for more information." %
+                    sub_error
                 )
 
     # =============================================================================
@@ -2356,8 +2381,8 @@ class Plugin(indigo.PluginBase):
         for title_name in titles:
             if len(titles[title_name]) > 1:
                 self.logger.warning(
-                    f"Audit CSV data files: CSV filename [{title_name}] referenced by more than one CSV Engine device: "
-                    f"{titles[title_name]}"
+                    "Audit CSV data files: CSV filename [%s] referenced by more than one CSV Engine device: "
+                    "%s" % title_name, titles[title_name]
                 )
 
     # =============================================================================
@@ -2373,7 +2398,7 @@ class Plugin(indigo.PluginBase):
         :param int dev_id:
         """
         dev = indigo.devices[int(dev_id)]
-        self.logger.threaddebug(f"[{dev.name}] csv item add values_dict: {dict(values_dict)}")
+        self.logger.threaddebug("[%s] csv item add values_dict: %s" % (dev.name, dict(values_dict)))
 
         error_msg_dict = indigo.Dict()
 
@@ -2420,7 +2445,9 @@ class Plugin(indigo.PluginBase):
 
         except AttributeError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error(f"[{dev.name}] Error adding CSV item: {sub_error}. See plugin log for more information.")
+            self.logger.error(
+                "[%s] Error adding CSV item: %s. See plugin log for more information." % (dev.name, sub_error)
+            )
 
         # If the appropriate CSV file doesn't exist, create it and write the header line.
         file_name = values_dict['addValue']
@@ -2453,7 +2480,7 @@ class Plugin(indigo.PluginBase):
         :param int dev_id:
         """
         dev = indigo.devices[int(dev_id)]
-        self.logger.threaddebug(f"[{dev.name}] csv item delete values_dict: {dict(values_dict)}")
+        self.logger.threaddebug("[%s] csv item delete values_dict: %s" % (dev.name, dict(values_dict)))
 
         # Convert column_dict from a string to a literal dict.
         column_dict = ast.literal_eval(values_dict['columnDict'])
@@ -2465,7 +2492,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error deleting CSV item: {sub_error}. See plugin log for more information."
+                "[%s] Error deleting CSV item: %s. See plugin log for more information." % (dev.name, sub_error)
             )
 
         values_dict['csv_item_list'] = ""
@@ -2505,7 +2532,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error generating CSV item list: {sub_error}. See plugin log for more information."
+                "[%s] Error generating CSV item list: %s. See plugin log for more information." % (dev.name, sub_error)
             )
             prop_list = []
 
@@ -2525,7 +2552,7 @@ class Plugin(indigo.PluginBase):
         :param int dev_id:
         """
         dev = indigo.devices[dev_id]
-        self.logger.threaddebug(f"[{dev.name}] csv item update values_dict: {dict(values_dict)}")
+        self.logger.threaddebug("[%s] csv item update values_dict: %s" % (dev.name, dict(values_dict)))
 
         error_msg_dict = indigo.Dict()
         # Convert column_dict from a string to a literal dict.
@@ -2560,7 +2587,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] Error updating CSV item: {sub_error}. See plugin log for more information."
+                "[%s] Error updating CSV item: %s. See plugin log for more information." % (dev.name, sub_error)
             )
 
         # Remove any empty entries as they're not going to do any good anyway.
@@ -2590,7 +2617,7 @@ class Plugin(indigo.PluginBase):
         :param int dev_id:
         """
         dev = indigo.devices[int(dev_id)]
-        self.logger.threaddebug(f"[{dev.name}] csv item select values_dict: {dict(values_dict)}")
+        self.logger.threaddebug("[%s] csv item select values_dict: %s" % (dev.name, dict(values_dict)))
 
         try:
             column_dict                     = ast.literal_eval(values_dict['columnDict'])
@@ -2604,8 +2631,8 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"[{dev.name}] There was an error establishing a connection with the item you  chose: {sub_error}. See "
-                f"plugin log for more information."
+                "[%s] There was an error establishing a connection with the item you  chose: %s. See plugin log for "
+                "more information." % (dev.name, sub_error)
             )
         return values_dict
 
@@ -2639,7 +2666,7 @@ class Plugin(indigo.PluginBase):
                         # Convert column_dict from a string to a literal dict.
                         csv_dict = ast.literal_eval(csv_dict_str)
 
-                        self.logger.threaddebug(f"[{dev.name}] Refreshing CSV  Device: {dict(csv_dict)}")
+                        self.logger.threaddebug("[%s] Refreshing CSV  Device: %s" % (dev.name, dict(csv_dict)))
                         self.csv_refresh_process(dev=dev, csv_dict=csv_dict)
 
     # =============================================================================
@@ -2681,13 +2708,13 @@ class Plugin(indigo.PluginBase):
 
                     except OSError:
                         self.logger.critical(
-                            f"[{dev.name}] Target data folder either doesn't exist or the plugin is unable to "
-                            f"access/create it."
+                            "[%s] Target data folder either doesn't exist or the plugin is unable to "
+                            "access/create it." % dev.name
                         )
 
                 if not os.path.isfile(full_path):
                     try:
-                        self.logger.debug(f"CSV doesn't exist. Creating: {full_path}")
+                        self.logger.debug("CSV doesn't exist. Creating: %s" % full_path)
                         with open(full_path, 'w', encoding="utf-8") as csv_file:
                             csv_file.write(f"{'Timestamp'},{value[0].encode('utf-8')}\n")
                             csv_file.close()
@@ -2696,8 +2723,8 @@ class Plugin(indigo.PluginBase):
 
                     except IOError:
                         self.logger.critical(
-                            f"[{dev.name}] The plugin is unable to access the data storage location. See plugin log "
-                            f"for more information."
+                            "[%s] The plugin is unable to access the data storage location. See plugin log "
+                            "for more information." % dev.name
                         )
 
                 # =============================== Create Backup ===============================
@@ -2705,11 +2732,11 @@ class Plugin(indigo.PluginBase):
                 try:
                     shutil.copyfile(full_path, backup)
                 except IOError as sub_error:
-                    self.logger.error(f"[{dev.name}] Unable to backup CSV file: {sub_error}.")
+                    self.logger.error("[%s] Unable to backup CSV file: %s." % (dev.name, sub_error))
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
                     self.logger.error(
-                        f"[{dev.name}] Unable to backup CSV file: {sub_error}. See plugin log for more information."
+                        "[%s] Unable to backup CSV file: %s. See plugin log for more information." % (dev.name, sub_error)
                     )
 
                 # ================================= Load Data =================================
@@ -2727,7 +2754,7 @@ class Plugin(indigo.PluginBase):
                         column_names[0][0] = 'Timestamp'
 
                 except IOError as sub_error:
-                    self.logger.error(f"[{dev.name}] Unable to load CSV data: {sub_error}.")
+                    self.logger.error("[%s] Unable to load CSV data: %s." % (dev.name, sub_error))
 
                 # ============================== Limit for Time ===============================
                 # Limit data by time
@@ -2739,8 +2766,8 @@ class Plugin(indigo.PluginBase):
                     # and send a warning to the log.
                     if len(time_data) == 0:
                         self.logger.debug(
-                            f"[{dev.name} - {column_names[0][1]}] all CSV data are older than the time limit. Returning"
-                            f" original data."
+                            "[%s - %s] all CSV data are older than the time limit. Returning original data." %
+                            dev.name, column_names[0][1]
                         )
                     else:
                         data = time_data
@@ -2764,8 +2791,8 @@ class Plugin(indigo.PluginBase):
 
                     else:
                         self.logger.critical(
-                            f"The settings for CSV Engine data element '{value[0]}' are not valid: [dev: {value[1]}, "
-                            f"state/value: {value[2]}]"
+                            "The settings for CSV Engine data element '%s' are not valid: [dev: %s, state/value: %s]" %
+                            (value[0], value[1], value[2])
                         )
 
                     # Give matplotlib something it can chew on if the value to be saved is 'None'
@@ -2779,11 +2806,11 @@ class Plugin(indigo.PluginBase):
                 except ValueError as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
                     self.logger.error(
-                        f"[{dev.name}] Invalid Indigo ID: {sub_error}. See plugin log for more information."
+                        "[%s] Invalid Indigo ID: %s. See plugin log for more information." % (dev.name, sub_error)
                     )
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.error(f"[{dev.name}] Invalid CSV definition: {sub_error}")
+                    self.logger.error("[%s] Invalid CSV definition: %s" % (dev.name, sub_error))
 
                 # ============================= Limit for Length ==============================
                 # The data frame (with the newest observation included) may now be too long. If it is, we trim it for
@@ -2805,25 +2832,25 @@ class Plugin(indigo.PluginBase):
                     os.remove(backup)
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.error(f"[{dev.name}] Unable to delete backup file. {sub_error}")
+                    self.logger.error("[%s] Unable to delete backup file. %s" % (dev.name, sub_error))
 
             dev.updateStatesOnServer(
                 [{'key': 'csvLastUpdated', 'value': f"{dt.datetime.now()}"},
                  {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}]
             )
 
-            self.logger.info(f"[{dev.name}] CSV data updated successfully.")
+            self.logger.info("[%s] CSV data updated successfully." % dev.name)
             dev.updateStateImageOnServer(indigo.kStateImageSel.WindowSensorClosed)
 
         except UnboundLocalError:
-            self.logger.critical(f"[{dev.name}] Unable to reach storage location. Check connections and permissions.")
+            self.logger.critical("[%s] Unable to reach storage location. Check connections and permissions." % dev.name)
         except ValueError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.critical(f"[{dev.name}] Error: {sub_error}")
+            self.logger.critical("[%s] Error: %s" % (dev.name, sub_error))
 
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.critical(f"[{dev.name}] Error: {sub_error}")
+            self.logger.critical("[%s] Error: %s" % (dev.name, sub_error))
 
     # =============================================================================
     def csv_refresh_device_action(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
@@ -3432,7 +3459,7 @@ class Plugin(indigo.PluginBase):
 
         except IOError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error(f"Error generating file list: {sub_error}. See plugin log for more information.")
+            self.logger.error("Error generating file list: %s. See plugin log for more information." % sub_error)
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
@@ -3461,7 +3488,7 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"Error building font list.  Returning generic list. {sub_error}. See plugin log for more information."
+                "Error building font list. Returning generic list. %s. See plugin log for more information." % sub_error
             )
 
             font_menu = FONT_MENU
@@ -3515,13 +3542,13 @@ class Plugin(indigo.PluginBase):
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
             self.logger.error(
-                f"Error getting list of forecast devices: {sub_error}. See plugin log for more information."
+                "Error getting list of forecast devices: %s. See plugin log for more information." % sub_error
             )
 
         self.logger.threaddebug(
-            f"Forecast device list generated successfully: {forecast_source_menu}"
+            "Forecast device list generated successfully: %s" % forecast_source_menu
         )
-        self.logger.threaddebug(f"forecast_source_menu: {forecast_source_menu}")
+        self.logger.threaddebug("forecast_source_menu: %s" % forecast_source_menu)
 
         return sorted(forecast_source_menu, key=lambda s: s[1].lower())
 
@@ -3550,7 +3577,7 @@ class Plugin(indigo.PluginBase):
         :param indigo.Device dev:
         :param bool caller_waiting_for_result:
         """
-        self.logger.info(f"Scripting payload: {dict(plugin_action.props)}")
+        self.logger.info("Scripting payload: %s" % dict(plugin_action.props))
 
         # TODO: take a look at broadcast messages and whether this is something else that can be made to work in this
         #       neighborhood.
@@ -3615,7 +3642,7 @@ class Plugin(indigo.PluginBase):
             if caller_waiting_for_result:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
                 self.logger.error(
-                    f"[{dev.name}] Error: {sub_error}. See plugin log for more information."
+                    "[%s] Error: %s. See plugin log for more information." % (dev.name, sub_error)
                 )
                 return {'success': False, 'message': sub_error}
 
@@ -3681,7 +3708,7 @@ class Plugin(indigo.PluginBase):
         self.logger.critical("!" * 80)
 
     # =============================================================================
-    def process_plotting_log(self, dev: indigo.Device = None, replies: bytes = b"", errors: str = "") -> bool:
+    def process_plotting_log(self, dev: indigo.Device = None, replies: bytes = b"", errors: str = "") -> bool | None:
         """
         Process output of multiprocessing queue messages
 
@@ -3714,10 +3741,10 @@ class Plugin(indigo.PluginBase):
 
             if not success:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
-                self.logger.critical(f"[{dev.name}] error producing chart. See logs for more information.")
+                self.logger.critical("[%s] error producing chart. See logs for more information." % dev.name)
             else:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-                self.logger.info(f"[{dev.name}] chart refreshed.")
+                self.logger.info("[%s] chart refreshed." % dev.name)
 
             return success
 
@@ -3731,8 +3758,8 @@ class Plugin(indigo.PluginBase):
 
             elif "'numpy.float64' object cannot be interpreted as an index" in errors:
                 self.logger.critical(
-                    f"[{dev.name}] Unfortunately, your version of Matplotlib doesn't support Polar chart plotting. "
-                    f"Disabling device."
+                    "[%s] Unfortunately, your version of Matplotlib doesn't support Polar chart plotting. "
+                    "Disabling device." % dev.name
                 )
                 indigo.device.enable(dev, False)
 
@@ -3867,7 +3894,7 @@ class Plugin(indigo.PluginBase):
         with open(full_path, 'r', encoding='utf-8') as f:
             infile = json.load(f)
 
-        self.logger.debug(f"themeNameGenerator: list(infile) = {list(infile)}")
+        self.logger.debug("themeNameGenerator: list(infile) = %s" % list(infile))
         return [(key, key) for key in sorted(infile)]
 
     # =============================================================================
@@ -3880,8 +3907,8 @@ class Plugin(indigo.PluginBase):
         """
         # Don't need to trap user cancel since this callback won't be called if user cancels. There is no way to trap
         # the cancel.
-        self.logger.debug(f"{values_dict}")
-        self.logger.debug(f"{menu_item_id}")
+        self.logger.debug("%s" % values_dict)
+        self.logger.debug("%s" % menu_item_id)
 
         # ==========================  Apply Theme Settings  ===========================
         for key in [
@@ -3916,7 +3943,7 @@ class Plugin(indigo.PluginBase):
         for key in infile[selected_theme]:
             self.pluginPrefs[key] = infile[selected_theme][key]
 
-        self.logger.info(f"[{selected_theme}] theme applied.")
+        self.logger.info("[%s] theme applied." % selected_theme)
 
     # =============================================================================
     def themeApply(self, values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
@@ -3952,7 +3979,7 @@ class Plugin(indigo.PluginBase):
         return values_dict
 
     # =============================================================================
-    def themeExecuteActionButton(self, values_dict: indigo.Dict = None, menu_item_id: str = 0) -> dict:  # noqa
+    def themeExecuteActionButton(self, values_dict: indigo.Dict = None, menu_item_id: str = 0) -> dict|tuple:  # noqa
         """
         Process the Theme Manager Execute Action button press
 
@@ -4163,12 +4190,14 @@ class MakeChart:
             ast.BitXor: op.xor, ast.USub: op.neg
         }
 
-        if isinstance(mode, ast.Num):  # <number>
-            result = mode.n
+        if isinstance(mode, ast.Constant):  # <number>
+            result = mode.value
         elif isinstance(mode, ast.BinOp):  # <left> <operator> <right>
-            result = operators[type(mode.op)](self.eval_(mode.left), self.eval_(mode.right))
+            result = operators[type(mode.op)](  # type: ignore[index]
+                self.eval_(mode.left), self.eval_(mode.right)
+            )
         elif isinstance(mode, ast.UnaryOp):  # <operator> <operand> e.g., -1
-            result = operators[type(mode.op)](self.eval_(mode.operand))
+            result = operators[type(mode.op)](self.eval_(mode.operand))  # type: ignore[index]
         else:
             raise TypeError(mode)
 

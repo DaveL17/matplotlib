@@ -227,8 +227,8 @@ try:
         _ = [text.set_color(P_DICT['fontColor']) for text in legend.get_texts()]
 
         # Set legend area color
-        num_handles = len(legend.legendHandles)
-        _ = [legend.legendHandles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
+        num_handles = len(legend.legend_handles)
+        _ = [legend.legend_handles[_].set_color(final_colors[_]) for _ in range(0, num_handles)]
 
         frame = legend.get_frame()
         frame.set_alpha(0)

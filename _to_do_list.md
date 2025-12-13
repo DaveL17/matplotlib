@@ -1,5 +1,8 @@
 - Vertical bar stock charts don't allow for setting annotation precision for bar 5.  Others?  see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
 - Do we still have to use x-axis label OR legend (but not both?) see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
+- Error messages say "Matplotlib Error" and should say "Maatplotlib Plugin Error" to distinguish them from the library.
+  See: https://matplotlib.org/stable/api/prev_api_changes/api_changes_3.9.0.html
+- bump api version
 
 #### NEW
 - Combination device (line/bar to replicate weather devices).

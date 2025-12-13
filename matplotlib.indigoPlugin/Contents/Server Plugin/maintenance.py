@@ -356,7 +356,7 @@ class Maintain:
         # Log list of removed keys
         if list_of_removed_keys:
             self.my_logger.debug(
-                "[%s] Performing maintenance - removing unneeded keys: %s" % (dev_name, list_of_removed_keys)
+                "[%s] Performing maintenance - removing unneeded keys: %s" % dev_name, list_of_removed_keys
             )
 
         return prefs
@@ -460,7 +460,8 @@ class Maintain:
                     if props[prop] in ('steps', 'steps-mid', 'steps-post'):
                         # Change style to `solid`
                         self.my_logger.warning(
-                            "Converting deprecated line style setting to solid line style for device [%s]." % dev.name
+                            "Converting deprecated line style setting to solid line style for device [%s]." %
+                            dev.name
                         )
                         props[prop] = '-'
 
@@ -475,8 +476,8 @@ class Maintain:
                             if props[prop] in ('#custom', 'custom'):
 
                                 self.my_logger.debug(
-                                    "Resetting legacy device preferences for custom colors to new "
-                                    "color picker.")
+                                    "Resetting legacy device preferences for custom colors to new color picker."
+                                )
 
                                 if props[f'{prop}Other']:
                                     props[prop] = props[f'{prop}Other']
