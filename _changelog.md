@@ -1,5 +1,8 @@
 #### v2025.2.0
+- Fixes bug which caused the 8 hour X axis option to plot at 4 hour increments.
 - Addresses Matplotlib API known changes in upgrade from (3.8.2 -> 3.10.7).
+  - Removes references to `plot_date` which has been formally deprecated. [3.9.0]
+  - `Legend.legendHandles` was undocumented and has been renamed to `legend_handles`. [3.9.0]
 - Improves exception logging for cases where a charted value is not a valid number.
 - Code cleanup.
 

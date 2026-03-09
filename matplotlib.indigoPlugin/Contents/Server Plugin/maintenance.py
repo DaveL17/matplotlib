@@ -20,7 +20,7 @@ except ImportError:
 
 __author__    = "DaveL17"
 __build__     = "Unused"
-__copyright__ = "Copyright 2017-2019 DaveL17"
+__copyright__ = "Copyright 2017-2026 DaveL17"
 __license__   = "MIT"
 __title__     = "maintenance"
 __version__   = "0.1.03"
