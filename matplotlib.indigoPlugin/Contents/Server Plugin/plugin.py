@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import threading
 import traceback
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Tuple, Union
 import datetime as dt
 import operator as op
 import xml.etree.ElementTree as eTree

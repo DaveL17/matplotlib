@@ -148,7 +148,7 @@ try:
 
     chart_tools.save(logger=LOG)
 
-except Exception as sub_error:
+except Exception:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")

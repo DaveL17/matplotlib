@@ -1131,7 +1131,7 @@ def save(logger: dict) -> None:
         plt.clf()
         plt.close('all')
 
-    except RuntimeError as err:
+    except RuntimeError:
         # There are too many observations in the CSV data.
         # if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
         if "exceeds Locator.MAXTICKS" in traceback.format_exc():  # removes payload

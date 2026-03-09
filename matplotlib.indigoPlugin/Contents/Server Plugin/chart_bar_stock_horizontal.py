@@ -202,7 +202,7 @@ try:
     try:
         chart_tools.save(logger=LOG)
 
-    except OverflowError as err:
+    except OverflowError:
         # if "date value out of range" in traceback.format_exc(err):
         if "date value out of range" in traceback.format_exc():  # removes payload
             LOG['Critical'].append(
@@ -210,7 +210,7 @@ try:
                 f"device settings."
             )
 
-except Exception as sub_error:
+except Exception:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")

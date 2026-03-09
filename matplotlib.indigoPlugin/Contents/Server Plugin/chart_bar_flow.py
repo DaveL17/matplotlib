@@ -118,7 +118,7 @@ try:
                     width = np.min(np.diff(DATES_TO_DICT)) * 0.8
                 else:
                     width = float(P_DICT['barWidth'])
-            except ValueError as sub_error:
+            except ValueError:
                 width = 0.8
 
             # Early versions of matplotlib will truncate leading and trailing bars where the value is zero. With this
@@ -247,7 +247,7 @@ try:
 
     chart_tools.save(logger=LOG)
 
-except Exception as sub_error:
+except Exception:
     tb = traceback.format_exc()
     tb_type = sys.exc_info()[1]
     LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
