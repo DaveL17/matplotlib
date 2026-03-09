@@ -61,7 +61,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2025.2.0"
+__version__   = "2025.2.1"
 
 
 # =============================================================================
@@ -87,7 +87,6 @@ class Plugin(indigo.PluginBase):
         self.pluginIsInitializing: bool  = True   # Flag signaling that __init__ is in process
         self.pluginIsShuttingDown: bool  = False  # Flag signaling that the plugin is shutting down.
         self.skipRefreshDateUpdate: bool = False  # Flag that we have called for a manual chart refresh
-        self.final_data: list            = []
         # List of devices and variables (updated in getDeviceConfigUiValues)
         self.dev_var_list: list          = []
         self.refresh_queue: Queue        = Queue()
@@ -1347,44 +1346,6 @@ class Plugin(indigo.PluginBase):
 
             return False
 
-    # =============================================================================
-    # def audit_dict_color(self, _dict_: dict) -> dict:
-    #     """
-    #     Title Placeholder
-    #
-    #     Body placeholder
-    #
-    #     :param dict _dict_:
-    #     """
-    #     # TODO: this method can be flattened
-    #
-    #     pattern = r"[0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f] [0-9A-Fa-f][0-9A-Fa-f]"
-    #     # Colors are stored in pluginProps as "XX XX XX", and we need to convert them to "#XXXXXX".
-    #     for k in _dict_:
-    #         if isinstance(_dict_[k], str):
-    #             if re.search(pattern, _dict_[k]):
-    #                 _dict_[k] = self.fix_rgb(color=_dict_[k])
-    #             else:
-    #                 ...
-    #
-    #         # k_dict is a dict of dicts, so we need to go one level lower.
-    #         elif isinstance(_dict_[k], dict):
-    #             for k1 in _dict_[k]:
-    #                 if isinstance(_dict_[k][k1], str):
-    #                     if re.search(pattern, _dict_[k][k1]):
-    #                         _dict_[k][k1] = self.fix_rgb(color=_dict_[k][k1])
-    #                     else:
-    #                         ...
-    #                 if isinstance(_dict_[k][k1], dict):
-    #                     for k11 in _dict_[k][k1]:
-    #                         if re.search(pattern, str(_dict_[k][k1][k11])):
-    #                             _dict_[k][k1][k11] = self.fix_rgb(color=_dict_[k][k1][k11])
-    #                         else:
-    #                             ...
-    #
-    #     return _dict_
-
-    # TODO: this is the flattened version. Delete above code if working
     def audit_dict_color(self, _dict_: dict) -> dict:
         """Convert all color strings in a dict (and nested dicts) to '#RRGGBB' format.
 
@@ -3703,43 +3664,6 @@ class Plugin(indigo.PluginBase):
                 caller_waiting_for_result is False.
         """
         self.logger.info("Scripting payload: %s" % dict(plugin_action.props))
-
-        # TODO: take a look at broadcast messages and whether this is something else that can be made to work in this
-        #       neighborhood.
-        # TODO: this worked well up until where the "real" device would get its data. Need to make the API shim device
-        #       work with existing get data steps.
-        # # Instantiate an instance of an ApiDevice for data from the API call.
-        # my_device = ApiDevice()
-        #
-        # # =============================  Unpack Payload  ==============================
-        # # Take payload data from action and parse it into API device attributes.
-        # my_device.apiXvalues   = plugin_action.props['x_values']
-        # my_device.apiYvalues   = plugin_action.props['y_values']
-        # my_device.apiKwargs    = plugin_action.props['kwargs']
-        # my_device.path_name    = plugin_action.props['path']
-        # my_device.apiFileName  = plugin_action.props['filename']
-        # my_device.deviceTypeId = plugin_action.props['deviceTypeId']
-        #
-        # # ======================  Obtain All Plugin Preferences  ======================
-        # # Take plugin prefs and parse them into API device attributes.
-        # my_device.globalProps = self.pluginPrefs
-        #
-        # # ==================  Obtain All Properties for Device Type  ==================
-        # # Take device type properties and parse them into API device attributes.
-        #
-        # # Get the config XML for the chart device type
-        # props = self.devicesTypeDict[my_device.deviceTypeId]["ConfigUIRawXml"]
-        # root  = eTree.ElementTree(eTree.fromstring(props))
-        #
-        # # Extract all field ids and defaultValues from XML
-        # for type_tag in root.findall('Field'):
-        #     field_id        = type_tag.get('id')
-        #     default_value   = type_tag.get('defaultValue')
-        #     if field_id not in my_device.globalProps:
-        #         my_device.globalProps[field_id] = default_value
-        #
-        # # Call for chart to be produced.
-        # self.charts_refresh(dev_list=[my_device])
 
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))

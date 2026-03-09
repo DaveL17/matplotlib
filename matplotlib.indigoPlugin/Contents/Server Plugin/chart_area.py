@@ -153,7 +153,6 @@ try:
                         **K_DICT['k_annotation']
                     )
 
-    y_data = chart_tools.hide_anomalies(data=Y_OBS_TUPLE[0], props=PROPS, logger=LOG)
     ax.stackplot(
         X_OBS,
         Y_OBS_TUPLE,

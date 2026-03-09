@@ -201,24 +201,6 @@ def eval_(mode: ast.AST) -> Union[int, float]:
 
 
 # =============================================================================
-def fix_rgb(color: str) -> str:
-    """Normalize a color string to the #RRGGBB hex format expected by matplotlib.
-
-    Strips spaces and any leading '#' characters from the input, then prepends a single '#' to
-    produce a clean hex color string.
-
-    Args:
-        color (str): A color string in any of several common formats (e.g., "FF 00 00", "#FF0000").
-
-    Returns:
-        str: A normalized hex color string in '#RRGGBB' format.
-    """
-    LOG['Debug'].append(f"[{payload['props']['name']}] Coercing colors to #RRBBGG.")
-    rgb = color.replace(' ', '').replace('#', '')
-    return f"#{rgb}"
-
-
-# =============================================================================
 def format_axis(ax_obj: Any) -> None:
     """Set font, color, and grid properties on all cells of a matplotlib table object.
 
@@ -687,37 +669,6 @@ def format_axis_y1_min_max(p_dict: dict, logger: dict) -> None:
         logger['Warning'].append(
             f"[{payload['props']['name']}] Error setting axis limits for Y1. Will rely on "
             f"Matplotlib to determine limits."
-        )
-
-
-# =============================================================================
-# this is currently unused.
-def format_axis_y2_label(p_dict: dict, k_dict: dict, logger: dict) -> None:
-    """Format the Y2 axis label text, font, and tick label properties.
-
-    Sets the Y2 axis label text and applies the configured font name and font size to Y-axis tick
-    labels. Uses custom font sizes when the customSizeFont preference is enabled. Currently unused.
-
-    Args:
-        p_dict (dict): Plotting parameters dictionary containing 'customAxisLabelY2', 'fontMain',
-            'customSizeFont', 'customTickFontSize', and 'tickFontSize'.
-        k_dict (dict): Plotting kwargs dictionary containing 'k_y_axis_font' entry.
-        logger (dict): The logging message dictionary for appending warnings and debug info.
-    """
-
-    font_main = p_dict.get('fontMain', 'Arial')  # Main font style
-
-    try:
-        plt.ylabel(p_dict['customAxisLabelY2'], **k_dict['k_y_axis_font'])
-
-        if p_dict['customSizeFont']:
-            plt.yticks(fontname=font_main, fontsize=int(p_dict['customTickFontSize']))
-        else:
-            plt.yticks(fontname=font_main, fontsize=int(p_dict['tickFontSize']))
-
-    except (KeyError, ValueError) as err:
-        logger['Threaddebug'].append(
-            f"[{payload['props']['name']}] Problem formatting axis labels: {err}"
         )
 
 

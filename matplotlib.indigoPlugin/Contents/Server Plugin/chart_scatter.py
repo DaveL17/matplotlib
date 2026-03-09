@@ -14,7 +14,6 @@ import traceback
 from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
-# from matplotlib import patches as patches
 from matplotlib import patches
 # My modules
 import chart_tools  # noqa

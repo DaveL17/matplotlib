@@ -28,7 +28,6 @@ CHART_NAME: str           = PROPS['name']
 PLUG_DICT: dict           = PAYLOAD['prefs']
 BAR_COLORS: List[str]     = []
 DATES_TO_DICT: list       = []
-X_TICKS: list             = []
 
 LOG['Threaddebug'].append("chart_bar_flow.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")

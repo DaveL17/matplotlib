@@ -191,7 +191,7 @@ try:
 
         # Precipitation bar annotations
         annotate = P_DICT['line3Annotate']
-        precision = int(PROPS.get(f'line{line}AnnotationPrecision', "0"))
+        precision = int(PROPS.get('line3AnnotationPrecision', "0"))
         if annotate:
             for xy in zip(dates_to_plot, P_DICT['y_obs3']):
                 ax1.annotate(

@@ -14,7 +14,6 @@ import traceback
 from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
-# from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
@@ -27,11 +26,6 @@ K_DICT: dict              = PAYLOAD['k_dict']
 PROPS: dict               = PAYLOAD['props']
 CHART_NAME: str           = PROPS['name']
 PLUG_DICT: dict           = PAYLOAD['prefs']
-ANNOTATION_VALUES: list   = []
-BAR_COLORS: list          = []
-X_LABELS: list            = []
-X_TICKS: list             = []
-
 # ================================== Globals ==================================
 COLOR_LIGHT: str  = P_DICT['bar_1']
 COLOR_DARK: str   = P_DICT['bar_2']

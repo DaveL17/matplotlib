@@ -117,13 +117,11 @@ try:
 
             if limit > 0:
                 y_obs = P_DICT[f'y_obs{line}']
-                new_old = PROPS['limitDataRange']
-
                 prune = chart_tools.prune_data(
                     x_data=dates_to_plot,
                     y_data=y_obs,
                     limit=limit,
-                    new_old='None',
+                    new_old=PROPS['limitDataRange'],
                     logger=LOG
                 )
                 P_DICT[f'x_obs{line}'], P_DICT[f'y_obs{line}'] = prune

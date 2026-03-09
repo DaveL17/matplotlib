@@ -75,10 +75,10 @@ try:
 
         # =================================== Grids ===================================
         if P_DICT['showxAxisGrid']:
-            plot.xaxis.grid(True, **K_DICT['k_grid_fig'])
+            s_plot.xaxis.grid(True, **K_DICT['k_grid_fig'])
 
         if P_DICT['showyAxisGrid']:
-            plot.yaxis.grid(True, **K_DICT['k_grid_fig'])
+            s_plot.yaxis.grid(True, **K_DICT['k_grid_fig'])
 
         # ================================ Tick Labels ================================
         if PROPS['customSizeFont']:

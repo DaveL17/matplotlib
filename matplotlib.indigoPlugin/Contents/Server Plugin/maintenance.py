@@ -495,34 +495,6 @@ class Maintain:
                                 else:
                                     props[prop] = 'FF FF FF'
 
-                # ============================== Fix Area Props ===============================
-                if dev.deviceTypeId == 'areaChartingDevice':
-                    ...
-
-                # ===========================  Fix Flow Bar Props  ============================
-                if dev.deviceTypeId == 'barChartingDevice':
-                    ...
-
-                # ===========================  Fix Stock Bar Props  ===========================
-                if dev.deviceTypeId == 'barStockChartingDevice':
-                    ...
-
-                # ===========================  Fix Stock Bar Props  ===========================
-                if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
-                    ...
-
-                # ==========================  Fix Radial Bar Props  ===========================
-                if dev.deviceTypeId == 'radialBarChartingDevice':
-                    ...
-
-                # ========================= Fix Battery Health Props ==========================
-                if dev.deviceTypeId == 'batteryHealthDevice':
-                    ...
-
-                # ============================ Fix Calendar Props =============================
-                if dev.deviceTypeId == 'calendarChartingDevice':
-                    ...
-
                 # ============================== Fix Line Props ===============================
                 if dev.deviceTypeId == 'lineChartingDevice':
 
@@ -533,14 +505,6 @@ class Maintain:
                         else:
                             props['filterAnomalies'] = 0
 
-                # ========================= Fix Multiline Text Props ==========================
-                if dev.deviceTypeId == 'multiLineText':
-                    ...
-
-                # ============================== Fix Polar Props ==============================
-                if dev.deviceTypeId == 'polarChartingDevice':
-                    ...
-
                 # ============================= Fix Scatter Props =============================
                 if dev.deviceTypeId == 'scatterChartingDevice':
 
@@ -550,10 +514,6 @@ class Maintain:
                             props['filterAnomalies'] = 3
                         else:
                             props['filterAnomalies'] = 0
-
-                # ============================ Fix Forecast Props =============================
-                if dev.deviceTypeId == 'forecastChartingDevice':
-                    ...
 
                 # =============== Establish Refresh Interval for Legacy Devices ===============
                 # Establish refresh interval for legacy devices. If the prop isn't present, we set it equal to the
