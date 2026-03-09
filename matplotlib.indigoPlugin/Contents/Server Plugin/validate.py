@@ -14,7 +14,7 @@ my_logger = logging.getLogger("Plugin")
 
 
 def __init__():
-    ...
+    """Initialize the validate module (no-op placeholder)."""
 
 # ==============================================================================
 # ============================= Plugin Validation ==============================
@@ -23,10 +23,13 @@ def __init__():
 
 # =============================== Chart Colors ================================+
 def chart_colors(values_dict: indigo.Dict) -> None:
-    """
-    Inspects various color controls and sets them to default when the value is not valid hex (A-F, 0-9).
+    """Inspect color controls and reset any invalid hex values to their defaults.
 
-    :param indigo.Dict values_dict:
+    Checks each tracked color preference against a valid hexadecimal pattern (A-F, 0-9). If a value fails
+    validation, it is replaced with the corresponding default color and a warning is logged.
+
+    Args:
+        values_dict (indigo.Dict): The plugin preferences dictionary containing color fields to validate.
     """
     # TODO: check to see whether this dict is up to date.
     # TODO: update 2024-10-23 - this may need to be refactored because color controls have been moved to the theme
@@ -46,11 +49,17 @@ def chart_colors(values_dict: indigo.Dict) -> None:
 
 # ============================= Chart Dimensions ==============================
 def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
-    """
+    """Validate plugin chart dimension preferences.
 
-    :param indigo.Dict values_dict:
-    :param indigo.Dict error_msg_dict:
-    :return:
+    Checks that each chart dimension property is a real number greater than 75 pixels. Removes surrounding whitespace
+    from the values before checking. Populates error_msg_dict with an appropriate message for each failing field.
+
+    Args:
+        values_dict (indigo.Dict): The plugin preferences dictionary containing chart dimension fields.
+        error_msg_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
     for dimension_prop in (
             'rectChartHeight',
@@ -79,11 +88,18 @@ def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> t
 # ============================= Chart Resolution ==============================
 # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
 def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
-    """
+    """Validate the chart resolution (DPI) preference.
 
-    :param values_dict:
-    :param error_msg_dict:
-    :return:
+    Ensures the chartResolution field is not null or blank. If the DPI warning flag is set and the value is below 80,
+    clears the flag and reports a warning. Includes a warning feature that passes the value after the warning is
+    cleared.
+
+    Args:
+        values_dict (indigo.Dict): The plugin preferences dictionary containing the chartResolution field.
+        error_msg_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
     try:
         # If value is null, a null string, or all whitespace.
@@ -107,11 +123,17 @@ def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> t
 
 # ================================ Data Paths ==================================
 def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict) -> dict:
-    """
-    Ensure the data path value is valid.
+    """Ensure chart and data path values end with a forward slash.
 
-    :param indigo.Dict values_dict:
-    :param indigo.Dict error_dict:
+    Validates that the chartPath and dataPath fields end with a '/' character. Sets an error message for any path
+    that does not conform.
+
+    Args:
+        values_dict (indigo.Dict): The plugin preferences dictionary containing path fields.
+        error_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        dict: The error_dict after validation, possibly containing path-related errors.
     """
     for path_prop in ('chartPath', 'dataPath'):
         try:
@@ -128,11 +150,17 @@ def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict) -> dict:
 # ================================ Line Weight =================================
 # Line weight is a hidden prop in PluginConfig.xml and may no longer be needed.  fixme
 def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
-    """
+    """Validate the global line weight preference.
 
-    :param indigo.Dict values_dict:
-    :param indigo.Dict error_msg_dict:
-    :return:
+    Ensures the lineWeight field is a real number greater than zero. This is a hidden prop in PluginConfig.xml and
+    may no longer be needed.
+
+    Args:
+        values_dict (indigo.Dict): The plugin preferences dictionary containing the lineWeight field.
+        error_msg_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
     try:
         if float(values_dict['lineWeight']) <= 0:
@@ -149,11 +177,18 @@ def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
 
 # =============================== Custom Ticks =================================
 def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict) -> tuple:
-    """
-    Ensure all custom tick locations are numeric, within bounds, and of the same length.
+    """Validate custom Y-axis tick locations and labels.
 
-    :param indigo.Dict values_dict:
-    :param indigo.Dict error_dict:
+    Ensures all custom tick location values are numeric, that tick locations and labels contain the same number of
+    items, and that all tick locations fall within the configured Y-axis bounds (if bounds are set).
+
+    Args:
+        values_dict (indigo.Dict): The device configuration dictionary containing customTicksY,
+            customTicksLabelY, yAxisMin, and yAxisMax fields.
+        error_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_dict) after validation.
     """
 
     my_ticks = values_dict['customTicksY'].split(',')  # Make a list from a string.

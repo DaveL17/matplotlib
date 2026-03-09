@@ -35,23 +35,19 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        """
-        Title Placeholder
-
-        Body placeholder
-        :return:
-        """
+        """Initialize the multiline text chart module (no-op placeholder)."""
 
     def clean_string(val):
-        """
-        Cleans long strings of whitespace and formats certain characters
+        """Clean a string of extra whitespace and reformat select characters.
 
-        The clean_string(self, val) method is used to scrub multiline text elements in order to try to make them more
-        presentable. The need is easily seen by looking at the rough text that is provided by the U.S. National Weather
-        Service, for example.
-        -----
-        :param unicode val:
-        :return val:
+        Scrubs multiline text elements to make them more presentable for display. Replaces common problematic character
+        sequences (such as those found in National Weather Service text) and collapses extra whitespace.
+
+        Args:
+            val (str): The raw text string to clean.
+
+        Returns:
+            str: The cleaned text string with normalized whitespace and reformatted characters.
         """
 
         # List of (elements, replacements)

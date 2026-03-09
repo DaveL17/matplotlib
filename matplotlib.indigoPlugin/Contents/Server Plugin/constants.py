@@ -1,7 +1,7 @@
 # noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
-Repository of application constants
+Repository of application constants.
 
 The constants.py file contains all application constants and is imported as a library. References are denoted as
 constants by the use of all caps.
@@ -10,12 +10,7 @@ constants by the use of all caps.
 
 # =============================================================================
 def __init__():
-    """
-    Title Placeholder
-
-    Body placeholder
-    :return:
-    """
+    """Initialize the constants module (no-op placeholder)."""
 
 
 CLEAN_LIST = (

@@ -38,7 +38,7 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        ...
+        """Initialize the flow bar chart module (no-op placeholder)."""
 
     num_obs = P_DICT['numObs']
 

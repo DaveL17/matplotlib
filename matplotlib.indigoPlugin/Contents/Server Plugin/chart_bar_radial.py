@@ -1,10 +1,11 @@
 # noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
-Title Placeholder
+Creates the radial bar (donut) charts.
 
-Body placeholder
-see also https://stackoverflow.com/a/49733577/2827397
+Renders a single value as a radial/donut-style bar chart using a pie chart with a hole cut out. The filled portion
+represents the plotted value; the remainder represents the balance up to the scale maximum. See also
+https://stackoverflow.com/a/49733577/2827397
 """
 
 import json
@@ -53,12 +54,7 @@ LOG['Threaddebug'].append(f"Value: {PLOT_VALUE} Scale: {PLOT_SCALE}")
 try:
 
     def __init__():
-        """
-        Title Placeholder
-
-        Body placeholder
-        :return:
-        """
+        """Initialize the radial bar chart module (no-op placeholder)."""
 
     # ============================  Custom Font Size  =============================
     # User has selected a custom font size.

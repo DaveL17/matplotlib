@@ -1,9 +1,11 @@
 # noqa pylint: disable=too-many-lines, line-too-long, invalid-name, unused-argument, redefined-builtin, broad-except, fixme
 
 """
-Title Placeholder
+Shared charting utility functions used by all chart subprocess scripts.
 
-Body placeholder
+Provides a library of functions for reading and processing CSV data, formatting matplotlib axes, ticks, grids, titles,
+legends, and best-fit lines, as well as saving finished chart images to disk. Loaded by each individual chart script
+via the payload mechanism.
 """
 # Built-in Modules
 import ast
@@ -41,27 +43,25 @@ except IndexError:
 
 
 def __init__():
-    """
-    Title Placeholder
-
-    Body placeholder
-    :return:
-    """
+    """Initialize the chart_tools module (no-op placeholder)."""
 
 
 # =============================================================================
 def convert_the_data(final_data: list, data_source: str, logger: dict):
-    """
-    Convert data into form that matplotlib can understand
+    """Convert data into a form that matplotlib can understand.
 
-    Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for plotting. We do this on the fly, and
-    we don't change the underlying data in any way. Further, some data can be presented that should not be charted. For
+    Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for plotting. We do this on the fly
+    and don't change the underlying data in any way. Some data can be presented that should not be charted; for
     example, the WUnderground plugin will present '-99.0' when WUnderground is not able to deliver a rational value.
     Therefore, we convert '-99.0' to NaN values.
-    -----
-    :param list final_data: the data to be charted
-    :param str data_source:
-    :param dict logger:
+
+    Args:
+        final_data (list): The raw chart data rows to be converted.
+        data_source (str): The path to the CSV data source file (used in log messages).
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        list: The converted data with non-numeric and sentinel values replaced by 'NaN'.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] "
@@ -76,12 +76,16 @@ def convert_the_data(final_data: list, data_source: str, logger: dict):
 
     # =============================================================================
     def is_number(s):
-        """
-        Title Placeholder
+        """Return True if the given value can be interpreted as a number.
 
-        Body placeholder
-        :param s:
-        :return:
+        Attempts to parse the value as a float or as a Unicode numeric character. Returns False if neither
+        interpretation succeeds.
+
+        Args:
+            s: The value to test for numeric interpretability.
+
+        Returns:
+            bool: True if the value is numeric, False otherwise.
         """
         try:
             float(s)
@@ -146,12 +150,16 @@ def convert_the_data(final_data: list, data_source: str, logger: dict):
 
 # =============================================================================
 def eval_expr(expr):
-    """
-    Title Placeholder
+    """Parse and evaluate a mathematical expression string safely.
 
-    Body placeholder
-    :param expr:
-    :return:
+    Parses the expression using the AST module and delegates evaluation to eval_(), which supports
+    basic arithmetic operators without using Python's built-in eval().
+
+    Args:
+        expr (str): A mathematical expression string to evaluate (e.g., "2 + 3 * 4").
+
+    Returns:
+        int | float: The numeric result of evaluating the expression.
     """
     # LOG['Debug'].append(f"[{payload['props']['name']}] Evaluating expressions.")
     return eval_(ast.parse(expr, mode='eval').body)
@@ -159,12 +167,19 @@ def eval_expr(expr):
 
 # =============================================================================
 def eval_(mode):
-    """
-    Title Placeholder
+    """Recursively evaluate an AST node as a mathematical expression.
 
-    Body placeholder
-    :param mode:
-    :return:
+    Handles numeric constants, binary operations (add, subtract, multiply, divide, power, XOR), and
+    unary negation. Raises TypeError for unsupported node types.
+
+    Args:
+        mode (ast.AST): An AST node representing a constant, binary operation, or unary operation.
+
+    Returns:
+        int | float: The numeric result of the evaluated AST node.
+
+    Raises:
+        TypeError: If the AST node type is not supported.
     """
     operators = {
         ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
@@ -185,12 +200,16 @@ def eval_(mode):
 
 # =============================================================================
 def fix_rgb(color):
-    """
-    Title Placeholder
+    """Normalize a color string to the #RRGGBB hex format expected by matplotlib.
 
-    Body placeholder
-    :param color:
-    :return:
+    Strips spaces and any leading '#' characters from the input, then prepends a single '#' to
+    produce a clean hex color string.
+
+    Args:
+        color (str): A color string in any of several common formats (e.g., "FF 00 00", "#FF0000").
+
+    Returns:
+        str: A normalized hex color string in '#RRGGBB' format.
     """
     LOG['Debug'].append(f"[{payload['props']['name']}] Coercing colors to #RRBBGG.")
     rgb = color.replace(' ', '').replace('#', '')
@@ -199,12 +218,14 @@ def fix_rgb(color):
 
 # =============================================================================
 def format_axis(ax_obj):
-    """
-    Set various axis properties
+    """Set font, color, and grid properties on all cells of a matplotlib table object.
 
+    Applies the configured face color, font color, font name, font size, and line width to each cell
+    in the table. Also controls whether cell edges are drawn based on the calendarGrid preference.
     Note that this method purposefully accesses protected members of the _text class.
-    -----
-    :param class 'matplotlib.table.Table' ax_obj: matplotlib table object
+
+    Args:
+        ax_obj (matplotlib.table.Table): The matplotlib table object whose cells will be formatted.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Setting axis properties.")
@@ -229,17 +250,17 @@ def format_axis(ax_obj):
 
 # =============================================================================
 def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
-    """
-    Format X axis label visibility and properties
+    """Format X-axis label visibility and tick properties.
 
-    If the user chooses to display a legend, we don't want an axis label because they will fight with each other for
-    space.
-    -----
-    :param dict logger:
-    :param dict dev: device props
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :return unicode result:
+    Applies font name, font size, and rotation to X-axis tick labels. If a legend is displayed,
+    suppresses the X-axis label to prevent the two elements from competing for space. Logs a
+    debug message if the label is suppressed.
+
+    Args:
+        dev (dict): Device properties dictionary (passed by Indigo, may not be used directly).
+        p_dict (dict): Plotting parameters dictionary containing font, tick, and label settings.
+        k_dict (dict): Plotting kwargs dictionary containing pre-built matplotlib keyword args.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
     try:
         font_main           = p_dict.get('fontMain', 'Arial')  # Main font style
@@ -294,14 +315,16 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
 
 # =============================================================================
 def format_axis_x_min_max(p_dict, logger):
-    """
-    Format x-axis range limits
+    """Set explicit minimum and maximum bounds for the X axis.
 
-    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly
-    at times. This block is meant to overcome that weirdness for something more desirable.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict logger:
+    Reads the desired min/max from p_dict and applies them via plt.xlim(). When a bound is set to
+    'none', a small padding is computed automatically from the data range. Setting limits before
+    plotting disables autoscaling, so this method uses a nudge-from-zero trick to avoid degenerate
+    limits when the data minimum or maximum is exactly zero.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'data_array', 'xAxisMin', and 'xAxisMax'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     try:
@@ -349,13 +372,16 @@ def format_axis_x_min_max(p_dict, logger):
 
 # =============================================================================
 def format_axis_x_scale(x_axis_bins, logger):
-    """
-    Format X axis scale based on user setting
+    """Configure the major and minor locators for a date-based X axis.
 
-    The format_axis_x_scale() method sets the bins for the X axis. Presently, we assume a date-based X axis.
-    -----
-    :param dict logger:
-    :param list x_axis_bins:
+    Maps a human-readable bin name (e.g., 'hourly', 'daily', 'weekly') to the appropriate matplotlib
+    date locators for both major and minor ticks. Assumes a date-based X axis.
+
+    Args:
+        x_axis_bins (str): The desired tick interval bin name. Supported values include
+            'quarter-hourly', 'half-hourly', 'hourly', 'hourly_2', 'hourly_4', 'hourly_8',
+            'hourly_12', 'daily', 'weekly', 'monthly', and 'yearly'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     try:
@@ -375,7 +401,7 @@ def format_axis_x_scale(x_axis_bins, logger):
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 8)))
         elif x_axis_bins == 'hourly_8':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=8))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 4)))
         elif x_axis_bins == 'hourly_12':
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
@@ -402,15 +428,21 @@ def format_axis_x_scale(x_axis_bins, logger):
 
 # =============================================================================
 def format_axis_x_ticks(ax, p_dict, k_dict, logger):
-    """
-    Format X axis tick properties
+    """Format X-axis tick marks, date formatter, and scale locators.
 
-    Controls the format and placement of the tick marks on the X axis.
-    -----
-    :param class 'matplotlib.axes.AxesSubplot' ax:
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    Applies major and minor tick parameters to the X axis, sets the date formatter from
+    p_dict['xAxisLabelFormat'], and calls format_axis_x_scale() to configure the tick locator
+    interval. If the label format is set to 'None', tick labels are hidden entirely. Only
+    applies tick formatting when a date-based label format key is present in p_dict.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to format.
+        p_dict (dict): Plotting parameters dictionary containing 'xAxisLabelFormat' and 'xAxisBins'.
+        k_dict (dict): Plotting kwargs dictionary containing 'k_major_x' and 'k_minor_x' entries.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        matplotlib.axes.AxesSubplot: The formatted axes object, or None if an exception occurs.
     """
 
     try:
@@ -437,14 +469,16 @@ def format_axis_x_ticks(ax, p_dict, k_dict, logger):
 
 # =============================================================================
 def format_axis_y_ticks(p_dict, k_dict, logger):
-    """
-    Format Y axis tick marks
+    """Apply custom Y-axis tick locations and labels if configured.
 
-    Controls the format and placement of Y ticks.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    Reads custom tick mark values and labels from p_dict. If neither is set, returns without
+    making changes. If tick locations are provided but labels are empty, the locations are also
+    used as labels. Replaces the default matplotlib Y tick marks and labels with the custom values.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'customTicksY' and 'customTicksLabelY'.
+        k_dict (dict): Plotting kwargs dictionary (passed through, not directly used in this function).
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     try:
@@ -480,15 +514,21 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
 
 # =============================================================================
 def format_axis_y(ax, p_dict, k_dict, logger):
-    """
-    Format Y1 axis display properties
+    """Format Y-axis tick parameters, number formatter, and optional Y2 mirroring.
 
-    Controls the format and properties of the Y axis.
-    -----
-    :param class 'matplotlib.axes.AxesSubplot' ax:
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    Applies major and minor tick parameters to the Y axis and sets a fixed-precision number
+    formatter. Optionally mirrors Y-axis tick labels on the right side (Y2), and can suppress
+    the left-side labels if the user wants Y2-only display.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to format.
+        p_dict (dict): Plotting parameters dictionary containing 'yAxisPrecision', 'yMirrorValues',
+            and 'yMirrorValuesAlsoY1'.
+        k_dict (dict): Plotting kwargs dictionary containing 'k_major_y' and 'k_minor_y' entries.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        matplotlib.axes.AxesSubplot: The formatted axes object, or None if an exception occurs.
     """
     # TODO: Balance the axis methods.  We should have:
     #       x_label
@@ -549,13 +589,16 @@ def format_axis_y(ax, p_dict, k_dict, logger):
 
 # =============================================================================
 def format_axis_y1_label(p_dict, k_dict, logger):
-    """
-    Format Y1 axis labels
-    Controls the format and placement of labels for the Y1 axis.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    """Format the Y1 axis label text, font, and tick label properties.
+
+    Sets the Y-axis label text and applies the configured font name, font size, and rotation to
+    Y-axis tick labels. Uses custom font sizes when the customSizeFont preference is enabled.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'customAxisLabelY', 'fontMain',
+            'customSizeFont', 'customTickFontSize', 'tickFontSize', and 'yAxisRotate'.
+        k_dict (dict): Plotting kwargs dictionary containing 'k_y_axis_font' entry.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     font_main = p_dict.get('fontMain', 'Arial')  # Main font style
@@ -590,14 +633,16 @@ def format_axis_y1_label(p_dict, k_dict, logger):
 
 # =============================================================================
 def format_axis_y1_min_max(p_dict, logger):
-    """
-    Format Y1 axis range limits
+    """Set explicit minimum and maximum bounds for the Y1 axis.
 
-    Setting the limits before the plot turns off autoscaling, which causes the limit that's not set to behave weirdly
-    at times. This block is meant to overcome that weirdness for something more desirable.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict logger:
+    Reads the desired min/max from p_dict and applies them via plt.ylim(). When a bound is set to
+    'none', a small padding is computed automatically from the data range. Setting limits before
+    plotting disables autoscaling, so this method uses a nudge-from-zero trick to avoid degenerate
+    limits when the data minimum or maximum is exactly zero.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'data_array', 'yAxisMin', and 'yAxisMax'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     try:
@@ -646,14 +691,16 @@ def format_axis_y1_min_max(p_dict, logger):
 # =============================================================================
 # this is currently unused.
 def format_axis_y2_label(p_dict, k_dict, logger):
-    """
-    Format Y2 axis properties
+    """Format the Y2 axis label text, font, and tick label properties.
 
-    Controls the format and placement of labels for the Y2 axis.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    Sets the Y2 axis label text and applies the configured font name and font size to Y-axis tick
+    labels. Uses custom font sizes when the customSizeFont preference is enabled. Currently unused.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'customAxisLabelY2', 'fontMain',
+            'customSizeFont', 'customTickFontSize', and 'tickFontSize'.
+        k_dict (dict): Plotting kwargs dictionary containing 'k_y_axis_font' entry.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     font_main = p_dict.get('fontMain', 'Arial')  # Main font style
@@ -674,18 +721,22 @@ def format_axis_y2_label(p_dict, k_dict, logger):
 
 # =============================================================================
 def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
-    """
-    Adds best fit line segments to plots
+    """Add a polynomial best-fit line overlay to the given axes.
 
-    The format_best_fit_line_segments method provides a utility to add "best fit lines" to select types of charts (best
-    fit lines are not appropriate for all chart types).
-    -----
-    :param class 'matplotlib.axes.AxesSubplot' ax:
-    :param numpy.ndarray dates_to_plot:
-    :param int line:
-    :param dict p_dict: plotting parameters
-    :param dict logger:
-    :return ax:
+    Computes a first-degree polynomial fit (linear regression) over the provided date values and
+    corresponding Y observations, then plots the result as a line on the axes. Best-fit lines are
+    not appropriate for all chart types.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to plot the best-fit line on.
+        dates_to_plot (numpy.ndarray): Array of numeric date values used as the X axis for the fit.
+        line (int): The line series number used to look up the color and Y data in p_dict.
+        p_dict (dict): Plotting parameters dictionary containing the Y observations and best-fit
+            line color keyed by line number (e.g., 'y_obs1', 'line1BestFitColor').
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        matplotlib.axes.AxesSubplot: The axes object with the best-fit line added, or None on error.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Formatting best fit line segments.")
@@ -714,17 +765,25 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
 
 # =============================================================================
 def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="horiz"):
-    """
-    Chart custom line segments handler
+    """Draw configured custom horizontal or vertical reference lines on the axes.
 
-    Process any custom line segments and add them to the matplotlib axes object.
-    -----
-    :param dict plug_dict:
-    :param class 'matplotlib.axes.AxesSubplot' ax:
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
-    :param str orient: orientation of custom line segments
+    Reads custom line segment definitions from p_dict and draws them as axhline (horizontal) or
+    axvline (vertical) overlays using the stored color and style settings. If the
+    promoteCustomLineSegments preference is enabled, the line values are also appended to
+    p_dict['data_array'] so they influence axis auto-scaling.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to draw custom lines on.
+        plug_dict (dict): Plugin preferences dictionary, checked for 'promoteCustomLineSegments'.
+        p_dict (dict): Plotting parameters dictionary containing 'enableCustomLineSegments',
+            'customLineSegments', 'customLineStyle', and 'data_array'.
+        k_dict (dict): Plotting kwargs dictionary containing the 'k_custom' entry.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+        orient (str): Orientation of the custom line segments. Accepts 'horiz' (default) or 'vert'.
+
+    Returns:
+        matplotlib.lines.Line2D | None: The last drawn line artist, or None if no lines were drawn
+            or an exception occurred.
     """
     # Note that these need to be plotted after the legend is established, otherwise some characteristics of the min/max
     # lines will take over the legend props.
@@ -798,13 +857,18 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
 
 # =============================================================================
 def format_dates(list_of_dates, logger):
-    """
-    Convert date strings to date objects
+    """Convert a list of date strings to matplotlib numeric date values.
 
-    Convert string representations of date values to mdate values for charting.
-    -----
-    :param list list_of_dates:
-    :param dict logger:
+    Parses each date string using dateutil and converts the resulting datetime objects to
+    matplotlib date numbers via mdate.date2num(), which are the values expected by matplotlib
+    for date-based X axes.
+
+    Args:
+        list_of_dates (list): A list of date strings to parse and convert.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        numpy.ndarray | None: An array of matplotlib numeric date values, or None if an error occurs.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Formatting dates.")
@@ -832,14 +896,15 @@ def format_dates(list_of_dates, logger):
 
 # =============================================================================
 def format_grids(p_dict, k_dict, logger):
-    """
-    Format matplotlib grids
+    """Enable X and/or Y axis grid lines based on the configured preferences.
 
-    Format grids for visibility and properties.
-    -----
-    :param dict p_dict: plotting parameters
-    :param dict k_dict: plotting kwargs
-    :param dict logger:
+    Checks the showxAxisGrid and showyAxisGrid flags in p_dict and enables the corresponding
+    matplotlib grid lines using the style properties from k_dict.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'showxAxisGrid' and 'showyAxisGrid'.
+        k_dict (dict): Plotting kwargs dictionary containing the 'k_grid_fig' entry.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Formatting grids.")
@@ -864,15 +929,17 @@ def format_grids(p_dict, k_dict, logger):
 
 # =============================================================================
 def format_title(p_dict, k_dict, loc, align='center', logger=None):
-    """
-    Plot the figure's title
-    -----
-    :param p_dict:
-    :param k_dict:
-    :param loc:
-    :param str align:
-    :param dict logger:
-    :return:
+    """Render the chart's figure-level title using plt.suptitle().
+
+    Reads the title text from p_dict['chartTitle'] and renders it at the specified figure
+    position using the title font kwargs from k_dict.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'chartTitle'.
+        k_dict (dict): Plotting kwargs dictionary containing the 'k_title_font' entry.
+        loc (tuple): A (x, y) tuple specifying the title position in figure coordinates.
+        align (str): Horizontal alignment of the title text. Defaults to 'center'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
     """
     try:
         plt.suptitle(p_dict['chartTitle'], position=loc, ha=align, **k_dict['k_title_font'])
@@ -882,14 +949,19 @@ def format_title(p_dict, k_dict, loc, align='center', logger=None):
 
 # =============================================================================
 def get_data(data_source, logger):
-    """
-    Retrieve data from CSV file.
+    """Read and return chart data from a CSV file.
 
-    Reads data from source CSV file and returns a list of tuples for charting. The data are provided as strings
-    [('formatted date', 'observation'), ...]
-    -----
-    :param unicode data_source:
-    :param dict logger:
+    Opens the CSV file at data_source, reads all rows, and passes the data through convert_the_data()
+    for normalization. If the file cannot be read, returns a minimal two-row proxy dataset and logs
+    a warning so that downstream chart code does not crash.
+
+    Args:
+        data_source (str): The filesystem path to the CSV data file to read.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        list: A list of rows (as lists) in the form [['timestamp', 'placeholder'], ...], with
+            non-numeric and sentinel values normalized to 'NaN'.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Retrieving CSV data.")
@@ -926,11 +998,20 @@ def get_data(data_source, logger):
 def hide_anomalies(data: tuple = None, props: dict = None, logger: dict = None):
     """Detect outliers in data and replace them with 'NaN'.
 
+    Computes the mean and standard deviation of the input data and replaces any values that fall
+    outside the configured number of standard deviations with 'NaN'. If the filterAnomalies
+    preference is 0 or not set, the data is returned unchanged.
+
     Credit: https://gist.github.com/wmlba/89bc2f4556b8ee397ca7a5017b497657#file-outlier_std-py
-    -----
-    :param list data:
-    :param dict props:
-    :param dict logger:
+
+    Args:
+        data (tuple): The sequence of numeric values to inspect for anomalies.
+        props (dict): Device properties dictionary containing the 'filterAnomalies' threshold.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        list | tuple: The data with outliers replaced by 'NaN', or the original data if filtering
+            is disabled.
     """
     LOG['Debug'].append(f"[{payload['props']['name']}] Identifying and disguising anomalous data.")
 
@@ -969,15 +1050,19 @@ def hide_anomalies(data: tuple = None, props: dict = None, logger: dict = None):
 
 # =============================================================================
 def make_chart_figure(width, height, p_dict):
-    """
-    Create the matplotlib figure object and create the main axes element.
+    """Create the matplotlib figure and primary axes object for a chart.
 
-    Create the figure object for charting and include one axes object. The method also add a few customizations when
-    defining the objects.
-    -----
-    :param float width:
-    :param float height:
-    :param dict p_dict: plotting parameters
+    Constructs a single-subplot figure sized in inches based on the given pixel dimensions and the
+    current DPI setting. Applies the configured face color and spine color to the axes, and adds a
+    small margin around the plot area.
+
+    Args:
+        width (float): The desired chart width in pixels.
+        height (float): The desired chart height in pixels.
+        p_dict (dict): Plotting parameters dictionary containing 'faceColor' and 'spineColor'.
+
+    Returns:
+        matplotlib.axes.AxesSubplot: The configured primary axes object.
     """
 
     dpi = float(plt.rcParams['savefig.dpi'])
@@ -996,19 +1081,22 @@ def make_chart_figure(width, height, p_dict):
 
 # =============================================================================
 def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
-    """
-    Prune data to display subset of available data
+    """Trim data to only include observations within a recent time window.
 
-    The prune_data() method is used to show a subset of available data. Users enter a number of days into a device
-    config dialog, the method then drops any observations that are outside that window.
-    -----
-    :rtype: object
-    :param list x_data:
-    :param list y_data:
-    :param int limit:
-    :param unicode new_old:
-    :param dict logger:
-    :return:
+    Filters x_data and y_data to keep only the observations that fall within the past `limit` days
+    from now. If no observations remain after filtering, returns a single synthetic observation at
+    the current time with value 0 and logs a warning.
+
+    Args:
+        x_data (list): A list of timestamp strings in '%Y-%m-%d %H:%M:%S.%f' format.
+        y_data (list): A list of corresponding Y values parallel to x_data.
+        limit (int): The number of days back from now to retain observations.
+        new_old (str): Unused parameter passed through from the caller.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+
+    Returns:
+        tuple: A two-element tuple of (final_x, final_y), each a list of observations within the
+            time window, with timestamps returned as '%Y-%m-%d %H:%M:%S.%f' strings.
     """
 
     LOG['Debug'].append(f"[{payload['props']['name']}] Pruning data as needed.")
@@ -1053,13 +1141,16 @@ def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
 
 # =============================================================================
 def save(logger):
-    """
-    Title Placeholder
+    """Save the completed matplotlib figure to disk and release figure resources.
 
-    Body placeholder
-    -----
-    :param logger:
-    :return:
+    Applies tight layout and subplot margin adjustments appropriate for the chart type, then saves
+    the figure to the path and filename specified in the payload. Logs a warning if the chart is not
+    saved due to missing path or filename. Clears and closes the figure to free memory. Logs a
+    critical error if the chart exceeds matplotlib's MAXTICKS limit.
+
+    Args:
+        logger (dict): The logging message dictionary for appending warnings, debug info, and
+            critical errors.
     """
     try:
         top_margin    = 0.9

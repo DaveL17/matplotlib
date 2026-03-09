@@ -26,18 +26,17 @@ __version__   = "0.1.03"
 
 
 class Maintain:
-    """
-    Various plugin maintenance utilities
+    """Various plugin maintenance utilities.
 
-    Maintain is a container for code that makes specific to consolidate methods used throughout all Indigo plugins with
-    the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for each plugin.
+    Container for methods that consolidate maintenance tasks used throughout Indigo plugins with the
+    com.fogbert.indigoPlugin.xxxx bundle identifier. Can be customized for each plugin.
     """
 
     def __init__(self, plugin):
-        """
-        Constructor
+        """Initialize the Maintain instance and attach it to the parent plugin.
 
-        :param plugin:
+        Args:
+            plugin: The Indigo plugin instance that this maintenance object belongs to.
         """
         self.plugin = plugin
         self.pluginPrefs = plugin.pluginPrefs
@@ -45,15 +44,17 @@ class Maintain:
         self.my_logger.debug("Initializing maintenance framework.x")
 
     def clean_prefs(self, dev_name: str, prefs: dict):
-        """
-        Remove legacy keys from non-chart device prefs
+        """Remove legacy keys from non-chart device prefs.
 
-        None of the keys listed here should be present in device types using this method to clean their prefs. If they
-        exist, delete them.
-        -----
-        :param str dev_name:
-        :param dict prefs:
-        :return:
+        None of the keys in the removal list should be present in non-chart device types such as csvEngine and
+        rcParamsDevice. If any are found, they are deleted and their names logged.
+
+        Args:
+            dev_name (str): The name of the device whose prefs are being cleaned (used for logging).
+            prefs (dict): The device plugin properties dictionary to clean.
+
+        Returns:
+            dict: The cleaned props dictionary with legacy keys removed.
         """
 
         list_of_removed_keys = []
@@ -363,12 +364,15 @@ class Maintain:
         return prefs
 
     def clean_props(self, dev: indigo.Device):
-        """
-        Remove legacy keys from device prefs
+        """Update and repair device plugin properties to match the current plugin version.
 
-        -----
-        :param indigo.Device dev:
-        :return:
+        Performs a series of maintenance tasks on the device's pluginProps: sets the isChart flag, converts string
+        booleans to native bools, updates legacy color values, fixes deprecated line styles, migrates custom color
+        settings from legacy formats, and ensures the refresh interval is present. Saves all changes back to the
+        Indigo server.
+
+        Args:
+            dev (indigo.Device): The Indigo device whose plugin properties will be cleaned and updated.
         """
         props = dev.pluginProps
 

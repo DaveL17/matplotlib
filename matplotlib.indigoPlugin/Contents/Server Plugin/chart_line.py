@@ -35,7 +35,7 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        ...
+        """Initialize the line chart module (no-op placeholder)."""
 
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
 
@@ -137,7 +137,7 @@ try:
                 logger=LOG
             )
 
-            ax.plot_date(
+            ax.plot(
                 P_DICT[f'x_obs{line}'],
                 y_data,
                 color=P_DICT[f'line{line}Color'],

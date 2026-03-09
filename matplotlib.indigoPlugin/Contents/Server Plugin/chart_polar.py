@@ -36,12 +36,7 @@ if PLUG_DICT['verboseLogging']:
 
 try:
     def __init__():
-        """
-        Title Placeholder
-
-        Body placeholder
-        :return:
-        """
+        """Initialize the polar chart module (no-op placeholder)."""
 
     num_obs = P_DICT['numObs']
 

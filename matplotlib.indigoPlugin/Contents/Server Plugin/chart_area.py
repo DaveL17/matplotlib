@@ -36,7 +36,7 @@ if PLUG_DICT['verboseLogging']:
 
 
 def __init__():
-    ...
+    """Initialize the area chart module (no-op placeholder)."""
 
 
 try:
@@ -278,7 +278,7 @@ try:
             # Note that stackplots don't support markers, so we need to plot a line (with no width) on the plot to
             # receive the markers.
             if P_DICT[f'area{area}Marker'] != 'None':
-                ax.plot_date(
+                ax.plot(
                     P_DICT[f'x_obs{area}'],
                     Y_OBS_TUPLE_REL[f'y_obs{area}'],
                     marker=P_DICT[f'area{area}Marker'],
@@ -289,7 +289,7 @@ try:
                 )
 
             if P_DICT[f'line{area}Style'] != 'None':
-                ax.plot_date(
+                ax.plot(
                     P_DICT[f'x_obs{area}'], Y_OBS_TUPLE_REL[f'y_obs{area}'],
                     zorder=10,
                     lw=1,

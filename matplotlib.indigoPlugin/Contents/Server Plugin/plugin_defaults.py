@@ -1,5 +1,8 @@
 """
 Contains plugin default preferences.
+
+Defines the kDefaultPluginPrefs dictionary used to initialize plugin preferences when they are not already set by the
+user. All keys correspond to fields defined in PluginConfig.xml.
 """
 
 import indigo  # noqa

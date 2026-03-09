@@ -54,18 +54,18 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        ...
+        """Initialize the composite weather chart module (no-op placeholder)."""
 
 
     def format_subplot(s_plot, title: str = "Title"):
-        """
-        Title Placeholder
+        """Apply consistent formatting to a single weather composite subplot.
 
-        Note that we have to set these for each subplot as it's rendered or else the settings will only be applied to
-        the last subplot rendered.
+        Must be called individually for each subplot as it's rendered; settings applied to one subplot do not carry
+        over to others.
 
-        :param s_plot:
-        :param str title:
+        Args:
+            s_plot: The matplotlib subplot axes object to format.
+            title (str): The title string to display above the subplot.
         """
         s_plot.set_title(title, **K_DICT['k_title_font'])  # The subplot title
         chart_tools.format_axis_x_ticks(ax=s_plot, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
@@ -86,13 +86,13 @@ try:
             s_plot.tick_params(axis='both', labelsize=int(PLUG_DICT['tickFontSize']))
 
     def transparent_chart_fill(s):
-        """
-        Title Placeholder
+        """Fill a subplot's plot area with the configured face color for transparent chart support.
 
-        Body placeholder
-        -----
-        :param s:
-        :return:
+        When the chart is configured for a transparent background but a filled plot area, this method adds a filled
+        rectangle patch behind the chart content to provide the desired background color.
+
+        Args:
+            s: The matplotlib subplot axes object to fill.
         """
         if P_DICT['transparent_filled']:
             s.add_patch(

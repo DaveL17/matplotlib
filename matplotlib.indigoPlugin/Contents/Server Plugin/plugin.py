@@ -66,22 +66,22 @@ __version__   = "2025.2.0"
 
 # =============================================================================
 class Plugin(indigo.PluginBase):
-    """
-    Standard Indigo Plugin Class
+    """The main Indigo plugin class for the Matplotlib plugin.
 
-    :param indigo.PluginBase:
+    Manages chart devices, CSV engine devices, plugin preferences, and all Indigo-framework callbacks.
+    Provides chart rendering by dispatching subprocess scripts and handling their output.
     """
+
     def __init__(self, plugin_id: str = "", plugin_display_name: str = "", plugin_version: str = "", plugin_prefs: indigo.Dict = None):  # noqa
-        """
-        Plugin initialization
+        """Initialize the Plugin instance and set up logging and framework objects.
 
-        :param str plugin_id:
-        :param str plugin_display_name:
-        :param str plugin_version:
-        :param indigo.Dict plugin_prefs:
+        Args:
+            plugin_id (str): The Indigo plugin bundle identifier.
+            plugin_display_name (str): The human-readable plugin name.
+            plugin_version (str): The plugin version string.
+            plugin_prefs (indigo.Dict): The persisted plugin preferences dictionary.
         """
         super().__init__(plugin_id, plugin_display_name, plugin_version, plugin_prefs)
-        indigo.server.log(f"{type(plugin_prefs)}")
 
         # ============================ Instance Attributes =============================
         self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
@@ -120,29 +120,27 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def __del__(self):
-        """
-        Title Placeholder
-
-        Body placeholder
-
-        :return:
-        """
+        """Destroy the Plugin instance and call the parent class destructor."""
         indigo.PluginBase.__del__(self)
 
     # =============================================================================
     # ============================== Indigo Methods ===============================
     # =============================================================================
     def closed_device_config_ui(self, values_dict: indigo.Dict = None, user_cancelled: bool = False, type_id: str = "", dev_id: int = 0) -> bool:  # noqa
-        """
-        Title Placeholder
+        """Handle cleanup when a device configuration dialog is closed.
 
-        Body placeholder
+        Logs the final values_dict if the user confirmed, or a cancellation message if the user
+        cancelled. If the device is fully configured and is a chart device type, queues a chart
+        refresh.
 
-        :param indigo.Dict values_dict:
-        :param bool user_cancelled:
-        :param str type_id:
-        :param int dev_id:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The configuration values from the dialog.
+            user_cancelled (bool): True if the user cancelled the dialog without saving.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            bool: Always True.
         """
         dev = indigo.devices[dev_id]
 
@@ -193,13 +191,13 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def device_start_comm(self, dev: indigo.Device = None) -> None:  # noqa
-        """
-        Title Placeholder
+        """Start communication with a chart device.
 
-        Body placeholder
+        Resets the plugin shutdown flag, cleans device properties to match the current plugin
+        version, and updates the device state list and state image.
 
-        :param indigo.Device dev:
-        :return:
+        Args:
+            dev (indigo.Device): The Indigo device instance being started.
         """
         self.logger.debug("[%s] Starting chart device." % dev.name)
         # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global is in its proper
@@ -212,28 +210,29 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def device_stop_comm(dev: indigo.Device = None) -> None:  # noqa
-        """
-        Title Placeholder
+        """Stop communication with a chart device and update its state to disabled.
 
-        Body placeholder
-
-        :param indigo.Device dev:
-        :return:
+        Args:
+            dev (indigo.Device): The Indigo device instance being stopped.
         """
         dev.updateStatesOnServer([{'key': 'onOffState', 'value': False, 'uiValue': 'Disabled'}])
         dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
     # =============================================================================
     def getActionConfigUiValues(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:
-        """
-        Title Placeholder
+        """Return pre-populated values for an action configuration dialog.
 
-        Body placeholder
+        For the 'themeApplyAction' type, returns values_dict unchanged. For all other action
+        types, returns the full pluginPrefs dict if values_dict is empty, otherwise returns
+        the existing values_dict.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The current dialog values.
+            type_id (str): The action type identifier string.
+            dev_id (int): The Indigo device ID associated with the action.
+
+        Returns:
+            dict: The resolved values dictionary to populate the action dialog.
         """
         # ===========================  Apply Theme Action  ============================
         if type_id == "themeApplyAction":
@@ -249,15 +248,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getDeviceConfigUiValues(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0):  # noqa
-        """
-        Title Placeholder
+        """Return pre-populated values for a device configuration dialog.
 
-        Body placeholder
+        Handles special initialization for CSV Engine devices (resetting workflow fields) and
+        ensures the dialog opens on the 'Chart Controls' settings group. For new (unconfigured)
+        devices, sets per-type default values for colors, sources, and style preferences.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The current device configuration values.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            indigo.Dict: The populated values dictionary, or a (True, values_dict) tuple on error.
         """
         dev = indigo.devices[int(dev_id)]
         self.dev_var_list = self.generatorDeviceAndVariableList()
@@ -471,13 +474,16 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getDeviceStateList(self, dev: indigo.Device = None) -> list:  # noqa
-        """
-        Title Placeholder
+        """Return the list of device states for the given device.
 
-        Body placeholder
+        For rcParams devices, dynamically adds one string state for each matplotlib rcParams key
+        (with '.' replaced by '_'). Also appends an 'onOffState' string state.
 
-        :param indigo.Device dev:
-        :return:
+        Args:
+            dev (indigo.Device): The Indigo device instance.
+
+        Returns:
+            list: The list of device state dictionaries for the device.
         """
         state_list = indigo.PluginBase.getDeviceStateList(self, dev)
 
@@ -494,13 +500,16 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getMenuActionConfigUiValues(self, menu_id: str = "") -> tuple:
-        """
-        Title Placeholder
+        """Return pre-populated settings and an empty error dict for menu action dialogs.
 
-        Body placeholder
+        For the advanced settings menu, reads the relevant preference keys from pluginPrefs. For
+        the Theme Manager menu, also reads the current theme-related preference values.
 
-        :param str menu_id:
-        :return:
+        Args:
+            menu_id (str): The menu action identifier string.
+
+        Returns:
+            tuple: A two-element tuple of (settings indigo.Dict, error_msg_dict indigo.Dict).
         """
         settings       = indigo.Dict()
         error_msg_dict = indigo.Dict()
@@ -529,12 +538,13 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getPrefsConfigUiValues(self):  # noqa
-        """
-        Title Placeholder
+        """Return plugin preferences pre-populated with defaults for the preferences dialog.
 
-        Body placeholder
+        Reads the current pluginPrefs and fills in defaults for any missing color, font, and
+        display preference keys. This is primarily needed the first time the plugin is configured.
 
-        :return:
+        Returns:
+            indigo.Dict: The plugin preferences dictionary with all required keys populated.
         """
         # Pull in the initial pluginPrefs. If the plugin is being set up for the first time, this dict will be empty.
         # Subsequent calls will pass the established dict.
@@ -569,12 +579,10 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def runConcurrentThread(self):  # noqa
-        """
-        Title Placeholder
+        """Run the plugin's main background loop.
 
-        Body placeholder
-
-        :return:
+        Checks the chart refresh queue, refreshes CSV engine data, and refreshes chart devices on
+        each iteration. Sleeps 10 seconds between cycles. Runs until the plugin is shut down.
         """
         self.sleep(0.5)
 
@@ -588,26 +596,28 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def sendDevicePing(dev_id: int = 0, suppress_logging: bool = False) -> dict:  # noqa
-        """
-        Title Placeholder
+        """Respond to a device ping request.
 
-        Body placeholder
+        Matplotlib plugin devices do not support the ping function. Logs an informational message
+        and returns a Failure result.
 
-        :param int dev_id:
-        :param bool suppress_logging:
-        :return:
+        Args:
+            dev_id (int): The Indigo device ID to ping.
+            suppress_logging (bool): Whether to suppress logging output.
+
+        Returns:
+            dict: A result dictionary with key 'result' set to 'Failure'.
         """
         indigo.server.log("Matplotlib Plugin devices do not support the ping function.")
         return {'result': 'Failure'}
 
     # =============================================================================
     def startup(self) -> None:
-        """
-        Title Placeholder
+        """Perform plugin startup tasks.
 
-        Body placeholder
-
-        :return:
+        Audits the Indigo server version compatibility, checks CSV filename uniqueness, audits CSV
+        file health, audits device properties, audits chart and data save paths, and audits the
+        themes file.
         """
         # =========================== Check Indigo Version ============================
         self.Fogbert.audit_server_version(min_ver=2022)
@@ -629,23 +639,26 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def shutdown(self) -> None:
-        """
-        Title Placeholder
+        """Perform plugin shutdown tasks.
 
-        Body placeholder
+        Sets the pluginIsShuttingDown flag to True to halt the concurrent thread loop.
         """
         self.logger.threaddebug("Shutdown called.")
         self.pluginIsShuttingDown = True
 
     # =============================================================================
     def validatePrefsConfigUi(self, values_dict: indigo.Dict = None) -> tuple:  # noqa
-        """
-        Title Placeholder
+        """Validate the plugin preferences configuration dialog before saving.
 
-        Body placeholder
+        Validates data paths, chart colors, chart dimensions, chart resolution, and line weight.
+        Logs any changed preference values. Sets the dpiWarningFlag to True on success.
 
-        :return indigo.Dict values_dict:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The preference values submitted from the dialog.
+
+        Returns:
+            tuple: (True, values_dict) on success, or (False, values_dict, error_msg_dict)
+                if validation fails.
         """
         error_msg_dict = indigo.Dict()
 
@@ -703,15 +716,20 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def validateDeviceConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
-        """
-        Title Placeholder
+        """Validate a device configuration dialog before saving.
 
-        Body placeholder
+        Applies device-type-specific validation (required sources, numeric values, axis limits,
+        custom tick counts, etc.) and general validation across all chart types (custom dimensions,
+        axis limit format and ordering).
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The device configuration values submitted from the dialog.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            tuple: (True, values_dict, error_msg_dict) on success, or
+                (False, values_dict, error_msg_dict) if validation fails.
         """
         error_msg_dict = indigo.Dict()
         self.logger.threaddebug("Validating device configuration parameters.")
@@ -1118,15 +1136,15 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def validateMenuConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
-        """
-        Title Placeholder
+        """Validate menu configuration dialog values and log the submitted payload.
 
-        Body placeholder
+        Args:
+            values_dict (indigo.Dict): The menu configuration values submitted from the dialog.
+            type_id (str): The menu type identifier string.
+            dev_id (int): The Indigo device ID (if applicable).
 
-        :return indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
-        :return:
+        Returns:
+            tuple: A two-element tuple of (True, values_dict).
         """
         self.logger.info("v: %s" % values_dict)
         self.logger.info("t: %s" % type_id)
@@ -1135,37 +1153,38 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def __log_dicts(self, dev: indigo.Device = None) -> None:
-        """
-        Write parameters dicts to log under verbose logging
+        """Write device plugin properties to the threaddebug log.
 
-        Simple method to write rcParm and kwarg dicts to debug log.
+        A simple helper to log the device's pluginProps dict under verbose logging for
+        troubleshooting chart rendering issues.
 
-        :return indigo.Device dev:
+        Args:
+            dev (indigo.Device): The Indigo device whose props will be logged.
         """
         self.logger.threaddebug(f"[{dev.name:<19}] Props: {dict(dev.pluginProps)}")
 
     # =============================================================================
     def dummyCallback(self, values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> None:  # noqa
-        """
-        Dummy callback method to force dialog refreshes
+        """Serve as a no-op callback to force configuration dialog refreshes.
 
-        The purpose of the dummyCallback method is to provide something for configuration dialogs to call in order to
-        force a refresh of any dynamic controls (dynamicReload=True).
+        Provides a callback target for configuration dialog controls that use dynamicReload=True.
+        Calling this method triggers Indigo to reload dynamic controls in the dialog.
 
-        :param str type_id:
-        :param indigo.Dict values_dict:
-        :param int target_id:
+        Args:
+            values_dict (indigo.Dict): The current dialog values.
+            type_id (str): The type identifier string.
+            target_id (int): The target device or variable ID.
         """
 
     # =============================================================================
     def action_refresh_the_charts(self, plugin_action) -> None:  # noqa
-        """
-        Called by an Indigo Action item.
+        """Refresh all enabled chart devices in response to an Indigo Action item.
 
-        Allows the plugin to call the charts_refresh() method from an Indigo Action item. This action will refresh all
-        charts.
+        Sets the skipRefreshDateUpdate flag and calls charts_refresh() with all enabled non-CSV
+        chart devices. Logs a completion banner when finished.
 
-        :param indigo.PluginAction plugin_action:
+        Args:
+            plugin_action: The Indigo plugin action instance (passed by Indigo).
         """
         self.skipRefreshDateUpdate = True
         devices_to_refresh = [dev for dev in indigo.devices.iter('self') if
@@ -1176,15 +1195,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def advancedSettingsExecuted(self, values_dict: indigo.Dict = None, menu_id: int = 0) -> bool:  # noqa
-        """
-        Save advanced settings menu items to plugin props for storage
+        """Save advanced settings menu selections to pluginPrefs for permanent storage.
 
-        The advancedSettingsExecuted() method is a place where advanced settings will be controlled. This method takes
-        the returned values and sends them to the pluginPrefs for permanent storage. Note that valuesDict here is for
-        the menu, not all plugin prefs.
+        Persists the custom line segments, promote custom line segments, snappy config menus, and
+        force origin lines preferences from the advanced settings menu dialog. Note that values_dict
+        here covers only menu values, not all plugin prefs.
 
-        :param indigo.Dict values_dict:
-        :param int menu_id:
+        Args:
+            values_dict (indigo.Dict): The advanced settings dialog values.
+            menu_id (int): The menu identifier (passed by Indigo, not used directly).
+
+        Returns:
+            bool: Always True.
         """
         self.pluginPrefs['enableCustomLineSegments']  = values_dict['enableCustomLineSegments']
         self.pluginPrefs['promoteCustomLineSegments'] = values_dict['promoteCustomLineSegments']
@@ -1196,27 +1218,24 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def advancedSettingsMenu(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> None:  # noqa
-        """
-        Write advanced settings menu selections to the log
+        """Log the current advanced settings menu selections at threaddebug level.
 
-        The advancedSettingsMenu() method is called when actions are taken within the Advanced Settings Menu item from
-        the plugin menu.
+        Called when actions are taken within the Advanced Settings Menu item from the plugin menu.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
+        Args:
+            values_dict (indigo.Dict): The advanced settings dialog values.
+            type_id (str): The menu type identifier string.
+            dev_id (int): The Indigo device ID (if applicable).
         """
         self.logger.threaddebug("Advanced settings menu final prefs: %s" % dict(values_dict))
 
     # =============================================================================
     def audit_csv_health(self) -> None:
-        """
-        Creates any missing CSV files before beginning
+        """Create any missing CSV data files before the plugin begins normal operation.
 
-        Iterate through all existing CSV Engine devices. It doesn't matter if the device is enabled or not, since we're
-        only creating the file if it doesn't exist, and we're only going to add the header to the file.
-
-        :return:
+        Iterates through all CSV Engine devices (enabled or disabled) and creates any missing CSV
+        files in the configured data path. New files are initialized with a header row. Also
+        creates the data directory if it does not yet exist.
         """
         self.logger.debug("Auditing CSV health.")
         data_path = self.pluginPrefs['dataPath']
@@ -1250,19 +1269,16 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def audit_device_props(self) -> bool:
-        """
-        Audit device properties to ensure they match the current config.
+        """Audit device properties to ensure they match the current plugin configuration.
 
-        The audit_device_props method performs two functions. It compares the current device config XML layout to the
-        current dev.pluginProps, and (1) where the current config has fields that are missing from the device, they
-        will be _added_ to the device (checkboxes will be coerced to boolean based on the defaultValue attribute if
-        specified; unspecified, the value will be set to False.) and (2) where the current pluginProps contains keys
-        that are not in the config, they will be _removed_ from the device. The method will return True if it has run
-        error free; False on exception. Note that this method should _not_ be called from device_start_comm() as it will
-        cause an infinite loop--the call to dev.replacePluginPropsOnServer() from this method automatically calls
-        device_start_comm(). It is recommended that the method be called from plugin's startup() method.
+        Compares the current device config XML layout to each device's pluginProps. Fields present
+        in the XML but missing from the device are added (checkboxes coerced to bool based on
+        defaultValue, or False if unspecified). Keys present in pluginProps but absent from the XML
+        are removed. Should not be called from device_start_comm() to avoid an infinite loop.
+        Should be called from the plugin's startup() method instead.
 
-        :return:
+        Returns:
+            bool: True if the audit completed without errors, False on exception.
         """
         self.logger.debug("Updating device properties to match current plugin version.")
 
@@ -1309,7 +1325,7 @@ class Plugin(indigo.PluginBase):
                             props[field_id] = default_value
                             self.logger.debug(
                                 "[%s] missing prop [%s] will be added. Value set [%s]" %
-                                dev.name, field_id, default_value
+                                (dev.name, field_id, default_value)
                             )
 
                 # =========================== Match Config to Props ===========================
@@ -1370,12 +1386,16 @@ class Plugin(indigo.PluginBase):
 
     # TODO: this is the flattened version. Delete above code if working
     def audit_dict_color(self, _dict_: dict) -> dict:
-        """
-        Title Placeholder
+        """Convert all color strings in a dict (and nested dicts) to '#RRGGBB' format.
 
-        Body placeholder
+        Recursively traverses the given dictionary and replaces any string values that match the
+        'XX XX XX' color pattern with the normalized '#XXXXXX' format required by matplotlib.
 
-        :param dict _dict_:
+        Args:
+            _dict_ (dict): The dictionary to process for color string normalization.
+
+        Returns:
+            dict: A new dictionary with all matching color strings converted.
         """
         pattern = r"[0-9A-Fa-f]{2} [0-9A-Fa-f]{2} [0-9A-Fa-f]{2}"
 
@@ -1390,14 +1410,12 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def audit_save_paths(self) -> None:
-        """
-        Audit plugin save locations to ensure validity
+        """Audit and validate the plugin's CSV and chart save path configurations.
 
-        The audit_save_paths() method will attempt to access the configured paths (CSV save location, chart save
-        location) to ensure that they are accessible to the plugin. It will attempt to write to the paths and warn the
-        user if unsuccessful.
-
-        :return:
+        Attempts to access the configured paths for CSV and chart file storage. Creates missing
+        directories and checks write permissions, logging warnings for any inaccessible paths.
+        Also compares the current save path against the expected path for the installed Indigo
+        version and warns if they differ.
         """
         # ============================= Audit Save Paths ==============================
         # Test the current path settings to ensure that they are valid.
@@ -1452,10 +1470,10 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def audit_themes_file() -> None:
-        """
-        Check to make sure that the Themes Repository exists. If it doesn't, create it.
+        """Create the themes JSON repository file if it does not already exist.
 
-        :return:
+        Checks for the presence of the plugin themes JSON file in the Indigo Preferences folder
+        and creates an empty JSON object file if the file is not found.
         """
         full_path = (indigo.server.getInstallFolderPath() +
                      "/Preferences/Plugins/matplotlib plugin themes.json")
@@ -1465,13 +1483,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def chart_stock_bar(self, dev: indigo.Device = None) -> list:
-        """
-        Title Placeholder
+        """Collect stock bar chart data from Indigo devices and variables.
 
-        Body placeholder
+        Iterates through up to five bar data sources configured on the device, reads each value
+        from the appropriate Indigo device state or variable, and assembles a list of per-bar
+        data dicts ready to be serialized and passed to the chart subprocess.
 
-        :param indigo.Device dev:
-        :return:
+        Args:
+            dev (indigo.Device): The Indigo chart device instance.
+
+        Returns:
+            list: A list of dicts, each containing the bar number, name, state, color, legend,
+                annotation flag, suppress flag, and value for one bar series.
         """
         # We can't access Indigo objects from the subprocess, so we need to get all the information we need before
         # calling the process.
@@ -1522,22 +1545,29 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def charts_refresh(self, dev_list: list = None) -> None:
-        """
-        Refreshes all the plugin chart devices.
+        """Refresh all plugin chart devices, rendering updated images via subprocesses.
 
-        Iterate through each chart device and refresh the image. Only enabled chart devices will be refreshed.
+        Iterates through the provided device list (or builds one from devices that have exceeded
+        their refresh interval), assembles the per-device payload, audits color values, and
+        dispatches a subprocess for each chart type. Processes the subprocess reply log when
+        finished.
 
-        :param list dev_list: list of devices to be refreshed.
+        Args:
+            dev_list (list): A list of indigo.Device instances to refresh. If None, the method
+                determines which devices need refreshing based on their refresh intervals.
         """
         def convert_to_native(obj: Union[indigo.Dict, indigo.List]):
-            """
-            Convert any indigo.Dict and indigo.List objects to native formats.
+            """Convert any indigo.Dict and indigo.List objects to native Python formats.
 
-            credit: Jay Martin
+            Recursively converts indigo.List to Python list and indigo.Dict to Python dict.
+            Credit: Jay Martin
                     https://forums.indigodomo.com/viewtopic.php?p=193744#p193744
 
-            :param (indigo.Dict, indigo.List) obj:
-            :return:
+            Args:
+                obj (indigo.Dict | indigo.List): The Indigo collection object to convert.
+
+            Returns:
+                list | dict | object: The converted native Python object.
             """
             if isinstance(obj, indigo.List):
                 native_list = []
@@ -2348,10 +2378,11 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_check_unique(self) -> None:
-        """
-        Title Placeholder
+        """Check CSV Engine devices for duplicate CSV filename references.
 
-        :return:
+        Iterates through all CSV Engine devices and builds a mapping of CSV filenames to the
+        devices that reference them. Logs a warning for any filename referenced by more than one
+        CSV Engine device, as duplicate references can cause data integrity issues.
         """
         self.logger.debug("Checking CSV references.")
         titles = {}
@@ -2384,15 +2415,20 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_item_add(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
-        """
-        Add new item to CSV engine
+        """Add a new CSV data source item to the CSV Engine device configuration.
 
-        The csv_item_add() method is called when the user clicks on the 'Add Item' button in the CSV Engine config
-        dialog.
+        Called when the user clicks the 'Add Item' button in the CSV Engine config dialog.
+        Validates that all required fields are populated, generates the next key, saves the new
+        item to the columnDict, creates the CSV file if it does not exist, and resets the add
+        form fields.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
+        Args:
+            values_dict (indigo.Dict): The current CSV Engine configuration dialog values.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            tuple: A two-element tuple of (values_dict, error_msg_dict).
         """
         dev = indigo.devices[int(dev_id)]
         self.logger.threaddebug("[%s] csv item add values_dict: %s" % (dev.name, dict(values_dict)))
@@ -2466,15 +2502,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_item_delete(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
-        """
-        Deletes items from the CSV Engine configuration dialog
+        """Delete the selected CSV data source item from the CSV Engine configuration.
 
-        The csv_item_delete() method is called when the user clicks on the "Delete Item" button in the CSV Engine
-        config dialog.
+        Called when the user clicks the 'Delete Item' button in the CSV Engine config dialog.
+        Removes the selected item from the columnDict and resets all edit form fields.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
+        Args:
+            values_dict (indigo.Dict): The current CSV Engine configuration dialog values.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            dict: The updated values_dict with the item removed and edit fields cleared.
         """
         dev = indigo.devices[int(dev_id)]
         self.logger.threaddebug("[%s] csv item delete values_dict: %s" % (dev.name, dict(values_dict)))
@@ -2506,16 +2545,20 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_item_list(self, filter: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Construct the list of CSV items
+        """Generate the sorted list of CSV item key/name pairs for the CSV Engine config dialog.
 
-        The csv_item_list() method generates the list of Item Key : Item Value pairs that will be presented in the CVS
-        Engine device config dialog. It's called at open and routinely as changes are made in the dialog.
+        Reads the columnDict from values_dict and returns a case-insensitive sorted list of
+        (key, item_name) tuples for display in the CSV Engine item list control. Called when the
+        dialog opens and whenever changes are made.
 
-        :param str filter:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            filter (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current CSV Engine configuration dialog values.
+            type_id (str): The device type identifier string.
+            target_id (int): The Indigo device ID.
+
+        Returns:
+            list: A sorted list of (key, item_name) tuples.
         """
         dev = indigo.devices[int(target_id)]
 
@@ -2539,14 +2582,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_item_update(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
-        """
-        Updates items from the CSV Engine configuration dialog
+        """Update a CSV data source item in the CSV Engine device configuration.
 
-        When the user selects the 'Update Item' button, update the dict of CSV engine items.
+        Called when the user clicks the 'Update Item' button in the CSV Engine config dialog.
+        Validates the new key for uniqueness, updates the selected item in columnDict, and resets
+        the edit form fields on success.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
+        Args:
+            values_dict (indigo.Dict): The current CSV Engine configuration dialog values.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            tuple: A two-element tuple of (values_dict, error_msg_dict).
         """
         dev = indigo.devices[dev_id]
         self.logger.threaddebug("[%s] csv item update values_dict: %s" % (dev.name, dict(values_dict)))
@@ -2602,16 +2650,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_item_select(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
-        """
-        Populates CSV engine controls for updates and deletions
+        """Populate CSV Engine edit controls when the user selects an item from the item list.
 
-        The csv_item_select() method is called when the user actually selects something within the CSV engine Item List
-        dropdown menu. When the user selects an item from the Item List, we populate the Title, ID, and Data controls
-        with the relevant Item properties.
+        Called when the user selects an item from the CSV Engine Item List dropdown. Reads the
+        selected item's properties from columnDict and populates the edit key, source, state, and
+        value controls, and sets the isColumnSelected flag.
 
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int dev_id:
+        Args:
+            values_dict (indigo.Dict): The current CSV Engine configuration dialog values.
+            type_id (str): The device type identifier string.
+            dev_id (int): The Indigo device ID.
+
+        Returns:
+            dict: The updated values_dict with edit controls populated.
         """
         dev = indigo.devices[int(dev_id)]
         self.logger.threaddebug("[%s] csv item select values_dict: %s" % (dev.name, dict(values_dict)))
@@ -2668,12 +2719,16 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_refresh_process(self, dev: indigo.Device = None, csv_dict: dict = None) -> None:
-        """
-        The csv_refresh_process() method processes CSV update requests
+        """Process a CSV data refresh for a CSV Engine device.
 
-        :param indigo.Device dev: indigo device instance
-        :param dict csv_dict:
-        :return:
+        For each CSV source in csv_dict, creates the CSV file if missing, backs it up, loads
+        existing data, applies time and length limits, appends the newest observation from the
+        linked Indigo device or variable, and writes the updated data back to disk. Updates the
+        device's csvLastUpdated state and state image on completion.
+
+        Args:
+            dev (indigo.Device): The Indigo CSV Engine device instance.
+            csv_dict (dict): A dict mapping keys to (item_name, source_id, source_state) tuples.
         """
         try:
 
@@ -2851,17 +2906,16 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def csv_refresh_device_action(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
-        """
-        Perform a manual refresh of a single CSV Device
+        """Manually refresh all CSV sources for a single CSV Engine device via an Action item.
 
-        The csv_refresh_device_action() method will allow for the update of a single CSV Engine device. This method
-        will update all CSV sources associated with the selected CSV Engine device each time the Action item is called.
-        Only CSV Engine devices set to a manual refresh interval will be presented.
+        Updates all CSV sources associated with the selected CSV Engine device. Only CSV Engine
+        devices set to a manual refresh interval are presented in the action configuration.
 
-        :param indigo.ActionGroup plugin_action:
-        :param indigo.Device dev:
-        :param bool caller_waiting_for_result:
-        :return:
+        Args:
+            plugin_action (indigo.ActionGroup): The Indigo action group containing the target
+                device selection.
+            dev (indigo.Device): The Indigo device associated with the action (passed by Indigo).
+            caller_waiting_for_result (bool): Whether the caller is waiting for a return value.
         """
         dev = indigo.devices[int(plugin_action.props['targetDevice'])]
 
@@ -2882,18 +2936,17 @@ class Plugin(indigo.PluginBase):
     def csv_refresh_source_action(
             self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False  # noqa
     ) -> None:
-        """
-        Perform a manual refresh of a single CSV Source
+        """Manually refresh a single CSV source for a CSV Engine device via an Action item.
 
-        The csv_refresh_source_action() method will allow for the update of a single CSV source from a CSV Engine
-        device. When creating a new Action item, the user selects a target CSV Engine device and then the available CSV
-        sources will be displayed. The user selects a single CSV source that will be updated each time the Action is
-        called. Only CSV Engine devices set to a manual refresh interval will be presented.
+        Allows the user to update one specific CSV source from a CSV Engine device. The action
+        configuration presents the available CSV sources for the selected CSV Engine device. Only
+        CSV Engine devices set to a manual refresh interval are presented.
 
-        :param indigo.ActionGroup plugin_action:
-        :param indigo.Device dev:
-        :param bool caller_waiting_for_result:
-        :return:
+        Args:
+            plugin_action (indigo.ActionGroup): The Indigo action group containing the target
+                device and source selections.
+            dev (indigo.Device): The Indigo device associated with the action (passed by Indigo).
+            caller_waiting_for_result (bool): Whether the caller is waiting for a return value.
         """
         indigo.server.log(f"{plugin_action}")
         dev_id = int(plugin_action.props['targetDevice'])
@@ -2912,17 +2965,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def csv_source(type_id: str = "", values_dict: indigo.Dict = None, dev_id: int = 0, target_id: int = 0) -> list:  # noqa
-        """
-        Construct a list of devices and variables for the CSV engine
+        """Construct the list of available devices and variables for the CSV Engine add-item control.
 
-        Constructs a list of devices and variables for the user to select within the CSV engine configuration dialog
-        box. Devices and variables are listed in alphabetical order with devices first and then variables. Devices are
-        prepended with '(D)' and variables with '(V)'. Category labels are also included for visual clarity.
+        Builds a list of (id, name) tuples for devices, variables, or both depending on the
+        addSourceFilter preference. Category labels and separators are included for visual clarity.
 
-        :param str type_id:
-        :param indigo.Dict values_dict:
-        :param int dev_id:
-        :param int target_id:
+        Args:
+            type_id (str): The device type identifier string (passed by Indigo).
+            values_dict (indigo.Dict): The current dialog values, including 'addSourceFilter'.
+            dev_id (int): The Indigo device ID (passed by Indigo).
+            target_id (int): The target device or variable ID (passed by Indigo).
+
+        Returns:
+            list: A list of (id, name) tuples suitable for an Indigo dropdown control.
         """
         list_ = []
 
@@ -2956,17 +3011,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def csv_source_edit(type_id: str = "", values_dict: indigo.Dict = None, dev_id: int = 0, target_id: int = 0) -> list:  # noqa
-        """
-        Construct a list of devices and variables for the CSV engine
+        """Construct the list of available devices and variables for the CSV Engine edit-item control.
 
-        Constructs a list of devices and variables for the user to select within the CSV engine configuration dialog
-        box. Devices and variables are listed in alphabetical order with devices first and then variables. Devices are
-        prepended with '(D)' and variables with '(V)'. Category labels are also included for visual clarity.
+        Builds a list of (id, name) tuples for devices, variables, or both depending on the
+        editSourceFilter preference. Category labels and separators are included for visual clarity.
 
-        :param str type_id:
-        :param indigo.Dict values_dict:
-        :param int dev_id:
-        :param int target_id:
+        Args:
+            type_id (str): The device type identifier string (passed by Indigo).
+            values_dict (indigo.Dict): The current dialog values, including 'editSourceFilter'.
+            dev_id (int): The Indigo device ID (passed by Indigo).
+            target_id (int): The target device or variable ID (passed by Indigo).
+
+        Returns:
+            list: A list of (id, name) tuples suitable for an Indigo dropdown control.
         """
         list_ = []
 
@@ -3005,16 +3062,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def get_csv_device_list(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Return a list of CSV Engine devices set to manual refresh
+        """Return a list of CSV Engine devices configured for manual refresh.
 
-        The get_csv_device_list() method returns a list of CSV Engine devices with a manual refresh interval.
+        Filters plugin devices to return only CSV Engine devices whose refreshInterval is set to
+        zero (manual update only).
 
-        :param int fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
-        :return:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (device_id, device_name) tuples for CSV Engine manual-refresh devices.
         """
         # Return a list of tuples that contains only CSV devices set to manual refresh
         # (refreshInterval = 0) for config menu.
@@ -3024,16 +3084,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def get_csv_source_list(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Return a list of CSV sources from CSV Engine devices set to manual refresh
+        """Return the list of CSV data sources for the selected CSV Engine device.
 
-        The get_csv_source_list() method returns a list of CSV sources for the target CSV Engine device.
+        Once the user selects a target CSV Engine device (from get_csv_device_list()), this method
+        populates the CSV source dropdown with the available data sources for that device.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
-        :return:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values, containing 'targetDevice'.
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (key, item_name) tuples for the CSV sources, or an empty list on error.
         """
         try:
             if not values_dict:
@@ -3054,17 +3117,22 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def device_state_value_list_add(type_id: str = "", values_dict: indigo.Dict = None, dev_id: int = 0, target_id: int = 0) -> list:  # noqa
-        """
-        Formulates list of device states for CSV engine
+        """Return the list of device states or variable value for the CSV Engine add-item control.
 
-        Once a user selects a device or variable within the CSV engine configuration dialog, we need to obtain the
-        relevant device states to chose from. If the user selects a variable, we simply return the variable value
-        identifier. The return is a list of tuples of the form:
+        Once the user selects a device or variable in the CSV Engine add-item dialog, populates
+        the state/value dropdown. Returns the device's states (excluding UI states) for devices, or
+        [('value', 'value')] for variables. Returns a placeholder if no source is selected or the
+        filter does not match the source type.
 
-        :param str type_id:
-        :param indigo.Dict values_dict:
-        :param int dev_id:
-        :param int target_id:
+        Args:
+            type_id (str): The device type identifier string (passed by Indigo).
+            values_dict (indigo.Dict): The current dialog values, containing 'addSource' and
+                'addSourceFilter'.
+            dev_id (int): The Indigo device ID (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of state/value identifier strings or placeholder tuples.
         """
         result = None
         if values_dict['addSource'] != '':
@@ -3100,17 +3168,22 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def device_state_value_list_edit(type_id: str = "", values_dict: indigo.Dict = None, dev_id: int = 0, target_id: int = 0) -> list:  # noqa
-        """
-        Formulates list of device states for CSV engine
+        """Return the list of device states or variable value for the CSV Engine edit-item control.
 
-        Once a user selects a device or variable within the CSV engine configuration dialog, we need to obtain the
-        relevant device states to chose from. If the user selects a variable, we simply return the variable value
-        identifier. The return is a list of tuples of the form:
+        Once the user selects a device or variable in the CSV Engine edit-item dialog, populates
+        the state/value dropdown. Returns the device's states (excluding UI states) for devices, or
+        [('value', 'value')] for variables. Returns a placeholder if no source is selected or the
+        filter does not match the source type.
 
-        :param str type_id:
-        :param indigo.Dict values_dict:
-        :param int dev_id:
-        :param int target_id:
+        Args:
+            type_id (str): The device type identifier string (passed by Indigo).
+            values_dict (indigo.Dict): The current dialog values, containing 'editSource' and
+                'editSourceFilter'.
+            dev_id (int): The Indigo device ID (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of state/value identifier strings or placeholder tuples.
         """
         result = None
         if values_dict['editSource'] != '':
@@ -3145,13 +3218,15 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def fix_rgb(color: str = "") -> str:  # noqa
-        """
-        Title Placeholder
+        """Normalize a color string to the '#RRGGBB' hex format expected by matplotlib.
 
-        Body placeholder
+        Strips spaces and any leading '#' characters from the input, then prepends a single '#'.
 
-        :param str color:
-        :return:
+        Args:
+            color (str): A color string in any format (e.g., "FF 00 00", "#FF0000").
+
+        Returns:
+            str: A normalized hex color string in '#RRGGBB' format.
         """
         # FIXME - once migration is complete, can remove the hash ('#') from this method (don't add one) and delete the
         #         truncation elsewhere (to remove the hash).
@@ -3161,14 +3236,17 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def format_markers(p_dict: dict = None) -> dict:  # noqa
-        """
-        Format matplotlib markers
+        """Convert XML-safe marker placeholder strings to the actual matplotlib marker characters.
 
-        The Devices.xml file cannot contain '<' or '>' as a value, as this conflicts with the construction of the XML
-        code. Matplotlib needs these values for select built-in marker styles, so we need to change them to what MPL is
-        expecting.
+        The Devices.xml file cannot contain '<' or '>' as values because they conflict with XML
+        syntax. This method converts the safe placeholder strings ('PIX', 'TL', 'TR') to their
+        actual matplotlib marker equivalents (',', '<', '>').
 
-        :param dict p_dict:
+        Args:
+            p_dict (dict): The plotting parameters dictionary containing marker key/value pairs.
+
+        Returns:
+            dict: The updated p_dict with marker values converted to matplotlib-compatible strings.
         """
         markers     = (
             'area1Marker', 'area2Marker', 'area3Marker', 'area4Marker', 'area5Marker', 'area6Marker', 'area7Marker',
@@ -3189,52 +3267,58 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def generatorDeviceStates(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns device states list or variable 'value'.
+        """Return device states or a variable value list for a dropdown control.
 
-        Returns a list of device states or 'value' for a variable, based on ID transmitted in the filter attribute. The
-        generatorDeviceStates() method returns a list of device states each list includes only states for the selected
-        device. If a variable id is provided, the list returns one element. The lists are generated in the DLFramework
-        module.
+        Returns a list of device states for the selected device, or [('value', 'value')] if a
+        variable is selected. The device or variable ID is transmitted via the fltr attribute.
+        Generated by DLFramework.
+
+        Example return values:
+            [('dev state name', 'dev state name'), ...]
+            [('value', 'value')]
+
+        Args:
+            fltr (str): The key in values_dict that holds the selected device or variable ID.
+            values_dict (indigo.Dict): The current dialog values.
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
 
         Returns:
-          [('dev state name', 'dev state name'), ('dev state name', 'dev state name')]
-        or
-          [('value', 'value')]
-
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+            list: A list of state name tuples or the variable value tuple.
         """
         return self.Fogbert.generatorStateOrValue(values_dict[fltr])
 
     # =============================================================================
     def generatorDeviceList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of Indigo variables.
+        """Return a list of all Indigo devices for dropdown menus.
 
-        Provides a list of Indigo variables for various dropdown menus. The method is agnostic whether the variable is
-        enabled or disabled. The method returns a list of tuples in the form: [(dev.id, dev.name), (dev.id, dev.name)].
-        The list is generated within the DLFramework module.
+        Returns (device_id, device_name) tuples for all devices, regardless of enabled status.
+        Generated by DLFramework.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (device_id, device_name) tuples.
         """
         return self.Fogbert.deviceList()
 
     # =============================================================================
     @staticmethod
     def generatorPrecisionList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of value precision options for pulldown menus.
+        """Return a list of numeric display precision options for dropdown menus.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (value, label) tuples for 0–3 decimal place precision options.
         """
         return [("0", "0 (#)*"),
                 ("1", "1 (#.#)"),
@@ -3245,13 +3329,16 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def generatorLineStyleDefaultNoneList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of Matplotlib line styles for pulldown menus.
+        """Return a list of matplotlib line style options with 'None' as the default.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (value, label) tuples for matplotlib line styles.
         """
         return [
             ("--", "Dashed"),
@@ -3265,13 +3352,16 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def generatorLineStyleDefaultSolidList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of Matplotlib line styles for pulldown menus.
+        """Return a list of matplotlib line style options with 'Solid' as the default.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (value, label) tuples for matplotlib line styles.
         """
         return [
             ("--", "Dashed"),
@@ -3285,13 +3375,16 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def generatorMarkerList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of Matplotlib Markers for pulldown menus.
+        """Return a list of matplotlib marker style options for dropdown menus.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (value, label) tuples for matplotlib marker styles.
         """
         return [
             ("o", "Circle"),
@@ -3322,65 +3415,74 @@ class Plugin(indigo.PluginBase):
 
 # =============================================================================
     def latestDevVarList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Title Placeholder
+        """Return the cached list of devices and variables built in getDeviceConfigUiValues.
 
-        Body placeholder
+        Returns the dev_var_list populated when the device config dialog was opened, avoiding
+        redundant Indigo server calls during dialog interaction.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
-        :return:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: The cached list of (id, name) tuples for devices and variables.
         """
         return self.dev_var_list
 
     # =============================================================================
     def generatorDeviceAndVariableList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Create a list of devices and variables for config menu controls
+        """Return a combined list of all Indigo devices and variables for dropdown menus.
 
-        Provides a list of Indigo devices and variables for various dropdown menus. The method is agnostic whether the
-        devices and variables are enabled or disabled. All devices are listed first and then all variables. The method
-        returns a list of tuples in the form: [(dev.id, dev.name), (var.id, var.name)]. It prepends (D) or (V) to make
-        it easier to distinguish between the two. The list is generated within the DLFramework module.
+        All devices are listed first and then all variables, regardless of enabled status.
+        Generated by DLFramework.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (id, name) tuples for all devices followed by all variables.
         """
         return self.Fogbert.deviceAndVariableList()
 
     # =============================================================================
     def generatorVariableList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of Indigo variables.
+        """Return a list of all Indigo variables for dropdown menus.
 
-        Provides a list of Indigo variables for various dropdown menus. The method is agnostic whether the variable is
-        enabled or disabled. The method returns a list of tuples in the form: [(var.id, var.name), (var.id, var.name)].
-        The list is generated within the DLFramework module.
+        Returns (variable_id, variable_name) tuples for all variables, regardless of enabled
+        status. Generated by DLFramework.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (variable_id, variable_name) tuples.
         """
         return self.Fogbert.variableList()
 
     # =============================================================================
     @staticmethod
     def get_axis_list(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Returns a list of axis formats.
+        """Return a list of common Python date format strings for X-axis label dropdown menus.
 
-        Returns a list of Python date formatting strings for use in plotting date labels. The list does not include all
-        Python format specifiers.
+        Generates live examples using the current date and time to show the user how each format
+        will appear. Does not include all possible Python strftime specifiers.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (format_string, example_label) tuples.
         """
         now = dt.datetime.now()
 
@@ -3407,17 +3509,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def get_battery_device_list(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Create a list of battery-powered devices
+        """Return a list of all Indigo devices that report a battery level.
 
-        Creates a list of tuples that contains the device ID and device name of all Indigo devices that report a
-        batterLevel device property that is not None. If no devices meet the criteria, a single tuple is returned as a
-        place-holder.
+        Filters all Indigo devices to those with a non-None batteryLevel property. If no
+        battery-powered devices are found, returns a single placeholder tuple.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (device_id, device_name) tuples for battery-powered devices.
         """
         batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
 
@@ -3428,16 +3532,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getFileList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Get list of CSV files for various dropdown menus.
+        """Return a sorted list of CSV files from the configured data path for dropdown menus.
 
-        Generates a list of CSV source files that are located in the folder specified within the plugin configuration
-        dialog. If the method is unable to find any CSV files, an empty list is returned.
+        Scans the dataPath folder for '*.csv' files and returns a sorted list of (filename,
+        display_name) tuples. Appends a separator and a 'None' option at the end of the list.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A sorted list of (filename, display_name) tuples plus a 'None' entry.
         """
         file_name_list_menu = []
         default_path = f"{indigo.server.getLogsFolderPath()}/com.fogbert.indigoplugin.matplotlib/"
@@ -3463,16 +3570,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getFontList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Provide a list of font names for various dropdown menus.
+        """Return a sorted list of font names visible to matplotlib for dropdown menus.
 
-        Note that these are the fonts that Matplotlib can see, not necessarily all the fonts installed on the system.
-        If matplotlib can't find any fonts, then a default list of fonts that matplotlib supports natively are provided.
+        These are the fonts that matplotlib can discover, not necessarily all fonts installed on the
+        system. Falls back to the FONT_MENU constant list if matplotlib cannot find any fonts.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A sorted list of font name strings.
         """
         font_menu = []
 
@@ -3495,13 +3605,19 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def getRefreshList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Generate a list of all chart devices and construct a menu item list for the "Redraw Charts Now..." menu item.
+        """Return a list of chart devices for the 'Redraw Charts Now...' menu dropdown.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Builds a menu list starting with 'All Charts' and 'Skip Manual Charts' options, then
+        appends each enabled plugin chart device.
+
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A list of (id, label) tuples for the refresh menu.
         """
         menu = [('all', 'All Charts'), ('auto', 'Skip Manual Charts'), ('-1', '%%separator%%')]
 
@@ -3511,17 +3627,20 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def getForecastSource(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Return a list of WUnderground devices for forecast chart devices
+        """Return a sorted list of compatible weather forecast source devices.
 
-        Generates and returns a list of potential forecast devices for the forecast devices type. Presently, the plugin
-        only works with WUnderground devices, but the intention is to expand the list of compatible devices going
-        forward.
+        Iterates over Fantastic Weather and WUnderground plugin devices and returns those with
+        supported forecast device type IDs. Intended to be expanded to support additional weather
+        plugins in the future.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param str type_id:
-        :param int target_id:
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The device type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A case-insensitive sorted list of (device_id, device_name) tuples.
         """
         forecast_source_menu = []
 
@@ -3551,13 +3670,14 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def plotActionApi(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> dict:  # noqa
-        """
-        Plugin API handler
+        """Handle simple chart generation API calls from Indigo Action items.
 
-        A container for simple API calls to the matplotlib plugin. All payload elements are required, although kwargs
-        can be an empty dict if no kwargs desired. If caller is waiting for a result (recommended), returns a dict.
-        Receives::
-            payload = {
+        Provides a scripting API entry point for generating a basic matplotlib line chart from
+        an Action item payload. All payload elements are required; kwargs may be an empty dict.
+
+        Expected payload structure::
+
+            {
                 'x_values': [1, 2, 3],
                 'y_values': [2, 4, 6],
                 'kwargs': {
@@ -3565,14 +3685,22 @@ class Plugin(indigo.PluginBase):
                     'color': 'b',
                     'marker': 's',
                     'markerfacecolor': 'b'
-                    },
+                },
                 'path': '/full/path/name/',
                 'filename': 'chart_filename.png'
             }
 
-        :param indigo.ActionGroup plugin_action:
-        :param indigo.Device dev:
-        :param bool caller_waiting_for_result:
+        Args:
+            plugin_action (indigo.ActionGroup): The Indigo action group containing the chart
+                payload in its props dict.
+            dev (indigo.Device): The Indigo device associated with the action (passed by Indigo).
+            caller_waiting_for_result (bool): If True, returns a result dict; otherwise returns
+                None.
+
+        Returns:
+            dict | None: {'success': True, 'message': 'Success'} on success,
+                {'success': False, 'message': error} on failure, or None if
+                caller_waiting_for_result is False.
         """
         self.logger.info("Scripting payload: %s" % dict(plugin_action.props))
 
@@ -3687,14 +3815,13 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def plugin_error_handler(self, sub_error: str = "") -> None:
-        """
-        Centralized handling of traceback messages
+        """Log a formatted traceback message to the plugin log file.
 
-        Centralized handling of traceback messages formatted for pretty display in the plugin log file. If sent here,
-        they will not be displayed in the Indigo Events log. Use the following syntax to send exceptions here:
-        self.pluginErrorHandler(traceback.format_exc())
+        Formats and logs traceback messages to the plugin log only (not the Indigo Events log).
+        Use this method to handle exceptions by passing traceback.format_exc() as the argument.
 
-        :param str sub_error:  String version of traceback message.
+        Args:
+            sub_error (str): The string-formatted traceback message to log.
         """
         sub_error = sub_error.splitlines()
         self.logger.critical(f"{' TRACEBACK ':!^80}")
@@ -3706,15 +3833,20 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def process_plotting_log(self, dev: indigo.Device = None, replies: bytes = b"", errors: str = "") -> bool | None:
-        """
-        Process output of multiprocessing queue messages
+        """Process and dispatch log messages returned from a chart subprocess.
 
-        The processLogQueue() method accepts a multiprocessing queue that contains log messages. The method parses
-        those messages across the various self.logger.* calls.
+        Parses the JSON log reply from a subprocess and routes each log-level list to the
+        corresponding self.logger.* call. Updates the device state image based on whether any
+        critical messages were received. Also handles select special stderr output patterns.
 
-        :param indigo.Device dev:
-        :param bytes replies:
-        :param str errors:
+        Args:
+            dev (indigo.Device): The Indigo device that triggered the chart subprocess.
+            replies (bytes): The raw stdout bytes from the chart subprocess, expected to be JSON.
+            errors (str): The stderr output from the chart subprocess.
+
+        Returns:
+            bool | None: True if the chart rendered without critical errors, False if a critical
+                error occurred, or None if the reply could not be parsed.
         """
         # ======================= Process Output Queue ========================
         try:
@@ -3767,13 +3899,14 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def rc_params_device_update(dev: indigo.Device = None) -> None:  # noqa
-        """
-        Update rcParams device with updated state values
+        """Push all current matplotlib rcParams values to the rcParams device states.
 
-        Push the rcParams settings to the rcParams Device. The state names have already been created by
-        getDeviceStateList() which will ensure that future rcParams will be picked up if they're ever added to the file.
+        Updates each state on the rcParamsDevice with the corresponding current matplotlib
+        rcParams value. State names were already created by getDeviceStateList(). This ensures
+        future rcParams additions are automatically picked up.
 
-        :param indigo.Device dev: indigo device instance
+        Args:
+            dev (indigo.Device): The Indigo rcParams device instance to update.
         """
         state_list = []
         for key, value in rcParams.items():
@@ -3787,13 +3920,17 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def refreshAChartAction(self, plugin_action: indigo.ActionGroup = None) -> bool:  # noqa
-        """
-        Refreshes an individual plugin chart device.
+        """Refresh a single chart device in response to an Indigo Action item call.
 
-        Process Indigo Action item call for a chart refresh. Passes the id of the device called from the action. This
-        method is a handler to pass along the action call. The action will refresh only the specified chart.
+        Reads the target device from the action's deviceId and calls charts_refresh() for that
+        device only. Logs a completion banner when finished.
 
-        :param indigo.ActionGroup plugin_action:
+        Args:
+            plugin_action (indigo.ActionGroup): The Indigo action group specifying the target
+                device to refresh.
+
+        Returns:
+            bool: Always False.
         """
         # Indigo will trap if device is disabled.
         dev = indigo.devices[plugin_action.deviceId]
@@ -3803,14 +3940,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def refresh_the_charts_now(self, values_dict: indigo.Dict = None, menu_id: str = "") -> tuple:  # noqa
-        """
-        Refresh all enabled charts
+        """Trigger a chart refresh from the 'Redraw Charts Now...' plugin menu item.
 
-        Refresh all enabled charts based on some user action (like an Indigo menu call).
+        Validates that a refresh target is selected and adds the appropriate device list to the
+        refresh queue. Supports 'all charts', 'skip manual charts', or a single selected chart.
 
-        :param indigo.Dict values_dict:
-        :param str menu_id:
-        :return:
+        Args:
+            values_dict (indigo.Dict): The menu dialog values containing the 'allCharts' selection.
+            menu_id (str): The menu identifier string (passed by Indigo).
+
+        Returns:
+            tuple: (True, values_dict) on success, or (False, values_dict, error_msg_dict) if
+                no target is selected.
         """
         self.skipRefreshDateUpdate = True
         error_msg_dict = indigo.Dict()
@@ -3846,8 +3987,10 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def refresh_the_charts_queue(self) -> None:
-        """
-        Create and manage the queue for chart updates
+        """Drain the chart refresh queue by processing all pending refresh requests.
+
+        Spawns a daemon thread that calls charts_refresh() for each device list in the queue
+        until the queue is empty.
         """
         def work_the_refresh_queue():
             while not self.refresh_queue.empty():
@@ -3860,10 +4003,14 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def save_snapshot(self, action: indigo.ActionGroup = None) -> None:  # noqa
-        """
-        Save a snapshot of select plugin information to disk for later debugging.
+        """Save a diagnostic snapshot of plugin state to a file in the user's home directory.
 
-        :param indigo.ActionGroup action:
+        Writes the current pluginPrefs, matplotlib rcParams, and all plugin device props to
+        ~/matplotlib_snapshot.txt for later debugging. Logs a confirmation message regardless of
+        the current plugin debug level.
+
+        Args:
+            action (indigo.ActionGroup): The Indigo action group (passed by Indigo, not used).
         """
         home = os.path.expanduser("~")
         with open(home + "/matplotlib_snapshot.txt", 'w', encoding='utf-8') as outfile:
@@ -3878,13 +4025,19 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeNameGenerator(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
-        """
-        Generate a list of theme names from the json file for UI controls
+        """Return a sorted list of theme names from the themes JSON file for UI dropdown controls.
 
-        :param str fltr:
-        :param indigo.Dict values_dict:
-        :param int type_id:
-        :param int target_id:
+        Reads the themes JSON file from the Indigo Preferences folder and returns a sorted list of
+        (name, name) tuples for use in dialog dropdown controls.
+
+        Args:
+            fltr (str): Filter string passed by Indigo (not used directly).
+            values_dict (indigo.Dict): The current dialog values (passed by Indigo).
+            type_id (str): The type identifier string (passed by Indigo).
+            target_id (int): The target device ID (passed by Indigo).
+
+        Returns:
+            list: A sorted list of (theme_name, theme_name) tuples.
         """
         full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
 
@@ -3896,11 +4049,17 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeManagerCloseUi(self, values_dict: indigo.Dict = None, menu_item_id: str = "") -> bool:  # noqa
-        """
-        Apply theme settings when user closes Theme Manager dialog
+        """Apply theme settings to pluginPrefs when the Theme Manager dialog is closed.
 
-        :param indigo.Dict values_dict:
-        :param int menu_item_id:
+        Copies the theme-related preference keys from the dialog values into pluginPrefs for
+        persistence. User cancellation cannot be trapped for this dialog type.
+
+        Args:
+            values_dict (indigo.Dict): The Theme Manager dialog values.
+            menu_item_id (str): The menu item identifier string (passed by Indigo).
+
+        Returns:
+            bool: Always True.
         """
         # Don't need to trap user cancel since this callback won't be called if user cancels. There is no way to trap
         # the cancel.
@@ -3919,10 +4078,15 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeApplyAction(self, plugin_action: indigo.ActionGroup = None) -> None:  # noqa
-        """
-        Process the Indigo Apply Theme action item
+        """Apply the selected theme to pluginPrefs via an Indigo Action item.
 
-        :param indigo.ActionGroup plugin_action:
+        Reads the selected theme name from the action props, retrieves the theme from the themes
+        JSON file, and updates each theme key in pluginPrefs. Logs a warning if the theme is no
+        longer valid.
+
+        Args:
+            plugin_action (indigo.ActionGroup): The Indigo action group containing the
+                'targetTheme' selection.
         """
         full_path = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         selected_theme = plugin_action.props['targetTheme']
@@ -3944,11 +4108,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeApply(self, values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
-        """
-        Process the Theme Manager Apply Theme action
+        """Apply the selected theme from the Theme Manager dialog to pluginPrefs.
 
-        :param indigo.Dict values_dict:
-        :param int menu_item_id:
+        Validates that exactly one theme is selected, loads the theme from the JSON file, and
+        applies its values to both the dialog and pluginPrefs. Resets the allThemes control.
+
+        Args:
+            values_dict (indigo.Dict): The Theme Manager dialog values containing 'allThemes'.
+            menu_item_id (str): The menu item identifier string (passed by Indigo).
+
+        Returns:
+            indigo.Dict | tuple: The updated values_dict on success, or a (values_dict,
+                error_msg_dict) tuple if validation fails.
         """
         error_msg_dict = indigo.Dict()
         full_path      = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
@@ -3977,11 +4148,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def themeExecuteActionButton(self, values_dict: indigo.Dict = None, menu_item_id: str = 0) -> dict|tuple:  # noqa
-        """
-        Process the Theme Manager Execute Action button press
+        """Process the Theme Manager Execute Action button press.
 
-        :param indigo.Dict values_dict:
-        :param int menu_item_id:
+        Validates the selected action and dispatches to the appropriate theme management method
+        (apply, delete, rename, or save).
+
+        Args:
+            values_dict (indigo.Dict): Form values from the config UI dialog.
+            menu_item_id (str): The menu item identifier (unused).
+
+        Returns:
+            dict | tuple: Updated values_dict, or a tuple of (values_dict, error_msg_dict) on
+                validation failure.
         """
         error_msg_dict = indigo.Dict()
         result = None
@@ -4007,11 +4185,18 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def theme_rename(values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
-        """
-        Process the Theme Manager Rename Theme action
+        """Process the Theme Manager Rename Theme action.
 
-        :param indigo.Dict values_dict:
-        :param int menu_item_id:
+        Validates that exactly one theme is selected and a new name is provided, then renames
+        the theme in the plugin themes JSON file.
+
+        Args:
+            values_dict (indigo.Dict): Form values from the config UI dialog.
+            menu_item_id (str): The menu item identifier (unused).
+
+        Returns:
+            indigo.Dict | tuple: Updated values_dict, or a tuple of (values_dict, error_msg_dict)
+                on validation failure.
         """
         full_path      = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
         old_name       = values_dict['allThemes']
@@ -4049,11 +4234,18 @@ class Plugin(indigo.PluginBase):
 
     # =============================================================================
     def theme_save(self, values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
-        """
-        Process the Theme Manager Save Theme action
+        """Process the Theme Manager Save Theme action.
 
-        :param indigo.Dict values_dict:
-        :param str menu_item_id:
+        Validates that a theme name is provided, then saves the current plugin preferences as a
+        named theme to the plugin themes JSON file.
+
+        Args:
+            values_dict (indigo.Dict): Form values from the config UI dialog.
+            menu_item_id (str): The menu item identifier (unused).
+
+        Returns:
+            indigo.Dict | tuple: Updated values_dict, or a tuple of (values_dict, error_msg_dict)
+                on validation failure.
         """
         self.logger.debug("theme_save")
         full_path      = f"{indigo.server.getInstallFolderPath()}/Preferences/Plugins/matplotlib plugin themes.json"
@@ -4104,11 +4296,18 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def theme_delete(values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
-        """
-        Process the Theme Manager Delete Theme action
+        """Process the Theme Manager Delete Theme action.
 
-        :param indigo.Dict values_dict:
-        :param int menu_item_id:
+        Validates that at least one theme is selected, then removes the selected theme(s) from
+        the plugin themes JSON file.
+
+        Args:
+            values_dict (indigo.Dict): Form values from the config UI dialog.
+            menu_item_id (str): The menu item identifier (unused).
+
+        Returns:
+            indigo.Dict | tuple: Updated values_dict, or a tuple of (values_dict, error_msg_dict)
+                on validation failure.
         """
         full_path = indigo.server.getInstallFolderPath() + "/Preferences/Plugins/matplotlib plugin themes.json"
         del_theme_name = list(values_dict['allThemes'])
@@ -4138,15 +4337,13 @@ class Plugin(indigo.PluginBase):
 
 
 class MakeChart:
-    """
-    Title Placeholder
+    """Utility class for chart data preparation and expression evaluation.
 
-    Body placeholder
+    Provides helper methods for cleaning text strings and evaluating mathematical
+    expressions parsed from AST nodes, used during chart data processing.
     """
     def __init__(self):
-        """
-        Title Placeholder
-        """
+        """Initialize MakeChart, setting up the data store and configuring logging."""
         self.final_data = []
 
         base = indigo.server.getInstallFolderPath()
@@ -4157,14 +4354,17 @@ class MakeChart:
     @staticmethod
     def clean_string(val: str = "") -> str:  # noqa
         """
-        Cleans long strings of whitespace and formats certain characters
+        """Scrub multiline text to remove excess whitespace and normalize certain characters.
 
-        The clean_string(self, val) method is used to scrub multiline text elements in order to try to make them more
-        presentable. The need is easily seen by looking at the rough text that is provided by the U.S. National Weather
-        Service, for example.
+        Iterates over a predefined replacement list (CLEAN_LIST) to substitute known problematic
+        character sequences, then collapses all internal whitespace to single spaces. Useful for
+        cleaning rough text from sources such as the U.S. National Weather Service.
 
-        :param str val:
-        :return str val:
+        Args:
+            val (str): The raw string to clean.
+
+        Returns:
+            str: The cleaned, whitespace-normalized string.
         """
         # Take the old, and replace it with the new.
         for (old, new) in CLEAN_LIST:
@@ -4174,13 +4374,20 @@ class MakeChart:
 
     # =============================================================================
     def eval_(self, mode=None) -> dict:
-        """
-        Title Placeholder
+        """Recursively evaluate an AST node representing a mathematical expression.
 
-        Body placeholder
+        Supports numeric constants, binary operations (+, -, *, /, **, ^), and unary negation.
+        Used to safely compute user-defined adjustment expressions without calling eval().
 
-        :param mode:
-        :return:
+        Args:
+            mode (ast.AST | None): An AST node to evaluate. Supported node types are
+                ast.Constant, ast.BinOp, and ast.UnaryOp.
+
+        Returns:
+            dict: The numeric result of evaluating the expression.
+
+        Raises:
+            TypeError: If the AST node type is not supported.
         """
         operators = {
             ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Div: op.truediv, ast.Pow: op.pow,
@@ -4203,10 +4410,11 @@ class MakeChart:
 
 # =============================================================================
 class ApiDevice:
-    """
-    Title Placeholder
+    """Shim class that mimics an Indigo device for API-based chart scripting.
 
-    Body placeholder
+    Provides a lightweight object that simulates the interface of an Indigo device, allowing
+    external scripts to inject chart payloads into the plugin without requiring a real configured
+    device. Exposes state management methods compatible with the Indigo device API.
     """
     def __init__(self):
         self.configured = True
@@ -4235,9 +4443,7 @@ class ApiDevice:
     # =============================================================================
     @staticmethod
     def __doc__() -> str:
-        """
-        Title Placeholder
-        """
+        """Return a description of the ApiDevice shim class."""
         return (
             "A Matplotlib Plugin API shim device. Used to pass scripting payload to the plugin by simulating a built-"
             "in device type. See Plugin Wiki for more information."
@@ -4257,25 +4463,26 @@ class ApiDevice:
     # =============================  Custom Methods  ==============================
     @staticmethod
     def updateStateOnServer(item = None) -> None:  # noqa
-        """
-        Title Placeholder
+        """Log a single state update request to the Indigo server log.
 
-        Body placeholder
+        Mimics the Indigo device updateStateOnServer API for compatibility with scripts that
+        update device states. Logs the item payload rather than performing a real state update.
 
-        :param item:
-        :return:
+        Args:
+            item: The state update payload to log.
         """
         indigo.server.log(f"updateStateOnServer: {item}")
 
     # =============================================================================
     def updateStatesOnServer(self, item = None) -> None:  # noqa
-        """
-        Title Placeholder
+        """Update multiple states on the shim device from a list of state dicts.
 
-        Body placeholder
+        Mimics the Indigo device updateStatesOnServer API. Iterates over the provided list of
+        state update dicts and applies each key/value pair to the internal states dict.
 
-        :param item:
-        :return:
+        Args:
+            item (list[dict]): A list of dicts each containing 'key', 'value', and optionally
+                'uiValue' entries describing the state updates to apply.
         """
         # Update object attributes based on item payload. Item is a list of dicts {'key': k, 'value': v, 'uiValue': uiv}
         for thing in item:
@@ -4284,12 +4491,12 @@ class ApiDevice:
     # =============================================================================
     @staticmethod
     def updateStateImageOnServer(item = None) -> None:  # noqa
-        """
-        Title Placeholder
+        """Log a state image update request to the Indigo server log.
 
-        Body placeholder
+        Mimics the Indigo device updateStateImageOnServer API for compatibility with scripts that
+        set device state images. Logs the item payload rather than performing a real update.
 
-        :param item:
-        :return:
+        Args:
+            item: The state image update payload to log.
         """
         indigo.server.log(f"updateStateImageOnServer: {item}")

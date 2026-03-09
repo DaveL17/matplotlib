@@ -32,7 +32,7 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        ...
+        """Initialize the calendar chart module (no-op placeholder)."""
 
     fmt = {
         'short': {

@@ -37,7 +37,7 @@ if PLUG_DICT['verboseLogging']:
 try:
 
     def __init__():
-        ...
+        """Initialize the scatter chart module (no-op placeholder)."""
 
 
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
