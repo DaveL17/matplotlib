@@ -10,23 +10,24 @@ import itertools
 import json
 import sys
 import traceback
+from typing import Any, Dict, List, Tuple
 # Third-party Modules
 from matplotlib import pyplot as plt
 from matplotlib import patches
 # My Modules
 import chart_tools
 
-LOG             = chart_tools.LOG
-PAYLOAD         = chart_tools.payload
-P_DICT          = PAYLOAD['p_dict']
-K_DICT          = PAYLOAD['k_dict']
-PLUG_DICT       = PAYLOAD['prefs']
-PROPS           = PAYLOAD['props']
-CHART_NAME      = PROPS['name']
-X_OBS           = ''
-Y_OBS_TUPLE     = ()  # Y values
-Y_OBS_TUPLE_REL = {}  # Y values relative to chart (cumulative value)
-Y_COLORS_TUPLE  = ()  # Y area colors
+LOG: Dict[str, List[str]]   = chart_tools.LOG
+PAYLOAD: dict               = chart_tools.payload
+P_DICT: dict                = PAYLOAD['p_dict']
+K_DICT: dict                = PAYLOAD['k_dict']
+PLUG_DICT: dict             = PAYLOAD['prefs']
+PROPS: dict                 = PAYLOAD['props']
+CHART_NAME: str             = PROPS['name']
+X_OBS: Any                  = ''
+Y_OBS_TUPLE: Tuple          = ()  # Y values
+Y_OBS_TUPLE_REL: Dict       = {}  # Y values relative to chart (cumulative value)
+Y_COLORS_TUPLE: Tuple       = ()  # Y area colors
 
 LOG['Threaddebug'].append("chart_area.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -35,7 +36,7 @@ if PLUG_DICT['verboseLogging']:
     LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 
-def __init__():
+def __init__() -> None:
     """Initialize the area chart module (no-op placeholder)."""
 
 

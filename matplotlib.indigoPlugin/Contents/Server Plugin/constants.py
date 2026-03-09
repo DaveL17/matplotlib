@@ -7,13 +7,15 @@ The constants.py file contains all application constants and is imported as a li
 constants by the use of all caps.
 """
 
+from typing import Dict, List, Tuple
+
 
 # =============================================================================
-def __init__():
+def __init__() -> None:
     """Initialize the constants module (no-op placeholder)."""
 
 
-CLEAN_LIST = (
+CLEAN_LIST: Tuple[Tuple[str, str], ...] = (
     (' am ', ' AM '),
     (' pm ', ' PM '),
     ('*', ' '),
@@ -24,7 +26,7 @@ CLEAN_LIST = (
     ('/', ' / ')
 )
 
-DEBUG_LABELS = {
+DEBUG_LABELS: Dict[int, str] = {
     10: "Debugging Messages",
     20: "Informational Messages",
     30: "Warning Messages",
@@ -32,7 +34,7 @@ DEBUG_LABELS = {
     50: "Critical Errors Only"
 }
 
-FONT_MENU = [
+FONT_MENU: List[str] = [
     'Arial',
     'Apple Chancery',
     'Andale Mono',

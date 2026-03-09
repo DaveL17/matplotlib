@@ -11,20 +11,21 @@ import json
 import sys
 import textwrap
 import traceback
+from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 from matplotlib import patches
 # My Modules
 import chart_tools  # noqa
 
-LOG          = chart_tools.LOG
-PAYLOAD      = chart_tools.payload
-P_DICT       = PAYLOAD['p_dict']
-K_DICT       = PAYLOAD['k_dict']
-PROPS        = PAYLOAD['props']
-CHART_NAME   = PROPS['name']
-PLUG_DICT    = PAYLOAD['prefs']
-TEXT_TO_PLOT = PAYLOAD['data']
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+TEXT_TO_PLOT: str         = PAYLOAD['data']
 
 LOG['Threaddebug'].append("chart_multiline.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -34,10 +35,10 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the multiline text chart module (no-op placeholder)."""
 
-    def clean_string(val):
+    def clean_string(val: str) -> str:
         """Clean a string of extra whitespace and reformat select characters.
 
         Scrubs multiline text elements to make them more presentable for display. Replaces common problematic character

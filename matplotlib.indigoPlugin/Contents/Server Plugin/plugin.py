@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import threading
 import traceback
-from typing import Any, Union
+from typing import Any, List, Optional, Tuple, Union
 import datetime as dt
 import operator as op
 import xml.etree.ElementTree as eTree
@@ -84,14 +84,14 @@ class Plugin(indigo.PluginBase):
         super().__init__(plugin_id, plugin_display_name, plugin_version, plugin_prefs)
 
         # ============================ Instance Attributes =============================
-        self.pluginIsInitializing  = True   # Flag signaling that __init__ is in process
-        self.pluginIsShuttingDown  = False  # Flag signaling that the plugin is shutting down.
-        self.skipRefreshDateUpdate = False  # Flag that we have called for a manual chart refresh
-        self.final_data            = []
+        self.pluginIsInitializing: bool  = True   # Flag signaling that __init__ is in process
+        self.pluginIsShuttingDown: bool  = False  # Flag signaling that the plugin is shutting down.
+        self.skipRefreshDateUpdate: bool = False  # Flag that we have called for a manual chart refresh
+        self.final_data: list            = []
         # List of devices and variables (updated in getDeviceConfigUiValues)
-        self.dev_var_list          = []
-        self.refresh_queue         = Queue()
-        self.debug_level = int(plugin_prefs.get('showDebugLevel', "30"))
+        self.dev_var_list: list          = []
+        self.refresh_queue: Queue        = Queue()
+        self.debug_level: int            = int(plugin_prefs.get('showDebugLevel', "30"))
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert  = Dave.Fogbert(self)           # Plugin functional framework
@@ -111,7 +111,7 @@ class Plugin(indigo.PluginBase):
 
         self.pluginIsInitializing = False
 
-    def log_plugin_environment(self):
+    def log_plugin_environment(self) -> None:
         """
         Log pluginEnvironment information when plugin is first started
         """
@@ -119,7 +119,7 @@ class Plugin(indigo.PluginBase):
         self.pluginEnvironmentLogger()
 
     # =============================================================================
-    def __del__(self):
+    def __del__(self) -> None:
         """Destroy the Plugin instance and call the parent class destructor."""
         indigo.PluginBase.__del__(self)
 
@@ -247,7 +247,7 @@ class Plugin(indigo.PluginBase):
         return result
 
     # =============================================================================
-    def getDeviceConfigUiValues(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0):  # noqa
+    def getDeviceConfigUiValues(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> indigo.Dict:  # noqa
         """Return pre-populated values for a device configuration dialog.
 
         Handles special initialization for CSV Engine devices (resetting workflow fields) and
@@ -499,7 +499,7 @@ class Plugin(indigo.PluginBase):
         return state_list
 
     # =============================================================================
-    def getMenuActionConfigUiValues(self, menu_id: str = "") -> tuple:
+    def getMenuActionConfigUiValues(self, menu_id: str = "") -> Tuple[indigo.Dict, indigo.Dict]:
         """Return pre-populated settings and an empty error dict for menu action dialogs.
 
         For the advanced settings menu, reads the relevant preference keys from pluginPrefs. For
@@ -537,7 +537,7 @@ class Plugin(indigo.PluginBase):
         return settings, error_msg_dict
 
     # =============================================================================
-    def getPrefsConfigUiValues(self):  # noqa
+    def getPrefsConfigUiValues(self) -> indigo.Dict:  # noqa
         """Return plugin preferences pre-populated with defaults for the preferences dialog.
 
         Reads the current pluginPrefs and fills in defaults for any missing color, font, and
@@ -578,7 +578,7 @@ class Plugin(indigo.PluginBase):
         return plugin_prefs
 
     # =============================================================================
-    def runConcurrentThread(self):  # noqa
+    def runConcurrentThread(self) -> None:  # noqa
         """Run the plugin's main background loop.
 
         Checks the chart refresh queue, refreshes CSV engine data, and refreshes chart devices on
@@ -647,7 +647,7 @@ class Plugin(indigo.PluginBase):
         self.pluginIsShuttingDown = True
 
     # =============================================================================
-    def validatePrefsConfigUi(self, values_dict: indigo.Dict = None) -> tuple:  # noqa
+    def validatePrefsConfigUi(self, values_dict: indigo.Dict = None) -> Tuple[bool, indigo.Dict]:  # noqa
         """Validate the plugin preferences configuration dialog before saving.
 
         Validates data paths, chart colors, chart dimensions, chart resolution, and line weight.
@@ -715,7 +715,7 @@ class Plugin(indigo.PluginBase):
             return True, values_dict
 
     # =============================================================================
-    def validateDeviceConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
+    def validateDeviceConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[bool, indigo.Dict, indigo.Dict]:  # noqa
         """Validate a device configuration dialog before saving.
 
         Applies device-type-specific validation (required sources, numeric values, axis limits,
@@ -1135,7 +1135,7 @@ class Plugin(indigo.PluginBase):
         return True, values_dict, error_msg_dict
 
     # =============================================================================
-    def validateMenuConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
+    def validateMenuConfigUi(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[bool, indigo.Dict]:  # noqa
         """Validate menu configuration dialog values and log the submitted payload.
 
         Args:
@@ -1177,7 +1177,7 @@ class Plugin(indigo.PluginBase):
         """
 
     # =============================================================================
-    def action_refresh_the_charts(self, plugin_action) -> None:  # noqa
+    def action_refresh_the_charts(self, plugin_action: Any) -> None:  # noqa
         """Refresh all enabled chart devices in response to an Indigo Action item.
 
         Sets the skipRefreshDateUpdate flag and calls charts_refresh() with all enabled non-CSV
@@ -1399,7 +1399,7 @@ class Plugin(indigo.PluginBase):
         """
         pattern = r"[0-9A-Fa-f]{2} [0-9A-Fa-f]{2} [0-9A-Fa-f]{2}"
 
-        def process_value(value):
+        def process_value(value: Any) -> Any:
             if isinstance(value, str):
                 return self.fix_rgb(color=value) if re.search(pattern, value) else value
             elif isinstance(value, dict):
@@ -1556,7 +1556,7 @@ class Plugin(indigo.PluginBase):
             dev_list (list): A list of indigo.Device instances to refresh. If None, the method
                 determines which devices need refreshing based on their refresh intervals.
         """
-        def convert_to_native(obj: Union[indigo.Dict, indigo.List]):
+        def convert_to_native(obj: Union[indigo.Dict, indigo.List]) -> Any:
             """Convert any indigo.Dict and indigo.List objects to native Python formats.
 
             Recursively converts indigo.List to Python list and indigo.Dict to Python dict.
@@ -2414,7 +2414,7 @@ class Plugin(indigo.PluginBase):
                 )
 
     # =============================================================================
-    def csv_item_add(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
+    def csv_item_add(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[indigo.Dict, indigo.Dict]:  # noqa
         """Add a new CSV data source item to the CSV Engine device configuration.
 
         Called when the user clicks the 'Add Item' button in the CSV Engine config dialog.
@@ -2581,7 +2581,7 @@ class Plugin(indigo.PluginBase):
         return result
 
     # =============================================================================
-    def csv_item_update(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> tuple:  # noqa
+    def csv_item_update(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[indigo.Dict, indigo.Dict]:  # noqa
         """Update a CSV data source item in the CSV Engine device configuration.
 
         Called when the user clicks the 'Update Item' button in the CSV Engine config dialog.
@@ -3992,7 +3992,7 @@ class Plugin(indigo.PluginBase):
         Spawns a daemon thread that calls charts_refresh() for each device list in the queue
         until the queue is empty.
         """
-        def work_the_refresh_queue():
+        def work_the_refresh_queue() -> None:
             while not self.refresh_queue.empty():
                 queue_dev = self.refresh_queue.get()
                 self.charts_refresh(queue_dev)
@@ -4342,9 +4342,9 @@ class MakeChart:
     Provides helper methods for cleaning text strings and evaluating mathematical
     expressions parsed from AST nodes, used during chart data processing.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize MakeChart, setting up the data store and configuring logging."""
-        self.final_data = []
+        self.final_data: list = []
 
         base = indigo.server.getInstallFolderPath()
         path = base + "/Logs/com.fogbert.indigoplugin.matplotlib/"
@@ -4353,7 +4353,6 @@ class MakeChart:
     # =============================================================================
     @staticmethod
     def clean_string(val: str = "") -> str:  # noqa
-        """
         """Scrub multiline text to remove excess whitespace and normalize certain characters.
 
         Iterates over a predefined replacement list (CLEAN_LIST) to substitute known problematic
@@ -4373,7 +4372,7 @@ class MakeChart:
         return ' '.join(val.split())
 
     # =============================================================================
-    def eval_(self, mode=None) -> dict:
+    def eval_(self, mode: ast.AST = None) -> Union[int, float]:
         """Recursively evaluate an AST node representing a mathematical expression.
 
         Supports numeric constants, binary operations (+, -, *, /, **, ^), and unary negation.
@@ -4384,7 +4383,7 @@ class MakeChart:
                 ast.Constant, ast.BinOp, and ast.UnaryOp.
 
         Returns:
-            dict: The numeric result of evaluating the expression.
+            int | float: The numeric result of evaluating the expression.
 
         Raises:
             TypeError: If the AST node type is not supported.
@@ -4416,29 +4415,29 @@ class ApiDevice:
     external scripts to inject chart payloads into the plugin without requiring a real configured
     device. Exposes state management methods compatible with the Indigo device API.
     """
-    def __init__(self):
-        self.configured = True
-        self.deviceTypeId = ''  # areaChartingDevice, lineChartingDevice, etc.
-        self.enabled = True
-        self.errorState = False
-        self.globalProps = indigo.Dict()
-        self.id = -1
-        self.lastChanged = ""
-        self.lastSuccessfulComm = ""
-        self.model = "API Device"
-        self.name = 'Matplotlib Plugin API Device'
-        self.pluginId = "com.fogbert.indigoplugin.matplotlib"
-        self.pluginProps = self.globalProps
-        self.states = indigo.Dict()
+    def __init__(self) -> None:
+        self.configured: bool         = True
+        self.deviceTypeId: str        = ''  # areaChartingDevice, lineChartingDevice, etc.
+        self.enabled: bool            = True
+        self.errorState: bool         = False
+        self.globalProps: indigo.Dict = indigo.Dict()
+        self.id: int                  = -1
+        self.lastChanged: str         = ""
+        self.lastSuccessfulComm: str  = ""
+        self.model: str               = "API Device"
+        self.name: str                = 'Matplotlib Plugin API Device'
+        self.pluginId: str            = "com.fogbert.indigoplugin.matplotlib"
+        self.pluginProps: indigo.Dict = self.globalProps
+        self.states: indigo.Dict      = indigo.Dict()
         self.states['chartLastUpdated'] = ""
         self.states['onOffState'] = ""
 
         # Attributes to hold payload data
-        self.apiXvalues  = []
-        self.apiYvalues  = []
-        self.apiKwargs   = {}
-        self.apiPathName = ""
-        self.apiFileName = ""
+        self.apiXvalues: list  = []
+        self.apiYvalues: list  = []
+        self.apiKwargs: dict   = {}
+        self.apiPathName: str  = ""
+        self.apiFileName: str  = ""
 
     # =============================================================================
     @staticmethod
@@ -4462,7 +4461,7 @@ class ApiDevice:
 
     # =============================  Custom Methods  ==============================
     @staticmethod
-    def updateStateOnServer(item = None) -> None:  # noqa
+    def updateStateOnServer(item: Any = None) -> None:  # noqa
         """Log a single state update request to the Indigo server log.
 
         Mimics the Indigo device updateStateOnServer API for compatibility with scripts that
@@ -4474,7 +4473,7 @@ class ApiDevice:
         indigo.server.log(f"updateStateOnServer: {item}")
 
     # =============================================================================
-    def updateStatesOnServer(self, item = None) -> None:  # noqa
+    def updateStatesOnServer(self, item: Any = None) -> None:  # noqa
         """Update multiple states on the shim device from a list of state dicts.
 
         Mimics the Indigo device updateStatesOnServer API. Iterates over the provided list of
@@ -4490,7 +4489,7 @@ class ApiDevice:
 
     # =============================================================================
     @staticmethod
-    def updateStateImageOnServer(item = None) -> None:  # noqa
+    def updateStateImageOnServer(item: Any = None) -> None:  # noqa
         """Log a state image update request to the Indigo server log.
 
         Mimics the Indigo device updateStateImageOnServer API for compatibility with scripts that

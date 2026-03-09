@@ -10,6 +10,7 @@ import itertools
 import json
 import sys
 import traceback
+from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 from matplotlib import patches
@@ -17,14 +18,14 @@ from matplotlib import dates as mdate
 # My modules
 import chart_tools  # noqa
 
-LOG         = chart_tools.LOG
-PAYLOAD     = chart_tools.payload
-P_DICT      = PAYLOAD['p_dict']
-K_DICT      = PAYLOAD['k_dict']
-PLUG_DICT   = PAYLOAD['prefs']
-PROPS       = PAYLOAD['props']
-CHART_NAME  = PROPS['name']
-LINE_COLORS = []
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+LINE_COLORS: List[str]    = []
 
 LOG['Threaddebug'].append("chart_line.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -34,7 +35,7 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the line chart module (no-op placeholder)."""
 
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)

@@ -5,11 +5,12 @@ Defines the kDefaultPluginPrefs dictionary used to initialize plugin preferences
 user. All keys correspond to fields defined in PluginConfig.xml.
 """
 
+from typing import Any, Dict
 import indigo  # noqa
 
-INSTALL_PATH = indigo.server.getInstallFolderPath()
+INSTALL_PATH: str = indigo.server.getInstallFolderPath()
 
-kDefaultPluginPrefs = {
+kDefaultPluginPrefs: Dict[str, Any] = {
     'backgroundColor': "00 00 00",
     'backgroundColorOther': False,
     'chartPath': f"{INSTALL_PATH}/IndigoWebServer/images/controls/",

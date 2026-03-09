@@ -8,6 +8,7 @@ the com.fogbert.indigoPlugin.xxxx bundle identifier. It can be customized for ea
 # Built-in Modules
 import logging
 import re
+from typing import Any
 
 # Third-party Modules
 try:
@@ -32,18 +33,18 @@ class Maintain:
     com.fogbert.indigoPlugin.xxxx bundle identifier. Can be customized for each plugin.
     """
 
-    def __init__(self, plugin):
+    def __init__(self, plugin: Any) -> None:
         """Initialize the Maintain instance and attach it to the parent plugin.
 
         Args:
             plugin: The Indigo plugin instance that this maintenance object belongs to.
         """
-        self.plugin = plugin
-        self.pluginPrefs = plugin.pluginPrefs
-        self.my_logger = logging.getLogger("Plugin.Maintain")
+        self.plugin: Any           = plugin
+        self.pluginPrefs: Any      = plugin.pluginPrefs
+        self.my_logger: logging.Logger = logging.getLogger("Plugin.Maintain")
         self.my_logger.debug("Initializing maintenance framework.x")
 
-    def clean_prefs(self, dev_name: str, prefs: dict):
+    def clean_prefs(self, dev_name: str, prefs: dict) -> dict:
         """Remove legacy keys from non-chart device prefs.
 
         None of the keys in the removal list should be present in non-chart device types such as csvEngine and
@@ -363,7 +364,7 @@ class Maintain:
 
         return prefs
 
-    def clean_props(self, dev: indigo.Device):
+    def clean_props(self, dev: indigo.Device) -> None:
         """Update and repair device plugin properties to match the current plugin version.
 
         Performs a series of maintenance tasks on the device's pluginProps: sets the isChart flag, converts string

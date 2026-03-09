@@ -14,6 +14,7 @@ import sys
 import traceback
 import datetime as dt
 from copy import deepcopy
+from typing import Dict, List
 import numpy as np
 # Third-party Modules
 from matplotlib import pyplot as plt
@@ -22,16 +23,16 @@ from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
-LOG          = chart_tools.LOG
-PAYLOAD      = chart_tools.payload
-P_DICT       = PAYLOAD['p_dict']
-K_DICT       = PAYLOAD['k_dict']
-STATE_LIST   = PAYLOAD['state_list']
-DEV_TYPE     = PAYLOAD['dev_type']
-PROPS        = PAYLOAD['props']
-CHART_NAME   = PROPS['name']
-PLUG_DICT    = PAYLOAD['prefs']
-SUN_RISE_SET = PAYLOAD['sun_rise_set']
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+STATE_LIST: dict          = PAYLOAD['state_list']
+DEV_TYPE: str             = PAYLOAD['dev_type']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+SUN_RISE_SET: list        = PAYLOAD['sun_rise_set']
 
 LOG['Threaddebug'].append("chart_weather_forecast.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -41,7 +42,7 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the weather forecast chart module (no-op placeholder)."""
 
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)

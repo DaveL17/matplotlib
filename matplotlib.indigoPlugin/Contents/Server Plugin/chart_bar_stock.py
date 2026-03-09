@@ -11,24 +11,25 @@ import itertools
 import json
 import sys
 import traceback
+from typing import Any, Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
-LOG               = chart_tools.LOG
-PAYLOAD           = chart_tools.payload
-CHART_DATA        = PAYLOAD['data']
-P_DICT            = PAYLOAD['p_dict']
-K_DICT            = PAYLOAD['k_dict']
-PROPS             = PAYLOAD['props']
-CHART_NAME        = PROPS['name']
-PLUG_DICT         = PAYLOAD['prefs']
-ANNOTATION_VALUE  = []
-BAR_COLORS        = []
-X_LABELS          = []
-X_TICKS           = []
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+CHART_DATA: list          = PAYLOAD['data']
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+ANNOTATION_VALUE: list    = []
+BAR_COLORS: List[str]     = []
+X_LABELS: List[Any]       = []
+X_TICKS: List[int]        = []
 
 LOG['Threaddebug'].append("chart_bar_stock.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -38,7 +39,7 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the stock bar chart module (no-op placeholder)."""
 
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)

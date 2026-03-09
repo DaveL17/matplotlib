@@ -11,6 +11,7 @@ fly" rather than through direct user input.
 import json
 import sys
 import traceback
+from typing import Any, Dict, List
 import numpy as np
 # Third-party Modules
 from matplotlib import pyplot as plt
@@ -18,18 +19,18 @@ from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
-LOG        = chart_tools.LOG
-PAYLOAD    = chart_tools.payload
-P_DICT     = PAYLOAD['p_dict']
-K_DICT     = PAYLOAD['k_dict']
-PLUG_DICT  = PAYLOAD['prefs']
-PROPS      = PAYLOAD['props']
-CHART_NAME = PROPS['name']
-DATA       = PAYLOAD['data']
-BAR_COLORS = []
-CHART_DATA = {}
-X_VALUES   = []
-Y_TEXT     = []
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+DATA: dict                = PAYLOAD['data']
+BAR_COLORS: List[str]     = []
+CHART_DATA: Dict[str, Any] = {}
+X_VALUES: list            = []
+Y_TEXT: List[str]         = []
 
 LOG['Threaddebug'].append("chart_batteryhealth.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")

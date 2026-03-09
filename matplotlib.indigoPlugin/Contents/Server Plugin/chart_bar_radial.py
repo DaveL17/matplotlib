@@ -11,6 +11,7 @@ https://stackoverflow.com/a/49733577/2827397
 import json
 import sys
 import traceback
+from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 # from matplotlib import patches
@@ -18,31 +19,31 @@ from matplotlib import pyplot as plt
 import chart_tools  # noqa
 
 
-LOG               = chart_tools.LOG
-PAYLOAD           = chart_tools.payload
-PLOT_VALUE        = PAYLOAD['data']
-P_DICT            = PAYLOAD['p_dict']
-K_DICT            = PAYLOAD['k_dict']
-PROPS             = PAYLOAD['props']
-CHART_NAME        = PROPS['name']
-PLUG_DICT         = PAYLOAD['prefs']
-ANNOTATION_VALUES = []
-BAR_COLORS        = []
-X_LABELS          = []
-X_TICKS           = []
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+PLOT_VALUE: float         = PAYLOAD['data']
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+ANNOTATION_VALUES: list   = []
+BAR_COLORS: list          = []
+X_LABELS: list            = []
+X_TICKS: list             = []
 
 # ================================== Globals ==================================
-COLOR_LIGHT   = P_DICT['bar_1']
-COLOR_DARK  = P_DICT['bar_2']
-COLOR_FONT   = P_DICT['fontColor']
-COLOR_BORDER = P_DICT['gridColor']
-FONT_MAIN    = P_DICT['fontMain']
-PRECISION    = P_DICT['precision']
-ICON_HEIGHT  = P_DICT['sqChartSize']
-ICON_WIDTH   = P_DICT['sqChartSize']
-SLICE_WIDTH  = 0.35
-PLOT_SCALE   = float(PAYLOAD.get('scale', P_DICT['scale']))
-ZERO_LOC = int(P_DICT['startAngle'])
+COLOR_LIGHT: str  = P_DICT['bar_1']
+COLOR_DARK: str   = P_DICT['bar_2']
+COLOR_FONT: str   = P_DICT['fontColor']
+COLOR_BORDER: str = P_DICT['gridColor']
+FONT_MAIN: str    = P_DICT['fontMain']
+PRECISION: int    = P_DICT['precision']
+ICON_HEIGHT: int  = P_DICT['sqChartSize']
+ICON_WIDTH: int   = P_DICT['sqChartSize']
+SLICE_WIDTH: float = 0.35
+PLOT_SCALE: float  = float(PAYLOAD.get('scale', P_DICT['scale']))
+ZERO_LOC: int      = int(P_DICT['startAngle'])
 
 LOG['Threaddebug'].append("chart_bar_radial.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -53,7 +54,7 @@ LOG['Threaddebug'].append(f"Value: {PLOT_VALUE} Scale: {PLOT_SCALE}")
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the radial bar chart module (no-op placeholder)."""
 
     # ============================  Custom Font Size  =============================

@@ -11,17 +11,18 @@ import datetime as dt
 import json
 import sys
 import traceback
+from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 # My modules
 import chart_tools
 
-LOG        = chart_tools.LOG
-PAYLOAD    = chart_tools.payload
-PROPS      = PAYLOAD['props']
-CHART_NAME = PROPS['name']
-P_DICT     = PAYLOAD['p_dict']
-PLUG_DICT  = PAYLOAD['prefs']
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+P_DICT: dict              = PAYLOAD['p_dict']
+PLUG_DICT: dict           = PAYLOAD['prefs']
 
 LOG['Threaddebug'].append("chart_calendar.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -31,7 +32,7 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the calendar chart module (no-op placeholder)."""
 
     fmt = {

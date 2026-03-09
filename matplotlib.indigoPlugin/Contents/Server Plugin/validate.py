@@ -7,13 +7,14 @@ TODO: move other validation code here.
 """
 import re
 import logging
+from typing import Tuple
 
 import indigo  # noqa
 
 my_logger = logging.getLogger("Plugin")
 
 
-def __init__():
+def __init__() -> None:
     """Initialize the validate module (no-op placeholder)."""
 
 # ==============================================================================
@@ -48,7 +49,7 @@ def chart_colors(values_dict: indigo.Dict) -> None:
 
 
 # ============================= Chart Dimensions ==============================
-def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
+def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
     """Validate plugin chart dimension preferences.
 
     Checks that each chart dimension property is a real number greater than 75 pixels. Removes surrounding whitespace
@@ -87,7 +88,7 @@ def chart_dimensions(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> t
 
 # ============================= Chart Resolution ==============================
 # Note that chart resolution includes a warning feature that will pass the value after the warning is cleared.
-def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
+def chart_resolution(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
     """Validate the chart resolution (DPI) preference.
 
     Ensures the chartResolution field is not null or blank. If the DPI warning flag is set and the value is below 80,
@@ -149,7 +150,7 @@ def data_paths(values_dict: indigo.Dict, error_dict: indigo.Dict) -> dict:
 
 # ================================ Line Weight =================================
 # Line weight is a hidden prop in PluginConfig.xml and may no longer be needed.  fixme
-def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
+def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
     """Validate the global line weight preference.
 
     Ensures the lineWeight field is a real number greater than zero. This is a hidden prop in PluginConfig.xml and
@@ -176,7 +177,7 @@ def line_weight(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> tuple:
 # ==============================================================================
 
 # =============================== Custom Ticks =================================
-def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict) -> tuple:
+def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
     """Validate custom Y-axis tick locations and labels.
 
     Ensures all custom tick location values are numeric, that tick locations and labels contain the same number of

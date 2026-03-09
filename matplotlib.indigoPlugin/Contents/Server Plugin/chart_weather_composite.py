@@ -14,6 +14,7 @@ import json
 import sys
 import traceback
 import datetime as dt
+from typing import Any, Dict, List
 import numpy as np
 # Third-party Modules
 from matplotlib import pyplot as plt
@@ -23,26 +24,26 @@ from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
-LOG              = chart_tools.LOG
-PAYLOAD          = chart_tools.payload
-P_DICT           = PAYLOAD['p_dict']
-K_DICT           = PAYLOAD['k_dict']
-STATE_DICT       = PAYLOAD['state_list']
-DEV_TYPE         = PAYLOAD['dev_type']
-PROPS            = PAYLOAD['props']
-CHART_NAME       = PROPS['name']
-PLUG_DICT        = PAYLOAD['prefs']
-DATES_TO_PLOT    = ()
-FORECAST_LENGTH  = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
-HEIGHT           = int(PROPS['height'])
-HUMIDITY         = ()
-PRECIPITATION    = ()
-PRESSURE         = ()
-TEMPERATURE_HIGH = ()
-TEMPERATURE_LOW  = ()
-WIDTH            = int(PROPS['width'])
-WIND_BEARING     = ()
-WIND_SPEED       = ()
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+STATE_DICT: dict          = PAYLOAD['state_list']
+DEV_TYPE: str             = PAYLOAD['dev_type']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+DATES_TO_PLOT: tuple      = ()
+FORECAST_LENGTH: Dict[str, int] = {'Daily': 8, 'Hourly': 24, 'wundergroundTenDay': 10, 'wundergroundHourly': 24}
+HEIGHT: int               = int(PROPS['height'])
+HUMIDITY: tuple           = ()
+PRECIPITATION: tuple      = ()
+PRESSURE: tuple           = ()
+TEMPERATURE_HIGH: tuple   = ()
+TEMPERATURE_LOW: tuple    = ()
+WIDTH: int                = int(PROPS['width'])
+WIND_BEARING: tuple       = ()
+WIND_SPEED: tuple         = ()
 
 LOG['Threaddebug'].append("chart_weather_composite.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -53,11 +54,11 @@ if PLUG_DICT['verboseLogging']:
 
 try:
 
-    def __init__():
+    def __init__() -> None:
         """Initialize the composite weather chart module (no-op placeholder)."""
 
 
-    def format_subplot(s_plot, title: str = "Title"):
+    def format_subplot(s_plot: Any, title: str = "Title") -> None:
         """Apply consistent formatting to a single weather composite subplot.
 
         Must be called individually for each subplot as it's rendered; settings applied to one subplot do not carry
@@ -85,7 +86,7 @@ try:
         else:
             s_plot.tick_params(axis='both', labelsize=int(PLUG_DICT['tickFontSize']))
 
-    def transparent_chart_fill(s):
+    def transparent_chart_fill(s: Any) -> None:
         """Fill a subplot's plot area with the configured face color for transparent chart support.
 
         When the chart is configured for a transparent background but a filled plot area, this method adds a filled

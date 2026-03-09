@@ -13,20 +13,21 @@ that could be passed to the device. Better to make it the responsibility of the 
 import json
 import sys
 import traceback
+from typing import Dict, List
 import numpy as np
 # Third-party Modules
 from matplotlib import pyplot as plt
 # My modules
 import chart_tools
 
-LOG        = chart_tools.LOG
-PAYLOAD    = chart_tools.payload
-P_DICT     = PAYLOAD['p_dict']
-K_DICT     = PAYLOAD['k_dict']
-PLUG_DICT  = PAYLOAD['prefs']
-PROPS      = PAYLOAD['props']
-CHART_NAME = PROPS['name']
-FINAL_DATA = []
+LOG: Dict[str, List[str]] = chart_tools.LOG
+PAYLOAD: dict             = chart_tools.payload
+P_DICT: dict              = PAYLOAD['p_dict']
+K_DICT: dict              = PAYLOAD['k_dict']
+PLUG_DICT: dict           = PAYLOAD['prefs']
+PROPS: dict               = PAYLOAD['props']
+CHART_NAME: str           = PROPS['name']
+FINAL_DATA: list          = []
 
 LOG['Threaddebug'].append("chart_polar.py called.")
 plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
@@ -35,7 +36,7 @@ if PLUG_DICT['verboseLogging']:
     LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
-    def __init__():
+    def __init__() -> None:
         """Initialize the polar chart module (no-op placeholder)."""
 
     num_obs = P_DICT['numObs']

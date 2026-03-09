@@ -16,6 +16,7 @@ import traceback
 import unicodedata
 import datetime as dt
 import operator as op
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 from dateutil.parser import parse as date_parse
 
@@ -31,10 +32,11 @@ from matplotlib import ticker as mtick
 # My modules
 
 # Collection of logging messages.
-LOG = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
+LOG: Dict[str, List[str]] = {'Threaddebug': [], 'Debug': [], 'Info': [], 'Warning': [], 'Critical': []}
 
 # Unpack the payload data. The first element of the payload is the name of this script (we don't need that). As long
 # as size isn't a limitation we will always send the entire payload as element 1.
+payload: dict = {}
 try:
     payload = json.loads(sys.argv[1].encode("utf-8"))
     LOG['Debug'].append(f"[{payload['props']['name']}] payload unpacked successfully.")
@@ -42,12 +44,12 @@ except IndexError:
     ...
 
 
-def __init__():
+def __init__() -> None:
     """Initialize the chart_tools module (no-op placeholder)."""
 
 
 # =============================================================================
-def convert_the_data(final_data: list, data_source: str, logger: dict):
+def convert_the_data(final_data: list, data_source: str, logger: dict) -> list:
     """Convert data into a form that matplotlib can understand.
 
     Matplotlib can't plot values like 'Open' and 'Closed', so we convert them for plotting. We do this on the fly
@@ -75,7 +77,7 @@ def convert_the_data(final_data: list, data_source: str, logger: dict):
     now_text = dt.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
 
     # =============================================================================
-    def is_number(s):
+    def is_number(s: Any) -> bool:
         """Return True if the given value can be interpreted as a number.
 
         Attempts to parse the value as a float or as a Unicode numeric character. Returns False if neither
@@ -149,7 +151,7 @@ def convert_the_data(final_data: list, data_source: str, logger: dict):
 
 
 # =============================================================================
-def eval_expr(expr):
+def eval_expr(expr: str) -> Union[int, float]:
     """Parse and evaluate a mathematical expression string safely.
 
     Parses the expression using the AST module and delegates evaluation to eval_(), which supports
@@ -166,7 +168,7 @@ def eval_expr(expr):
 
 
 # =============================================================================
-def eval_(mode):
+def eval_(mode: ast.AST) -> Union[int, float]:
     """Recursively evaluate an AST node as a mathematical expression.
 
     Handles numeric constants, binary operations (add, subtract, multiply, divide, power, XOR), and
@@ -199,7 +201,7 @@ def eval_(mode):
 
 
 # =============================================================================
-def fix_rgb(color):
+def fix_rgb(color: str) -> str:
     """Normalize a color string to the #RRGGBB hex format expected by matplotlib.
 
     Strips spaces and any leading '#' characters from the input, then prepends a single '#' to
@@ -217,7 +219,7 @@ def fix_rgb(color):
 
 
 # =============================================================================
-def format_axis(ax_obj):
+def format_axis(ax_obj: Any) -> None:
     """Set font, color, and grid properties on all cells of a matplotlib table object.
 
     Applies the configured face color, font color, font name, font size, and line width to each cell
@@ -249,7 +251,7 @@ def format_axis(ax_obj):
 
 
 # =============================================================================
-def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
+def format_axis_x_label(dev: Any, p_dict: dict, k_dict: dict, logger: dict) -> None:  # noqa
     """Format X-axis label visibility and tick properties.
 
     Applies font name, font size, and rotation to X-axis tick labels. If a legend is displayed,
@@ -314,7 +316,7 @@ def format_axis_x_label(dev, p_dict, k_dict, logger):  # noqa
 
 
 # =============================================================================
-def format_axis_x_min_max(p_dict, logger):
+def format_axis_x_min_max(p_dict: dict, logger: dict) -> None:
     """Set explicit minimum and maximum bounds for the X axis.
 
     Reads the desired min/max from p_dict and applies them via plt.xlim(). When a bound is set to
@@ -371,7 +373,7 @@ def format_axis_x_min_max(p_dict, logger):
 
 
 # =============================================================================
-def format_axis_x_scale(x_axis_bins, logger):
+def format_axis_x_scale(x_axis_bins: str, logger: dict) -> None:
     """Configure the major and minor locators for a date-based X axis.
 
     Maps a human-readable bin name (e.g., 'hourly', 'daily', 'weekly') to the appropriate matplotlib
@@ -427,7 +429,7 @@ def format_axis_x_scale(x_axis_bins, logger):
 
 
 # =============================================================================
-def format_axis_x_ticks(ax, p_dict, k_dict, logger):
+def format_axis_x_ticks(ax: Any, p_dict: dict, k_dict: dict, logger: dict) -> Optional[Any]:
     """Format X-axis tick marks, date formatter, and scale locators.
 
     Applies major and minor tick parameters to the X axis, sets the date formatter from
@@ -468,7 +470,7 @@ def format_axis_x_ticks(ax, p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_axis_y_ticks(p_dict, k_dict, logger):
+def format_axis_y_ticks(p_dict: dict, k_dict: dict, logger: dict) -> None:
     """Apply custom Y-axis tick locations and labels if configured.
 
     Reads custom tick mark values and labels from p_dict. If neither is set, returns without
@@ -513,7 +515,7 @@ def format_axis_y_ticks(p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_axis_y(ax, p_dict, k_dict, logger):
+def format_axis_y(ax: Any, p_dict: dict, k_dict: dict, logger: dict) -> Optional[Any]:
     """Format Y-axis tick parameters, number formatter, and optional Y2 mirroring.
 
     Applies major and minor tick parameters to the Y axis and sets a fixed-precision number
@@ -588,7 +590,7 @@ def format_axis_y(ax, p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_axis_y1_label(p_dict, k_dict, logger):
+def format_axis_y1_label(p_dict: dict, k_dict: dict, logger: dict) -> None:
     """Format the Y1 axis label text, font, and tick label properties.
 
     Sets the Y-axis label text and applies the configured font name, font size, and rotation to
@@ -632,7 +634,7 @@ def format_axis_y1_label(p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_axis_y1_min_max(p_dict, logger):
+def format_axis_y1_min_max(p_dict: dict, logger: dict) -> None:
     """Set explicit minimum and maximum bounds for the Y1 axis.
 
     Reads the desired min/max from p_dict and applies them via plt.ylim(). When a bound is set to
@@ -690,7 +692,7 @@ def format_axis_y1_min_max(p_dict, logger):
 
 # =============================================================================
 # this is currently unused.
-def format_axis_y2_label(p_dict, k_dict, logger):
+def format_axis_y2_label(p_dict: dict, k_dict: dict, logger: dict) -> None:
     """Format the Y2 axis label text, font, and tick label properties.
 
     Sets the Y2 axis label text and applies the configured font name and font size to Y-axis tick
@@ -720,7 +722,7 @@ def format_axis_y2_label(p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
+def format_best_fit_line_segments(ax: Any, dates_to_plot: Any, line: int, p_dict: dict, logger: dict) -> Optional[Any]:
     """Add a polynomial best-fit line overlay to the given axes.
 
     Computes a first-degree polynomial fit (linear regression) over the provided date values and
@@ -764,7 +766,7 @@ def format_best_fit_line_segments(ax, dates_to_plot, line, p_dict, logger):
 
 
 # =============================================================================
-def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="horiz"):
+def format_custom_line_segments(ax: Any, plug_dict: dict, p_dict: dict, k_dict: dict, logger: dict, orient: str = "horiz") -> Optional[Any]:
     """Draw configured custom horizontal or vertical reference lines on the axes.
 
     Reads custom line segment definitions from p_dict and draws them as axhline (horizontal) or
@@ -856,7 +858,7 @@ def format_custom_line_segments(ax, plug_dict, p_dict, k_dict, logger, orient="h
 
 
 # =============================================================================
-def format_dates(list_of_dates, logger):
+def format_dates(list_of_dates: list, logger: dict) -> Optional[np.ndarray]:
     """Convert a list of date strings to matplotlib numeric date values.
 
     Parses each date string using dateutil and converts the resulting datetime objects to
@@ -895,7 +897,7 @@ def format_dates(list_of_dates, logger):
 
 
 # =============================================================================
-def format_grids(p_dict, k_dict, logger):
+def format_grids(p_dict: dict, k_dict: dict, logger: dict) -> None:
     """Enable X and/or Y axis grid lines based on the configured preferences.
 
     Checks the showxAxisGrid and showyAxisGrid flags in p_dict and enables the corresponding
@@ -928,7 +930,7 @@ def format_grids(p_dict, k_dict, logger):
 
 
 # =============================================================================
-def format_title(p_dict, k_dict, loc, align='center', logger=None):
+def format_title(p_dict: dict, k_dict: dict, loc: Tuple[float, float], align: str = 'center', logger: Optional[dict] = None) -> None:
     """Render the chart's figure-level title using plt.suptitle().
 
     Reads the title text from p_dict['chartTitle'] and renders it at the specified figure
@@ -948,7 +950,7 @@ def format_title(p_dict, k_dict, loc, align='center', logger=None):
 
 
 # =============================================================================
-def get_data(data_source, logger):
+def get_data(data_source: str, logger: dict) -> list:
     """Read and return chart data from a CSV file.
 
     Opens the CSV file at data_source, reads all rows, and passes the data through convert_the_data()
@@ -995,7 +997,7 @@ def get_data(data_source, logger):
 
 
 # =============================================================================
-def hide_anomalies(data: tuple = None, props: dict = None, logger: dict = None):
+def hide_anomalies(data: Any = None, props: dict = None, logger: dict = None) -> Union[list, Any]:
     """Detect outliers in data and replace them with 'NaN'.
 
     Computes the mean and standard deviation of the input data and replaces any values that fall
@@ -1049,7 +1051,7 @@ def hide_anomalies(data: tuple = None, props: dict = None, logger: dict = None):
 
 
 # =============================================================================
-def make_chart_figure(width, height, p_dict):
+def make_chart_figure(width: Union[int, float], height: Union[int, float], p_dict: dict) -> Any:
     """Create the matplotlib figure and primary axes object for a chart.
 
     Constructs a single-subplot figure sized in inches based on the given pixel dimensions and the
@@ -1080,7 +1082,7 @@ def make_chart_figure(width, height, p_dict):
 
 
 # =============================================================================
-def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
+def prune_data(x_data: list, y_data: list, limit: Union[int, float], new_old: str, logger: dict) -> Tuple[list, list]:  # noqa
     """Trim data to only include observations within a recent time window.
 
     Filters x_data and y_data to keep only the observations that fall within the past `limit` days
@@ -1140,7 +1142,7 @@ def prune_data(x_data, y_data, limit, new_old, logger):  # noqa
 
 
 # =============================================================================
-def save(logger):
+def save(logger: dict) -> None:
     """Save the completed matplotlib figure to disk and release figure resources.
 
     Applies tight layout and subplot margin adjustments appropriate for the chart type, then saves
