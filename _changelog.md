@@ -1,3 +1,8 @@
+#### v2025.2.1
+- Removes orphaned code and fixes related bugs.
+- PEP8 compliance improvements.
+- Code cleanup.
+
 #### v2025.2.0
 - Fixes bug which caused the 8 hour X axis option to plot at 4 hour increments.
 - Addresses Matplotlib API known changes in upgrade from (3.8.2 -> 3.10.7).
