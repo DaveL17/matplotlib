@@ -37,10 +37,10 @@
 - Adds new module `validate` and moves validation code to that module.
 - Code refinements.
 - Minor UI refinements.
- 
+
 ### v2022.1.5
 - Charts
-  - Annotation value precision controls added to Area, Bar Flow Vertical, Bar Stock Horizontal, Bar Stock Vertical, 
+  - Annotation value precision controls added to Area, Bar Flow Vertical, Bar Stock Horizontal, Bar Stock Vertical,
     Line, Weather Forecast devices.
   - Fixed bug in annotation display for weather forecast devices.
 - Theme Manager
@@ -58,7 +58,7 @@
 - Fixes bug where `'list' object has not attribute 'lower'`.
 - Fixes bug where `'list' object has not attribute 'strip'`.
 - Fixes bug where Weather Composite Chart Precipitation Bar resulted in an empty chart.
-- Fixes bug where some settings for Forecast Weather Composite devices would revert to their default settings when the 
+- Fixes bug where some settings for Forecast Weather Composite devices would revert to their default settings when the
   configuration dialog is opened.
 
 ### v2022.1.3
@@ -810,17 +810,17 @@
 
 ### v0.4.11
 - The following devices have been moved to a multiprocessing environment:
-    . Bar Chart Devices
-    . Line Chart Devices
-    . Polar Chart Devices
-    . Scatter Chart Devices
+  - Bar Chart Devices
+  - Line Chart Devices
+  - Polar Chart Devices
+  - Scatter Chart Devices
 - Adds trap for Matplotlib runtime error when charts are refreshed.
 
 ### v0.4.10
 - The following devices have been moved to a multiprocessing environment:
-    . Calendar Devices
-    . Multiline Text Devices
-    . Weather Forecast Devices
+  - Calendar Devices
+  - Multiline Text Devices
+  - Weather Forecast Devices
 - Fixes error in debug logging where 'isError' attribute was used with API 2.0 logging.
 
 ### v0.4.09
@@ -921,8 +921,8 @@
 
 ### v0.2.03
 - Added additional X Axis bins:
-  . Every 15 minutes
-  . Every 30 minutes
+  - Every 15 minutes
+  - Every 30 minutes
 - Links "About Matplotlib" menu item to the new forum.
 - Fixes bug when using variables for Multiline Text.
 - Fixes bug in CSV Engine that would not allow the assignment of an 11th data element.
