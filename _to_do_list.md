@@ -1,20 +1,5 @@
 ### Feature Requests
 
----
-#### 2019-01-04  Autolog
-I would like to be able to specify a different scale on the Y2 axis - Is this possible, if not can I request another
-feature addition?
-
-My use case is mapping thermostat values; multiple Temperatures and Heat Setpoints. I use the range -5 deg C to
-35 deg C for the Y1 axis. I would like to map the thermostat valve opening value on the Y2 scale from 0% (fully
-closed) to 100% (fully open). I would then be able to easily correlate the valve opening against the temperature.
-
-- Vertical bar stock charts don't allow for setting annotation precision for bar 5.  Others?  see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
-- Do we still have to use x-axis label OR legend (but not both?) see https://forums.indigodomo.com/viewtopic.php?f=219&t=27024
-- Error messages say "Matplotlib Error" and should say "Maatplotlib Plugin Error" to distinguish them from the library.
-  See: https://matplotlib.org/stable/api/prev_api_changes/api_changes_3.9.0.html
-- bump api version
-
 #### NEW
 - Combination device (line/bar to replicate weather devices).
 - "Error" chart with min/max/avg
