@@ -59,6 +59,7 @@
 
     <Action id="sep2" uiPath="DeviceActions"/>
 
+    <!-- ============================ Chart Theme ============================= -->
     <Action id="themeApplyAction" deviceFilter="" uiPath="DeviceActions">
         <Name>Apply Theme</Name>
         <CallbackMethod>themeApplyAction</CallbackMethod>
@@ -73,9 +74,42 @@
         </ConfigUI>
     </Action>
 
-    <!-- =========================== Hidden Actions =========================== -->
+    <!-- ============================ API Actions ============================= -->
+    <!-- Exposes the Refresh Cart API -->
     <Action id="refreshTheChartsAPI" uiPath="hidden">
         <Name>API Action to Draw Simple Chart</Name>
         <CallbackMethod>plotActionApi</CallbackMethod>
     </Action>
+
+    <!-- ============================= Menu Items ============================= -->
+    <!-- ======================= Disable Plugin Devices ======================= -->
+    <Action id="comms_kill_all" uiPath="hidden">
+        <Name>Disable All Plugin Devices</Name>
+        <CallbackMethod>commsKillAll</CallbackMethod>
+    </Action>
+
+    <!-- ======================== Enable Plugin Devices ======================= -->
+    <Action id="comms_unkill_all" uiPath="hidden">
+        <Name>Enable All Plugin Devices</Name>
+        <CallbackMethod>commsUnkillAll</CallbackMethod>
+    </Action>
+
+    <!-- ===================== Display Plugin Information ===================== -->
+    <Action id="print_environment_info" uiPath="hidden">
+        <Name>Display Plugin Information</Name>
+        <CallbackMethod>log_plugin_environment</CallbackMethod>
+    </Action>
+
+    <!-- ========================== Redraw Charts Now ========================= -->
+    <Action id="refresh_the_charts_now" uiPath="hidden">
+        <Name>Redraw Charts Now...</Name>
+        <CallbackMethod>refresh_the_charts_now</CallbackMethod>
+    </Action>
+
+    <!-- =========================== Save Snapshot ============================ -->
+    <Action id="saveSnapshot" uiPath="hidden">
+        <Name>Save Snapshot to File</Name>
+        <CallbackMethod>save_snapshot</CallbackMethod>
+    </Action>
+
 </Actions>

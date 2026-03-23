@@ -13,10 +13,11 @@
 	<CallbackMethod>commsUnkillAll</CallbackMethod>
 </MenuItem>
 
-    <MenuItem id="print_environment_info" uiPath="plugin_tools">
-        <Name>Display Plugin Information</Name>
-        <CallbackMethod>log_plugin_environment</CallbackMethod>
-    </MenuItem>
+<!-- ==================  Display Plugin Environment  ================== -->
+<MenuItem id="print_environment_info" uiPath="plugin_tools">
+	<Name>Display Plugin Information</Name>
+	<CallbackMethod>log_plugin_environment</CallbackMethod>
+</MenuItem>
 
 <MenuItem id="titleSeparator" type="separator"/>
 
@@ -25,9 +26,7 @@
 <MenuItem id="aboutMatplotlib">
 	<Name>About Matplotlib...</Name>
 	<ConfigUI>
-		<!--
-		Matplotlib citation per TOS.
-		-->
+		<!-- Matplotlib citation per TOS. -->
 		<Field id="aboutLabel" type="label">
 			<Label>Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.</Label>
 		</Field>

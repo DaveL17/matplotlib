@@ -110,7 +110,7 @@ class Plugin(indigo.PluginBase):
 
         self.pluginIsInitializing = False
 
-    def log_plugin_environment(self) -> None:
+    def log_plugin_environment(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:
         """
         Log pluginEnvironment information when plugin is first started
         """
@@ -2299,7 +2299,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.critical("Error: %s. See plugin log for more information." % sub_error)
 
     # =============================================================================
-    def commsKillAll(self) -> None:  # noqa
+    def commsKillAll(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
         """
         Deactivate communication with all plugin devices
 
@@ -2319,7 +2319,7 @@ class Plugin(indigo.PluginBase):
                 )
 
     # =============================================================================
-    def commsUnkillAll(self) -> None:  # noqa
+    def commsUnkillAll(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
         """
         Establish communication for all disabled plugin devices
 
@@ -3863,20 +3863,25 @@ class Plugin(indigo.PluginBase):
         return False
 
     # =============================================================================
-    def refresh_the_charts_now(self, values_dict: indigo.Dict = None, menu_id: str = "") -> tuple:  # noqa
-        """Trigger a chart refresh from the 'Redraw Charts Now...' plugin menu item.
+    def refresh_the_charts_now(self, plugin_action: indigo.ActionGroup = None, values_dict: indigo.Dict = None, menu_id: str = "", dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> tuple:  # noqa
+        """Trigger a chart refresh from the 'Redraw Charts Now...' plugin menu item or action.
 
         Validates that a refresh target is selected and adds the appropriate device list to the
         refresh queue. Supports 'all charts', 'skip manual charts', or a single selected chart.
 
         Args:
+            plugin_action (indigo.ActionGroup): The action group object when called as an action.
             values_dict (indigo.Dict): The menu dialog values containing the 'allCharts' selection.
             menu_id (str): The menu identifier string (passed by Indigo).
+            dev (indigo.Device): The Indigo device associated with the action (passed by Indigo).
+            caller_waiting_for_result (bool): Whether the caller is waiting for a return value.
 
         Returns:
             tuple: (True, values_dict) on success, or (False, values_dict, error_msg_dict) if
                 no target is selected.
         """
+        if plugin_action is not None:
+            values_dict = plugin_action.props
         self.skipRefreshDateUpdate = True
         error_msg_dict = indigo.Dict()
 
