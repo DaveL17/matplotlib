@@ -30,5 +30,3 @@
   files error.)
 - Audit style sheet files -- if dev id no longer exists, delete the style sheet.
 - Look to see if there's anything to be gained by using https://github.com/lgienapp/aquarel
-
-bump
