@@ -1,3 +1,4 @@
 [submodule "tests/shared"]
 	path = tests/shared
 	url = https://github.com/IndigoDomotics/TestingBase.git
+	branch = main
