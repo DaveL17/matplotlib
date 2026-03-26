@@ -636,6 +636,9 @@ class Plugin(indigo.PluginBase):
         # ============================ Audit Theme Paths ==============================
         self.audit_themes_file()
 
+        # =========================== Audit Stylesheets ===========================
+        self.audit_stylesheets()
+
     # =============================================================================
     def shutdown(self) -> None:
         """Perform plugin shutdown tasks.
@@ -1441,6 +1444,28 @@ class Plugin(indigo.PluginBase):
         if not os.path.isfile(full_path):
             with open(full_path, 'w', encoding='utf-8') as outfile:
                 outfile.write(json.dumps({}, indent=4))
+
+    # =============================================================================
+    def audit_stylesheets(self) -> None:
+        """Prune stylesheet files that no longer correspond to a plugin device.
+
+        Compares stylesheet filenames against existing plugin device IDs and removes any
+        orphaned files. Logs each pruned file at the WARNING level. Called once at plugin
+        startup.
+        """
+        if not os.path.exists("Stylesheets/"):
+            return
+
+        valid_ids = {dev.id for dev in indigo.devices.iter(filter='self')}
+
+        for filepath in glob.glob("Stylesheets/*_stylesheet"):
+            basename = os.path.basename(filepath)
+            stem     = basename[: -len("_stylesheet")]
+            if not stem.isdigit():
+                continue
+            if int(stem) not in valid_ids:
+                self.logger.warning("Pruning orphaned stylesheet: %s", basename)
+                os.remove(filepath)
 
     # =============================================================================
     def chart_stock_bar(self, dev: indigo.Device = None) -> list:
