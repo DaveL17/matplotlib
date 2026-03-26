@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python3:*)",
+      "Bash(ruff check:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/pip show:*)",
+      "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/python:*)"
+    ]
+  }
+}

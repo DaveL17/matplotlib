@@ -314,7 +314,7 @@ managed through the Theme Manager.
     </Field>
 
     <!-- Debugging Template -->
-    <Template file="DLFramework/template_debugging.xml" />
+    <Template id="debug_template" file="DLFramework/template_debugging.xml" />
 
     <Field id="verboseLogging" type="checkbox" defaultValue="false" hidden="False">
         <Label>Verbose Logging</Label>
