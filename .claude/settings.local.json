@@ -8,7 +8,9 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(gh api:*)",
       "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/pip show:*)",
-      "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/python:*)"
+      "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/python:*)",
+      "Bash(git config:*)",
+      "Bash(git submodule:*)"
     ]
   }
 }

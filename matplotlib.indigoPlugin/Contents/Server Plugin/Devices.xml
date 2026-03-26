@@ -5293,7 +5293,7 @@
     <Device id="csvEngine" type="custom">
         <Name>CSV Engine Device</Name>
         <ConfigUI>
-            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/csv_engine</SupportURL>
+            <SupportURL>https://github.com/DaveL17/matplotlib/wiki/csv-engine</SupportURL>
 
             <Field id="isChart" type="checkbox" defaultValue="false" hidden="true"/>
 
