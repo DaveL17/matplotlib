@@ -49,7 +49,7 @@
 	<CallbackMethod>advancedSettingsExecuted</CallbackMethod>
 	<ButtonTitle>Save</ButtonTitle>
 	<ConfigUI>
-		<SupportURL>https://github.com/DaveL17/matplotlib/wiki/advanced_settings</SupportURL>
+		<SupportURL>https://github.com/DaveL17/matplotlib/wiki/https://github.com/DaveL17/matplotlib/wiki/advanced-settings</SupportURL>
 		<Field id="instructionsLabel" type="label">
 			<Label>Advanced Plugin Settings</Label>
 		</Field>
