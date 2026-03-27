@@ -10,7 +10,11 @@
       "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/pip show:*)",
       "Bash(/Users/Dave/PycharmProjects/matplotlib/.venv/bin/python:*)",
       "Bash(git config:*)",
-      "Bash(git submodule:*)"
+      "Bash(git submodule:*)",
+      "Bash(python -m pytest tests/test_chart_files.py)",
+      "Bash(python -m pytest tests/test_chart_files.py::TestChartArea -x -s)",
+      "Bash(python Charts/chart_area.py '{\"\"\"\"prefs\"\"\"\":{\"\"\"\"dataPath\"\"\"\":\"\"\"\"/tmp/\"\"\"\",\"\"\"\"verboseLogging\"\"\"\":false,\"\"\"\"forceOriginLines\"\"\"\":false,\"\"\"\"enableCustomLineSegments\"\"\"\":false},\"\"\"\"props\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"Test\"\"\"\",\"\"\"\"id\"\"\"\":\"\"\"\"1331356132\"\"\"\",\"\"\"\"chart_type\"\"\"\":\"\"\"\"area\"\"\"\",\"\"\"\"isChart\"\"\"\":true,\"\"\"\"limitDataRangeLength\"\"\"\":\"\"\"\"0\"\"\"\",\"\"\"\"limitDataRange\"\"\"\":\"\"\"\"new\"\"\"\"},\"\"\"\"p_dict\"\"\"\":{\"\"\"\"chart_width\"\"\"\":500,\"\"\"\"chart_height\"\"\"\":300,\"\"\"\"chartPath\"\"\"\":\"\"\"\"/tmp/\"\"\"\",\"\"\"\"fileName\"\"\"\":\"\"\"\"test.png\"\"\"\",\"\"\"\"customColors\"\"\"\":false,\"\"\"\"backgroundColor\"\"\"\":\"\"\"\"#ffffff\"\"\"\",\"\"\"\"faceColor\"\"\"\":\"\"\"\"#ffffff\"\"\"\",\"\"\"\"gridColor\"\"\"\":\"\"\"\"#aaaaaa\"\"\"\",\"\"\"\"spineColor\"\"\"\":\"\"\"\"#aaaaaa\"\"\"\",\"\"\"\"fontColor\"\"\"\":\"\"\"\"#000000\"\"\"\",\"\"\"\"showTitle\"\"\"\":false,\"\"\"\"titleFont\"\"\"\":\"\"\"\"Arial\"\"\"\",\"\"\"\"titleFontSize\"\"\"\":12,\"\"\"\"xAxisLabel\"\"\"\":\"\"\"\"\"\"\"\",\"\"\"\"yAxisLabel\"\"\"\":\"\"\"\"\"\"\"\",\"\"\"\"xAxisLabelFont\"\"\"\":\"\"\"\"Arial\"\"\"\",\"\"\"\"xAxisLabelFontSize\"\"\"\":10,\"\"\"\"yAxisLabelFont\"\"\"\":\"\"\"\"Arial\"\"\"\",\"\"\"\"yAxisLabelFontSize\"\"\"\":10,\"\"\"\"tickLabelFont\"\"\"\":\"\"\"\"Arial\"\"\"\",\"\"\"\"tickLabelFontSize\"\"\"\":9,\"\"\"\"chartPath\"\"\"\":\"\"\"\"/tmp/\"\"\"\",\"\"\"\"area_1_color\"\"\"\":\"\"\"\"#aa0000\"\"\"\",\"\"\"\"area_1_source\"\"\"\":\"\"\"\"test_data.csv\"\"\"\",\"\"\"\"area_1_header\"\"\"\":\"\"\"\"Test Series 1\"\"\"\",\"\"\"\"area_1_fill\"\"\"\":true,\"\"\"\"area_1_visible\"\"\"\":true},\"\"\"\"k_dict\"\"\"\":{}}')",
+      "Bash(python -m pytest tests/ -v)"
     ]
   }
 }

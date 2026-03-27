@@ -17,6 +17,7 @@ Structure
 # Built-in Modules
 import copy
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -37,10 +38,10 @@ _CSV_CONTENT = (
     "2025-01-05 00:00:00,18.0\n"
 )
 
+
 # =============================================================================
 # Shared runner
 # =============================================================================
-
 def _run_chart(script: str, payload: dict) -> Tuple[subprocess.CompletedProcess, dict]:
     """Run a chart script as a subprocess and parse its JSON log output.
 
@@ -51,11 +52,14 @@ def _run_chart(script: str, payload: dict) -> Tuple[subprocess.CompletedProcess,
     Returns:
         Tuple[subprocess.CompletedProcess, dict]: The completed process and the parsed LOG dict.
     """
+    env = os.environ.copy()
+    env['PYTHONPATH'] = str(SERVER_PLUGIN_PATH)
     result = subprocess.run(
         [sys.executable, script, json.dumps(payload)],
         cwd=str(SERVER_PLUGIN_PATH),
         capture_output=True,
         text=True,
+        env=env,
     )
     log: dict = json.loads(result.stdout) if result.stdout.strip() else {}
     return (result, log)
@@ -906,7 +910,7 @@ class _ChartTestMixin:
 
 class TestChartArea(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_area.py."""
-    SCRIPT          = 'chart_area.py'
+    SCRIPT          = 'Charts/chart_area.py'
     OUTPUT_FILENAME = 'test_chart_area.png'
 
     @classmethod
@@ -924,7 +928,7 @@ class TestChartArea(_ChartTestMixin, unittest.TestCase):
 
 class TestChartBarFlow(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_bar_flow.py."""
-    SCRIPT          = 'chart_bar_flow.py'
+    SCRIPT          = 'Charts/chart_bar_flow.py'
     OUTPUT_FILENAME = 'test_chart_bar_flow.png'
 
     @classmethod
@@ -946,7 +950,7 @@ class TestChartBarRadial(_ChartTestMixin, unittest.TestCase):
     This chart takes a single float value via payload['data'] rather than CSV
     time-series data, so no CSV file is written during setup.
     """
-    SCRIPT          = 'chart_bar_radial.py'
+    SCRIPT          = 'Charts/chart_bar_radial.py'
     OUTPUT_FILENAME = 'test_chart_bar_radial.png'
 
     @classmethod
@@ -957,7 +961,7 @@ class TestChartBarRadial(_ChartTestMixin, unittest.TestCase):
 
 class TestChartBarStock(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_bar_stock.py."""
-    SCRIPT          = 'chart_bar_stock.py'
+    SCRIPT          = 'Charts/chart_bar_stock.py'
     OUTPUT_FILENAME = 'test_chart_bar_stock.png'
 
     @classmethod
@@ -968,7 +972,7 @@ class TestChartBarStock(_ChartTestMixin, unittest.TestCase):
 
 class TestChartBarStockHorizontal(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_bar_stock_horizontal.py."""
-    SCRIPT          = 'chart_bar_stock_horizontal.py'
+    SCRIPT          = 'Charts/chart_bar_stock_horizontal.py'
     OUTPUT_FILENAME = 'test_chart_bar_stock_horizontal.png'
 
     @classmethod
@@ -979,7 +983,7 @@ class TestChartBarStockHorizontal(_ChartTestMixin, unittest.TestCase):
 
 class TestChartBatteryHealth(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_batteryhealth.py."""
-    SCRIPT          = 'chart_batteryhealth.py'
+    SCRIPT          = 'Charts/chart_batteryhealth.py'
     OUTPUT_FILENAME = 'test_chart_batteryhealth.png'
 
     @classmethod
@@ -990,7 +994,7 @@ class TestChartBatteryHealth(_ChartTestMixin, unittest.TestCase):
 
 class TestChartCalendar(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_calendar.py."""
-    SCRIPT          = 'chart_calendar.py'
+    SCRIPT          = 'Charts/chart_calendar.py'
     OUTPUT_FILENAME = 'test_chart_calendar.png'
 
     @classmethod
@@ -1001,7 +1005,7 @@ class TestChartCalendar(_ChartTestMixin, unittest.TestCase):
 
 class TestChartLine(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_line.py."""
-    SCRIPT          = 'chart_line.py'
+    SCRIPT          = 'Charts/chart_line.py'
     OUTPUT_FILENAME = 'test_chart_line.png'
 
     @classmethod
@@ -1012,7 +1016,7 @@ class TestChartLine(_ChartTestMixin, unittest.TestCase):
 
 class TestChartMultiline(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_multiline.py."""
-    SCRIPT          = 'chart_multiline.py'
+    SCRIPT          = 'Charts/chart_multiline.py'
     OUTPUT_FILENAME = 'test_chart_multiline.png'
 
     @classmethod
@@ -1023,7 +1027,7 @@ class TestChartMultiline(_ChartTestMixin, unittest.TestCase):
 
 class TestChartPolar(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_polar.py."""
-    SCRIPT          = 'chart_polar.py'
+    SCRIPT          = 'Charts/chart_polar.py'
     OUTPUT_FILENAME = 'test_chart_polar.png'
 
     @classmethod
@@ -1034,7 +1038,7 @@ class TestChartPolar(_ChartTestMixin, unittest.TestCase):
 
 class TestChartScatter(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_scatter.py."""
-    SCRIPT          = 'chart_scatter.py'
+    SCRIPT          = 'Charts/chart_scatter.py'
     OUTPUT_FILENAME = 'test_chart_scatter.png'
 
     @classmethod
@@ -1045,7 +1049,7 @@ class TestChartScatter(_ChartTestMixin, unittest.TestCase):
 
 class TestChartWeatherComposite(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_weather_composite.py."""
-    SCRIPT          = 'chart_weather_composite.py'
+    SCRIPT          = 'Charts/chart_weather_composite.py'
     OUTPUT_FILENAME = 'test_chart_weather_composite.png'
 
     @classmethod
@@ -1056,7 +1060,7 @@ class TestChartWeatherComposite(_ChartTestMixin, unittest.TestCase):
 
 class TestChartWeatherForecast(_ChartTestMixin, unittest.TestCase):
     """Tests for chart_weather_forecast.py."""
-    SCRIPT          = 'chart_weather_forecast.py'
+    SCRIPT          = 'Charts/chart_weather_forecast.py'
     OUTPUT_FILENAME = 'test_chart_weather_forecast.png'
 
     @classmethod

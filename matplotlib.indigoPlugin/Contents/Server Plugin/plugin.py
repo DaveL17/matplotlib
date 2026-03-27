@@ -3918,6 +3918,8 @@ class Plugin(indigo.PluginBase):
             values_dict = plugin_action.props
         elif isinstance(plugin_action, indigo.Dict):
             values_dict = plugin_action
+        elif plugin_action is not None:
+            values_dict = plugin_action.props
         self.skipRefreshDateUpdate = True
         error_msg_dict = indigo.Dict()
 
