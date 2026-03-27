@@ -1471,7 +1471,7 @@ class Plugin(indigo.PluginBase):
     def chart_stock_bar(self, dev: indigo.Device = None) -> list:
         """Collect stock bar chart data from Indigo devices and variables.
 
-        Iterates through up to five bar data sources configured on the device, reads each value
+        Iterates through up to five bar data sources configured on the device. Reads each value
         from the appropriate Indigo device state or variable, and assembles a list of per-bar
         data dicts ready to be serialized and passed to the chart subprocess.
 
@@ -2054,7 +2054,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_area.py'
+                            path_to_file = 'Charts/chart_area.py'
 
                         # ===============================  Flow Bar  ===============================
                         if dev.deviceTypeId == 'barChartingDevice':
@@ -2064,7 +2064,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_bar_flow.py'
+                            path_to_file = 'Charts/chart_bar_flow.py'
 
                         # ===============================  Stock Bar  ==============================
                         if dev.deviceTypeId == 'barStockChartingDevice':
@@ -2076,7 +2076,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_bar_stock.py'
+                            path_to_file = 'Charts/chart_bar_stock.py'
 
                         # =========================  Stock Horizontal Bar  =========================
                         if dev.deviceTypeId == 'barStockHorizontalChartingDevice':
@@ -2088,7 +2088,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_bar_stock_horizontal.py'
+                            path_to_file = 'Charts/chart_bar_stock_horizontal.py'
 
                         # ===========================  Stock Radial Bar  ===========================
                         if dev.deviceTypeId == 'radialBarChartingDevice':
@@ -2125,7 +2125,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload = convert_to_native(raw_payload)
 
                             # Run the plot
-                            path_to_file = 'chart_bar_radial.py'
+                            path_to_file = 'Charts/chart_bar_radial.py'
 
                         # ========================== Battery Health Chart ==========================
                         if dev.deviceTypeId == 'batteryHealthDevice':
@@ -2164,17 +2164,17 @@ class Plugin(indigo.PluginBase):
 
                             # Payload sent to the subprocess script
                             raw_payload['data'] = device_dict
-                            path_to_file = 'chart_batteryhealth.py'
+                            path_to_file = 'Charts/chart_batteryhealth.py'
 
                         # ============================= Calendar Charts ============================
                         if dev.deviceTypeId == "calendarChartingDevice":
 
-                            path_to_file = 'chart_calendar.py'
+                            path_to_file = 'Charts/chart_calendar.py'
 
                         # =============================== Line Charts ==============================
                         if dev.deviceTypeId == "lineChartingDevice":
 
-                            path_to_file = 'chart_line.py'
+                            path_to_file = 'Charts/chart_line.py'
 
                         # ============================= Multiline Text =============================
                         if dev.deviceTypeId == 'multiLineText':
@@ -2195,7 +2195,7 @@ class Plugin(indigo.PluginBase):
                                     raw_payload['data'] = "Unable to reconcile plot text. Confirm device settings."
                                     self.logger.info("The plugin only supports device state and variable values.")
 
-                                path_to_file = 'chart_multiline.py'
+                                path_to_file = 'Charts/chart_multiline.py'
 
                             except OSError as err:
                                 if "Argument list too long" in str(err):
@@ -2204,13 +2204,13 @@ class Plugin(indigo.PluginBase):
                         # ============================== Polar Charts ==============================
                         if dev.deviceTypeId == "polarChartingDevice":
 
-                            path_to_file = 'chart_polar.py'
+                            path_to_file = 'Charts/chart_polar.py'
 
                         # ============================= Scatter Charts =============================
                         if dev.deviceTypeId == "scatterChartingDevice":
 
                             # Run the plot
-                            path_to_file = 'chart_scatter.py'
+                            path_to_file = 'Charts/chart_scatter.py'
 
                         # ========================= Weather Forecast Charts ========================
                         if dev.deviceTypeId == "forecastChartingDevice":
@@ -2222,7 +2222,7 @@ class Plugin(indigo.PluginBase):
                             raw_payload['dev_type']     = dev_type
                             raw_payload['state_list']   = state_list
                             raw_payload['sun_rise_set'] = sun_rise_set
-                            path_to_file = 'chart_weather_forecast.py'
+                            path_to_file = 'Charts/chart_weather_forecast.py'
 
                         # ========================= Weather Composite Charts =======================
                         if dev.deviceTypeId == "compositeForecastDevice":
@@ -2232,7 +2232,7 @@ class Plugin(indigo.PluginBase):
 
                             raw_payload['dev_type']   = dev_type
                             raw_payload['state_list'] = dict(state_list)
-                            path_to_file = 'chart_weather_composite.py'
+                            path_to_file = 'Charts/chart_weather_composite.py'
 
                         # Convert any nested indigo.Dict and indigo.List objects to native formats. We wait until this
                         # point to convert it because some devices add additional device-specific data.
@@ -2269,10 +2269,14 @@ class Plugin(indigo.PluginBase):
                         # It's important to use the full path to the Python version to ensure that we get the version
                         # we want.
                         try:
+                            plugin_dir  = os.getcwd()
+                            environment = os.environ.copy()
+                            environment['PYTHONPATH'] = plugin_dir
                             with subprocess.Popen(
                                     ['/usr/local/bin/python3', path_to_file, payload, ],
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
+                                    env=environment,
                             ) as proc:
 
                                 # Get the results and act on anything that's returned.
@@ -2707,10 +2711,15 @@ class Plugin(indigo.PluginBase):
     def csv_refresh_process(self, dev: indigo.Device = None, csv_dict: dict = None) -> None:
         """Process a CSV data refresh for a CSV Engine device.
 
-        For each CSV source in csv_dict, creates the CSV file if missing, backs it up, loads
-        existing data, applies time and length limits, appends the newest observation from the
-        linked Indigo device or variable, and writes the updated data back to disk. Updates the
-        device's csvLastUpdated state and state image on completion.
+        For each CSV source in csv_dict:
+        - creates the CSV file if missing,
+        - backs it up,
+        - loads existing data,
+        - applies time and length limits,
+        - appends the newest observation from the linked Indigo device or variable, and
+        - writes the updated data back to disk.
+
+        Updates the device's csvLastUpdated state and state image on completion.
 
         Args:
             dev (indigo.Device): The Indigo CSV Engine device instance.
@@ -3905,8 +3914,10 @@ class Plugin(indigo.PluginBase):
             tuple: (True, values_dict) on success, or (False, values_dict, error_msg_dict) if
                 no target is selected.
         """
-        if plugin_action is not None:
+        if isinstance(plugin_action, indigo.ActionGroup):
             values_dict = plugin_action.props
+        elif isinstance(plugin_action, indigo.Dict):
+            values_dict = plugin_action
         self.skipRefreshDateUpdate = True
         error_msg_dict = indigo.Dict()
 

@@ -28,5 +28,3 @@
 - Move multiline text font size to theme size
 - Make sure any existing processes have been closed with communicate(), before starting a new one.  (Too many open
   files error.)
-- Audit style sheet files -- if dev id no longer exists, delete the style sheet.
-- Look to see if there's anything to be gained by using https://github.com/lgienapp/aquarel
