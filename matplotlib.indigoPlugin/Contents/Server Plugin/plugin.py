@@ -1481,7 +1481,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of dicts, each containing the bar number, name, state, color, legend,
                 annotation flag, suppress flag, and value for one bar series.
-        """
+"""
         # We can't access Indigo objects from the subprocess, so we need to get all the information we need before
         # calling the process.
 

@@ -23,8 +23,6 @@
 - Improve reaction when data location is unavailable. Maybe get it out of csv_refresh_process and don't even cycle the
   plugin when the location is gone.
 - Change chart features based on underlying data. (i.e., stock bar chart)
-- Move more code out of plugin.py
 - Move multiline text font color to theme color
 - Move multiline text font size to theme size
-- Make sure any existing processes have been closed with communicate(), before starting a new one.  (Too many open
-  files error.)
+- Move more code out of plugin.py
