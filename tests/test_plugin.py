@@ -65,7 +65,10 @@ class TestPluginActions(APIBase):
         """Verify refresh_csv_device runs successfully."""
         config = {"targetDevice": os.getenv("REFRESH_CSV_ACTION")}
         result = self._assert_response(
-            self._execute_action("refresh_csv_device", props=config, wait=True),
+            self._execute_action("refresh_csv_device",
+                                 props=config,
+                                 wait=True,
+                                 msg_id="test_refresh_csv_device_action"),
             "action_refresh_the_charts failed"
         )
         self.assertEqual(result.status_code, 200, f"Action call failed.")
@@ -74,7 +77,10 @@ class TestPluginActions(APIBase):
         """Verify refresh_csv_source runs successfully."""
         config = {"targetDevice": os.getenv("REFRESH_CSV_TARGET_DEVICE"), "targetSource": os.getenv("REFRESH_CSV_TARGET_SOURCE")}
         result = self._assert_response(
-            self._execute_action("refresh_csv_source", props=config, wait=True),
+            self._execute_action("refresh_csv_source",
+                                 props=config,
+                                 wait=True,
+                                 msg_id="test_refresh_csv_source_action"),
             "action_refresh_the_charts failed"
         )
         self.assertEqual(result.status_code, 200, f"Action call failed.")
@@ -84,7 +90,8 @@ class TestPluginActions(APIBase):
         result = self._assert_response(
             self._execute_action("refreshAChartAction",
                                  deviceId=int(os.getenv("REDRAW_A_CHART_ACTION")),
-                                 wait=True),
+                                 wait=True,
+                                 msg_id="test_refresh_a_chart_action"),
             "action_refresh_the_charts failed"
         )
         self.assertEqual(result.status_code, 200, f"Action call failed.")
@@ -94,6 +101,7 @@ class TestPluginActions(APIBase):
         result = self._assert_response(
             self._execute_action("action_refresh_the_charts",
                                  wait=True,
+                                 msg_id="test_refresh_the_charts",
                                  timeout=60.0),
             "action_refresh_the_charts failed"
         )
@@ -103,7 +111,7 @@ class TestPluginActions(APIBase):
         """Verify themeApplyAction runs successfully."""
         config = {"targetTheme": os.getenv("APPLY_THEME")}
         result = self._assert_response(
-            self._execute_action("themeApplyAction", props=config, wait=True),
+            self._execute_action("themeApplyAction", props=config, wait=True, msg_id="test_themeApplyAction"),
             "themeApplyAction failed"
         )
         self.assertEqual(result.status_code, 200, f"Action call failed.")
@@ -114,7 +122,7 @@ class TestPluginActions(APIBase):
     def test_comms_kill_all_menu(self):
         """Verify comms_kill_all runs successfully."""
         result = self._assert_response(
-            self._execute_action("comms_kill_all", wait=True),
+            self._execute_action("comms_kill_all", wait=True, msg_id="test_comms_kill_all"),
             "comms_kill_all menu item failed"
         )
         self.assertEqual(result.status_code, 200, f"Menu item call failed.")
@@ -122,7 +130,7 @@ class TestPluginActions(APIBase):
     def test_comms_unkill_all_menu(self):
         """Verify comms_unkill_all runs successfully."""
         result = self._assert_response(
-            self._execute_action("comms_unkill_all", wait=True),
+            self._execute_action("comms_unkill_all", wait=True, msg_id="test_comms_unkill_all"),
             "comms_unkill_all menu item failed"
         )
         self.assertEqual(result.status_code, 200, f"Menu item call failed.")
@@ -130,7 +138,9 @@ class TestPluginActions(APIBase):
     def test_print_environment_info_menu(self):
         """Verify print_environment_info runs successfully."""
         result = self._assert_response(
-            self._execute_action("print_environment_info", wait=True),
+            self._execute_action("print_environment_info",
+                                 wait=True,
+                                 msg_id="test_print_environment_info_menu"),
             "print_environment_info menu item failed"
         )
         self.assertEqual(result.status_code, 200, f"Menu item call failed.")
@@ -139,7 +149,10 @@ class TestPluginActions(APIBase):
         """Verify refresh_the_charts_now runs successfully."""
         config = {"allCharts": "all"}
         result = self._assert_response(
-            self._execute_action("refresh_the_charts_now", props=config, wait=True),
+            self._execute_action("refresh_the_charts_now",
+                                 props=config,
+                                 wait=True,
+                                 msg_id="test_refresh_the_charts_now_menu"),
             "refresh_the_charts_now menu item failed"
         )
         self.assertEqual(result.status_code, 200, f"Menu item call failed.")
@@ -147,7 +160,7 @@ class TestPluginActions(APIBase):
     def test_save_snapshot_menu(self):
         """Verify saveSnapshot runs successfully."""
         result = self._assert_response(
-            self._execute_action("saveSnapshot", wait=True),
+            self._execute_action("saveSnapshot", wait=True, msg_id="test_save_snapshot_menu"),
             "saveSnapshot menu item failed"
         )
         self.assertEqual(result.status_code, 200, f"Menu item call failed.")

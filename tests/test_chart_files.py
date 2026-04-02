@@ -882,9 +882,9 @@ class _ChartTestMixin:
     def tearDownClass(cls) -> None:
         cls._temp_dir.cleanup()
 
-    # ------------------------------------------------------------------
+    # =============================================================================
     # Standard tests (inherited by all subclasses)
-    # ------------------------------------------------------------------
+    # =============================================================================
 
     def test_output_file_created(self) -> None:
         """Chart script should write an image to chartPath/fileName."""
