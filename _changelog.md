@@ -1,3 +1,15 @@
+### v2025.2.2
+- Fixes `TypeError` in `%`-formatted log statements missing tuple parentheses (`csv_check_unique`, 
+  `csv_refresh_process`, battery health error handler).
+- Fixes thread target in `refresh_the_charts_queue` called with `()` instead of passed as a reference, causing queue 
+  refreshes to run on the main thread with a no-op daemon thread.
+- Fixes `onOffState` appended inside the rcParams loop in `getDeviceStateList`, resulting in duplicate states.
+- Fixes `updateStatesOnServer` called inside the rcParams loop in `rc_params_device_update`; now batched into a single 
+  call.
+- Fixes y-axis min/max fallback assigning Python builtins `min`/`max` instead of `None` when values are non-numeric.
+- Fixes CSV header written as `b'column_name'` due to redundant `.encode('utf-8')` call on an already-decoded string.
+- Fixes duplicate and mismatched key in `get_axis_list` for the month/year date format entry.
+
 ### v2025.2.1
 - Removes orphaned code and fixes related bugs.
 - PEP8 compliance improvements.

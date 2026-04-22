@@ -61,7 +61,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2025.2.1"
+__version__   = "2025.2.2"
 
 
 # =============================================================================
@@ -209,7 +209,7 @@ class Plugin(indigo.PluginBase):
     # =============================================================================
     @staticmethod
     def device_stop_comm(dev: indigo.Device = None) -> None:  # noqa
-        """Stop communication with a chart device and update its state to disabled.
+        """Stop communication with a chart device and update its state to show disabled.
 
         Args:
             dev (indigo.Device): The Indigo device instance being stopped.
@@ -493,7 +493,7 @@ class Plugin(indigo.PluginBase):
                     key = key[1:]
                 dynamic_state = self.getDeviceStateDictForStringType(key, key, key)
                 state_list.append(dynamic_state)
-                state_list.append(self.getDeviceStateDictForStringType('onOffState', 'onOffState', 'onOffState'))
+            state_list.append(self.getDeviceStateDictForStringType('onOffState', 'onOffState', 'onOffState'))
 
         return state_list
 
@@ -766,7 +766,7 @@ class Plugin(indigo.PluginBase):
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) < 0:
+                if float(values_dict['barWidth']) <= 0:
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
@@ -785,7 +785,7 @@ class Plugin(indigo.PluginBase):
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) < 0:
+                if float(values_dict['barWidth']) <= 0:
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
@@ -819,7 +819,7 @@ class Plugin(indigo.PluginBase):
                         except ValueError:
                             if val.lower() not in ['true', 'false']:
                                 error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                                values_dict['settingsGroup'] = str(n)
+                                values_dict['settingsGroup'] = str(n.group(0))
 
         # ==========================  Stock Horizontal Bar  ===========================
         if type_id == 'barStockHorizontalChartingDevice':
@@ -831,7 +831,7 @@ class Plugin(indigo.PluginBase):
 
             try:
                 # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) < 0:
+                if float(values_dict['barWidth']) <= 0:
                     raise ValueError
             except ValueError:
                 error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
@@ -866,7 +866,7 @@ class Plugin(indigo.PluginBase):
                         except ValueError:
                             if val.lower() not in ['true', 'false']:
                                 error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                                values_dict['settingsGroup'] = f"{n}"
+                                values_dict['settingsGroup'] = f"{n.group(0)}"
 
         # ===============================  Radial Bar  ================================
         if type_id == 'radialBarChartingDevice':
@@ -932,13 +932,13 @@ class Plugin(indigo.PluginBase):
 
                 # columnDict may contain a place-holder dict with one entry, so we test for that.
                 if len(sources) < 2:
-                    for key in sources:
-                        if sources[key] == ('None', 'None', 'None'):
-                            raise ValueError
-
                     # If columnDict has no keys, we know that won't work either.
                     if len(sources) == 0:
                         raise ValueError
+
+                    for key in sources:
+                        if sources[key] == ('None', 'None', 'None'):
+                            raise ValueError
 
             except ValueError:
                 error_msg_dict['addSource'] = "You must create at least one CSV data source."
@@ -952,7 +952,7 @@ class Plugin(indigo.PluginBase):
                 values_dict['settingsGroup'] = "1"
 
             # Iterate for each line group (1-6).
-            for area in range(1, 9, 1):
+            for area in range(1, 7, 1):
 
                 # Line adjustment values
                 for char in values_dict[f'line{area}adjuster']:
@@ -1114,12 +1114,12 @@ class Plugin(indigo.PluginBase):
         try:
             y_min = float(values_dict.get('yAxisMin', "None"))
         except ValueError:
-            y_min = min
+            y_min = None
 
         try:
             y_max = float(values_dict.get('yAxisMax', "None"))
         except ValueError:
-            y_max = max
+            y_max = None
 
         if isinstance(y_min, float) and isinstance(y_max, float):
             if not y_max > y_min:
@@ -2153,7 +2153,7 @@ class Plugin(indigo.PluginBase):
                                 except Exception as sub_error:
                                     self.plugin_error_handler(sub_error=traceback.format_exc())
                                     self.logger.error(
-                                        "[%s] Error reading battery devices: %s" % batt_dev.name, sub_error
+                                        "[%s] Error reading battery devices: %s" % (batt_dev.name, sub_error)
                                     )
 
                             if not device_dict:
@@ -2400,7 +2400,7 @@ class Plugin(indigo.PluginBase):
             if len(titles[title_name]) > 1:
                 self.logger.warning(
                     "Audit CSV data files: CSV filename [%s] referenced by more than one CSV Engine device: "
-                    "%s" % title_name, titles[title_name]
+                    "%s" % (title_name, titles[title_name])
                 )
 
     # =============================================================================
@@ -2763,7 +2763,7 @@ class Plugin(indigo.PluginBase):
                     try:
                         self.logger.debug("CSV doesn't exist. Creating: %s" % full_path)
                         with open(full_path, 'w', encoding="utf-8") as csv_file:
-                            csv_file.write(f"{'Timestamp'},{value[0].encode('utf-8')}\n")
+                            csv_file.write(f"{'Timestamp'},{value[0]}\n")
                             csv_file.close()
 
                         self.sleep(1)
@@ -2814,7 +2814,7 @@ class Plugin(indigo.PluginBase):
                     if len(time_data) == 0:
                         self.logger.debug(
                             "[%s - %s] all CSV data are older than the time limit. Returning original data." %
-                            dev.name, column_names[0][1]
+                            (dev.name, column_names[0][1])
                         )
                     else:
                         data = time_data
@@ -3495,7 +3495,7 @@ class Plugin(indigo.PluginBase):
             ("%Y", dt.datetime.strftime(now, "%Y") + ' (year)'),
             ("%b %d", dt.datetime.strftime(now, "%b %d") + ' (month date)'),
             ("%d %b", dt.datetime.strftime(now, "%d %b") + ' (date month)'),
-            ("%y %b", dt.datetime.strftime(now, "%b %y") + ' (month year)'),
+            ("%b %y", dt.datetime.strftime(now, "%b %y") + ' (month year)'),
             ("%y %b", dt.datetime.strftime(now, "%y %b") + ' (year month)'),
             ("%b %d %Y", dt.datetime.strftime(now, "%b %d %Y") + ' (full date)'),
             ("%Y %b %d", dt.datetime.strftime(now, "%Y %b %d") + ' (full date)')
@@ -3872,9 +3872,9 @@ class Plugin(indigo.PluginBase):
             if key.startswith('_'):
                 key = key[1:]
             state_list.append({'key': key, 'value': str(value)})
-            dev.updateStatesOnServer(state_list)
 
-        dev.updateStatesOnServer([{'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}])
+        state_list.append({'key': 'onOffState', 'value': True, 'uiValue': 'Updated'})
+        dev.updateStatesOnServer(state_list)
 
     # =============================================================================
     def refreshAChartAction(self, plugin_action: indigo.ActionGroup = None) -> bool:  # noqa
@@ -3964,7 +3964,7 @@ class Plugin(indigo.PluginBase):
                 queue_dev = self.refresh_queue.get()
                 self.charts_refresh(queue_dev)
 
-        t = threading.Thread(target=work_the_refresh_queue(), args=())
+        t = threading.Thread(target=work_the_refresh_queue)
         t.daemon = True
         t.start()
 
