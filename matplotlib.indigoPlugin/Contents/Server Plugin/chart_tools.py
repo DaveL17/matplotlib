@@ -372,7 +372,7 @@ def format_axis_x_scale(x_axis_bins: str, logger: dict) -> None:
         if x_axis_bins == 'quarter-hourly':
             plt.gca().xaxis.set_major_locator(mdate.MinuteLocator(interval=15))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 1)))
-        if x_axis_bins == 'half-hourly':
+        elif x_axis_bins == 'half-hourly':
             plt.gca().xaxis.set_major_locator(mdate.MinuteLocator(interval=30))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 1)))
         elif x_axis_bins == 'hourly':
@@ -388,7 +388,7 @@ def format_axis_x_scale(x_axis_bins: str, logger: dict) -> None:
             plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=8))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 4)))
         elif x_axis_bins == 'hourly_12':
-            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=4))
+            plt.gca().xaxis.set_major_locator(mdate.HourLocator(interval=12))
             plt.gca().xaxis.set_minor_locator(mdate.HourLocator(byhour=range(0, 24, 2)))
         elif x_axis_bins == 'daily':
             plt.gca().xaxis.set_major_locator(mdate.DayLocator(interval=1))
@@ -401,7 +401,7 @@ def format_axis_x_scale(x_axis_bins: str, logger: dict) -> None:
             plt.gca().xaxis.set_minor_locator(mdate.DayLocator(interval=1))
         elif x_axis_bins == 'yearly':
             plt.gca().xaxis.set_major_locator(mdate.YearLocator())
-            plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=12))
+            plt.gca().xaxis.set_minor_locator(mdate.MonthLocator(interval=3))
 
     except (ValueError, TypeError):
         logger['Threaddebug'].append(
@@ -480,11 +480,11 @@ def format_axis_y_ticks(p_dict: dict, k_dict: dict, logger: dict) -> None:
             custom_ticks_labels = custom_ticks_marks
 
         # Replace default Y tick values with the custom ones.
-        if custom_ticks_marks not in ('none', ''):
+        if custom_ticks_marks:
             marks = custom_ticks_marks
 
         # Replace the default Y tick labels with the custom ones.
-        if custom_ticks_labels not in ('none', ''):
+        if custom_ticks_labels:
             labels = custom_ticks_labels
 
         plt.yticks(marks, labels)
@@ -554,7 +554,7 @@ def format_axis_y(ax: Any, p_dict: dict, k_dict: dict, logger: dict) -> Optional
             f"[{name}] Problem formatting Y ticks: k_major_y = {k_dict['k_major_y']}"
         )
         logger['Threaddebug'].append(
-            f"[{name}] Problem formatting Y ticks: k_minor_x = {k_dict['k_minor_y']}"
+            f"[{name}] Problem formatting Y ticks: k_minor_y = {k_dict['k_minor_y']}"
         )
         lbl_fmt = mtick.FormatStrFormatter(
             f"[{name}] %.{int(p_dict['yAxisPrecision'])}f"

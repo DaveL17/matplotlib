@@ -1,3 +1,16 @@
+### v2025.2.4
+- Fixes `hourly_12` X axis bin using `interval=4` instead of `interval=12` for the major tick
+  locator, causing it to plot the same ticks as `hourly_4`.
+- Fixes `half-hourly` X axis bin using a standalone `if` instead of `elif`, breaking it out of the
+  locator chain.
+- Fixes `yearly` X axis minor locator using `interval=12` (same spacing as the major locator),
+  making minor ticks invisible; now uses `interval=3` for quarterly minor ticks.
+- Fixes Y axis custom tick guards comparing a list to string sentinels (`'none'`, `''`), which was
+  always `True`; now uses truthiness checks so defaults are only replaced when custom values are
+  present.
+- Fixes misleading log message in `format_axis_y` that reported `k_minor_x` when logging Y axis
+  tick kwargs.
+
 ### v2025.2.3
 - Fixes `maintenance.clean_props` color refactoring slicing the property key name instead of the hex value, producing
   corrupt color strings for all migrated devices.
