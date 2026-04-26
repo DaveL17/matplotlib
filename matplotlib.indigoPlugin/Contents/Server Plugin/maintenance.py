@@ -42,7 +42,7 @@ class Maintain:
         self.plugin: Any           = plugin
         self.pluginPrefs: Any      = plugin.pluginPrefs
         self.my_logger: logging.Logger = logging.getLogger("Plugin.Maintain")
-        self.my_logger.debug("Initializing maintenance framework.x")
+        self.my_logger.debug("Initializing maintenance framework.")
 
     def clean_prefs(self, dev_name: str, prefs: dict) -> dict:
         """Remove legacy keys from non-chart device prefs.
@@ -350,7 +350,7 @@ class Maintain:
         )
 
         # Iterate the keys to delete and delete them if they exist for key in prefs.keys():
-        for key in prefs:
+        for key in list(prefs):
             if key in list_of_keys_to_remove:
                 list_of_removed_keys.append(key)
                 del prefs[key]
@@ -397,7 +397,7 @@ class Maintain:
             'scatterChartingDevice': True
         }
 
-        props['isChart'] = is_chart_dict[dev.deviceTypeId]
+        props['isChart'] = is_chart_dict.get(dev.deviceTypeId, False)
 
         try:
             # Convert string bools to true bools for item in dev.pluginProps.keys():
@@ -406,7 +406,7 @@ class Maintain:
                     if not isinstance(props[item], bool):
                         if props[item].strip() in ('False', 'false'):
                             props[item] = False
-                        elif props[item] in ('True', 'true'):
+                        elif props[item].strip() in ('True', 'true'):
                             props[item] = True
                 except AttributeError:
                     ...
@@ -458,7 +458,7 @@ class Maintain:
                     if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
                         # pylint: disable=logging-not-lazy
                         self.my_logger.debug("[%s] Refactoring color property: (%s)" % (dev.name, prop))
-                        props[prop] = f"{prop[0:3]} {prop[3:5]} {prop[5:7]}".replace('#', '')
+                        props[prop] = f"{props[prop][1:3]} {props[prop][3:5]} {props[prop][5:7]}"
 
                     # ============================== Fix Line Styles ==============================
                     # In upgrading matplotlib from 1.3.1 (Apple's python 2.7 version) to v3.5.1, changes were made to
@@ -525,7 +525,7 @@ class Maintain:
             # ============================= Update the Server =============================
             dev.replacePluginPropsOnServer(props)
 
-            if self.plugin.pluginPrefs['verboseLogging']:
+            if self.plugin.pluginPrefs.get('verboseLogging', False):
                 self.my_logger.debug("[%s] prefs cleaned." % dev.name)   # pylint: disable=logging-not-lazy
 
         except Exception as err:

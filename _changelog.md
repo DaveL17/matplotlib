@@ -1,3 +1,14 @@
+### v2025.2.3
+- Fixes `maintenance.clean_props` color refactoring slicing the property key name instead of the hex value, producing
+  corrupt color strings for all migrated devices.
+- Fixes `maintenance.clean_prefs` raising `RuntimeError` by mutating the prefs dict while iterating over it; now
+  iterates over a snapshot copy.
+- Fixes inconsistent whitespace stripping in `maintenance.clean_props` bool conversion where `'True'` values with
+  leading/trailing spaces were silently left as strings.
+- Fixes `maintenance.clean_props` raising `KeyError` for unrecognized `deviceTypeId` values; unknown types now
+  default to `isChart = False`.
+- Fixes `maintenance.clean_props` raising `KeyError` when `verboseLogging` is absent from plugin prefs.
+
 ### v2025.2.2
 - Fixes `TypeError` in `%`-formatted log statements missing tuple parentheses (`csv_check_unique`, 
   `csv_refresh_process`, battery health error handler).
