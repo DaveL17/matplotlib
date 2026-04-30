@@ -1,3 +1,14 @@
+### v2025.2.5
+- Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
+  digit in the stock horizontal bar config validator.
+- Fixes `pluginPrefs.get('backgroundColorOther', 'false')` and `pluginPrefs.get('faceColorOther',
+  'false')` using a non-empty string default (always truthy) instead of boolean `False`.
+- Fixes CSV column rename deleting the old key without inserting the new key, causing the column to
+  be lost instead of renamed.
+- Removes duplicate `p_dict.update(dev.pluginProps)` call in `charts_refresh` that was overwritten
+  immediately by the second call.
+- Replaces side-effect list comprehensions in `csv_source_list` with `list.extend()`.
+
 ### v2025.2.4
 - Fixes `hourly_12` X axis bin using `interval=4` instead of `interval=12` for the major tick
   locator, causing it to plot the same ticks as `hourly_4`.
@@ -62,7 +73,7 @@
 - Code enhancements.
 
 ### v2022.1.7
-- Fixes bug where `Matplotlib Paramters Device` incorrectly labelled in error state.
+- Fixes bug where `Matplotlib Paramters Device` incorrectly labeled in error state.
 - Fixes bug `PluginAction' object has no attribute 'PROPS'`.
 - Fixes bug where Refresh CSV Device Action returned an error when no such devices exist.
 
@@ -101,7 +112,7 @@
 - Adds control to rotate X-axis labels (charts: area, bar (horizontal stock), bar (vertical flow), bar (vertical stock),
   line, scatter, weather forecast, weather forecast composite)
 - Fixes bug where user executes `Redraw Charts Now...` Menu Item without first selecting an option.
-- Adds `_to_do_list.md` and changes changelog to markdown.
+- Adds `_to_do_list.md` and changes changelog to Markdown.
 - Moves plugin environment logging to plugin menu item (log only on request).
 
 ### v2022.1.2
@@ -900,7 +911,7 @@
 - Logs warning when CSV Engine data element source ID is None type.
 - Properly sets the state of the device indicator in the main Indigo UI (green if enabled, gray if disabled), and
   provides a small set of status messages as the plugin cycles.
-- Fixes bug where certain devices with unicode characters in a path name would fail.
+- Fixes bug where certain devices with Unicode characters in a path name would fail.
 - Fixes bug where 'pixel', 'triangle left' and 'triangle right' marker styles would cause an error (scatter charts
   only).
 - Minor UI refinements.
@@ -928,7 +939,7 @@
 - Substantial additions to the plugin manual.
 - Renames "Extra Wide" controls to "Special Size" to better reflect that the settings not only control width and
   height, but can also be smaller or larger than the standard size.
-- Fixes bug where certain data file names with unicode characters would cause an error.
+- Fixes bug where certain data file names with Unicode characters would cause an error.
 - Moves support URL to GitHub.
 - Various code refinements.
 

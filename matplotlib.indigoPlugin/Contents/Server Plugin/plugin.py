@@ -61,7 +61,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2025.2.4"
+__version__   = "2025.2.5"
 
 
 # =============================================================================
@@ -857,7 +857,7 @@ class Plugin(indigo.PluginBase):
                         val = indigo.devices[source_id].states[values_dict[source]]
                         if not isinstance(val, (int, float, bool)):
                             error_msg_dict[source] = "The selected device state can not be charted due to its value."
-                            values_dict['settingsGroup'] = str(n)
+                            values_dict['settingsGroup'] = n.group(0)
 
                     else:
                         val = indigo.variables[source_id].value
@@ -1613,7 +1613,7 @@ class Plugin(indigo.PluginBase):
                 # Filled Background      = False
 
                 # Transparent is True, so we don't want filled.
-                if self.pluginPrefs.get('backgroundColorOther', 'false'):
+                if self.pluginPrefs.get('backgroundColorOther', False):
                     p_dict['transparent_charts'] = True
                 # Transparent is False, so we want filled.
                 else:
@@ -1625,7 +1625,7 @@ class Plugin(indigo.PluginBase):
                 # Filled Plot Area       = False
 
                 # Transparent is True, so we don't want filled.
-                if self.pluginPrefs.get('faceColorOther', 'false'):
+                if self.pluginPrefs.get('faceColorOther', False):
                     p_dict['transparent_filled'] = False
                 # Transparent is False, so we want filled.
                 else:
@@ -1791,8 +1791,6 @@ class Plugin(indigo.PluginBase):
 
                     # ========================== matplotlib.rc overrides ==========================
                     plt.rc('font', **k_dict['k_base_font'])
-
-                    p_dict.update(dev.pluginProps)
 
                     for _ in (
                         'bar_colors', 'customTicksLabelY', 'customTicksY', 'data_array', 'dates_to_plot', 'headers',
@@ -2599,11 +2597,16 @@ class Plugin(indigo.PluginBase):
             if key != previous_key:
                 if key in column_dict:
                     error_msg_dict['editKey'] = (
-                        f"New key ({key}) already exists in the global properties, please use a  different key value"
+                        f"New key ({key}) already exists in the global properties, please use a different key value"
                     )
                     values_dict['editKey']   = previous_key
                 else:
                     del column_dict[previous_key]
+                    column_dict[key] = (
+                        values_dict['editValue'],
+                        values_dict['editSource'],
+                        values_dict['editState']
+                    )
             else:
                 column_dict[key] = (
                     values_dict['editValue'],
@@ -2978,28 +2981,20 @@ class Plugin(indigo.PluginBase):
 
         # Devices
         if values_dict.get('addSourceFilter', 'A') == "D":
-            _ = [list_.append(t) for t in [("-1", "%%disabled:Devices%%"),
-                                           ("-2", "%%separator%%")]
-                 ]
-            _ = [list_.append((dev.id, dev.name)) for dev in indigo.devices.iter()]
+            list_.extend([("-1", "%%disabled:Devices%%"), ("-2", "%%separator%%")])
+            list_.extend((dev.id, dev.name) for dev in indigo.devices.iter())
 
         # Variables
         elif values_dict.get('addSourceFilter', 'A') == "V":
-            _ = [list_.append(t) for t in [("-3", "%%separator%%"),
-                                           ("-4", "%%disabled:Variables%%"),
-                                           ("-5", "%%separator%%")]
-                 ]
-            _ = [list_.append((var.id, var.name)) for var in indigo.variables.iter()]
+            list_.extend([("-3", "%%separator%%"), ("-4", "%%disabled:Variables%%"), ("-5", "%%separator%%")])
+            list_.extend((var.id, var.name) for var in indigo.variables.iter())
 
         # Devices and variables
         else:
-            _ = [list_.append(t) for t in [("-1", "%%disabled:Devices%%"), ("-2", "%%separator%%")]]
-            _ = [list_.append((dev.id, dev.name)) for dev in indigo.devices.iter()]
-            _ = [list_.append(t) for t in [("-3", "%%separator%%"),
-                                           ("-4", "%%disabled:Variables%%"),
-                                           ("-5", "%%separator%%")]
-                 ]
-            _ = [list_.append((var.id, var.name)) for var in indigo.variables.iter()]
+            list_.extend([("-1", "%%disabled:Devices%%"), ("-2", "%%separator%%")])
+            list_.extend((dev.id, dev.name) for dev in indigo.devices.iter())
+            list_.extend([("-3", "%%separator%%"), ("-4", "%%disabled:Variables%%"), ("-5", "%%separator%%")])
+            list_.extend((var.id, var.name) for var in indigo.variables.iter())
 
         return list_
 
