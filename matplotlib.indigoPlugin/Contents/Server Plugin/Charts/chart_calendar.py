@@ -21,11 +21,7 @@ CHART_NAME: str           = PROPS['name']
 P_DICT: dict              = PAYLOAD['p_dict']
 PLUG_DICT: dict           = PAYLOAD['prefs']
 
-LOG['Threaddebug'].append("chart_calendar.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 try:
 

@@ -36,11 +36,7 @@ SLICE_WIDTH: float = 0.35
 PLOT_SCALE: float  = float(PAYLOAD.get('scale', P_DICT['scale']))
 ZERO_LOC: int      = int(P_DICT['startAngle'])
 
-LOG['Threaddebug'].append("chart_bar_radial.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 LOG['Threaddebug'].append(f"Value: {PLOT_VALUE} Scale: {PLOT_SCALE}")
 
 try:

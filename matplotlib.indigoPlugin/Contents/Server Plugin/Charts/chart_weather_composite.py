@@ -41,12 +41,8 @@ WIDTH: int                = int(PROPS['width'])
 WIND_BEARING: tuple       = ()
 WIND_SPEED: tuple         = ()
 
-LOG['Threaddebug'].append("chart_weather_composite.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 DPI              = int(plt.rcParams['savefig.dpi'])
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
 
 try:
 

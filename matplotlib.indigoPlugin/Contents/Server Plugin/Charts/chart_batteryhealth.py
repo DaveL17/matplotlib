@@ -28,11 +28,7 @@ CHART_DATA: Dict[str, Any] = {}
 X_VALUES: list            = []
 Y_TEXT: List[str]         = []
 
-LOG['Threaddebug'].append("chart_batteryhealth.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 try:
     rgb = P_DICT['cautionColor'].replace(' ', '').replace('#', '')

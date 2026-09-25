@@ -28,11 +28,7 @@ BAR_COLORS: List[str]     = []
 X_LABELS: List[Any]       = []
 X_TICKS: List[int]        = []
 
-LOG['Threaddebug'].append("chart_bar_stock.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 try:
 

@@ -26,11 +26,7 @@ Y_OBS_TUPLE: Tuple          = ()  # Y values
 Y_OBS_TUPLE_REL: Dict       = {}  # Y values relative to chart (cumulative value)
 Y_COLORS_TUPLE: Tuple       = ()  # Y area colors
 
-LOG['Threaddebug'].append("chart_area.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 
 def __init__() -> None:

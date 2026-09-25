@@ -22,11 +22,7 @@ PROPS: dict               = PAYLOAD['props']
 CHART_NAME: str           = PROPS['name']
 LINE_COLORS: List[str]    = []
 
-LOG['Threaddebug'].append("chart_line.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 try:
 

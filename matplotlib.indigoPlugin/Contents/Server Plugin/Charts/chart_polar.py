@@ -27,11 +27,7 @@ PROPS: dict               = PAYLOAD['props']
 CHART_NAME: str           = PROPS['name']
 FINAL_DATA: list          = []
 
-LOG['Threaddebug'].append("chart_polar.py called.")
-plt.style.use(f"Stylesheets/{PROPS['id']}_stylesheet")
-
-if PLUG_DICT['verboseLogging']:
-    LOG['Threaddebug'].append(f"{PAYLOAD}")
+chart_tools.chart_startup(file_name=__file__, props=PROPS, plug_dict=PLUG_DICT, payload=PAYLOAD, logger=LOG)
 
 try:
     def __init__() -> None:
