@@ -693,7 +693,6 @@ class Plugin(indigo.PluginBase):
 
         # ============================ There are no errors =============================
         else:
-            # TODO: consider adding this feature to DLFramework and including in all plugins.
             # ============================== Log All Changes ==============================
             # Log any changes to the plugin preferences.
             changed_keys   = ()
@@ -1098,7 +1097,6 @@ class Plugin(indigo.PluginBase):
         if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
 
             if indigo_ver <= 7:
-                # new_save_path = indigo.server.getInstallFolderPath() + "/IndigoWebServer/images/controls/" # TODO
                 new_save_path = f"{indigo.server.getInstallFolderPath()}/IndigoWebServer/images/controls/"
 
                 if new_save_path != current_save_path:

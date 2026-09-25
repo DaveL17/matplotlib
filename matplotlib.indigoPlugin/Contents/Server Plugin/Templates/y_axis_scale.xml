@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Template>
+
+    <Field id="yAxisScale" type="menu" defaultValue="linear" visibleBindingId="settingsGroup" visibleBindingValue="y"
+           tooltip="Select preference for the scale of your chart's Y axis.">
+        <Label>Scale:</Label>
+        <List>
+            <Option value="linear">Linear*</Option>
+            <Option value="log">Logarithmic</Option>
+        </List>
+    </Field>
+
+</Template>

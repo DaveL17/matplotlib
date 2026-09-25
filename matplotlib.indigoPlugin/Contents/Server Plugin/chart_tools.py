@@ -452,12 +452,14 @@ def format_axis_x_ticks(ax: Any, p_dict: dict, k_dict: dict, logger: dict) -> Op
 
 
 # =============================================================================
-def format_axis_y_ticks(p_dict: dict, k_dict: dict, logger: dict) -> None:
-    """Apply custom Y-axis tick locations and labels if configured.
+def format_axis_y1_ticks(p_dict: dict, k_dict: dict, logger: dict) -> None:
+    """Apply custom Y1-axis tick locations and labels if configured.
 
     Reads custom tick mark values and labels from p_dict. If neither is set, returns without
     making changes. If tick locations are provided but labels are empty, the locations are also
     used as labels. Replaces the default matplotlib Y tick marks and labels with the custom values.
+
+    This is a Y1-only feature; there is no equivalent custom-tick-values control for Y2.
 
     Args:
         p_dict (dict): Plotting parameters dictionary containing 'customTicksY' and 'customTicksLabelY'.
@@ -513,20 +515,15 @@ def format_axis_y(ax: Any, p_dict: dict, k_dict: dict, logger: dict) -> Optional
 
     Returns:
         matplotlib.axes.AxesSubplot: The formatted axes object, or None if an exception occurs.
-    """
-    # TODO: Balance the axis methods.  We should have:
-    #       x_label
-    #       x_scale
-    #       x_ticks
-    #       y1_label
-    #       y1_scale
-    #       y1_ticks
-    #       y1_min_max
-    #       y2_label
-    #       y2_scale
-    #       y2_ticks
-    #       y2_min_max
 
+    Note:
+        This function is intentionally ax-parameterized rather than split into separate Y1/Y2
+        variants: it already fills the "y1 tick styling" and "y2 tick styling" roles for whichever
+        axes object is passed in (see chart_weather_forecast.py, which calls this once per twin
+        axis). A second, near-duplicate function split by axis would just be unreused code, not a
+        real balance fix. format_axis_y1_ticks() is a different, Y1-only concern (custom tick
+        values/labels); there is no Y2 equivalent for that feature.
+    """
     try:
         ax.tick_params(axis='y', **k_dict['k_major_y'])
         ax.tick_params(axis='y', **k_dict['k_minor_y'])
@@ -668,6 +665,143 @@ def format_axis_y1_min_max(p_dict: dict, logger: dict) -> None:
     except (ValueError, TypeError):
         logger['Warning'].append(
             f"[{payload['props']['name']}] Error setting axis limits for Y1. Will rely on "
+            f"Matplotlib to determine limits."
+        )
+
+
+# =============================================================================
+def format_axis_y1_scale(ax: Any, p_dict: dict, logger: dict) -> None:
+    """Set the Y1 axis to a linear or logarithmic scale.
+
+    Reads the desired scale from p_dict['yAxisScale'] ('linear' or 'log') and applies it via
+    ax.set_yscale(). Charts that don't expose this preference default to 'linear', matching
+    matplotlib's own default.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to format.
+        p_dict (dict): Plotting parameters dictionary optionally containing 'yAxisScale'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+    """
+    try:
+        ax.set_yscale(p_dict.get('yAxisScale', 'linear'))
+
+    except ValueError as err:
+        logger['Warning'].append(
+            f"[{payload['props']['name']}] Problem setting Y1 axis scale: yAxisScale = "
+            f"{p_dict.get('yAxisScale')}. ({err})"
+        )
+
+
+# =============================================================================
+def format_axis_y2_scale(ax: Any, p_dict: dict, logger: dict) -> None:
+    """Set the Y2 axis to a linear or logarithmic scale.
+
+    Reads the desired scale from p_dict['y2AxisScale'] ('linear' or 'log') and applies it via
+    ax.set_yscale(). Charts that don't expose this preference default to 'linear', matching
+    matplotlib's own default.
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The Y2 (twin) axes object to format.
+        p_dict (dict): Plotting parameters dictionary optionally containing 'y2AxisScale'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+    """
+    try:
+        ax.set_yscale(p_dict.get('y2AxisScale', 'linear'))
+
+    except ValueError as err:
+        logger['Warning'].append(
+            f"[{payload['props']['name']}] Problem setting Y2 axis scale: y2AxisScale = "
+            f"{p_dict.get('y2AxisScale')}. ({err})"
+        )
+
+
+# =============================================================================
+def format_axis_y2_label(p_dict: dict, k_dict: dict, ax: Any, logger: dict, label_position: str = 'right') -> None:
+    """Set the Y2 axis label text, font, and label position.
+
+    Sets the Y2-axis label text from p_dict['customAxisLabelY2'] and positions it on the given
+    side. Mirrors the label-setting portion of format_axis_y1_label(); unlike that function, this
+    does not independently style Y2 tick labels, matching the current single caller's behavior
+    (chart_weather_forecast.py), which relies on format_axis_y()/format_axis_y1_scale() /
+    format_axis_y2_scale() for tick styling instead.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing 'customAxisLabelY2'.
+        k_dict (dict): Plotting kwargs dictionary containing 'k_y_axis_font' entry.
+        ax (matplotlib.axes.AxesSubplot): The Y2 (twin) axes object whose label is being set.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+        label_position (str): Which side to place the label on ('left' or 'right').
+    """
+    try:
+        ax.set_ylabel(p_dict.get('customAxisLabelY2', ''), **k_dict['k_y_axis_font'])
+        ax.yaxis.set_label_position(label_position)
+
+    except (KeyError, ValueError):
+        logger['Threaddebug'].append(
+            f"[{payload['props']['name']}] Problem formatting Y2 axis label: customAxisLabelY2 = "
+            f"{p_dict.get('customAxisLabelY2')}"
+        )
+
+
+# =============================================================================
+def format_axis_y2_min_max(p_dict: dict, logger: dict, data_key: str = 'data_array') -> None:
+    """Set explicit minimum and maximum bounds for the Y2 axis.
+
+    Reads the desired min/max from p_dict['y2AxisMin'] / p_dict['y2AxisMax'] and applies them via
+    plt.ylim() against matplotlib's current axes (so this must be called while the intended Y2
+    axes object is current, e.g. right after plotting to it). When a bound is set to 'none', a
+    small padding is computed automatically from the data range in p_dict[data_key]. This mirrors
+    format_axis_y1_min_max()'s nudge-from-zero behavior exactly; data_key defaults to 'data_array'
+    for symmetry with the Y1 version, but callers with a second, Y2-specific data series (e.g. a
+    twinx chart) should pass that key explicitly, since 'data_array' is commonly already claimed
+    by the Y1 series.
+
+    Args:
+        p_dict (dict): Plotting parameters dictionary containing data_key, 'y2AxisMin', and
+            'y2AxisMax'.
+        logger (dict): The logging message dictionary for appending warnings and debug info.
+        data_key (str): The p_dict key holding the list of Y2 data values to compute bounds from.
+    """
+
+    try:
+
+        y_min = min(p_dict[data_key])
+        y_max = max(p_dict[data_key])
+        y_min_wanted = p_dict['y2AxisMin']
+        y_max_wanted = p_dict['y2AxisMax']
+
+        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
+        # very nearly zero.
+        if y_min == 0:
+            y_min = 0.000001
+
+        if y_max == 0:
+            y_max = 0.000001
+
+        # Y min
+        if isinstance(y_min_wanted, str) and y_min_wanted.lower() == 'none':
+            if y_min > 0:
+                y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
+            else:
+                y_axis_min = y_min * (1 + (1 / abs(y_min) ** 1.25))
+        else:
+            y_axis_min = float(y_min_wanted)
+
+        # Y max
+        if isinstance(y_max_wanted, str) and y_max_wanted.lower() == 'none':
+            if y_max > 0:
+                y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
+            else:
+                y_axis_max = y_max * (1 - (1 / abs(y_max) ** 1.25))
+
+        else:
+            y_axis_max = float(y_max_wanted)
+
+        plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
+
+    except (ValueError, TypeError):
+        logger['Warning'].append(
+            f"[{payload['props']['name']}] Error setting axis limits for Y2. Will rely on "
             f"Matplotlib to determine limits."
         )
 

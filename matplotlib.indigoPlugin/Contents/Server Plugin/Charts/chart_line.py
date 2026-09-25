@@ -14,7 +14,6 @@ from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
 from matplotlib import patches
-from matplotlib import dates as mdate
 # My modules
 import chart_tools  # noqa
 
@@ -41,17 +40,11 @@ try:
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
 
     # ============================== Format X Ticks ===============================
-    ax.tick_params(axis='x', **K_DICT['k_major_x'])
-    ax.tick_params(axis='x', **K_DICT['k_minor_x'])
-    ax.xaxis.set_major_formatter(mdate.DateFormatter(P_DICT['xAxisLabelFormat']))
-    chart_tools.format_axis_x_scale(x_axis_bins=P_DICT['xAxisBins'], logger=LOG)
-
-    # If the x-axis format has been set to None, let's hide the labels.
-    if P_DICT['xAxisLabelFormat'] == "None":
-        ax.axes.xaxis.set_ticklabels([])
+    chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # =============================== Format Y Axis ===============================
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_scale(ax=ax, p_dict=P_DICT, logger=LOG)
 
     for line in range(1, 9, 1):
 
@@ -286,7 +279,7 @@ try:
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
-    chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     chart_tools.save(logger=LOG)
 

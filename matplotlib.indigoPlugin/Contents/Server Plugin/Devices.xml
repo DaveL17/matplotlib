@@ -185,6 +185,7 @@
             </Field>
 
             <Template file="Templates/y_axis_precision.xml" />
+            <Template file="Templates/y_axis_scale.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="y"
@@ -1149,6 +1150,7 @@
             </Field>
 
             <Template file="Templates/y_axis_precision.xml" />
+            <Template file="Templates/y_axis_scale.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="y"
@@ -1590,6 +1592,7 @@
             </Field>
 
             <Template file="Templates/y_axis_precision.xml" />
+            <Template file="Templates/y_axis_scale.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="y"
@@ -3006,6 +3009,7 @@
             </Field>
 
             <Template file="Templates/y_axis_precision.xml" />
+            <Template file="Templates/y_axis_scale.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="y"
@@ -4375,6 +4379,7 @@
             </Field>
 
             <Template file="Templates/y_axis_precision.xml" />
+            <Template file="Templates/y_axis_scale.xml" />
 
             <Field id="customTicksLabelY" type="textfield" defaultValue=""
                    visibleBindingId="settingsGroup" visibleBindingValue="y"
@@ -4878,6 +4883,16 @@
                 <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
             </Field>
 
+            <Field id="yAxisScale" type="menu" defaultValue="linear"
+                   visibleBindingId="settingsGroup" visibleBindingValue="y1"
+                   tooltip="Select preference for the scale of your chart's Y axis.">
+                <Label>Scale:</Label>
+                <List>
+                    <Option value="linear">Linear*</Option>
+                    <Option value="log">Logarithmic</Option>
+                </List>
+            </Field>
+
             <!-- =======================  Y2 Axis Controls  ======================= -->
             <Field id="showy2AxisGrid" type="checkbox" defaultValue="false"
                    visibleBindingId="settingsGroup" visibleBindingValue="y2"
@@ -4909,6 +4924,16 @@
                    tooltip="Select preference for the precision of your chart's Y2 axis.">
                 <Label>Precision:</Label>
                 <List class="self" filter="bar1Source" method="generatorPrecisionList" dynamicReload="true"/>
+            </Field>
+
+            <Field id="y2AxisScale" type="menu" defaultValue="linear"
+                   visibleBindingId="settingsGroup" visibleBindingValue="y2"
+                   tooltip="Select preference for the scale of your chart's Y2 axis.">
+                <Label>Scale:</Label>
+                <List>
+                    <Option value="linear">Linear*</Option>
+                    <Option value="log">Logarithmic</Option>
+                </List>
             </Field>
 
             <!-- =======================  High Temperature  ======================= -->

@@ -43,6 +43,7 @@ try:
     ax = chart_tools.make_chart_figure(width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_x_ticks(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y(ax=ax, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_scale(ax=ax, p_dict=P_DICT, logger=LOG)
 
     for thing in range(1, 5, 1):
 
@@ -264,7 +265,7 @@ try:
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
-    chart_tools.format_axis_y_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_ticks(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     chart_tools.save(logger=LOG)
 

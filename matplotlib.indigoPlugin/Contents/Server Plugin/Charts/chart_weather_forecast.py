@@ -162,7 +162,10 @@ try:
     ax1 = chart_tools.make_chart_figure(
         width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT)
     chart_tools.format_axis_x_ticks(ax=ax1, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    # Note: ax1 carries the precipitation (Y2) series -- see the "AX2" section below for why the
+    # ax1/ax2 objects are swapped relative to their Y1/Y2 semantics.
     chart_tools.format_axis_y(ax=ax1, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y2_scale(ax=ax1, p_dict=P_DICT, logger=LOG)
 
     # ============================ Precipitation Bars =============================
     # The width of the bars is a percentage of a day, so we need to account for instances where the unit of time could
@@ -203,50 +206,15 @@ try:
                 )
 
     # ============================== Precip Min/Max ===============================
-    if P_DICT['y2AxisMin'] != 'None' and P_DICT['y2AxisMax'] != 'None':
-        y2_axis_min = float(P_DICT['y2AxisMin'])
-        y2_axis_max = float(P_DICT['y2AxisMax'])
-
-    elif P_DICT['y2AxisMin'] != 'None' and P_DICT['y2AxisMax'] == 'None':
-        y2_axis_min = float(P_DICT['y2AxisMin'])
-        y2_axis_max = max(P_DICT['y_obs3'])
-
-    elif P_DICT['y2AxisMin'] == 'None' and P_DICT['y2AxisMax'] != 'None':
-        y2_axis_min = 0
-        y2_axis_max = float(P_DICT['y2AxisMax'])
-
-    else:
-        if max(P_DICT['y_obs3']) - min(P_DICT['y_obs3']) == 0:
-            y2_axis_min = 0
-            y2_axis_max = 1
-
-        elif max(P_DICT['y_obs3']) != 0 and \
-                min(P_DICT['y_obs3']) != 0 and \
-                0 < max(P_DICT['y_obs3']) - min(P_DICT['y_obs3']) <= 1:
-
-            y2_axis_min = min(P_DICT['y_obs3']) * (1 - (1 / min(P_DICT['y_obs3']) ** 1.25))
-            y2_axis_max = max(P_DICT['y_obs3']) * (1 + (1 / max(P_DICT['y_obs3']) ** 1.25))
-
-        else:
-            if min(P_DICT['y_obs3']) < 0:
-                y2_axis_min = min(P_DICT['y_obs3']) * 1.5
-            else:
-                y2_axis_min = min(P_DICT['y_obs3']) * 0.75
-            if max(P_DICT['y_obs3']) < 0:
-                y2_axis_max = 0
-            else:
-                y2_axis_max = max(P_DICT['y_obs3']) * 1.10
-
-    plt.ylim(ymin=y2_axis_min, ymax=y2_axis_max)
+    chart_tools.format_axis_y2_min_max(p_dict=P_DICT, logger=LOG, data_key='y_obs3')
 
     # =============================== X1 Axis Label ===============================
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
-    # =============================== Y1 Axis Label ===============================
-    # Note we're plotting Y2 label on ax1. We do this because we want the precipitation bars to be under the
-    # temperature plot, but we want the precipitation scale to be on the right side.
-    plt.ylabel(P_DICT['customAxisLabelY2'], **K_DICT['k_y_axis_font'])
-    ax1.yaxis.set_label_position('right')
+    # =============================== Y2 Axis Label ===============================
+    # Note we're plotting the Y2 (precipitation) label on ax1. We do this because we want the precipitation bars to
+    # be under the temperature plot, but we want the precipitation scale to be on the right side.
+    chart_tools.format_axis_y2_label(p_dict=P_DICT, k_dict=K_DICT, ax=ax1, logger=LOG, label_position='right')
 
     # ============================= Legend Properties =============================
     # (note that we need a separate instance of this code for each subplot. This one controls the precipitation
@@ -356,7 +324,9 @@ try:
     just_the_data = deepcopy(P_DICT['data_array'])
 
     chart_tools.format_axis_x_ticks(ax=ax2, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    # Note: ax2 carries the temperature (Y1) series -- see the note above the ax1 formatting calls.
     chart_tools.format_axis_y(ax=ax2, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_axis_y1_scale(ax=ax2, p_dict=P_DICT, logger=LOG)
     chart_tools.format_custom_line_segments(
         ax=ax2,
         plug_dict=PLUG_DICT,
