@@ -1940,6 +1940,11 @@ class Plugin(indigo.PluginBase):
                                         v = ', '.join(str(_) for _ in v)
                                     else:
                                         v = ""
+                                # '#' starts a comment in matplotlib stylesheet ('.mplstyle') file syntax, so a
+                                # '#RRGGBB' color value would be silently dropped to matplotlib's default if left
+                                # in place. matplotlib.rcParams itself always normalizes hex colors to include the
+                                # '#' internally (see fix_rgb()), so this strip is required here regardless of how
+                                # the value was originally set.
                                 if isinstance(v, str) and v.startswith('#'):
                                     v = v[1:]
                                 outfile.write(f"{k}: {v}\n")
@@ -2894,14 +2899,20 @@ class Plugin(indigo.PluginBase):
 
         Strips spaces and any leading '#' characters from the input, then prepends a single '#'.
 
+        The leading '#' is required here: this value is used directly as a matplotlib Artist color
+        kwarg (e.g. bar/line color), and matplotlib.colors.to_rgba() rejects a bare hex string
+        ('FF0000' raises ValueError) but accepts the '#'-prefixed form. Don't drop the '#' -- the
+        Stylesheets writer (charts_refresh(), where rcParams is serialized to a '.mplstyle' file)
+        strips it back off there instead, because '#' starts a comment in that file format and a
+        '#'-prefixed color would be silently dropped to matplotlib's default. The two are a matched
+        pair for two different matplotlib color-format conventions, not redundant steps.
+
         Args:
             color (str): A color string in any format (e.g., "FF 00 00", "#FF0000").
 
         Returns:
             str: A normalized hex color string in '#RRGGBB' format.
         """
-        # FIXME - once migration is complete, can remove the hash ('#') from this method (don't add one) and delete the
-        #         truncation elsewhere (to remove the hash).
         rgb_fixed = color.replace(' ', '').replace('#', '')
         return f"#{rgb_fixed}"
 

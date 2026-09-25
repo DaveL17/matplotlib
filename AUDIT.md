@@ -33,27 +33,17 @@ worth surfacing together):
 - `plugin.py:696` — possible DLFramework generalization.
 - `plugin.py:1101`, `plugin.py:1109` — commented-out alternate save paths, unclear
   if still needed.
-- `plugin.py:2903` (`fix_rgb`) — explicit migration note: once complete, the
-  leading `#` handling here and a corresponding truncation elsewhere can be
-  removed. Worth tracking to closure since it's describing dead-code-in-waiting.
-- ~~`validate.py:34, 35` — the `chart_colors` color dict may be stale since color
-  controls moved to the theme manager.~~ **Resolved after a deep dive:** the dict
-  itself was confirmed up to date (cross-checked against the theme-key lists in
-  `theme_save()` and `themeManagerCloseUi()`). The real gap was that the Theme
-  Manager's two pluginPrefs-write paths — `themeManagerCloseUi()` and
-  `themeApply()` (which reads a user-editable `matplotlib plugin themes.json` off
-  disk) — bypassed all validation. Added `validate.theme_prefs()` (colors + line
-  weight, tolerant of missing/partial keys) and wired it into both paths; also
-  tightened `chart_colors()`'s regex to require exactly 6 hex digits instead of
-  any length.
-- ~~`validate.py:6` — "move other validation code here."~~ **Resolved:** all of
-  `validateDeviceConfigUi`'s per-chart-type and cross-chart-type validation logic
-  (area, bar/flow, stock bar, stock horizontal bar, battery health, CSV engine,
-  line, multiline text, polar, scatter, weather forecast, composite weather,
-  custom dimensions, axis limits — 14 functions) has been moved into `validate.py`,
-  shrinking `validateDeviceConfigUi` from ~400 lines to ~90. Only the radial-bar
-  scale check stayed in `plugin.py`, since it needs the instance's
-  `self.substitute()`.
+- ~~`plugin.py:2903` (`fix_rgb`) — migration note: once complete, the leading `#`
+  handling here and a corresponding truncation elsewhere can be removed.~~
+  **Resolved after a deep dive:** the premise was wrong, not incomplete. Verified
+  directly against matplotlib: `mcolors.to_rgba('FF0000')` raises (Artist color
+  kwargs require the `#`), while a `#`-prefixed color written into a `.mplstyle`
+  file is silently dropped to the default (`#` starts a comment in that file
+  format). `fix_rgb()`'s hash-adding and the Stylesheets writer's hash-stripping
+  are a matched pair serving two matplotlib subsystems with opposite `#`
+  conventions, not redundant leftovers — doing what the FIXME suggested would
+  have broken chart rendering. Replaced the FIXME with comments at both sites
+  explaining why each step is required.
 
 ## Things checked and found clean
 - No hardcoded secrets/API keys/passwords in tracked `.py` files; `tests/.env`
