@@ -1,4 +1,4 @@
-### v2025.2.5
+### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
   digit in the stock horizontal bar config validator.
 - Fixes `pluginPrefs.get('backgroundColorOther', 'false')` and `pluginPrefs.get('faceColorOther',
