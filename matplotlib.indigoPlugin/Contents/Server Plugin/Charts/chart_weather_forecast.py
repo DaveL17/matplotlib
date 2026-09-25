@@ -9,16 +9,12 @@ we need through the method call.
 """
 
 # Built-in Modules
-import json
-import sys
-import traceback
 import datetime as dt
 from copy import deepcopy
 from typing import Dict, List
 import numpy as np
 # Third-party Modules
 from matplotlib import pyplot as plt
-from matplotlib import patches
 
 # My modules
 import chart_tools  # noqa
@@ -236,17 +232,7 @@ try:
     chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
 
     # ========================== Transparent Charts Fill ==========================
-    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
-        ax1.add_patch(
-            patches.Rectangle(
-                (0, 0),
-                1,
-                1,
-                transform=ax1.transAxes,
-                facecolor=P_DICT['faceColor'],
-                zorder=1
-            )
-        )
+    chart_tools.add_transparent_fill_patch(ax=ax1, p_dict=P_DICT)
 
     # ============================= Sunrise / Sunset ==============================
     # Note that this highlights daytime hours on the chart.
@@ -426,9 +412,6 @@ try:
     chart_tools.save(logger=LOG)
 
 except Exception:
-    tb = traceback.format_exc()
-    tb_type = sys.exc_info()[1]
-    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
+    chart_tools.report_exception(chart_name=CHART_NAME, logger=LOG, file_name=__file__)
 
-json.dump(LOG, sys.stdout, indent=4)
+chart_tools.output_log(logger=LOG)

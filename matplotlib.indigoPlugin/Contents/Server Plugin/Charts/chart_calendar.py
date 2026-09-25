@@ -8,9 +8,6 @@ Given the unique nature of calendar charts, we use a separate method to construc
 # Built-in Modules
 import calendar
 import datetime as dt
-import json
-import sys
-import traceback
 from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
@@ -108,9 +105,6 @@ try:
     chart_tools.save(logger=LOG)
 
 except Exception:
-    tb = traceback.format_exc()
-    tb_type = sys.exc_info()[1]
-    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
+    chart_tools.report_exception(chart_name=CHART_NAME, logger=LOG, file_name=__file__)
 
-json.dump(LOG, sys.stdout, indent=4)
+chart_tools.output_log(logger=LOG)

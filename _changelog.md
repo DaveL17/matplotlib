@@ -16,6 +16,12 @@
   generators, startup audits, and color utilities out of `plugin.py` into dedicated modules
   (`validate.py`, `csv_handling.py`, `theme_handling.py`, `ui_lists.py`, `audits.py`,
   `color_utils.py`).
+- Fixes `chart_multiline.py`'s transparent-fill patch never setting a fill color (the `facecolor`
+  arg was commented out), so transparent-filled mode had no visible effect.
+- Fixes `chart_weather_composite.py`'s transparent-fill patch applying whenever `transparent_filled`
+  was set, ignoring the `transparent_charts` toggle every other chart type respects.
+- Consolidates the exception-handling/JSON-output footer and transparent-fill patch duplicated
+  across all `chart_*.py` scripts into shared `chart_tools` helpers.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

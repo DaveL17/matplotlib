@@ -7,14 +7,11 @@ All steps required to generate horizontal bar charts that use stock (time-agnost
 """
 
 # Built-in Modules
-import json
 import itertools
-import sys
 import traceback
 from typing import Any, Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt  # noqa
-from matplotlib import patches  # noqa
 # My modules
 import chart_tools  # noqa
 
@@ -133,14 +130,7 @@ try:
 
     # ===========================  Transparent Border  ============================
     # Add a patch so that we can have transparent charts but a filled plot area.
-    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
-        ax.add_patch(
-            patches.Rectangle((0, 0), 1, 1,
-                              transform=ax.transAxes,
-                              facecolor=P_DICT['faceColor'],
-                              zorder=1
-                              )
-        )
+    chart_tools.add_transparent_fill_patch(ax=ax, p_dict=P_DICT)
 
     # ============================= Legend Properties =============================
     # Legend should be plotted before any other lines are plotted (like averages or custom line segments).
@@ -211,9 +201,6 @@ try:
             )
 
 except Exception:
-    tb = traceback.format_exc()
-    tb_type = sys.exc_info()[1]
-    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
+    chart_tools.report_exception(chart_name=CHART_NAME, logger=LOG, file_name=__file__)
 
-json.dump(LOG, sys.stdout, indent=4)
+chart_tools.output_log(logger=LOG)

@@ -10,9 +10,6 @@ configuration dialog, the user would be able to add or remove elements and the c
 """
 
 # Built-in Modules
-import json
-import sys
-import traceback
 import datetime as dt
 from typing import Any, Dict, List
 import numpy as np
@@ -20,7 +17,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdate
 from matplotlib import ticker as mtick
-from matplotlib import patches
 # My modules
 import chart_tools  # noqa
 
@@ -95,15 +91,7 @@ try:
         Args:
             s: The matplotlib subplot axes object to fill.
         """
-        if P_DICT['transparent_filled']:
-            s.add_patch(
-                patches.Rectangle(
-                    (0, 0), 1, 1,
-                    transform=s.transAxes,
-                    facecolor=P_DICT['faceColor'],
-                    zorder=1
-                )
-            )
+        chart_tools.add_transparent_fill_patch(ax=s, p_dict=P_DICT)
 
     ax = chart_tools.make_chart_figure(
         width=P_DICT['chart_width'], height=P_DICT['chart_height'], p_dict=P_DICT
@@ -354,9 +342,6 @@ try:
     chart_tools.save(logger=LOG)
 
 except Exception:
-    tb = traceback.format_exc()
-    tb_type = sys.exc_info()[1]
-    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
+    chart_tools.report_exception(chart_name=CHART_NAME, logger=LOG, file_name=__file__)
 
-json.dump(LOG, sys.stdout, indent=4)
+chart_tools.output_log(logger=LOG)

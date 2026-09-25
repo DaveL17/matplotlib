@@ -27,6 +27,7 @@ import matplotlib
 matplotlib.use('AGG')
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdate
+from matplotlib import patches
 from matplotlib import ticker as mtick
 
 # My modules
@@ -1270,3 +1271,58 @@ def save(logger: dict) -> None:
         # if "exceeds Locator.MAXTICKS" in traceback.format_exc(err):
         if "exceeds Locator.MAXTICKS" in traceback.format_exc():  # removes payload
             logger['Critical'].append(f"[{payload['props']['name']}] Chart not saved. [Too many observations.]")
+
+
+# =============================================================================
+def add_transparent_fill_patch(ax: Any, p_dict: dict) -> None:
+    """Add an opaque patch behind the plot area for transparent-background charts.
+
+    No-op unless both p_dict['transparent_charts'] and p_dict['transparent_filled'] are set. Lets a
+    chart's outer canvas stay transparent while its plot area remains filled with p_dict['faceColor'].
+
+    Args:
+        ax (matplotlib.axes.AxesSubplot): The axes object to add the patch to.
+        p_dict (dict): Plotting parameters dictionary containing 'transparent_charts',
+            'transparent_filled', and 'faceColor'.
+    """
+    if p_dict['transparent_charts'] and p_dict['transparent_filled']:
+        ax.add_patch(
+            patches.Rectangle(
+                (0, 0), 1, 1,
+                transform=ax.transAxes,
+                facecolor=p_dict['faceColor'],
+                zorder=1
+            )
+        )
+
+
+# =============================================================================
+def report_exception(chart_name: str, logger: dict, file_name: str) -> None:
+    """Log an uncaught chart-rendering exception in the format shared by all chart_*.py scripts.
+
+    Call from a chart script's top-level `except Exception:` handler, passing that script's own
+    `__file__` as file_name so the reported filename matches the script that actually failed
+    (this function's own __file__ would otherwise always report chart_tools.py).
+
+    Args:
+        chart_name (str): The chart device's name, for the log message prefix.
+        logger (dict): The logging message dictionary to append to.
+        file_name (str): The calling script's `__file__`.
+    """
+    tb = traceback.format_exc()
+    tb_type = sys.exc_info()[1]
+    logger['Debug'].append(f"[{chart_name}] {tb}")
+    logger['Critical'].append(f"[{chart_name}] Error type: {tb_type} in {file_name.rsplit('/', maxsplit=1)[-1]}")
+
+
+# =============================================================================
+def output_log(logger: dict) -> None:
+    """Write the accumulated chart log dict to stdout as JSON.
+
+    Every chart_*.py script calls this as its last statement so plugin.py, which spawned it as a
+    subprocess, can read back the structured log messages produced during chart generation.
+
+    Args:
+        logger (dict): The logging message dictionary to serialize.
+    """
+    json.dump(logger, sys.stdout, indent=4)

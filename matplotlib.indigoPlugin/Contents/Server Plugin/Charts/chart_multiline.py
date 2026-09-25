@@ -7,14 +7,10 @@ Given the unique nature of multiline text charts, we use a separate method to co
 """
 
 # Built-in Modules
-import json
-import sys
 import textwrap
-import traceback
 from typing import Dict, List
 # Third-party Modules
 from matplotlib import pyplot as plt
-from matplotlib import patches
 # My Modules
 import chart_tools  # noqa
 
@@ -133,15 +129,7 @@ try:
         _ = [s.set_visible(False) for s in ax.spines.values()]
 
     # Transparent Charts Fill
-    if P_DICT['transparent_charts'] and P_DICT['transparent_filled']:
-        ax.add_patch(
-            patches.Rectangle(
-                (0, 0), 1, 1,
-                transform=ax.transAxes,
-                # facecolor=P_DICT['faceColor'],
-                zorder=1
-            )
-        )
+    chart_tools.add_transparent_fill_patch(ax=ax, p_dict=P_DICT)
 
     # =============================== Format Title ================================
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98), align='center')
@@ -149,9 +137,6 @@ try:
     chart_tools.save(logger=LOG)
 
 except Exception:
-    tb = traceback.format_exc()
-    tb_type = sys.exc_info()[1]
-    LOG['Debug'].append(f"[{CHART_NAME}] {tb}")
-    LOG['Critical'].append(f"[{CHART_NAME}] Error type: {tb_type} in {__file__.rsplit('/', maxsplit=1)[-1]}")
+    chart_tools.report_exception(chart_name=CHART_NAME, logger=LOG, file_name=__file__)
 
-json.dump(LOG, sys.stdout, indent=4)
+chart_tools.output_log(logger=LOG)
