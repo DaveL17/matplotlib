@@ -25,26 +25,63 @@ def __init__() -> None:
 def chart_colors(values_dict: indigo.Dict) -> None:
     """Inspect color controls and reset any invalid hex values to their defaults.
 
-    Checks each tracked color preference against a valid hexadecimal pattern (A-F, 0-9). If a value fails
-    validation, it is replaced with the corresponding default color and a warning is logged.
+    Checks each tracked color preference against a valid 6-digit hexadecimal pattern (A-F, 0-9,
+    e.g. "FF FF FF"). If a value fails validation, it is replaced with the corresponding default
+    color and a warning is logged. Keys not present in values_dict are skipped, so this is also
+    safe to call with a partial dict (e.g. a theme loaded from disk).
+
+    Also called by theme_prefs() for the Theme Manager's write paths (themeManagerCloseUi,
+    themeApply), which commit values directly to pluginPrefs without going through
+    validatePrefsConfigUi.
 
     Args:
-        values_dict (indigo.Dict): The plugin preferences dictionary containing color fields to validate.
+        values_dict (indigo.Dict): The plugin preferences (or theme) dictionary containing color
+            fields to validate.
     """
-    # TODO: check to see whether this dict is up to date.
-    # TODO: update 2024-10-23 - this may need to be refactored because color controls have been moved to the theme
-    #       manager.
     color_dict = {
         'fontColorAnnotation': "FF FF FF", 'fontColor': "FF FF FF", 'backgroundColor': "00 00 00",
         'faceColor': "00 00 00", 'gridColor': "88 88 88", 'spineColor': "88 88 88", 'tickColor': "88 88 88",
     }
 
-    for item in color_dict:
-        if re.search(r"^[0-9A-Fa-f]+$", values_dict[item].replace(" ", "")) is None:
-            values_dict[item] = color_dict[item]
+    for item, default in color_dict.items():
+        if item not in values_dict:
+            continue
+        if re.search(r"^[0-9A-Fa-f]{6}$", str(values_dict[item]).replace(" ", "")) is None:
+            values_dict[item] = default
             my_logger.warning("Invalid color code found in plugin preferences [%s], resetting to default.", item)
 
     my_logger.debug("Plugin config: chart colors validated.")
+
+
+# ================================ Theme Prefs =================================
+def theme_prefs(values_dict: indigo.Dict) -> indigo.Dict:
+    """Validate theme-related preference values before they are committed to pluginPrefs.
+
+    The Theme Manager can write these preferences directly to pluginPrefs (from its own dialog
+    closing, or from a saved theme loaded from the themes JSON file on disk), bypassing
+    validatePrefsConfigUi entirely. This runs the same color validation used there, plus a line
+    weight check, so a malformed or hand-edited theme can't push an invalid value into pluginPrefs
+    unvalidated. Keys not present in values_dict are skipped.
+
+    Args:
+        values_dict (indigo.Dict): The theme values to validate (Theme Manager dialog values, or
+            values loaded from the themes JSON file).
+
+    Returns:
+        indigo.Dict: The values_dict after validation, with any invalid entries reset to defaults.
+    """
+    chart_colors(values_dict)
+
+    if 'lineWeight' in values_dict:
+        try:
+            if float(values_dict['lineWeight']) <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            values_dict['lineWeight'] = "1.0"
+            my_logger.warning("Invalid line weight found in theme preferences, resetting to default.")
+
+    my_logger.debug("Theme preferences validated.")
+    return values_dict
 
 
 # ============================= Chart Dimensions ==============================

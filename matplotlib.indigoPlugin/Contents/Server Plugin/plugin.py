@@ -3695,8 +3695,9 @@ class Plugin(indigo.PluginBase):
     def themeManagerCloseUi(self, values_dict: indigo.Dict = None, menu_item_id: str = "") -> bool:  # noqa
         """Apply theme settings to pluginPrefs when the Theme Manager dialog is closed.
 
-        Copies the theme-related preference keys from the dialog values into pluginPrefs for
-        persistence. User cancellation cannot be trapped for this dialog type.
+        Validates the color and line weight values, then copies the theme-related preference keys
+        from the dialog values into pluginPrefs for persistence. User cancellation cannot be
+        trapped for this dialog type.
 
         Args:
             values_dict (indigo.Dict): The Theme Manager dialog values.
@@ -3709,6 +3710,9 @@ class Plugin(indigo.PluginBase):
         # the cancel.
         self.logger.debug("%s", values_dict)
         self.logger.debug("%s", menu_item_id)
+
+        # ==========================  Validate Theme Values  ===========================
+        values_dict = validate.theme_prefs(values_dict)
 
         # ==========================  Apply Theme Settings  ===========================
         for key in [
@@ -3754,8 +3758,10 @@ class Plugin(indigo.PluginBase):
     def themeApply(self, values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
         """Apply the selected theme from the Theme Manager dialog to pluginPrefs.
 
-        Validates that exactly one theme is selected, loads the theme from the JSON file, and
-        applies its values to both the dialog and pluginPrefs. Resets the allThemes control.
+        Validates that exactly one theme is selected, loads the theme from the JSON file, validates
+        its color and line weight values (the JSON file is user-editable and not otherwise
+        constrained by the UI), and applies the result to both the dialog and pluginPrefs. Resets
+        the allThemes control.
 
         Args:
             values_dict (indigo.Dict): The Theme Manager dialog values containing 'allThemes'.
@@ -3781,9 +3787,11 @@ class Plugin(indigo.PluginBase):
         with open(full_path, 'r', encoding='utf-8') as f:
             infile = json.load(f)
 
-        for key in infile[selected_theme[0]]:
-            values_dict[key] = infile[selected_theme[0]][key]
-            self.pluginPrefs[key] = infile[selected_theme[0]][key]
+        theme_values = validate.theme_prefs(infile[selected_theme[0]])
+
+        for key in theme_values:
+            values_dict[key] = theme_values[key]
+            self.pluginPrefs[key] = theme_values[key]
 
         # ======================  Reset Theme Manager Controls  =======================
         values_dict['allThemes'] = ""
