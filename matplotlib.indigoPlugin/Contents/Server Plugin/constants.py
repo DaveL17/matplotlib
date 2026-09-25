@@ -7,24 +7,13 @@ The constants.py file contains all application constants and is imported as a li
 constants by the use of all caps.
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 
 # =============================================================================
 def __init__() -> None:
     """Initialize the constants module (no-op placeholder)."""
 
-
-CLEAN_LIST: Tuple[Tuple[str, str], ...] = (
-    (' am ', ' AM '),
-    (' pm ', ' PM '),
-    ('*', ' '),
-    ('\u000A', ' '),
-    ('...', ' '),
-    ('/ ', '/'),
-    (' /', '/'),
-    ('/', ' / ')
-)
 
 DEBUG_LABELS: Dict[int, str] = {
     10: "Debugging Messages",

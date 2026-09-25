@@ -13,15 +13,19 @@ functional defects — nothing found here blocks day-to-day use.
 
 ## Findings
 
-### 3. `plugin.py` is very large (4,145 lines, down from 4,463 at time of audit)
-By comparison `chart_tools.py` is 1,138 lines and `validate.py` is now 808 lines
-(up from 233, after absorbing `validateDeviceConfigUi`'s validation logic per
-finding #5). This matches the project's own `_to_do_list.md` refinement item —
-"Move more code out of plugin.py" — so it's a known, tracked issue, not a new
-discovery, but it's still the single largest maintainability risk in the codebase
-(hard to navigate, hard to test in isolation, one accidental global changes many
-chart types).
-- **Fix:** no action needed immediately beyond what's already tracked; the
-  validation-logic extraction (#5) trimmed ~320 lines. Further reductions would need
-  to move other self-contained subsystems (e.g. CSV handling, theme handling) out
-  the same way.
+### 3. `plugin.py` is very large (3,472 lines, down from 4,463 at time of audit)
+Progress: `plugin.py` has shrunk by ~22% since the audit, via several extractions
+(each also noted where relevant above): device-validation logic moved to
+`validate.py`, axis-formatting logic consolidated in `chart_tools.py`, dead code
+removed (`MakeChart`/`ApiDevice`, ~162 lines — confirmed unused/superseded, not
+just movable), and CSV Engine handling (15 methods, ~780 lines) moved to a new
+`csv_handling.py` (module-level functions; the `Plugin` methods that Indigo calls
+by name — `csv_item_add`, `get_csv_device_list`, etc. — remain as thin delegating
+wrappers, since those names are referenced directly from `Actions.xml`/`Devices.xml`
+and can't be renamed). Verified with `py_compile`, the full `pytest` suite (55
+passed), and specifically confirming the two live-Indigo CSV integration tests
+(`test_refresh_csv_device_action`, `test_refresh_csv_source_action`) passed against
+a real server, not just skipped.
+- **Fix:** still the single largest file in the codebase and still worth further
+  reduction (theme handling, ~320 lines, is the next similarly-shaped candidate),
+  but no longer the extreme outlier it was at audit time.

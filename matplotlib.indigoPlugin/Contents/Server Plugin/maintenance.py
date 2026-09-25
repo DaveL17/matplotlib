@@ -359,7 +359,7 @@ class Maintain:
         if list_of_removed_keys:
             # pylint: disable=logging-not-lazy
             self.my_logger.debug(
-                "[%s] Performing maintenance - removing unneeded keys: %s" % (dev_name, list_of_removed_keys)
+                "[%s] Performing maintenance - removing unneeded keys: %s", dev_name, list_of_removed_keys
             )
 
         return prefs
@@ -470,8 +470,7 @@ class Maintain:
                         # Change style to `solid`
                         # pylint: disable=logging-not-lazy
                         self.my_logger.warning(
-                            "Converting deprecated line style setting to solid line style for device [%s]." %
-                            dev.name
+                            "Converting deprecated line style setting to solid line style for device [%s].", dev.name
                         )
                         props[prop] = '-'
 
