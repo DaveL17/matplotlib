@@ -14,8 +14,7 @@ payload = {'x_values': [1, 2, 3],
                       'color': 'b',
                       'marker': 'd',
                       'markerfacecolor': 'r'},
-           'path': '/Library/Application Support/Perceptive Automation/Indigo 7.x/'
-                   'IndigoWebServer/images/controls/static/',
+           'path': f"{indigo.server.getInstallFolderPath()}/Web Assets/images/controls/static/",
            'filename': 'chart_filename.png'
            }
 try:

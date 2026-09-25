@@ -43,7 +43,7 @@ def chart_colors(values_dict: indigo.Dict) -> None:
     for item in color_dict:
         if re.search(r"^[0-9A-Fa-f]+$", values_dict[item].replace(" ", "")) is None:
             values_dict[item] = color_dict[item]
-            my_logger.warning("Invalid color code found in plugin preferences [%s], resetting to default." % item)
+            my_logger.warning("Invalid color code found in plugin preferences [%s], resetting to default.", item)
 
     my_logger.debug("Plugin config: chart colors validated.")
 

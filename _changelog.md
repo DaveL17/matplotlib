@@ -1,3 +1,6 @@
+### v2025.2.6
+- Addresses findings from the `AUDIT.md` project audit (in progress).
+
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
   digit in the stock horizontal bar config validator.

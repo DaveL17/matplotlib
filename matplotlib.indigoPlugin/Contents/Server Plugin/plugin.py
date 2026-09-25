@@ -61,7 +61,7 @@ __copyright__ = Dave.__copyright__
 __license__   = Dave.__license__
 __build__     = Dave.__build__
 __title__     = "Matplotlib Plugin for Indigo"
-__version__   = "2025.2.5"
+__version__   = "2025.2.6"
 
 
 # =============================================================================
@@ -198,7 +198,7 @@ class Plugin(indigo.PluginBase):
         Args:
             dev (indigo.Device): The Indigo device instance being started.
         """
-        self.logger.debug("[%s] Starting chart device." % dev.name)
+        self.logger.debug("[%s] Starting chart device.", dev.name)
         # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global is in its proper
         # state.
         self.pluginIsShuttingDown = False
@@ -467,7 +467,7 @@ class Plugin(indigo.PluginBase):
 
         except KeyError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.warning("[%s] Error: %s. See plugin log for more information." % (dev.name, sub_error))
+            self.logger.warning("[%s] Error: %s. See plugin log for more information.", dev.name, sub_error)
 
         return True, values_dict
 
@@ -1148,9 +1148,9 @@ class Plugin(indigo.PluginBase):
         Returns:
             tuple: A two-element tuple of (True, values_dict).
         """
-        self.logger.info("v: %s" % values_dict)
-        self.logger.info("t: %s" % type_id)
-        self.logger.info("d: %s" % dev_id)
+        self.logger.info("v: %s", values_dict)
+        self.logger.info("t: %s", type_id)
+        self.logger.info("d: %s", dev_id)
         return True, values_dict
 
     # =============================================================================
@@ -1264,7 +1264,7 @@ class Plugin(indigo.PluginBase):
                             )
 
                     if not os.path.isfile(full_path):
-                        self.logger.warning("CSV file doesn't exist. Creating a new one: %s" % full_path)
+                        self.logger.warning("CSV file doesn't exist. Creating a new one: %s", full_path)
                         with open(full_path, 'w', encoding='utf-8') as csv_file:
                             csv_file.write(f"Timestamp,{column_dict[thing][2]}\n")
                             csv_file.close()
@@ -1336,7 +1336,7 @@ class Plugin(indigo.PluginBase):
                 for key in props:
                     if key not in fields:
 
-                        self.logger.debug("[%s] prop obsolete prop [%s] will be removed" % (dev.name, key))
+                        self.logger.debug("[%s] prop obsolete prop [%s] will be removed", dev.name, key)
                         del props[key]
 
                 # Now that we're done, let's save the updated dict back to the device.
@@ -1345,7 +1345,7 @@ class Plugin(indigo.PluginBase):
             return True
 
         except Exception as sub_error:
-            self.logger.warning("Audit device props error: %s" % sub_error)
+            self.logger.warning("Audit device props error: %s", sub_error)
 
             return False
 
@@ -1391,7 +1391,7 @@ class Plugin(indigo.PluginBase):
 
             if not os.path.isdir(path_name):
                 try:
-                    self.logger.warning(f"Target folder doesn't exist. Creating path:{path_name}")
+                    self.logger.warning("Target folder doesn't exist. Creating path:%s", path_name)
                     os.makedirs(path_name)
 
                 except (IOError, OSError):
@@ -1405,9 +1405,9 @@ class Plugin(indigo.PluginBase):
         self.logger.debug("Auditing path IO.")
         for path_name in path_list:
             if os.access(path_name, os.W_OK):
-                self.logger.debug("   Path OK: %s" % path_name)
+                self.logger.debug("   Path OK: %s", path_name)
             else:
-                self.logger.critical("   Plugin doesn't have the proper rights to write to the path: %s" % path_name)
+                self.logger.critical("   Plugin doesn't have the proper rights to write to the path: %s", path_name)
 
         # ================ Compare Save Path to Current Indigo Version ================
         indigo_ver = self.versStrToTuple(indigo.server.version)[0]
@@ -1420,16 +1420,16 @@ class Plugin(indigo.PluginBase):
                 new_save_path = f"{indigo.server.getInstallFolderPath()}/IndigoWebServer/images/controls/"
 
                 if new_save_path != current_save_path:
-                    self.logger.warning("Charts are being saved to: %s)" % current_save_path)
-                    self.logger.warning("You may want to change the save path to: %s" % new_save_path)
+                    self.logger.warning("Charts are being saved to: %s)", current_save_path)
+                    self.logger.warning("You may want to change the save path to: %s", new_save_path)
 
             elif indigo_ver == 2021:
                 # new_save_path = indigo.server.getInstallFolderPath() + "/Web Assets/images/controls/static/" # TODO
                 new_save_path = f"{indigo.server.getInstallFolderPath()}/Web Assets/images/controls/static/"
 
                 if new_save_path != current_save_path:
-                    self.logger.warning("Charts are being saved to: %s)" % current_save_path)
-                    self.logger.warning("You may want to change the save path to: %s" % new_save_path)
+                    self.logger.warning("Charts are being saved to: %s)", current_save_path)
+                    self.logger.warning("You may want to change the save path to: %s", new_save_path)
 
     # =============================================================================
     @staticmethod
@@ -1650,7 +1650,7 @@ class Plugin(indigo.PluginBase):
                 for dev in dev_list:
                     # A list of state/value pairs used to feed updateStatesOnServer()
                     device_states = []
-                    self.logger.debug("Updating chart: [%s]" % dev.name)
+                    self.logger.debug("Updating chart: [%s]", dev.name)
                     dev.updateStatesOnServer(
                         [{'key': 'onOffState', 'value': True, 'uiValue': 'Processing'}])
 
@@ -1999,7 +1999,7 @@ class Plugin(indigo.PluginBase):
                         except KeyError:
                             ...
                         except SyntaxError:
-                            self.logger.warning("[%s] Custom Line Segments entry is invalid. Skipping." % dev.name)
+                            self.logger.warning("[%s] Custom Line Segments entry is invalid. Skipping.", dev.name)
 
                         # =================================================
                         # Convert these indigo.List(s) to Python lists.
@@ -2263,7 +2263,7 @@ class Plugin(indigo.PluginBase):
                                 outfile.write(f"{k}: {v}\n")
 
                         # ============================  Process Result  ============================
-                        self.logger.debug("[%s] Sending to chart refresh process." % dev.name)
+                        self.logger.debug("[%s] Sending to chart refresh process.", dev.name)
                         # It's important to use the full path to the Python version to ensure that we get the version
                         # we want.
                         try:
@@ -2283,7 +2283,7 @@ class Plugin(indigo.PluginBase):
 
                         except (TypeError, ValueError):
                             self.logger.exception("")
-                            self.logger.debug("Payload raised error: %s" % payload)
+                            self.logger.debug("Payload raised error: %s", payload)
 
                         # Parse the output log
                         result = self.process_plotting_log(dev=dev, replies=reply, errors=err)
@@ -2323,7 +2323,7 @@ class Plugin(indigo.PluginBase):
 
             except Exception as sub_error:
                 self.plugin_error_handler(sub_error=traceback.format_exc())
-                self.logger.critical("Error: %s. See plugin log for more information." % sub_error)
+                self.logger.critical("Error: %s. See plugin log for more information.", sub_error)
 
     # =============================================================================
     def commsKillAll(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
@@ -2764,7 +2764,7 @@ class Plugin(indigo.PluginBase):
 
                 if not os.path.isfile(full_path):
                     try:
-                        self.logger.debug("CSV doesn't exist. Creating: %s" % full_path)
+                        self.logger.debug("CSV doesn't exist. Creating: %s", full_path)
                         with open(full_path, 'w', encoding="utf-8") as csv_file:
                             csv_file.write(f"{'Timestamp'},{value[0]}\n")
                             csv_file.close()
@@ -2782,7 +2782,7 @@ class Plugin(indigo.PluginBase):
                 try:
                     shutil.copyfile(full_path, backup)
                 except IOError as sub_error:
-                    self.logger.error("[%s] Unable to backup CSV file: %s." % (dev.name, sub_error))
+                    self.logger.error("[%s] Unable to backup CSV file: %s.", dev.name, sub_error)
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
                     self.logger.error(
@@ -2804,7 +2804,7 @@ class Plugin(indigo.PluginBase):
                         column_names[0][0] = 'Timestamp'
 
                 except IOError as sub_error:
-                    self.logger.error("[%s] Unable to load CSV data: %s." % (dev.name, sub_error))
+                    self.logger.error("[%s] Unable to load CSV data: %s.", dev.name, sub_error)
 
                 # ============================== Limit for Time ===============================
                 # Limit data by time
@@ -2860,7 +2860,7 @@ class Plugin(indigo.PluginBase):
                     )
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.error("[%s] Invalid CSV definition: %s" % (dev.name, sub_error))
+                    self.logger.error("[%s] Invalid CSV definition: %s", dev.name, sub_error)
 
                 # ============================= Limit for Length ==============================
                 # The data frame (with the newest observation included) may now be too long. If it is, we trim it for
@@ -2882,25 +2882,25 @@ class Plugin(indigo.PluginBase):
                     os.remove(backup)
                 except Exception as sub_error:
                     self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.error("[%s] Unable to delete backup file. %s" % (dev.name, sub_error))
+                    self.logger.error("[%s] Unable to delete backup file. %s", dev.name, sub_error)
 
             dev.updateStatesOnServer(
                 [{'key': 'csvLastUpdated', 'value': f"{dt.datetime.now()}"},
                  {'key': 'onOffState', 'value': True, 'uiValue': 'Updated'}]
             )
 
-            self.logger.info("[%s] CSV data updated successfully." % dev.name)
+            self.logger.info("[%s] CSV data updated successfully.", dev.name)
             dev.updateStateImageOnServer(indigo.kStateImageSel.WindowSensorClosed)
 
         except UnboundLocalError:
-            self.logger.critical("[%s] Unable to reach storage location. Check connections and permissions." % dev.name)
+            self.logger.critical("[%s] Unable to reach storage location. Check connections and permissions.", dev.name)
         except ValueError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.critical("[%s] Error: %s" % (dev.name, sub_error))
+            self.logger.critical("[%s] Error: %s", dev.name, sub_error)
 
         except Exception as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.critical("[%s] Error: %s" % (dev.name, sub_error))
+            self.logger.critical("[%s] Error: %s", dev.name, sub_error)
 
     # =============================================================================
     def csv_refresh_device_action(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> None:  # noqa
@@ -3553,7 +3553,7 @@ class Plugin(indigo.PluginBase):
 
         except IOError as sub_error:
             self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error("Error generating file list: %s. See plugin log for more information." % sub_error)
+            self.logger.error("Error generating file list: %s. See plugin log for more information.", sub_error)
 
         # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
         return file_name_list_menu
@@ -3692,7 +3692,7 @@ class Plugin(indigo.PluginBase):
                 {'success': False, 'message': error} on failure, or None if
                 caller_waiting_for_result is False.
         """
-        self.logger.info("Scripting payload: %s" % dict(plugin_action.props))
+        self.logger.info("Scripting payload: %s", dict(plugin_action.props))
 
         dpi          = int(self.pluginPrefs.get('chartResolution', 100))
         height       = float(self.pluginPrefs.get('rectChartHeight', 250))
@@ -3780,7 +3780,7 @@ class Plugin(indigo.PluginBase):
         self.logger.critical(f"{' TRACEBACK ':!^80}")
 
         for line in sub_error:
-            self.logger.critical(f"!!! {line}")
+            self.logger.critical("!!! %s", line)
 
         self.logger.critical("!" * 80)
 
@@ -3823,10 +3823,10 @@ class Plugin(indigo.PluginBase):
 
             if not success:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorTripped)
-                self.logger.critical("[%s] error producing chart. See logs for more information." % dev.name)
+                self.logger.critical("[%s] error producing chart. See logs for more information.", dev.name)
             else:
                 dev.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-                self.logger.info("[%s] chart refreshed." % dev.name)
+                self.logger.info("[%s] chart refreshed.", dev.name)
 
             return success
 
@@ -4006,7 +4006,7 @@ class Plugin(indigo.PluginBase):
         with open(full_path, 'r', encoding='utf-8') as f:
             infile = json.load(f)
 
-        self.logger.debug("themeNameGenerator: list(infile) = %s" % list(infile))
+        self.logger.debug("themeNameGenerator: list(infile) = %s", list(infile))
         return [(key, key) for key in sorted(infile)]
 
     # =============================================================================
@@ -4025,8 +4025,8 @@ class Plugin(indigo.PluginBase):
         """
         # Don't need to trap user cancel since this callback won't be called if user cancels. There is no way to trap
         # the cancel.
-        self.logger.debug("%s" % values_dict)
-        self.logger.debug("%s" % menu_item_id)
+        self.logger.debug("%s", values_dict)
+        self.logger.debug("%s", menu_item_id)
 
         # ==========================  Apply Theme Settings  ===========================
         for key in [
@@ -4066,7 +4066,7 @@ class Plugin(indigo.PluginBase):
         for key in infile[selected_theme]:
             self.pluginPrefs[key] = infile[selected_theme][key]
 
-        self.logger.info("[%s] theme applied." % selected_theme)
+        self.logger.info("[%s] theme applied.", selected_theme)
 
     # =============================================================================
     def themeApply(self, values_dict: indigo.Dict = None, menu_item_id: str = ""):  # noqa
