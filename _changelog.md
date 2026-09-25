@@ -30,6 +30,9 @@
   `chart_*.py` scripts, and the `_log_traceback` triplicated in `audits.py`, `csv_handling.py`, and
   `ui_lists.py`, into shared helpers (`chart_tools.chart_startup`, new `log_utils.py`).
 - Removes `AUDIT.md`; all findings have been addressed or deferred.
+- Consolidates the axis min/max bound-computation algorithm duplicated across
+  `format_axis_x_min_max`, `format_axis_y1_min_max`, and `format_axis_y2_min_max` into a shared
+  `chart_tools._axis_min_max` helper.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

@@ -299,6 +299,50 @@ def format_axis_x_label(dev: Any, p_dict: dict, k_dict: dict, logger: dict) -> N
 
 
 # =============================================================================
+def _axis_min_max(data_min: float, data_max: float, min_wanted: Any, max_wanted: Any) -> Tuple[float, float]:
+    """Compute axis bounds, nudging zero-valued extremes and padding automatic ('none') bounds.
+
+    Shared by format_axis_x_min_max(), format_axis_y1_min_max(), and format_axis_y2_min_max(): all
+    three apply this identical bound-computation algorithm to different p_dict keys and axes.
+    Setting limits before plotting disables matplotlib's autoscaling, so a small asymmetric padding
+    is computed from the data range for any bound left on 'none', and an exact-zero data extreme is
+    nudged to a very small non-zero value first to avoid a degenerate (zero-width) padding term.
+
+    Args:
+        data_min (float): The minimum value in the data being plotted.
+        data_max (float): The maximum value in the data being plotted.
+        min_wanted (Any): The user-configured minimum bound, or the string 'none' for automatic.
+        max_wanted (Any): The user-configured maximum bound, or the string 'none' for automatic.
+
+    Returns:
+        Tuple[float, float]: The (axis_min, axis_max) bounds to pass to plt.xlim()/plt.ylim().
+    """
+    if data_min == 0:
+        data_min = 0.000001
+
+    if data_max == 0:
+        data_max = 0.000001
+
+    if isinstance(min_wanted, str) and min_wanted.lower() == 'none':
+        if data_min > 0:
+            axis_min = data_min * (1 - (1 / abs(data_min) ** 1.25))
+        else:
+            axis_min = data_min * (1 + (1 / abs(data_min) ** 1.25))
+    else:
+        axis_min = float(min_wanted)
+
+    if isinstance(max_wanted, str) and max_wanted.lower() == 'none':
+        if data_max > 0:
+            axis_max = data_max * (1 + (1 / abs(data_max) ** 1.25))
+        else:
+            axis_max = data_max * (1 - (1 / abs(data_max) ** 1.25))
+    else:
+        axis_max = float(max_wanted)
+
+    return axis_min, axis_max
+
+
+# =============================================================================
 def format_axis_x_min_max(p_dict: dict, logger: dict) -> None:
     """Set explicit minimum and maximum bounds for the X axis.
 
@@ -313,38 +357,9 @@ def format_axis_x_min_max(p_dict: dict, logger: dict) -> None:
     """
 
     try:
-
         x_min = min(p_dict['data_array'])
         x_max = max(p_dict['data_array'])
-        x_min_wanted = p_dict['xAxisMin']
-        x_max_wanted = p_dict['xAxisMax']
-
-        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
-        # very nearly zero.
-        if x_min == 0:
-            x_min = 0.000001
-
-        if x_max == 0:
-            x_max = 0.000001
-
-        # Y min
-        if isinstance(x_min_wanted, str) and x_min_wanted.lower() == 'none':
-            if x_min > 0:
-                x_axis_min = x_min * (1 - (1 / abs(x_min) ** 1.25))
-            else:
-                x_axis_min = x_min * (1 + (1 / abs(x_min) ** 1.25))
-        else:
-            x_axis_min = float(x_min_wanted)
-
-        # Y max
-        if isinstance(x_max_wanted, str) and x_max_wanted.lower() == 'none':
-            if x_max > 0:
-                x_axis_max = x_max * (1 + (1 / abs(x_max) ** 1.25))
-            else:
-                x_axis_max = x_max * (1 - (1 / abs(x_max) ** 1.25))
-
-        else:
-            x_axis_max = float(x_max_wanted)
+        x_axis_min, x_axis_max = _axis_min_max(x_min, x_max, p_dict['xAxisMin'], p_dict['xAxisMax'])
 
         plt.xlim(xmin=x_axis_min, xmax=x_axis_max)
 
@@ -628,38 +643,9 @@ def format_axis_y1_min_max(p_dict: dict, logger: dict) -> None:
     """
 
     try:
-
         y_min = min(p_dict['data_array'])
         y_max = max(p_dict['data_array'])
-        y_min_wanted = p_dict['yAxisMin']
-        y_max_wanted = p_dict['yAxisMax']
-
-        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
-        # very nearly zero.
-        if y_min == 0:
-            y_min = 0.000001
-
-        if y_max == 0:
-            y_max = 0.000001
-
-        # Y min
-        if isinstance(y_min_wanted, str) and y_min_wanted.lower() == 'none':
-            if y_min > 0:
-                y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
-            else:
-                y_axis_min = y_min * (1 + (1 / abs(y_min) ** 1.25))
-        else:
-            y_axis_min = float(y_min_wanted)
-
-        # Y max
-        if isinstance(y_max_wanted, str) and y_max_wanted.lower() == 'none':
-            if y_max > 0:
-                y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
-            else:
-                y_axis_max = y_max * (1 - (1 / abs(y_max) ** 1.25))
-
-        else:
-            y_axis_max = float(y_max_wanted)
+        y_axis_min, y_axis_max = _axis_min_max(y_min, y_max, p_dict['yAxisMin'], p_dict['yAxisMax'])
 
         plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
@@ -765,38 +751,9 @@ def format_axis_y2_min_max(p_dict: dict, logger: dict, data_key: str = 'data_arr
     """
 
     try:
-
         y_min = min(p_dict[data_key])
         y_max = max(p_dict[data_key])
-        y_min_wanted = p_dict['y2AxisMin']
-        y_max_wanted = p_dict['y2AxisMax']
-
-        # Since the min / max is used here only for chart boundaries, we "trick" Matplotlib by using a number that's
-        # very nearly zero.
-        if y_min == 0:
-            y_min = 0.000001
-
-        if y_max == 0:
-            y_max = 0.000001
-
-        # Y min
-        if isinstance(y_min_wanted, str) and y_min_wanted.lower() == 'none':
-            if y_min > 0:
-                y_axis_min = y_min * (1 - (1 / abs(y_min) ** 1.25))
-            else:
-                y_axis_min = y_min * (1 + (1 / abs(y_min) ** 1.25))
-        else:
-            y_axis_min = float(y_min_wanted)
-
-        # Y max
-        if isinstance(y_max_wanted, str) and y_max_wanted.lower() == 'none':
-            if y_max > 0:
-                y_axis_max = y_max * (1 + (1 / abs(y_max) ** 1.25))
-            else:
-                y_axis_max = y_max * (1 - (1 / abs(y_max) ** 1.25))
-
-        else:
-            y_axis_max = float(y_max_wanted)
+        y_axis_min, y_axis_max = _axis_min_max(y_min, y_max, p_dict['y2AxisMin'], p_dict['y2AxisMax'])
 
         plt.ylim(ymin=y_axis_min, ymax=y_axis_max)
 
