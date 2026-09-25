@@ -13,29 +13,40 @@ functional defects — nothing found here blocks day-to-day use.
 
 ## Findings
 
-### 3. `plugin.py` is very large (4,463 lines)
-By comparison `chart_tools.py` is 1,138 lines and `maintenance.py` is 532. This
-matches the project's own `_to_do_list.md` refinement item — "Move more code out of
-plugin.py" — so it's a known, tracked issue, not a new discovery, but it's the
-single largest maintainability risk in the codebase (hard to navigate, hard to test
-in isolation, one accidental global changes many chart types).
-- **Fix:** no action needed beyond what's already tracked; flagging as confirmation
-  the to-do item is still accurate at 4,463 lines.
+### 3. `plugin.py` is very large (4,145 lines, down from 4,463 at time of audit)
+By comparison `chart_tools.py` is 1,138 lines and `validate.py` is now 808 lines
+(up from 233, after absorbing `validateDeviceConfigUi`'s validation logic per
+finding #5). This matches the project's own `_to_do_list.md` refinement item —
+"Move more code out of plugin.py" — so it's a known, tracked issue, not a new
+discovery, but it's still the single largest maintainability risk in the codebase
+(hard to navigate, hard to test in isolation, one accidental global changes many
+chart types).
+- **Fix:** no action needed immediately beyond what's already tracked; the
+  validation-logic extraction (#5) trimmed ~320 lines. Further reductions would need
+  to move other self-contained subsystems (e.g. CSV handling, theme handling) out
+  the same way.
 
 ### 5. Known `TODO`/`FIXME` markers still open
-Nine markers found in shipped code, listed for visibility (none newly discovered,
-but worth surfacing together):
+Markers found in shipped code, listed for visibility (none newly discovered, but
+worth surfacing together):
 - `chart_tools.py:517` — axis methods need balancing.
 - `plugin.py:696` — possible DLFramework generalization.
-- `plugin.py:1419`, `plugin.py:1427` — commented-out alternate save paths, unclear
+- `plugin.py:1101`, `plugin.py:1109` — commented-out alternate save paths, unclear
   if still needed.
-- `plugin.py:3221` (`fix_rgb`) — explicit migration note: once complete, the
+- `plugin.py:2903` (`fix_rgb`) — explicit migration note: once complete, the
   leading `#` handling here and a corresponding truncation elsewhere can be
   removed. Worth tracking to closure since it's describing dead-code-in-waiting.
-- `validate.py:6, 35, 36` — the module's own docstring says "move other validation
-  code here" (i.e., `validate.py` is known-incomplete), plus a note that the color
-  dict may be stale since color controls moved to the theme manager (2024-10-23
-  note, ~1 year old as of this audit).
+- `validate.py:34, 35` — a note that the `chart_colors` color dict may be stale
+  since color controls moved to the theme manager (2024-10-23 note, ~1 year old as
+  of this audit).
+  - ~~`validate.py:6` — "move other validation code here."~~ **Resolved:** all of
+    `validateDeviceConfigUi`'s per-chart-type and cross-chart-type validation logic
+    (area, bar/flow, stock bar, stock horizontal bar, battery health, CSV engine,
+    line, multiline text, polar, scatter, weather forecast, composite weather,
+    custom dimensions, axis limits — 14 functions) has been moved into `validate.py`,
+    shrinking `validateDeviceConfigUi` from ~400 lines to ~90. Only the radial-bar
+    scale check stayed in `plugin.py`, since it needs the instance's
+    `self.substitute()`.
 
 ## Things checked and found clean
 - No hardcoded secrets/API keys/passwords in tracked `.py` files; `tests/.env`

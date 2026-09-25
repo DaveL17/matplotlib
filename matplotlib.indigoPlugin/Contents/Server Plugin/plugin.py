@@ -738,135 +738,19 @@ class Plugin(indigo.PluginBase):
 
         # ================================ Area Chart =================================
         if type_id == 'areaChartingDevice':
-
-            # There must be at least 1 source selected
-            if values_dict['area1Source'] == 'None':
-                error_msg_dict['area1Source'] = "You must select at least one data source."
-                values_dict['settingsGroup'] = "1"
-
-            # Iterate for each area group (1-8).
-            for area in range(1, 9, 1):
-                # Line adjustment values
-                for char in values_dict[f'area{area}adjuster']:
-                    if char not in ' +-/*.0123456789':  # allowable numeric specifiers
-                        error_msg_dict[f'area{area}adjuster'] = "Valid operators are +, -, *, /"
-                        values_dict['settingsGroup'] = str(area)
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
+            values_dict, error_msg_dict = validate.area_chart(values_dict, error_msg_dict)
 
         # ================================  Flow Bar  =================================
         if type_id == 'barChartingDevice':
-
-            # Must select at least one source (bar 1)
-            if values_dict['bar1Source'] == 'None':
-                error_msg_dict['bar1Source'] = "You must select at least one data source."
-                values_dict['barLabel1'] = True
-                values_dict['settingsGroup'] = "1"
-
-            try:
-                # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) <= 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-                values_dict['settingsGroup'] = "ch"
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
+            values_dict, error_msg_dict = validate.bar_flow_chart(values_dict, error_msg_dict)
 
         # ================================  Stock Bar  ================================
         if type_id == 'barStockChartingDevice':
-
-            # Must select at least one source (bar 1)
-            if values_dict['bar1Source'] == 'None':
-                error_msg_dict['bar1Source'] = "You must select at least one data source."
-                values_dict['settingsGroup'] = "1"
-
-            try:
-                # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) <= 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-                values_dict['settingsGroup'] = "ch"
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
-
-            # Test the selected values to ensure that they can be charted (int, float, bool)
-            for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
-
-                # Pull the number out of the source key
-                n = re.search('[0-9]', source)
-
-                # Get the id of the bar source
-                if values_dict[f'bar{n.group(0)}Source'] != "None":
-                    source_id = int(values_dict[f'bar{n.group(0)}Source'])
-
-                    # By definition, it will either be a device ID or a variable ID.
-                    if source_id in indigo.devices:
-
-                        # Get the selected device state value
-                        val = indigo.devices[source_id].states[values_dict[source]]
-                        if not isinstance(val, (int, float, bool)):
-                            error_msg_dict[source] = "The selected device state can not be charted due to its value."
-
-                    else:
-                        val = indigo.variables[source_id].value
-                        try:
-                            float(val)
-                        except ValueError:
-                            if val.lower() not in ['true', 'false']:
-                                error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                                values_dict['settingsGroup'] = str(n.group(0))
+            values_dict, error_msg_dict = validate.bar_stock_chart(values_dict, error_msg_dict)
 
         # ==========================  Stock Horizontal Bar  ===========================
         if type_id == 'barStockHorizontalChartingDevice':
-
-            # Must select at least one source (bar 1)
-            if values_dict['bar1Source'] == 'None':
-                error_msg_dict['bar1Source'] = "You must select at least one data source."
-                values_dict['settingsGroup'] = "1"
-
-            try:
-                # Bar width must be greater than 0. Will also trap strings.
-                if float(values_dict['barWidth']) <= 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-                values_dict['settingsGroup'] = "ch"
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
-
-            # Test the selected values to ensure that they can be charted (int, float, bool)
-            for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
-
-                # Pull the number out of the source key
-                n = re.search('[0-9]', source)
-
-                # Get the id of the bar source
-                if values_dict[f'bar{n.group(0)}Source'] != "None":
-                    source_id = int(values_dict[f'bar{n.group(0)}Source'])
-
-                    # By definition, it will either be a device ID or a variable ID.
-                    if source_id in indigo.devices:
-
-                        # Get the selected device state value
-                        val = indigo.devices[source_id].states[values_dict[source]]
-                        if not isinstance(val, (int, float, bool)):
-                            error_msg_dict[source] = "The selected device state can not be charted due to its value."
-                            values_dict['settingsGroup'] = n.group(0)
-
-                    else:
-                        val = indigo.variables[source_id].value
-                        try:
-                            float(val)
-                        except ValueError:
-                            if val.lower() not in ['true', 'false']:
-                                error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                                values_dict['settingsGroup'] = f"{n.group(0)}"
+            values_dict, error_msg_dict = validate.bar_stock_horizontal_chart(values_dict, error_msg_dict)
 
         # ===============================  Radial Bar  ================================
         if type_id == 'radialBarChartingDevice':
@@ -884,15 +768,7 @@ class Plugin(indigo.PluginBase):
 
         # =========================== Battery Health Chart ============================
         if type_id == 'batteryHealthDevice':
-
-            for prop in ('cautionLevel', 'warningLevel'):
-                try:
-                    # Bar width must be greater than 0. Will also trap strings.
-                    if not 0 <= float(values_dict[prop]) <= 100:
-                        raise ValueError
-                except ValueError:
-                    error_msg_dict[prop] = "Alert levels must between 0 and 100 (integer)."
-                    values_dict['settingsGroup'] = "dsp"
+            values_dict, error_msg_dict = validate.battery_health_chart(values_dict, error_msg_dict)
 
         # ============================== Calendar Chart ===============================
         # There are currently no unique validation steps needed for calendar devices
@@ -901,230 +777,36 @@ class Plugin(indigo.PluginBase):
 
         # ================================ CSV Engine =================================
         if type_id == 'csvEngine':
-
-            # ========================== Number of Observations ===========================
-            try:
-                # Must be 1 or greater
-                if int(values_dict['numLinesToKeep']) < 1:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['numLinesToKeep'] = "The observation value must be a whole number greater than zero."
-
-            # ================================= Duration ==================================
-            try:
-                # Must be zero or greater
-                if float(values_dict['numLinesToKeepTime']) < 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['numLinesToKeepTime'] = "The duration value must be greater than zero."
-
-            # ============================= Refresh Interval ==============================
-            try:
-                # Must be zero or greater
-                if int(values_dict['refreshInterval']) < 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['refreshInterval'] = "The refresh interval must be a whole number greater than zero."
-
-            # =============================== Data Sources ================================
-            try:
-                sources = ast.literal_eval(values_dict['columnDict'])
-
-                # columnDict may contain a place-holder dict with one entry, so we test for that.
-                if len(sources) < 2:
-                    # If columnDict has no keys, we know that won't work either.
-                    if len(sources) == 0:
-                        raise ValueError
-
-                    for key in sources:
-                        if sources[key] == ('None', 'None', 'None'):
-                            raise ValueError
-
-            except ValueError:
-                error_msg_dict['addSource'] = "You must create at least one CSV data source."
+            values_dict, error_msg_dict = validate.csv_engine(values_dict, error_msg_dict)
 
         # ================================ Line Chart =================================
         if type_id == 'lineChartingDevice':
-
-            # There must be at least 1 source selected
-            if values_dict['line1Source'] == 'None':
-                error_msg_dict['line1Source'] = "You must select at least one data source."
-                values_dict['settingsGroup'] = "1"
-
-            # Iterate for each line group (1-6).
-            for area in range(1, 7, 1):
-
-                # Line adjustment values
-                for char in values_dict[f'line{area}adjuster']:
-                    if char not in ' +-/*.0123456789':  # allowable numeric specifiers
-                        error_msg_dict[f'line{area}adjuster'] = "Valid operators are +, -, *, /"
-                        values_dict['settingsGroup'] = str(area)
-
-                # Fill is illegal for the steps line type
-                if values_dict[f'line{area}Style'] == 'steps' and values_dict[f'line{area}Fill']:
-                    error_msg_dict[f'line{area}Fill'] = ("Fill is not supported for the Steps "
-                                                         "line type.")
-                    values_dict['settingsGroup'] = str(area)
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
+            values_dict, error_msg_dict = validate.line_chart(values_dict, error_msg_dict)
 
         # ============================== Multiline Text ===============================
         if type_id == 'multiLineText':
-
-            for prop in ('thing', 'thingState'):
-                # A data source must be selected
-                if not values_dict[prop] or values_dict[prop] == 'None':
-                    error_msg_dict[prop] = "You must select a data source."
-                    values_dict['settingsGroup'] = "src"
-
-            try:
-                if int(values_dict['numberOfCharacters']) < 1:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['numberOfCharacters'] = "The number of characters must be greater than zero."
-                values_dict['settingsGroup'] = "dsp"
-
-            # Figure width and height.
-            for prop in ('figureWidth', 'figureHeight'):
-                try:
-                    if int(values_dict[prop]) < 1:
-                        raise ValueError
-                except ValueError:
-                    error_msg_dict[prop] = (
-                        "The figure width and height must be positive whole numbers greater than zero (pixels)."
-                    )
-                    values_dict['settingsGroup'] = "dsp"
-
-            # Font size
-            try:
-                if float(values_dict['multilineFontSize']) < 0:
-                    raise ValueError
-            except ValueError:
-                error_msg_dict['multilineFontSize'] = "The font size must be a positive real number greater than zero."
-                values_dict['settingsGroup'] = "dsp"
+            values_dict, error_msg_dict = validate.multiline_text(values_dict, error_msg_dict)
 
         # ================================ Polar Chart ================================
         if type_id == 'polarChartingDevice':
-
-            if not values_dict['thetaValue']:
-                error_msg_dict['thetaValue'] = "You must select a direction source."
-                values_dict['settingsGroup'] = "src"
-
-            if not values_dict['radiiValue']:
-                error_msg_dict['radiiValue'] = "You must select a magnitude source."
-                values_dict['settingsGroup'] = "src"
-
-            # Number of observations
-            try:
-                if int(values_dict['numObs']) < 1:
-                    error_msg_dict['numObs'] = "You must specify at least 1 observation (must be a whole number)."
-                    values_dict['settingsGroup'] = "dsp"
-            except ValueError:
-                error_msg_dict['numObs'] = "You must specify at least 1 observation (must be a whole number integer)."
-                values_dict['settingsGroup'] = "dsp"
+            values_dict, error_msg_dict = validate.polar_chart(values_dict, error_msg_dict)
 
         # =============================== Scatter Chart ===============================
         if type_id == 'scatterChartingDevice':
-
-            if not values_dict['group1Source']:
-                error_msg_dict['group1Source'] = "You must select at least one data source."
-                values_dict['settingsGroup'] = "1"
-
-            # =============================== Custom Ticks ================================
-            values_dict, error_msg_dict = validate.custom_ticks(values_dict, error_msg_dict)
+            values_dict, error_msg_dict = validate.scatter_chart(values_dict, error_msg_dict)
 
         # =============================== Weather Chart ===============================
         if type_id == 'forecastChartingDevice':
-
-            if not values_dict['forecastSourceDevice']:
-                error_msg_dict['forecastSourceDevice'] = "You must select a weather forecast source device."
-                values_dict['settingsGroup'] = "ch"
+            values_dict, error_msg_dict = validate.weather_forecast_chart(values_dict, error_msg_dict)
 
         # ========================== Composite Weather Chart ==========================
         if type_id == 'compositeForecastDevice':
-
-            if not values_dict['forecastSourceDevice']:
-                error_msg_dict['forecastSourceDevice'] = "You must select a weather forecast source device."
-                values_dict['settingsGroup'] = "ch"
-
-            for _ in (
-                'pressure_min',
-                'pressure_max',
-                'temperature_min',
-                'temperature_max',
-                'humidity_min',
-                'humidity_max',
-                'precipitation_min',
-                'precipitation_max',
-                'wind_min',
-                'wind_max'
-            ):
-                try:
-                    float(values_dict[_])
-
-                except ValueError:
-                    if values_dict[_] in ("", "None"):
-                        ...
-                    else:
-                        error_msg_dict[_] = "The value must be empty, 'None', or a numeric value."
-                        values_dict['settingsGroup'] = "y1"
-
-            if len(values_dict['component_list']) < 2:
-                error_msg_dict['component_list'] = "You must select at least two plot elements."
-                values_dict['settingsGroup'] = "fe"
+            values_dict, error_msg_dict = validate.composite_weather_chart(values_dict, error_msg_dict)
 
         # ============================== All Chart Types ==============================
         # The following validation blocks are applied to all graphical chart device types.
-
-        # ========================== Chart Custom Dimensions ==========================
-        # Check to see that custom chart dimensions conform to valid types
-        for custom_dimension_prop in ('customSizeHeight', 'customSizeWidth', 'customSizePolar'):
-            try:
-                if custom_dimension_prop in values_dict \
-                        and values_dict[custom_dimension_prop] != 'None' \
-                        and float(values_dict[custom_dimension_prop]) < 75:
-                    error_msg_dict[custom_dimension_prop] = "The chart dimension value must be greater than 75 pixels."
-            except ValueError:
-                error_msg_dict[custom_dimension_prop] = (
-                    "The chart dimension value must be a real number greater than 75 pixels."
-                )
-
-        # ================================ Axis Limits ================================
-        # Check to see that each axis limit matches one of the accepted formats
-        for limit_prop in ('yAxisMax', 'yAxisMin', 'y2AxisMax', 'y2AxisMin'):
-
-            # We only do these if the device has these props.
-            if limit_prop in values_dict:
-
-                # Y-axis limits can not be empty.
-                if values_dict[limit_prop] == '' or values_dict[limit_prop].isspace():
-                    self.logger.warning("Limits can not be empty. Setting empty limits to 'None.'")
-                    values_dict[limit_prop] = "None"
-
-                # Y-axis limits must be a value that can float.
-                try:
-                    if values_dict[limit_prop] not in ('None', '0'):
-                        float(values_dict[limit_prop])
-                except ValueError:
-                    values_dict[limit_prop] = 'None'
-                    error_msg_dict[limit_prop] = "The axis limit must be a real number or None."
-
-        # Y-axis limits min must be less than max
-        try:
-            y_min = float(values_dict.get('yAxisMin', "None"))
-        except ValueError:
-            y_min = None
-
-        try:
-            y_max = float(values_dict.get('yAxisMax', "None"))
-        except ValueError:
-            y_max = None
-
-        if isinstance(y_min, float) and isinstance(y_max, float):
-            if not y_max > y_min:
-                error_msg_dict['yAxisMin'] = "Min must be less than max if both are specified."
-                error_msg_dict['yAxisMax'] = "Max must be greater than min if both are specified."
+        values_dict, error_msg_dict = validate.chart_custom_dimensions(values_dict, error_msg_dict)
+        values_dict, error_msg_dict = validate.axis_limits(values_dict, error_msg_dict)
 
         if len(error_msg_dict) > 0:
             error_msg_dict['showAlertText'] = (
