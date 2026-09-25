@@ -17,31 +17,13 @@ import indigo  # noqa
 from matplotlib import font_manager as mfont
 
 from constants import FONT_MENU
+import log_utils
 
 my_logger = logging.getLogger("Plugin")
 
 
 def __init__() -> None:
     """Initialize the ui_lists module (no-op placeholder)."""
-
-
-# =============================================================================
-def _log_traceback(sub_error: str) -> None:
-    """Log a formatted traceback message to the plugin log file.
-
-    Mirrors Plugin.plugin_error_handler(); duplicated here (rather than passed in as a callable)
-    so this module has no dependency on the Plugin instance beyond the data it's given.
-
-    Args:
-        sub_error (str): The string-formatted traceback message to log.
-    """
-    sub_error = sub_error.splitlines()
-    my_logger.critical(f"{' TRACEBACK ':!^80}")
-
-    for line in sub_error:
-        my_logger.critical("!!! %s", line)
-
-    my_logger.critical("!" * 80)
 
 
 # =============================================================================
@@ -302,7 +284,7 @@ def getFileList(prefs: indigo.Dict) -> list:
         file_name_list_menu = file_name_list_menu + [("-5", "%%separator%%"), ("None", "None")]
 
     except IOError as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error("Error generating file list: %s. See plugin log for more information.", sub_error)
 
     return file_name_list_menu
@@ -327,7 +309,7 @@ def getFontList() -> list:
                 font_menu.append(font_name)
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "Error building font list. Returning generic list. %s. See plugin log for more information.",
             sub_error
@@ -380,7 +362,7 @@ def getForecastSource() -> list:
                 forecast_source_menu.append((dev.id, dev.name))
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "Error getting list of forecast devices: %s. See plugin log for more information.", sub_error
         )

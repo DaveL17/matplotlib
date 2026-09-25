@@ -18,30 +18,13 @@ from typing import Callable, Tuple
 import indigo  # noqa
 from dateutil.parser import parse as date_parse
 
+import log_utils
+
 my_logger = logging.getLogger("Plugin")
 
 
 def __init__() -> None:
     """Initialize the csv_handling module (no-op placeholder)."""
-
-
-# =============================================================================
-def _log_traceback(sub_error: str) -> None:
-    """Log a formatted traceback message to the plugin log file.
-
-    Mirrors Plugin.plugin_error_handler(); duplicated here (rather than passed in as a callable)
-    so this module has no dependency on the Plugin instance beyond the data it's given.
-
-    Args:
-        sub_error (str): The string-formatted traceback message to log.
-    """
-    sub_error = sub_error.splitlines()
-    my_logger.critical(f"{' TRACEBACK ':!^80}")
-
-    for line in sub_error:
-        my_logger.critical("!!! %s", line)
-
-    my_logger.critical("!" * 80)
 
 
 # =============================================================================
@@ -73,7 +56,7 @@ def audit_csv_health(prefs: indigo.Dict) -> None:
                         my_logger.warning("Target data folder doesn't exist. Creating it.")
 
                     except OSError:
-                        _log_traceback(traceback.format_exc())
+                        log_utils.log_traceback(traceback.format_exc())
                         my_logger.critical(
                             "[%s] The plugin is unable to access the data storage location. See plugin log for "
                             "more information.", dev.name
@@ -187,7 +170,7 @@ def csv_item_add(values_dict: indigo.Dict, dev_id: int, prefs: indigo.Dict) -> T
         values_dict['columnDict'] = str(new_dict)
 
     except AttributeError as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "[%s] Error adding CSV item: %s. See plugin log for more information.", dev.name, sub_error
         )
@@ -236,7 +219,7 @@ def csv_item_delete(values_dict: indigo.Dict, dev_id: int) -> dict:
         del column_dict[values_dict['editKey']]
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "[%s] Error deleting CSV item: %s. See plugin log for more information.", dev.name, sub_error
         )
@@ -279,7 +262,7 @@ def csv_item_list(values_dict: indigo.Dict, target_id: int) -> list:
         prop_list   = [(key, value[0]) for key, value in column_dict.items()]
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "[%s] Error generating CSV item list: %s. See plugin log for more information.", dev.name, sub_error
         )
@@ -344,7 +327,7 @@ def csv_item_update(values_dict: indigo.Dict, dev_id: int) -> Tuple[indigo.Dict,
             values_dict['previousKey'] = key
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "[%s] Error updating CSV item: %s. See plugin log for more information.", dev.name, sub_error
         )
@@ -391,7 +374,7 @@ def csv_item_select(values_dict: indigo.Dict, dev_id: int) -> dict:
         values_dict['previousKey']      = values_dict['csv_item_list']
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.error(
             "[%s] There was an error establishing a connection with the item you  chose: %s. See plugin log for "
             "more information.", dev.name, sub_error
@@ -518,7 +501,7 @@ def csv_refresh_process(dev: indigo.Device, csv_dict: dict, prefs: indigo.Dict, 
             except IOError as sub_error:
                 my_logger.error("[%s] Unable to backup CSV file: %s.", dev.name, sub_error)
             except Exception as sub_error:
-                _log_traceback(traceback.format_exc())
+                log_utils.log_traceback(traceback.format_exc())
                 my_logger.error(
                     "[%s] Unable to backup CSV file: %s. See plugin log for more information.", dev.name, sub_error
                 )
@@ -586,12 +569,12 @@ def csv_refresh_process(dev: indigo.Device, csv_dict: dict, prefs: indigo.Dict, 
                 data.append([now, state_to_write])
 
             except ValueError as sub_error:
-                _log_traceback(traceback.format_exc())
+                log_utils.log_traceback(traceback.format_exc())
                 my_logger.error(
                     "[%s] Invalid Indigo ID: %s. See plugin log for more information.", dev.name, sub_error
                 )
             except Exception as sub_error:
-                _log_traceback(traceback.format_exc())
+                log_utils.log_traceback(traceback.format_exc())
                 my_logger.error("[%s] Invalid CSV definition: %s", dev.name, sub_error)
 
             # ============================= Limit for Length ==============================
@@ -613,7 +596,7 @@ def csv_refresh_process(dev: indigo.Device, csv_dict: dict, prefs: indigo.Dict, 
             try:
                 os.remove(backup)
             except Exception as sub_error:
-                _log_traceback(traceback.format_exc())
+                log_utils.log_traceback(traceback.format_exc())
                 my_logger.error("[%s] Unable to delete backup file. %s", dev.name, sub_error)
 
         dev.updateStatesOnServer(
@@ -627,11 +610,11 @@ def csv_refresh_process(dev: indigo.Device, csv_dict: dict, prefs: indigo.Dict, 
     except UnboundLocalError:
         my_logger.critical("[%s] Unable to reach storage location. Check connections and permissions.", dev.name)
     except ValueError as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.critical("[%s] Error: %s", dev.name, sub_error)
 
     except Exception as sub_error:
-        _log_traceback(traceback.format_exc())
+        log_utils.log_traceback(traceback.format_exc())
         my_logger.critical("[%s] Error: %s", dev.name, sub_error)
 
 

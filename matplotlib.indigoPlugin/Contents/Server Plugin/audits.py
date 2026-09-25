@@ -20,31 +20,13 @@ from typing import Any, Callable
 import indigo  # noqa
 
 import color_utils
+import log_utils
 
 my_logger = logging.getLogger("Plugin")
 
 
 def __init__() -> None:
     """Initialize the audits module (no-op placeholder)."""
-
-
-# =============================================================================
-def _log_traceback(sub_error: str) -> None:
-    """Log a formatted traceback message to the plugin log file.
-
-    Mirrors Plugin.plugin_error_handler(); duplicated here (rather than passed in as a callable)
-    so this module has no dependency on the Plugin instance beyond the data it's given.
-
-    Args:
-        sub_error (str): The string-formatted traceback message to log.
-    """
-    sub_error = sub_error.splitlines()
-    my_logger.critical(f"{' TRACEBACK ':!^80}")
-
-    for line in sub_error:
-        my_logger.critical("!!! %s", line)
-
-    my_logger.critical("!" * 80)
 
 
 # =============================================================================
@@ -184,7 +166,7 @@ def audit_save_paths(prefs: indigo.Dict, vers_str_to_tuple: Callable) -> None:
                 os.makedirs(path_name)
 
             except (IOError, OSError):
-                _log_traceback(traceback.format_exc())
+                log_utils.log_traceback(traceback.format_exc())
                 my_logger.critical(
                     "Target folder doesn't exist and the plugin is unable to create it. See plugin log for more "
                     "information."
