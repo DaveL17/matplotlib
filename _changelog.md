@@ -1,27 +1,21 @@
 ### v2025.2.6
-- Adds a Y1/Y2 chart axis scale option (linear/logarithmic) to area, bar (flow), bar (stock), line,
+- Adds a linear/logarithmic Y1/Y2 axis scale option to area, bar (flow), bar (stock), line,
   scatter, and weather forecast devices.
-- Fixes Theme Manager color/line weight values (from the Theme Manager dialog, and from the
-  user-editable themes JSON file on disk) being written to plugin preferences without validation;
-  now runs the same color/line-weight checks used elsewhere before committing.
-- Fixes `audit_device_props` raising `RuntimeError` (dictionary changed size during iteration)
-  whenever a device had an obsolete prop to remove, silently skipping that part of the startup
-  audit.
-- Fixes 38 log statements using eager `%`-string formatting or f-strings instead of lazy `%s` args,
-  including several that spanned multiple lines or used the `threaddebug` level.
-- Fixes `chart_line.py` missing the X-axis tick/date-formatter setup that every other date-axis
-  chart gets, since it had reimplemented (and diverged from) that logic inline instead of calling
-  the shared helper.
-- Removes `MakeChart` and `ApiDevice`, two unused classes left over from an earlier version of the
-  scripting API; `MakeChart`'s expression evaluator duplicated the one still in active use.
-- Removes stray Python 2.7 `.pyc` files and adds the per-installation generated theme stylesheet
-  files to `.gitignore`.
-- Restructures `plugin.py` for maintainability: device-config validation, CSV Engine handling,
-  Theme Manager handling, config-dialog list generators, startup/maintenance audits, and small
-  color-formatting utilities have all moved out into dedicated modules (`validate.py`,
-  `csv_handling.py`, `theme_handling.py`, `ui_lists.py`, `audits.py`, `color_utils.py`). No
-  functional change intended from this reorganization; `plugin.py` is 2,797 lines, down from
-  4,463.
+- Fixes Theme Manager color and line weight values being written to plugin preferences without
+  validation.
+- Fixes `audit_device_props` raising `RuntimeError` when removing an obsolete device prop, caused
+  by mutating a dict while iterating over it.
+- Fixes 38 log statements using eager `%` formatting or f-strings instead of lazy `%s` args.
+- Fixes `chart_line.py` missing X axis tick/date-formatter setup by reimplementing (and diverging
+  from) that logic inline instead of calling the shared helper.
+- Removes unused `MakeChart` and `ApiDevice` classes; `MakeChart`'s expression evaluator duplicated
+  logic still in use elsewhere.
+- Removes stray Python 2.7 `.pyc` files and gitignores per-installation generated theme stylesheet
+  files.
+- Moves device-config validation, CSV Engine handling, Theme Manager handling, config-dialog list
+  generators, startup audits, and color utilities out of `plugin.py` into dedicated modules
+  (`validate.py`, `csv_handling.py`, `theme_handling.py`, `ui_lists.py`, `audits.py`,
+  `color_utils.py`).
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
