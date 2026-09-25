@@ -18,17 +18,14 @@ plugin forecast charts if linked to the proper Fantastic Weather devices).
 # Built-in modules
 import ast
 import copy
-import glob
 import json
 import logging
 import os
-import re
 import subprocess
 import threading
 import traceback
 from typing import Any, Tuple, Union
 import datetime as dt
-import xml.etree.ElementTree as eTree
 from queue import Queue
 import numpy as np
 from dateutil.parser import parse as date_parse
@@ -36,7 +33,6 @@ from dateutil.parser import parse as date_parse
 import matplotlib
 # Note: this statement must be run before any other matplotlib imports are done.
 matplotlib.use('AGG')
-from matplotlib import font_manager as mfont  # noqa
 from matplotlib import pyplot as plt          # noqa
 from matplotlib import rcParams               # noqa
 
@@ -47,11 +43,14 @@ except ImportError:
 
 # My modules
 import DLFramework.DLFramework as Dave                     # noqa
+import audits                                               # noqa
+import color_utils                                          # noqa
 import csv_handling                                         # noqa
 import maintenance                                         # noqa
 import theme_handling                                       # noqa
+import ui_lists                                             # noqa
 import validate                                            # noqa
-from constants import DEBUG_LABELS, FONT_MENU  # noqa
+from constants import DEBUG_LABELS  # noqa
 from plugin_defaults import kDefaultPluginPrefs            # noqa
 
 # =================================== HEADER ==================================
@@ -627,16 +626,16 @@ class Plugin(indigo.PluginBase):
         self.audit_csv_health()
 
         # ============================ Audit Device Props =============================
-        self.audit_device_props()
+        audits.audit_device_props(get_device_config_ui_xml=self.getDeviceConfigUiXml)
 
         # ============================= Audit Save Paths ==============================
-        self.audit_save_paths()
+        audits.audit_save_paths(prefs=self.pluginPrefs, vers_str_to_tuple=self.versStrToTuple)
 
         # ============================ Audit Theme Paths ==============================
-        self.audit_themes_file()
+        audits.audit_themes_file()
 
         # =========================== Audit Stylesheets ===========================
-        self.audit_stylesheets()
+        audits.audit_stylesheets()
 
     # =============================================================================
     def shutdown(self) -> None:
@@ -922,202 +921,6 @@ class Plugin(indigo.PluginBase):
         csv_handling.audit_csv_health(prefs=self.pluginPrefs)
 
     # =============================================================================
-    def audit_device_props(self) -> bool:
-        """Audit device properties to ensure they match the current plugin configuration.
-
-        Compares the current device config XML layout to each device's pluginProps. Fields present
-        in the XML but missing from the device are added (checkboxes coerced to bool based on
-        defaultValue, or False if unspecified). Keys present in pluginProps but absent from the XML
-        are removed. Should not be called from device_start_comm() to avoid an infinite loop.
-        Should be called from the plugin's startup() method instead.
-
-        Returns:
-            bool: True if the audit completed without errors, False on exception.
-        """
-        self.logger.debug("Updating device properties to match current plugin version.")
-
-        try:
-            # Iterate through the plugin's devices
-            for dev in indigo.devices.iter(filter="self"):
-
-                # =========================== Match Props to Config ===========================
-                # For config props that are not in the device's current definition.
-
-                device_xml = self.getDeviceConfigUiXml(dev.deviceTypeId, dev.id)
-                fields     = []
-                props      = dev.pluginProps
-                tree       = eTree.fromstring(device_xml.encode('utf-8'))
-
-                # Iterate through the Config UI fields
-                for field in tree.iter('Field'):
-
-                    attributes = field.attrib
-
-                    # Ignore UI controls that the device doesn't need to function.
-                    if attributes['type'].lower() not in ('button', 'label', 'separator'):
-
-                        field_id      = attributes['id']    # attribute 'id' is required
-                        field_type    = attributes['type']  # attribute 'type' is required
-                        # attribute 'defaultValue is not required
-                        default_value = attributes.get('defaultValue', "")
-
-                        # Save a list of field IDs for later use.
-                        fields.append(field_id)
-
-                        # If the XML field is not in the device's current props dict
-                        if field_id not in props:
-
-                            # Coerce checkbox default values to bool. Everything that comes in from the XML is a
-                            # string; everything that's not converted will be sent as a string.
-                            if field_type.lower() == 'checkbox':
-                                if default_value.lower() == 'true':
-                                    default_value = True
-                                else:
-                                    # will be False if no defaultValue specified.
-                                    default_value = False
-
-                            props[field_id] = default_value
-                            self.logger.debug(
-                                "[%s] missing prop [%s] will be added. Value set [%s]", dev.name, field_id, default_value
-                            )
-
-                # =========================== Match Config to Props ===========================
-                # For props that have been removed but are still in the device definition.
-
-                for key in props:
-                    if key not in fields:
-
-                        self.logger.debug("[%s] prop obsolete prop [%s] will be removed", dev.name, key)
-                        del props[key]
-
-                # Now that we're done, let's save the updated dict back to the device.
-                dev.replacePluginPropsOnServer(props)
-
-            return True
-
-        except Exception as sub_error:
-            self.logger.warning("Audit device props error: %s", sub_error)
-
-            return False
-
-    def audit_dict_color(self, _dict_: dict) -> dict:
-        """Convert all color strings in a dict (and nested dicts) to '#RRGGBB' format.
-
-        Recursively traverses the given dictionary and replaces any string values that match the
-        'XX XX XX' color pattern with the normalized '#XXXXXX' format required by matplotlib.
-
-        Args:
-            _dict_ (dict): The dictionary to process for color string normalization.
-
-        Returns:
-            dict: A new dictionary with all matching color strings converted.
-        """
-        pattern = r"[0-9A-Fa-f]{2} [0-9A-Fa-f]{2} [0-9A-Fa-f]{2}"
-
-        def process_value(value: Any) -> Any:
-            if isinstance(value, str):
-                return self.fix_rgb(color=value) if re.search(pattern, value) else value
-            elif isinstance(value, dict):
-                return {k: process_value(v) for k, v in value.items()}
-            return value
-
-        return {k: process_value(v) for k, v in _dict_.items()}
-
-    # =============================================================================
-    def audit_save_paths(self) -> None:
-        """Audit and validate the plugin's CSV and chart save path configurations.
-
-        Attempts to access the configured paths for CSV and chart file storage. Creates missing
-        directories and checks write permissions, logging warnings for any inaccessible paths.
-        Also compares the current save path against the expected path for the installed Indigo
-        version and warns if they differ.
-        """
-        # ============================= Audit Save Paths ==============================
-        # Test the current path settings to ensure that they are valid.
-        path_list = (self.pluginPrefs['dataPath'], self.pluginPrefs['chartPath'])
-
-        # If the target folders do not exist, create them.
-        self.logger.debug("Auditing save paths.")
-        for path_name in path_list:
-
-            if not os.path.isdir(path_name):
-                try:
-                    self.logger.warning("Target folder doesn't exist. Creating path:%s", path_name)
-                    os.makedirs(path_name)
-
-                except (IOError, OSError):
-                    self.plugin_error_handler(sub_error=traceback.format_exc())
-                    self.logger.critical(
-                        "Target folder doesn't exist and the plugin is unable to create it. See plugin log for more "
-                        "information."
-                    )
-
-        # Test to ensure that each path is writeable.
-        self.logger.debug("Auditing path IO.")
-        for path_name in path_list:
-            if os.access(path_name, os.W_OK):
-                self.logger.debug("   Path OK: %s", path_name)
-            else:
-                self.logger.critical("   Plugin doesn't have the proper rights to write to the path: %s", path_name)
-
-        # ================ Compare Save Path to Current Indigo Version ================
-        indigo_ver = self.versStrToTuple(indigo.server.version)[0]
-        current_save_path = self.pluginPrefs['chartPath']
-
-        if current_save_path.startswith('/Library/Application Support/Perceptive Automation/Indigo'):
-
-            if indigo_ver <= 7:
-                new_save_path = f"{indigo.server.getInstallFolderPath()}/IndigoWebServer/images/controls/"
-
-                if new_save_path != current_save_path:
-                    self.logger.warning("Charts are being saved to: %s)", current_save_path)
-                    self.logger.warning("You may want to change the save path to: %s", new_save_path)
-
-            elif indigo_ver == 2021:
-                # new_save_path = indigo.server.getInstallFolderPath() + "/Web Assets/images/controls/static/" # TODO
-                new_save_path = f"{indigo.server.getInstallFolderPath()}/Web Assets/images/controls/static/"
-
-                if new_save_path != current_save_path:
-                    self.logger.warning("Charts are being saved to: %s)", current_save_path)
-                    self.logger.warning("You may want to change the save path to: %s", new_save_path)
-
-    # =============================================================================
-    @staticmethod
-    def audit_themes_file() -> None:
-        """Create the themes JSON repository file if it does not already exist.
-
-        Checks for the presence of the plugin themes JSON file in the Indigo Preferences folder
-        and creates an empty JSON object file if the file is not found.
-        """
-        full_path = (indigo.server.getInstallFolderPath() +
-                     "/Preferences/Plugins/matplotlib plugin themes.json")
-        if not os.path.isfile(full_path):
-            with open(full_path, 'w', encoding='utf-8') as outfile:
-                outfile.write(json.dumps({}, indent=4))
-
-    # =============================================================================
-    def audit_stylesheets(self) -> None:
-        """Prune stylesheet files that no longer correspond to a plugin device.
-
-        Compares stylesheet filenames against existing plugin device IDs and removes any
-        orphaned files. Logs each pruned file at the WARNING level. Called once at plugin
-        startup.
-        """
-        if not os.path.exists("Stylesheets/"):
-            return
-
-        valid_ids = {dev.id for dev in indigo.devices.iter(filter='self')}
-
-        for filepath in glob.glob("Stylesheets/*_stylesheet"):
-            basename = os.path.basename(filepath)
-            stem     = basename[: -len("_stylesheet")]
-            if not stem.isdigit():
-                continue
-            if int(stem) not in valid_ids:
-                self.logger.warning("Pruning orphaned stylesheet: %s", basename)
-                os.remove(filepath)
-
-    # =============================================================================
     def chart_stock_bar(self, dev: indigo.Device = None) -> list:
         """Collect stock bar chart data from Indigo devices and variables.
 
@@ -1141,7 +944,7 @@ class Plugin(indigo.PluginBase):
             bar_data = {}  # data for each bar
             try:
                 annotate    = dev.ownerProps[f'bar{_}Annotate']
-                color       = self.fix_rgb(dev.pluginProps[f'bar{_}Color'])
+                color       = color_utils.fix_rgb(dev.pluginProps[f'bar{_}Color'])
                 legend      = dev.ownerProps[f'bar{_}Legend']
                 suppress    = dev.ownerProps[f'suppressBar{_}']
                 thing_id    = int(dev.ownerProps[f'bar{_}Source'])
@@ -1251,11 +1054,11 @@ class Plugin(indigo.PluginBase):
                 plt.rcParams['ytick.right']      = 'False'
 
                 # Color values need a couple of adjustments.
-                plt.rcParams['grid.color']  = self.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
-                plt.rcParams['xtick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
-                plt.rcParams['ytick.color'] = self.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
-                plt.rcParams['xtick.labelcolor'] = self.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
-                plt.rcParams['ytick.labelcolor'] = self.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
+                plt.rcParams['grid.color']  = color_utils.fix_rgb(color=self.pluginPrefs.get('gridColor', '88 88 88'))
+                plt.rcParams['xtick.color'] = color_utils.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+                plt.rcParams['ytick.color'] = color_utils.fix_rgb(color=self.pluginPrefs.get('tickColor', '88 88 88'))
+                plt.rcParams['xtick.labelcolor'] = color_utils.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
+                plt.rcParams['ytick.labelcolor'] = color_utils.fix_rgb(color=p_dict.get('fontColor', '88 88 88'))
 
                 # ============================= Background color ==============================
                 # backgroundColorOther is the transparent background config setting
@@ -1591,8 +1394,8 @@ class Plugin(indigo.PluginBase):
                         # ============================== Line Markers ==============================
                         # Some line markers need to be adjusted due to their inherent value. For example, matplotlib
                         # uses '<', '>' and '.' as markers but storing these values will blow up the XML.  So we need
-                        # to convert them. (See self.formatMarkers() method.)
-                        p_dict = self.format_markers(p_dict=p_dict)
+                        # to convert them. (See color_utils.format_markers().)
+                        p_dict = color_utils.format_markers(p_dict=p_dict)
 
                         # Note that the logging of p_dict and k_dict are handled within the thread.
                         self.logger.threaddebug(f"{f' Generating Chart: {dev.name} ':*^80}")
@@ -1677,12 +1480,12 @@ class Plugin(indigo.PluginBase):
                         # can't be changed in the processes.
 
                         # Audit values in p_dict and k_dict to ensure they're in the proper format.
-                        plug_dict = copy.deepcopy(self.audit_dict_color(_dict_=plug_dict))
+                        plug_dict = copy.deepcopy(audits.audit_dict_color(_dict_=plug_dict))
                         plug_dict['old_prefs'] = None
-                        dev_dict  = self.audit_dict_color(_dict_=dev_dict)
-                        p_dict    = copy.deepcopy(self.audit_dict_color(_dict_=p_dict))
+                        dev_dict  = audits.audit_dict_color(_dict_=dev_dict)
+                        p_dict    = copy.deepcopy(audits.audit_dict_color(_dict_=p_dict))
                         p_dict['old_prefs'] = None
-                        k_dict    = self.audit_dict_color(_dict_=k_dict)
+                        k_dict    = audits.audit_dict_color(_dict_=k_dict)
 
                         # Instantiate basic payload sent to the subprocess scripts. Additional key/value pairs may be
                         # added below before payload is sent.
@@ -2283,36 +2086,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of state/value identifier strings or placeholder tuples.
         """
-        result = None
-        if values_dict['addSource'] != '':
-            try:
-                # User has selected an Indigo device element and then set the filter to Variables
-                # only.
-                if int(values_dict['addSource']) in indigo.devices \
-                        and values_dict['addSourceFilter'] == "V":
-                    result = [('None', 'Please select a data source first')]
-
-                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
-                elif int(values_dict['addSource']) in indigo.devices \
-                        and values_dict['addSourceFilter'] != "V":
-                    dev = indigo.devices[int(values_dict['addSource'])]
-                    result = [x for x in dev.states if ".ui" not in x]
-
-                elif int(values_dict['addSource']) in indigo.variables \
-                        and values_dict['addSourceFilter'] != "D":
-                    result = [('value', 'value')]
-
-                elif int(values_dict['addSource']) in indigo.variables \
-                        and values_dict['addSourceFilter'] == "D":
-                    result = [('None', 'Please select a data source first')]
-
-            except ValueError:
-                result = [('None', 'Please select a data source first')]
-
-        else:
-            result = [('None', 'Please select a data source first')]
-
-        return result
+        return ui_lists.device_state_value_list_add(values_dict=values_dict)
 
     # =============================================================================
     @staticmethod
@@ -2334,91 +2108,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of state/value identifier strings or placeholder tuples.
         """
-        result = None
-        if values_dict['editSource'] != '':
-            try:
-                # User has selected an Indigo device element and then set the filter to Variables only.
-                if int(values_dict['editSource']) in indigo.devices \
-                        and values_dict['editSourceFilter'] == "V":
-                    result = [('None', 'Please select a data source first')]
-
-                # User has selected an Indigo device element and the filter is set to Devices only or Show All.
-                elif int(values_dict['editSource']) in indigo.devices \
-                        and values_dict['editSourceFilter'] != "V":
-                    dev = indigo.devices[int(values_dict['editSource'])]
-                    result = [x for x in dev.states if ".ui" not in x]
-
-                elif int(values_dict['editSource']) in indigo.variables \
-                        and values_dict['editSourceFilter'] != "D":
-                    result = [('value', 'value')]
-
-                elif int(values_dict['editSource']) in indigo.variables \
-                        and values_dict['editSourceFilter'] == "D":
-                    result = [('None', 'Please select a data source first')]
-
-            except ValueError:
-                result = [('None', 'Please select a data source first')]
-
-        else:
-            result = [('None', 'Please select a data source first')]
-
-        return result
-
-    # =============================================================================
-    @staticmethod
-    def fix_rgb(color: str = "") -> str:  # noqa
-        """Normalize a color string to the '#RRGGBB' hex format expected by matplotlib.
-
-        Strips spaces and any leading '#' characters from the input, then prepends a single '#'.
-
-        The leading '#' is required here: this value is used directly as a matplotlib Artist color
-        kwarg (e.g. bar/line color), and matplotlib.colors.to_rgba() rejects a bare hex string
-        ('FF0000' raises ValueError) but accepts the '#'-prefixed form. Don't drop the '#' -- the
-        Stylesheets writer (charts_refresh(), where rcParams is serialized to a '.mplstyle' file)
-        strips it back off there instead, because '#' starts a comment in that file format and a
-        '#'-prefixed color would be silently dropped to matplotlib's default. The two are a matched
-        pair for two different matplotlib color-format conventions, not redundant steps.
-
-        Args:
-            color (str): A color string in any format (e.g., "FF 00 00", "#FF0000").
-
-        Returns:
-            str: A normalized hex color string in '#RRGGBB' format.
-        """
-        rgb_fixed = color.replace(' ', '').replace('#', '')
-        return f"#{rgb_fixed}"
-
-    # =============================================================================
-    @staticmethod
-    def format_markers(p_dict: dict = None) -> dict:  # noqa
-        """Convert XML-safe marker placeholder strings to the actual matplotlib marker characters.
-
-        The Devices.xml file cannot contain '<' or '>' as values because they conflict with XML
-        syntax. This method converts the safe placeholder strings ('PIX', 'TL', 'TR') to their
-        actual matplotlib marker equivalents (',', '<', '>').
-
-        Args:
-            p_dict (dict): The plotting parameters dictionary containing marker key/value pairs.
-
-        Returns:
-            dict: The updated p_dict with marker values converted to matplotlib-compatible strings.
-        """
-        markers     = (
-            'area1Marker', 'area2Marker', 'area3Marker', 'area4Marker', 'area5Marker', 'area6Marker', 'area7Marker',
-            'area8Marker', 'line1Marker', 'line2Marker', 'line3Marker', 'line4Marker', 'line5Marker', 'line6Marker',
-            'line7Marker', 'line8Marker', 'group1Marker', 'group2Marker', 'group3Marker', 'group4Marker'
-        )
-
-        marker_dict = {"PIX": ",", "TL": "<", "TR": ">"}
-
-        for marker in markers:
-            try:
-                if p_dict[marker] in marker_dict:
-                    p_dict[marker] = marker_dict[p_dict[marker]]
-            except KeyError:
-                ...
-
-        return p_dict
+        return ui_lists.device_state_value_list_edit(values_dict=values_dict)
 
     # =============================================================================
     def generatorDeviceStates(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
@@ -2475,11 +2165,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (value, label) tuples for 0–3 decimal place precision options.
         """
-        return [("0", "0 (#)*"),
-                ("1", "1 (#.#)"),
-                ("2", "2 (#.##)"),
-                ("3", "3 (#.###)"),
-                ]
+        return ui_lists.generatorPrecisionList()
 
     # =============================================================================
     @staticmethod
@@ -2495,14 +2181,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (value, label) tuples for matplotlib line styles.
         """
-        return [
-            ("--", "Dashed"),
-            (":", "Dotted"),
-            ("-.", "Dot Dash"),
-            ("-", "Solid"),
-            ("-1", "%%separator%%"),
-            ("None", "None*"),
-        ]
+        return ui_lists.generatorLineStyleDefaultNoneList()
 
     # =============================================================================
     @staticmethod
@@ -2518,14 +2197,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (value, label) tuples for matplotlib line styles.
         """
-        return [
-            ("--", "Dashed"),
-            (":", "Dotted"),
-            ("-.", "Dot Dash"),
-            ("-", "Solid*"),
-            ("-1", "%%separator%%"),
-            ("None", "None"),
-        ]
+        return ui_lists.generatorLineStyleDefaultSolidList()
 
     # =============================================================================
     @staticmethod
@@ -2541,32 +2213,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (value, label) tuples for matplotlib marker styles.
         """
-        return [
-            ("o", "Circle"),
-            ("D", "Diamond"),
-            ("d", "Diamond(Thin)"),
-            ("h", "Hexagon 1"),
-            ("H", "Hexagon 2"),
-            ("-", "Horizontal Line"),
-            ("8", "Octagon"),
-            ("p", "Pentagon"),
-            ("PIX", "Pixel"),
-            ("+", "Plus"),
-            (".", "Point"),
-            ("*", "Star"),
-            ("s", "Square"),
-            ("v", "Triangle Down"),
-            ("TL", "Triangle Left"),
-            ("TR", "Triangle Right"),
-            ("1", "Tri Down"),
-            ("2", "Tri Up"),
-            ("3", "Tri Left"),
-            ("4", "Tri Right"),
-            ("|", "Vertical Line"),
-            ("x", "X"),
-            ("-1", "%%separator%%"),
-            ("None", "None*")
-        ]
+        return ui_lists.generatorMarkerList()
 
 # =============================================================================
     def latestDevVarList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
@@ -2639,27 +2286,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (format_string, example_label) tuples.
         """
-        now = dt.datetime.now()
-
-        return [
-            ("None", "None"),
-            ("-1", "%%separator%%"),
-            ("%I:%M", dt.datetime.strftime(now, "%I:%M") + ' (12 hour clock)'),
-            ("%H:%M", dt.datetime.strftime(now, "%H:%M") + ' (24 hour clock)'),
-            ("%l:%M %p", dt.datetime.strftime(now, "%l:%M %p").strip() + ' (full time)'),
-            ("%a", dt.datetime.strftime(now, "%a") + ' (short day)'),
-            ("%A", dt.datetime.strftime(now, "%A") + ' (long day)*'),
-            ("%b", dt.datetime.strftime(now, "%b") + ' (short month)'),
-            ("%B", dt.datetime.strftime(now, "%B") + ' (long month)'),
-            ("%d", dt.datetime.strftime(now, "%d") + ' (date)'),
-            ("%Y", dt.datetime.strftime(now, "%Y") + ' (year)'),
-            ("%b %d", dt.datetime.strftime(now, "%b %d") + ' (month date)'),
-            ("%d %b", dt.datetime.strftime(now, "%d %b") + ' (date month)'),
-            ("%b %y", dt.datetime.strftime(now, "%b %y") + ' (month year)'),
-            ("%y %b", dt.datetime.strftime(now, "%y %b") + ' (year month)'),
-            ("%b %d %Y", dt.datetime.strftime(now, "%b %d %Y") + ' (full date)'),
-            ("%Y %b %d", dt.datetime.strftime(now, "%Y %b %d") + ' (full date)')
-        ]
+        return ui_lists.get_axis_list()
 
     # =============================================================================
     @staticmethod
@@ -2678,12 +2305,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (device_id, device_name) tuples for battery-powered devices.
         """
-        batt_list = [(dev.id, dev.name) for dev in indigo.devices.iter() if dev.batteryLevel is not None]
-
-        if len(batt_list) == 0:
-            batt_list = [(-1, 'No battery devices detected.'), ]
-
-        return batt_list
+        return ui_lists.get_battery_device_list()
 
     # =============================================================================
     def getFileList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
@@ -2701,27 +2323,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A sorted list of (filename, display_name) tuples plus a 'None' entry.
         """
-        file_name_list_menu = []
-        default_path = f"{indigo.server.getLogsFolderPath()}/com.fogbert.indigoplugin.matplotlib/"
-        source_path = self.pluginPrefs.get('dataPath', default_path)
-
-        try:
-            for file_name in glob.glob(f"{source_path}*.csv"):
-                final_filename = os.path.basename(file_name)
-                file_name_list_menu.append((final_filename, final_filename[:-4]))
-
-            # Sort the file list (case-insensitive sort)
-            file_name_list_menu = sorted(file_name_list_menu, key=lambda s: s[0].lower())
-
-            # Add 'None' as an option, and show it first in list
-            file_name_list_menu = file_name_list_menu + [("-5", "%%separator%%"), ("None", "None")]
-
-        except IOError as sub_error:
-            self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error("Error generating file list: %s. See plugin log for more information.", sub_error)
-
-        # return sorted(file_name_list_menu, key=lambda s: s[0].lower())  # Case insensitive sort
-        return file_name_list_menu
+        return ui_lists.getFileList(prefs=self.pluginPrefs)
 
     # =============================================================================
     def getFontList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
@@ -2739,24 +2341,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A sorted list of font name strings.
         """
-        font_menu = []
-
-        try:
-            for font in mfont.findSystemFonts(fontpaths=None, fontext='ttf'):
-                font_name = os.path.splitext(os.path.basename(font))[0]
-                if font_name not in font_menu:
-                    font_menu.append(font_name)
-
-        except Exception as sub_error:
-            self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error(
-                "Error building font list. Returning generic list. %s. See plugin log for more information.",
-                sub_error
-            )
-
-            font_menu = FONT_MENU
-
-        return sorted(font_menu)
+        return ui_lists.getFontList()
 
     # =============================================================================
     @staticmethod
@@ -2775,11 +2360,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A list of (id, label) tuples for the refresh menu.
         """
-        menu = [('all', 'All Charts'), ('auto', 'Skip Manual Charts'), ('-1', '%%separator%%')]
-
-        _ = [menu.append((dev.id, dev.name)) for dev in indigo.devices.iter(filter="self") if dev.pluginProps['isChart']]
-
-        return menu
+        return ui_lists.getRefreshList()
 
     # =============================================================================
     def getForecastSource(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
@@ -2798,31 +2379,7 @@ class Plugin(indigo.PluginBase):
         Returns:
             list: A case-insensitive sorted list of (device_id, device_name) tuples.
         """
-        forecast_source_menu = []
-
-        # We accept both WUnderground (legacy) and Fantastic Weather devices. We have to construct these one at a time.
-        # Note the typo in the bundle identifier is correct.
-        try:
-            for dev in indigo.devices.iter("com.fogbert.indigoplugin.fantasticwWeather"):
-                if dev.deviceTypeId in ('Daily', 'Hourly'):
-                    forecast_source_menu.append((dev.id, dev.name))
-
-            for dev in indigo.devices.iter("com.fogbert.indigoplugin.wunderground"):
-                if dev.deviceTypeId in ('wundergroundTenDay', 'wundergroundHourly'):
-                    forecast_source_menu.append((dev.id, dev.name))
-
-        except Exception as sub_error:
-            self.plugin_error_handler(sub_error=traceback.format_exc())
-            self.logger.error(
-                "Error getting list of forecast devices: %s. See plugin log for more information.", sub_error
-            )
-
-        self.logger.threaddebug(
-            "Forecast device list generated successfully: %s", forecast_source_menu
-        )
-        self.logger.threaddebug("forecast_source_menu: %s", forecast_source_menu)
-
-        return sorted(forecast_source_menu, key=lambda s: s[1].lower())
+        return ui_lists.getForecastSource()
 
     # =============================================================================
     def plotActionApi(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> dict:  # noqa

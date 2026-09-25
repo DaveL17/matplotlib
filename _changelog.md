@@ -1,12 +1,34 @@
 ### v2025.2.6
-- Addresses findings from the `AUDIT.md` project audit (in progress).
+- Adds a Y1/Y2 chart axis scale option (linear/logarithmic) to area, bar (flow), bar (stock), line,
+  scatter, and weather forecast devices.
+- Fixes Theme Manager color/line weight values (from the Theme Manager dialog, and from the
+  user-editable themes JSON file on disk) being written to plugin preferences without validation;
+  now runs the same color/line-weight checks used elsewhere before committing.
+- Fixes `audit_device_props` raising `RuntimeError` (dictionary changed size during iteration)
+  whenever a device had an obsolete prop to remove, silently skipping that part of the startup
+  audit.
+- Fixes 38 log statements using eager `%`-string formatting or f-strings instead of lazy `%s` args,
+  including several that spanned multiple lines or used the `threaddebug` level.
+- Fixes `chart_line.py` missing the X-axis tick/date-formatter setup that every other date-axis
+  chart gets, since it had reimplemented (and diverged from) that logic inline instead of calling
+  the shared helper.
+- Removes `MakeChart` and `ApiDevice`, two unused classes left over from an earlier version of the
+  scripting API; `MakeChart`'s expression evaluator duplicated the one still in active use.
+- Removes stray Python 2.7 `.pyc` files and adds the per-installation generated theme stylesheet
+  files to `.gitignore`.
+- Restructures `plugin.py` for maintainability: device-config validation, CSV Engine handling,
+  Theme Manager handling, config-dialog list generators, startup/maintenance audits, and small
+  color-formatting utilities have all moved out into dedicated modules (`validate.py`,
+  `csv_handling.py`, `theme_handling.py`, `ui_lists.py`, `audits.py`, `color_utils.py`). No
+  functional change intended from this reorganization; `plugin.py` is 2,797 lines, down from
+  4,463.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
   digit in the stock horizontal bar config validator.
 - Fixes `pluginPrefs.get('backgroundColorOther', 'false')` and `pluginPrefs.get('faceColorOther',
   'false')` using a non-empty string default (always truthy) instead of boolean `False`.
-- Fixes CSV column rename deleting the old key without inserting the new key, causing the column to
+- Fixes CSV column rename deleting  the old key without inserting the new key, causing the column to
   be lost instead of renamed.
 - Removes duplicate `p_dict.update(dev.pluginProps)` call in `charts_refresh` that was overwritten
   immediately by the second call.
