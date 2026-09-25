@@ -169,7 +169,7 @@ class Plugin(indigo.PluginBase):
             # Debug Logging
             self.debug_level = int(values_dict.get('showDebugLevel', "30"))
             self.indigo_log_handler.setLevel(self.debug_level)
-            indigo.server.log(f"Debugging on (Level: {DEBUG_LABELS[self.debug_level]} ({self.debug_level})")
+            indigo.server.log(f"Logging Level: {DEBUG_LABELS[self.debug_level]} ({self.debug_level})")
 
             # Plugin-specific actions
             if values_dict['verboseLogging']:

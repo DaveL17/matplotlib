@@ -22,6 +22,14 @@
   was set, ignoring the `transparent_charts` toggle every other chart type respects.
 - Consolidates the exception-handling/JSON-output footer and transparent-fill patch duplicated
   across all `chart_*.py` scripts into shared `chart_tools` helpers.
+- Fixes `chart_bar_stock_horizontal.py` logging "chart_bar_stock.py called." on startup instead of
+  its own filename.
+- Fixes the plugin preferences dialog logging "Debugging on (Level: Informational Messages (20)"
+  (mislabeled and missing a closing parenthesis) to "Logging Level: Informational Messages (20)".
+- Consolidates the startup stylesheet-load/verbose-payload-dump boilerplate duplicated across all
+  `chart_*.py` scripts, and the `_log_traceback` triplicated in `audits.py`, `csv_handling.py`, and
+  `ui_lists.py`, into shared helpers (`chart_tools.chart_startup`, new `log_utils.py`).
+- Removes `AUDIT.md`; all findings have been addressed or deferred.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
