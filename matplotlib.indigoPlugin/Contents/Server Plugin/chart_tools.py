@@ -899,6 +899,8 @@ def format_custom_line_segments(ax: Any, plug_dict: dict, p_dict: dict, k_dict: 
                 f"settings. {sub_error}. See plugin log for more information."
             )
 
+    return None
+
 
 # =============================================================================
 def format_dates(list_of_dates: list, logger: dict) -> Optional[np.ndarray]:
