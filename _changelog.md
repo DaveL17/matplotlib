@@ -33,6 +33,14 @@
 - Consolidates the axis min/max bound-computation algorithm duplicated across
   `format_axis_x_min_max`, `format_axis_y1_min_max`, and `format_axis_y2_min_max` into a shared
   `chart_tools._axis_min_max` helper.
+- Fixes `Maintain.clean_props()` raising `NameError` when converting a legacy hex color prop or
+  logging with verbose logging enabled, caused by referencing `my_logger` instead of
+  `self.my_logger`.
+- Fixes `plotActionApi`'s return type annotation (`dict`) not matching its documented and actual
+  `dict | None` return.
+- Marks `dummyCallback`, `chart_stock_bar`, `csv_check_unique`, `csv_item_delete`, `csv_item_list`,
+  `csv_item_update`, `csv_item_select`, `getFontList`, `getForecastSource`, and
+  `themeNameGenerator` as `@staticmethod`; none used `self`.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

@@ -457,7 +457,7 @@ class Maintain:
                     # Update legacy color values from hex to raw (#FFFFFF --> FF FF FF)
                     if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(props[prop])):
                         # pylint: disable=logging-not-lazy
-                        my_logger.debug("[%s] Refactoring color property: (%s)", dev.name, prop)
+                        self.my_logger.debug("[%s] Refactoring color property: (%s)", dev.name, prop)
                         props[prop] = f"{props[prop][1:3]} {props[prop][3:5]} {props[prop][5:7]}"
 
                     # ============================== Fix Line Styles ==============================
@@ -525,7 +525,7 @@ class Maintain:
             dev.replacePluginPropsOnServer(props)
 
             if self.plugin.pluginPrefs.get('verboseLogging', False):
-                my_logger.debug("[%s] prefs cleaned.", dev.name)   # pylint: disable=logging-not-lazy
+                self.my_logger.debug("[%s] prefs cleaned.", dev.name)   # pylint: disable=logging-not-lazy
 
         except Exception as err:
             indigo.server.log(str(err), isError=True)

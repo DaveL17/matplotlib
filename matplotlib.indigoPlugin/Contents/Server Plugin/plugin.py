@@ -127,12 +127,12 @@ class Plugin(indigo.PluginBase):
         """Handle cleanup when a device configuration dialog is closed.
 
         Logs the final values_dict if the user confirmed, or a cancellation message if the user
-        cancelled. If the device is fully configured and is a chart device type, queues a chart
+        canceled. If the device is fully configured and is a chart device type, queues a chart
         refresh.
 
         Args:
             values_dict (indigo.Dict): The configuration values from the dialog.
-            user_cancelled (bool): True if the user cancelled the dialog without saving.
+            user_cancelled (bool): True if the user canceled the dialog without saving.
             type_id (str): The device type identifier string.
             dev_id (int): The Indigo device ID.
 
@@ -845,7 +845,8 @@ class Plugin(indigo.PluginBase):
         self.logger.threaddebug("[%-19s] Props: %s", dev.name, dict(dev.pluginProps))
 
     # =============================================================================
-    def dummyCallback(self, values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> None:  # noqa
+    @staticmethod
+    def dummyCallback(values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> None:  # noqa
         """Serve as a no-op callback to force configuration dialog refreshes.
 
         Provides a callback target for configuration dialog controls that use dynamicReload=True.
@@ -921,7 +922,8 @@ class Plugin(indigo.PluginBase):
         csv_handling.audit_csv_health(prefs=self.pluginPrefs)
 
     # =============================================================================
-    def chart_stock_bar(self, dev: indigo.Device = None) -> list:
+    @staticmethod
+    def chart_stock_bar(dev: indigo.Device = None) -> list:
         """Collect stock bar chart data from Indigo devices and variables.
 
         Iterates through up to five bar data sources configured on the device. Reads each value
@@ -1821,7 +1823,8 @@ class Plugin(indigo.PluginBase):
                 )
 
     # =============================================================================
-    def csv_check_unique(self) -> None:
+    @staticmethod
+    def csv_check_unique() -> None:
         """Check CSV Engine devices for duplicate CSV filename references.
 
         Iterates through all CSV Engine devices and builds a mapping of CSV filenames to the
@@ -1850,7 +1853,8 @@ class Plugin(indigo.PluginBase):
         return csv_handling.csv_item_add(values_dict=values_dict, dev_id=dev_id, prefs=self.pluginPrefs)
 
     # =============================================================================
-    def csv_item_delete(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
+    @staticmethod
+    def csv_item_delete(values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
         """Delete the selected CSV data source item from the CSV Engine configuration.
 
         Called when the user clicks the 'Delete Item' button in the CSV Engine config dialog.
@@ -1867,7 +1871,8 @@ class Plugin(indigo.PluginBase):
         return csv_handling.csv_item_delete(values_dict=values_dict, dev_id=dev_id)
 
     # =============================================================================
-    def csv_item_list(self, filter: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
+    @staticmethod
+    def csv_item_list(filter: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """Generate the sorted list of CSV item key/name pairs for the CSV Engine config dialog.
 
         Reads the columnDict from values_dict and returns a case-insensitive sorted list of
@@ -1886,7 +1891,8 @@ class Plugin(indigo.PluginBase):
         return csv_handling.csv_item_list(values_dict=values_dict, target_id=target_id)
 
     # =============================================================================
-    def csv_item_update(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[indigo.Dict, indigo.Dict]:  # noqa
+    @staticmethod
+    def csv_item_update(values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> Tuple[indigo.Dict, indigo.Dict]:  # noqa
         """Update a CSV data source item in the CSV Engine device configuration.
 
         Called when the user clicks the 'Update Item' button in the CSV Engine config dialog.
@@ -1904,7 +1910,8 @@ class Plugin(indigo.PluginBase):
         return csv_handling.csv_item_update(values_dict=values_dict, dev_id=dev_id)
 
     # =============================================================================
-    def csv_item_select(self, values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
+    @staticmethod
+    def csv_item_select(values_dict: indigo.Dict = None, type_id: str = "", dev_id: int = 0) -> dict:  # noqa
         """Populate CSV Engine edit controls when the user selects an item from the item list.
 
         Called when the user selects an item from the CSV Engine Item List dropdown. Reads the
@@ -2326,7 +2333,8 @@ class Plugin(indigo.PluginBase):
         return ui_lists.getFileList(prefs=self.pluginPrefs)
 
     # =============================================================================
-    def getFontList(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
+    @staticmethod
+    def getFontList(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """Return a sorted list of font names visible to matplotlib for dropdown menus.
 
         These are the fonts that matplotlib can discover, not necessarily all fonts installed on the
@@ -2363,7 +2371,8 @@ class Plugin(indigo.PluginBase):
         return ui_lists.getRefreshList()
 
     # =============================================================================
-    def getForecastSource(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
+    @staticmethod
+    def getForecastSource(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """Return a sorted list of compatible weather forecast source devices.
 
         Iterates over Fantastic Weather and WUnderground plugin devices and returns those with
@@ -2382,7 +2391,7 @@ class Plugin(indigo.PluginBase):
         return ui_lists.getForecastSource()
 
     # =============================================================================
-    def plotActionApi(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> dict:  # noqa
+    def plotActionApi(self, plugin_action: indigo.ActionGroup = None, dev: indigo.Device = None, caller_waiting_for_result: bool = False) -> dict | None:  # noqa
         """Handle simple chart generation API calls from Indigo Action items.
 
         Provides a scripting API entry point for generating a basic matplotlib line chart from
@@ -2451,6 +2460,8 @@ class Plugin(indigo.PluginBase):
             # Note! returns from actions that were called by calls to indigo.executeAction() can't be Bools,
             # indigo.Dict -- and likely other types. Strings and the following dict will work.
             return {'success': True, 'message': "Success"}
+
+        return None
 
     # =============================================================================
     def pluginEnvironmentLogger(self) -> None:  # noqa
@@ -2529,7 +2540,7 @@ class Plugin(indigo.PluginBase):
             try:
                 replies = json.loads(replies)
             except json.decoder.JSONDecodeError:
-                return
+                return None
             success = True
 
             for msg in replies['Threaddebug']:
@@ -2571,6 +2582,8 @@ class Plugin(indigo.PluginBase):
             else:
                 self.logger.critical(errors)
                 dev.updateStateImageOnServer(indigo.kStateImageSel.Error)
+
+        return None
 
     # =============================================================================
     @staticmethod
@@ -2709,7 +2722,8 @@ class Plugin(indigo.PluginBase):
         indigo.server.log('Snapshot written to user home directory.')
 
     # =============================================================================
-    def themeNameGenerator(self, fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
+    @staticmethod
+    def themeNameGenerator(fltr: str = "", values_dict: indigo.Dict = None, type_id: str = "", target_id: int = 0) -> list:  # noqa
         """Return a sorted list of theme names from the themes JSON file for UI dropdown controls.
 
         Reads the themes JSON file from the Indigo Preferences folder and returns a sorted list of
@@ -2794,4 +2808,3 @@ class Plugin(indigo.PluginBase):
                 validation failure.
         """
         return theme_handling.themeExecuteActionButton(values_dict=values_dict, prefs=self.pluginPrefs)
-
