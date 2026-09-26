@@ -62,9 +62,6 @@ try:
             P_DICT['y_obs1'].append(STATE_LIST[f'h{counter}_temperature'])
             P_DICT['y_obs3'].append(STATE_LIST[f'h{counter}_precipChance'])
 
-            # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
-
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
             # case.
             if set(P_DICT['y_obs3']) == {0.0}:
@@ -74,6 +71,9 @@ try:
             P_DICT['headers_1'] = ('Temperature',)
             # that Matplotlib interprets the legend as a tuple.
             P_DICT['headers_2'] = ('Precipitation',)
+
+        # Convert the date strings for charting.
+        dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
     # ======================== WUnderground Hourly Device =========================
     elif DEV_TYPE == 'wundergroundHourly':
@@ -85,9 +85,6 @@ try:
             P_DICT['y_obs1'].append(STATE_LIST[f'h{counter}_temp'])
             P_DICT['y_obs3'].append(STATE_LIST[f'h{counter}_precip'])
 
-            # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
-
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
             # case.
             if set(P_DICT['y_obs3']) == {0.0}:
@@ -96,6 +93,9 @@ try:
             # Note that the trailing comma is required to ensure that Matplotlib interprets the legend as a tuple.
             P_DICT['headers_1'] = ('Temperature',)
             P_DICT['headers_2'] = ('Precipitation',)
+
+        # Convert the date strings for charting.
+        dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
     # ========================== Fantastic Daily Device ===========================
     elif DEV_TYPE == 'Daily':
@@ -108,9 +108,6 @@ try:
             P_DICT['y_obs2'].append(STATE_LIST[f'd{counter}_temperatureLow'])
             P_DICT['y_obs3'].append(STATE_LIST[f'd{counter}_precipChance'])
 
-            # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
-
             # Note that bar plots behave strangely if all the y obs are zero. We need to adjust slightly if that's the
             # case.
             if set(P_DICT['y_obs3']) == {0.0}:
@@ -118,6 +115,9 @@ try:
 
             P_DICT['headers_1'] = ('High Temperature', 'Low Temperature',)
             P_DICT['headers_2'] = ('Precipitation',)
+
+        # Convert the date strings for charting.
+        dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
     # ======================== WUnderground Ten Day Device ========================
     elif DEV_TYPE == 'wundergroundTenDay':
@@ -131,9 +131,6 @@ try:
             P_DICT['y_obs2'].append(STATE_LIST[f'd{counter}_low'])
             P_DICT['y_obs3'].append(STATE_LIST[f'd{counter}_pop'])
 
-            # Convert the date strings for charting.
-            dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
-
             # Note that bar plots behave strangely if all the y obs are zero.  We need to adjust slightly if that's the
             # case.
             if set(P_DICT['y_obs3']) == {0.0}:
@@ -141,6 +138,9 @@ try:
 
             P_DICT['headers_1'] = ('High Temperature', 'Low Temperature',)
             P_DICT['headers_2'] = ('Precipitation',)
+
+        # Convert the date strings for charting.
+        dates_to_plot = chart_tools.format_dates(list_of_dates=P_DICT['x_obs1'], logger=LOG)
 
     else:
         LOG['Warning'].append(
@@ -225,7 +225,9 @@ try:
         frame = legend.get_frame()
         frame.set_alpha(0)  # Note: frame alpha should be an int and not a string.
 
-    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    # Note: ax1 carries the precipitation (Y2) series -- see the "AX2" section below for why the
+    # ax1/ax2 objects are swapped relative to their Y1/Y2 semantics.
+    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG, axis_label='Y2')
 
     # ========================== Transparent Charts Fill ==========================
     chart_tools.add_transparent_fill_patch(ax=ax1, p_dict=P_DICT)
@@ -397,7 +399,8 @@ try:
         tick.label2.set_fontsize(PLUG_DICT['tickFontSize'])
 
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
-    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    # ax2 carries the temperature (Y1) series.
+    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG, axis_label='Y1')
 
     # With the upgrade to matplotlib 3.5.1, tick labels were automatically being assigned to `ax` (even though 'ax' is
     # not overtly referenced). Therefore, we set them to an empty list to suppress them.

@@ -245,7 +245,7 @@ try:
         logger=LOG,
         orient="horiz"
     )
-    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
+    chart_tools.format_grids(p_dict=P_DICT, k_dict=K_DICT, logger=LOG, axis_label='Y1')
     chart_tools.format_title(p_dict=P_DICT, k_dict=K_DICT, loc=(0.5, 0.98))
     chart_tools.format_axis_x_label(dev=PROPS, p_dict=P_DICT, k_dict=K_DICT, logger=LOG)
     chart_tools.format_axis_y1_label(p_dict=P_DICT, k_dict=K_DICT, logger=LOG)

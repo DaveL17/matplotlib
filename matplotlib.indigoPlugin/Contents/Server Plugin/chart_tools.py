@@ -942,19 +942,22 @@ def format_dates(list_of_dates: list, logger: dict) -> Optional[np.ndarray]:
 
 
 # =============================================================================
-def format_grids(p_dict: dict, k_dict: dict, logger: dict) -> None:
+def format_grids(p_dict: dict, k_dict: dict, logger: dict, axis_label: str) -> None:
     """Enable X and/or Y axis grid lines based on the configured preferences.
 
     Checks the showxAxisGrid and showyAxisGrid flags in p_dict and enables the corresponding
-    matplotlib grid lines using the style properties from k_dict.
+    matplotlib grid lines (on the current axes, `plt.gca()`) using the style properties from
+    k_dict.
 
     Args:
         p_dict (dict): Plotting parameters dictionary containing 'showxAxisGrid' and 'showyAxisGrid'.
         k_dict (dict): Plotting kwargs dictionary containing the 'k_grid_fig' entry.
         logger (dict): The logging message dictionary for appending warnings and debug info.
+        axis_label (str): Which axes this call is formatting (e.g., "Y1", "Y2"), so that charts
+            with more than one subplot/axes (via twinx()) produce distinguishable log messages.
     """
 
-    LOG['Debug'].append(f"[{payload['props']['name']}] Formatting grids.")
+    LOG['Debug'].append(f"[{payload['props']['name']}] Formatting {axis_label} grids.")
 
     try:
         if p_dict['showxAxisGrid']:

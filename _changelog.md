@@ -46,6 +46,12 @@
   `bar_stock_chart` and `bar_stock_horizontal_chart`, into shared `validate.py` helpers.
 - Fixes `bar_stock_chart` not setting `settingsGroup` when a selected device state can't be
   charted, unlike `bar_stock_horizontal_chart`'s equivalent check.
+- Fixes `chart_weather_forecast.py` calling `chart_tools.format_dates` once per observation
+  inside each device type's data loop (redoing the same date-list conversion repeatedly and
+  flooding the debug log with "Formatting dates." messages) instead of once after the loop.
+- Adds a required `axis_label` argument to `chart_tools.format_grids` so its debug log message
+  identifies which axis ("Y1", "Y2", etc.) is being formatted, distinguishing the two calls in
+  `chart_weather_forecast.py` (previously both logged an identical "Formatting grids." line).
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
