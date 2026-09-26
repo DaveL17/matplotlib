@@ -196,7 +196,7 @@ class Plugin(indigo.PluginBase):
         Args:
             dev (indigo.Device): The Indigo device instance being started.
         """
-        self.logger.debug("[%s] Starting chart device.", dev.name)
+        self.logger.debug("[%s] Starting device.", dev.name)
         # If we're coming here from a sleep state, we need to ensure that the plugin shutdown global is in its proper
         # state.
         self.pluginIsShuttingDown = False

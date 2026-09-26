@@ -52,6 +52,11 @@
 - Adds a required `axis_label` argument to `chart_tools.format_grids` so its debug log message
   identifies which axis ("Y1", "Y2", etc.) is being formatted, distinguishing the two calls in
   `chart_weather_forecast.py` (previously both logged an identical "Formatting grids." line).
+- Adds debug log messages to `chart_weather_forecast.py` marking the forecast-data-retrieval,
+  data-parsed, and daytime-highlighting stages, matching the level of detail other chart types
+  get from their shared CSV-handling helpers.
+- Fixes `device_start_comm` logging "Starting chart device." for CSV Engine devices, which aren't
+  charts, to "Starting device."
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

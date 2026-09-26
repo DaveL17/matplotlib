@@ -47,6 +47,8 @@ try:
                 f"[{CHART_NAME}] A line color is the same as the background color (so you will not be able to see it)."
             )
 
+    LOG['Debug'].append(f"[{CHART_NAME}] Retrieving weather forecast data ({DEV_TYPE}).")
+
     # ========================== Fantastic Hourly Device ==========================
     if DEV_TYPE == 'Hourly':
 
@@ -148,6 +150,8 @@ try:
             f"forecast devices."
         )
 
+    LOG['Debug'].append(f"[{CHART_NAME}] Weather forecast data parsed.")
+
     if PLUG_DICT['verboseLogging']:
         LOG['Threaddebug'].append(f"[{CHART_NAME}] p_dict: {P_DICT}")
 
@@ -238,6 +242,7 @@ try:
 
     if daylight and DEV_TYPE in ('Hourly', 'wundergroundHourly'):
 
+        LOG['Debug'].append(f"[{CHART_NAME}] Formatting daytime highlighting.")
         sun_rise, sun_set = chart_tools.format_dates(list_of_dates=SUN_RISE_SET, logger=LOG)
 
         min_dates_to_plot = np.amin(dates_to_plot)
