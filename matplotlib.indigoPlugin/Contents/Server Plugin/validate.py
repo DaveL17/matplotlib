@@ -269,6 +269,84 @@ def custom_ticks(values_dict: indigo.Dict, error_dict: indigo.Dict) -> Tuple[ind
     return values_dict, error_dict
 
 
+def _validate_bar_source_and_width(
+    values_dict: indigo.Dict, error_msg_dict: indigo.Dict, set_bar_label_1: bool = False
+) -> Tuple[indigo.Dict, indigo.Dict]:
+    """Validate the bar source and bar width fields shared by all bar chart types.
+
+    Ensures at least one data source (bar 1) is selected and that the bar width is a real number
+    greater than zero. Also runs the shared custom tick validation.
+
+    Args:
+        values_dict (indigo.Dict): The device configuration values.
+        error_msg_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+        set_bar_label_1 (bool): Whether to force `barLabel1` on when bar 1's source is unset (flow bar
+            charts only).
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
+    """
+    # Must select at least one source (bar 1)
+    if values_dict['bar1Source'] == 'None':
+        error_msg_dict['bar1Source'] = "You must select at least one data source."
+        if set_bar_label_1:
+            values_dict['barLabel1'] = True
+        values_dict['settingsGroup'] = "1"
+
+    try:
+        # Bar width must be greater than 0. Will also trap strings.
+        if float(values_dict['barWidth']) <= 0:
+            raise ValueError
+    except ValueError:
+        error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
+        values_dict['settingsGroup'] = "ch"
+
+    return custom_ticks(values_dict, error_msg_dict)
+
+
+def _validate_bar_chartable_values(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
+    """Validate that each selected stock bar source resolves to a chartable value.
+
+    Shared by bar_stock_chart and bar_stock_horizontal_chart. Ensures each selected bar source
+    (1-5) resolves to a chartable (int, float, bool) device state or variable value.
+
+    Args:
+        values_dict (indigo.Dict): The device configuration values.
+        error_msg_dict (indigo.Dict): The error message dictionary to populate with validation failures.
+
+    Returns:
+        tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
+    """
+    for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
+
+        # Pull the number out of the source key
+        n = re.search('[0-9]', source)
+
+        # Get the id of the bar source
+        if values_dict[f'bar{n.group(0)}Source'] != "None":
+            source_id = int(values_dict[f'bar{n.group(0)}Source'])
+
+            # By definition, it will either be a device ID or a variable ID.
+            if source_id in indigo.devices:
+
+                # Get the selected device state value
+                val = indigo.devices[source_id].states[values_dict[source]]
+                if not isinstance(val, (int, float, bool)):
+                    error_msg_dict[source] = "The selected device state can not be charted due to its value."
+                    values_dict['settingsGroup'] = n.group(0)
+
+            else:
+                val = indigo.variables[source_id].value
+                try:
+                    float(val)
+                except ValueError:
+                    if val.lower() not in ['true', 'false']:
+                        error_msg_dict[source] = "The selected variable can not be charted due to its value."
+                        values_dict['settingsGroup'] = str(n.group(0))
+
+    return values_dict, error_msg_dict
+
+
 # ================================ Area Chart ==================================
 def area_chart(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tuple[indigo.Dict, indigo.Dict]:
     """Validate area charting device configuration.
@@ -316,21 +394,9 @@ def bar_flow_chart(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tup
     Returns:
         tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
-    # Must select at least one source (bar 1)
-    if values_dict['bar1Source'] == 'None':
-        error_msg_dict['bar1Source'] = "You must select at least one data source."
-        values_dict['barLabel1'] = True
-        values_dict['settingsGroup'] = "1"
-
-    try:
-        # Bar width must be greater than 0. Will also trap strings.
-        if float(values_dict['barWidth']) <= 0:
-            raise ValueError
-    except ValueError:
-        error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-        values_dict['settingsGroup'] = "ch"
-
-    values_dict, error_msg_dict = custom_ticks(values_dict, error_msg_dict)
+    values_dict, error_msg_dict = _validate_bar_source_and_width(
+        values_dict, error_msg_dict, set_bar_label_1=True
+    )
 
     my_logger.debug("Flow bar chart validated.")
     return values_dict, error_msg_dict
@@ -351,47 +417,8 @@ def bar_stock_chart(values_dict: indigo.Dict, error_msg_dict: indigo.Dict) -> Tu
     Returns:
         tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
-    # Must select at least one source (bar 1)
-    if values_dict['bar1Source'] == 'None':
-        error_msg_dict['bar1Source'] = "You must select at least one data source."
-        values_dict['settingsGroup'] = "1"
-
-    try:
-        # Bar width must be greater than 0. Will also trap strings.
-        if float(values_dict['barWidth']) <= 0:
-            raise ValueError
-    except ValueError:
-        error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-        values_dict['settingsGroup'] = "ch"
-
-    values_dict, error_msg_dict = custom_ticks(values_dict, error_msg_dict)
-
-    # Test the selected values to ensure that they can be charted (int, float, bool)
-    for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
-
-        # Pull the number out of the source key
-        n = re.search('[0-9]', source)
-
-        # Get the id of the bar source
-        if values_dict[f'bar{n.group(0)}Source'] != "None":
-            source_id = int(values_dict[f'bar{n.group(0)}Source'])
-
-            # By definition, it will either be a device ID or a variable ID.
-            if source_id in indigo.devices:
-
-                # Get the selected device state value
-                val = indigo.devices[source_id].states[values_dict[source]]
-                if not isinstance(val, (int, float, bool)):
-                    error_msg_dict[source] = "The selected device state can not be charted due to its value."
-
-            else:
-                val = indigo.variables[source_id].value
-                try:
-                    float(val)
-                except ValueError:
-                    if val.lower() not in ['true', 'false']:
-                        error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                        values_dict['settingsGroup'] = str(n.group(0))
+    values_dict, error_msg_dict = _validate_bar_source_and_width(values_dict, error_msg_dict)
+    values_dict, error_msg_dict = _validate_bar_chartable_values(values_dict, error_msg_dict)
 
     my_logger.debug("Stock bar chart validated.")
     return values_dict, error_msg_dict
@@ -412,48 +439,8 @@ def bar_stock_horizontal_chart(values_dict: indigo.Dict, error_msg_dict: indigo.
     Returns:
         tuple: A two-element tuple of (values_dict, error_msg_dict) after validation.
     """
-    # Must select at least one source (bar 1)
-    if values_dict['bar1Source'] == 'None':
-        error_msg_dict['bar1Source'] = "You must select at least one data source."
-        values_dict['settingsGroup'] = "1"
-
-    try:
-        # Bar width must be greater than 0. Will also trap strings.
-        if float(values_dict['barWidth']) <= 0:
-            raise ValueError
-    except ValueError:
-        error_msg_dict['barWidth'] = "You must enter a bar width greater than 0."
-        values_dict['settingsGroup'] = "ch"
-
-    values_dict, error_msg_dict = custom_ticks(values_dict, error_msg_dict)
-
-    # Test the selected values to ensure that they can be charted (int, float, bool)
-    for source in ['bar1Value', 'bar2Value', 'bar3Value', 'bar4Value', 'bar5Value']:
-
-        # Pull the number out of the source key
-        n = re.search('[0-9]', source)
-
-        # Get the id of the bar source
-        if values_dict[f'bar{n.group(0)}Source'] != "None":
-            source_id = int(values_dict[f'bar{n.group(0)}Source'])
-
-            # By definition, it will either be a device ID or a variable ID.
-            if source_id in indigo.devices:
-
-                # Get the selected device state value
-                val = indigo.devices[source_id].states[values_dict[source]]
-                if not isinstance(val, (int, float, bool)):
-                    error_msg_dict[source] = "The selected device state can not be charted due to its value."
-                    values_dict['settingsGroup'] = n.group(0)
-
-            else:
-                val = indigo.variables[source_id].value
-                try:
-                    float(val)
-                except ValueError:
-                    if val.lower() not in ['true', 'false']:
-                        error_msg_dict[source] = "The selected variable can not be charted due to its value."
-                        values_dict['settingsGroup'] = f"{n.group(0)}"
+    values_dict, error_msg_dict = _validate_bar_source_and_width(values_dict, error_msg_dict)
+    values_dict, error_msg_dict = _validate_bar_chartable_values(values_dict, error_msg_dict)
 
     my_logger.debug("Horizontal stock bar chart validated.")
     return values_dict, error_msg_dict

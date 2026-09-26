@@ -41,6 +41,11 @@
 - Marks `dummyCallback`, `chart_stock_bar`, `csv_check_unique`, `csv_item_delete`, `csv_item_list`,
   `csv_item_update`, `csv_item_select`, `getFontList`, `getForecastSource`, and
   `themeNameGenerator` as `@staticmethod`; none used `self`.
+- Consolidates the bar source/width validation duplicated across `bar_flow_chart`, `bar_stock_chart`,
+  and `bar_stock_horizontal_chart`, and the chartable-value validation duplicated between
+  `bar_stock_chart` and `bar_stock_horizontal_chart`, into shared `validate.py` helpers.
+- Fixes `bar_stock_chart` not setting `settingsGroup` when a selected device state can't be
+  charted, unlike `bar_stock_horizontal_chart`'s equivalent check.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
