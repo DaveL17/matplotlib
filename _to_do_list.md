@@ -1,6 +1,7 @@
 ### Feature Requests
 
 #### NEW
+- [DO FIRST] The plugin Save Snapshot menu item saves a text file. It would be more useful if it was formatted JSON. 
 - Combination device (line/bar to replicate weather devices).
 - "Error" chart with min/max/avg
 - Floating bar chart
