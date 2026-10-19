@@ -60,6 +60,8 @@
 - Fixes `chart_batteryhealth.py` drawing the battery level label inside the bar (unreadable) when a
   device's level exactly equaled the caution threshold; labels for caution and warning levels are now
   always drawn outside the bar.
+- Fixes `chart_batteryhealth.py` drawing battery level labels outside the bar right-aligned, crowding the
+  bar; they're now left-aligned so their gap from the bar matches the padding of labels drawn inside it.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

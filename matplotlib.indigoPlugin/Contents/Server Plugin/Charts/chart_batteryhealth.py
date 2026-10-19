@@ -124,12 +124,13 @@ try:
                     **K_DICT['k_battery']
                 )
             else:
+                # Left-align outside labels so the padding mirrors the right-aligned labels inside the bar.
                 plt.annotate(
                     f"{width:.0f}",
                     xy=(width + 2, y + height / 2),
                     fontsize=font_size,
                     fontname=P_DICT['fontMain'],
-                    **K_DICT['k_battery']
+                    **{**K_DICT['k_battery'], 'ha': 'left'}
                 )
 
     # ================================ Chart Title ================================
