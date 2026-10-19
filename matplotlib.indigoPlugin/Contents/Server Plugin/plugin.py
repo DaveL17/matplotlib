@@ -89,6 +89,10 @@ class Plugin(indigo.PluginBase):
         self.dev_var_list: list          = []
         self.refresh_queue: Queue        = Queue()
         self.debug_level: int            = int(plugin_prefs.get('showDebugLevel', "30"))
+        # Per-device stylesheets live outside the plugin bundle so they're never shipped with it.
+        self.stylesheet_dir: str         = os.path.join(
+            indigo.server.getInstallFolderPath(), "Preferences", "Plugins", plugin_id, "Stylesheets"
+        )
 
         # ========================== Initialize DLFramework ===========================
         self.Fogbert  = Dave.Fogbert(self)           # Plugin functional framework
@@ -635,7 +639,7 @@ class Plugin(indigo.PluginBase):
         audits.audit_themes_file()
 
         # =========================== Audit Stylesheets ===========================
-        audits.audit_stylesheets()
+        audits.audit_stylesheets(stylesheet_dir=self.stylesheet_dir)
 
     # =============================================================================
     def shutdown(self) -> None:
@@ -1497,6 +1501,7 @@ class Plugin(indigo.PluginBase):
                             'p_dict': p_dict,
                             'k_dict': k_dict,
                             'data': None,
+                            'stylesheet': os.path.join(self.stylesheet_dir, f"{dev.id}_stylesheet"),
                         }
 
                         # =============================== Area Charts ==============================
@@ -1699,12 +1704,9 @@ class Plugin(indigo.PluginBase):
                         # each device because each device can have different styles.
 
                         # If the "Stylesheets" folder isn't present, create one.
-                        if not os.path.exists("Stylesheets/"):
-                            os.mkdir("Stylesheets/")
+                        os.makedirs(self.stylesheet_dir, exist_ok=True)
 
-                        with open(
-                                f"Stylesheets/{dev.id}_stylesheet", 'w', encoding="utf-8"
-                        ) as outfile:
+                        with open(raw_payload['stylesheet'], 'w', encoding="utf-8") as outfile:
                             for k, v in rcParams.items():
                                 # matplotlib stylesheets require lists to NOT have `[` or `]`, and values separated by
                                 # commas. Empty string for empty list.

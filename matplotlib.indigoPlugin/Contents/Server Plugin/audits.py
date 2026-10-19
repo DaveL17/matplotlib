@@ -216,18 +216,21 @@ def audit_themes_file() -> None:
 
 
 # =============================================================================
-def audit_stylesheets() -> None:
+def audit_stylesheets(stylesheet_dir: str) -> None:
     """Prune stylesheet files that no longer correspond to a plugin device.
 
     Compares stylesheet filenames against existing plugin device IDs and removes any orphaned
     files. Logs each pruned file at the WARNING level. Called once at plugin startup.
+
+    Args:
+        stylesheet_dir (str): The absolute path to the folder holding the per-device stylesheets.
     """
-    if not os.path.exists("Stylesheets/"):
+    if not os.path.exists(stylesheet_dir):
         return
 
     valid_ids = {dev.id for dev in indigo.devices.iter(filter='self')}
 
-    for filepath in glob.glob("Stylesheets/*_stylesheet"):
+    for filepath in glob.glob(os.path.join(stylesheet_dir, "*_stylesheet")):
         basename = os.path.basename(filepath)
         stem     = basename[: -len("_stylesheet")]
         if not stem.isdigit():

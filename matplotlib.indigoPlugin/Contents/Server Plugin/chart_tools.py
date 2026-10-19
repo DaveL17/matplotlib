@@ -1244,13 +1244,14 @@ def chart_startup(file_name: str, props: dict, plug_dict: dict, payload: dict, l
 
     Args:
         file_name (str): The calling script's `__file__`, used for the "called" log message.
-        props (dict): The device properties dict, containing 'id' for the stylesheet filename.
+        props (dict): The device properties dict.
         plug_dict (dict): The plugin preferences dict, containing 'verboseLogging'.
-        payload (dict): The full chart payload, dumped verbatim when verboseLogging is enabled.
+        payload (dict): The full chart payload, containing 'stylesheet' (the absolute path to the
+            device's stylesheet) and dumped verbatim when verboseLogging is enabled.
         logger (dict): The logging message dictionary to append to.
     """
     logger['Threaddebug'].append(f"{file_name.rsplit('/', maxsplit=1)[-1]} called.")
-    plt.style.use(f"Stylesheets/{props['id']}_stylesheet")
+    plt.style.use(payload['stylesheet'])
 
     if plug_dict['verboseLogging']:
         logger['Threaddebug'].append(f"{payload}")

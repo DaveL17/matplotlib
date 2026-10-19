@@ -62,6 +62,11 @@
   always drawn outside the bar.
 - Fixes `chart_batteryhealth.py` drawing battery level labels outside the bar right-aligned, crowding the
   bar; they're now left-aligned so their gap from the bar matches the padding of labels drawn inside it.
+- Fixes startup logging "Pruning orphaned stylesheet" for devices from another Indigo server: per-device
+  stylesheets were written inside the plugin bundle, so a bundle copied between servers carried the source
+  server's stylesheets with it. They're now written to
+  `Preferences/Plugins/com.fogbert.indigoplugin.matplotlib/Stylesheets/` outside the bundle. No user action
+  is needed; each chart regenerates its stylesheet on its next refresh.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured

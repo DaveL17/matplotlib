@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Tuple
 
 SERVER_PLUGIN_PATH = Path(__file__).parent.parent / "matplotlib.indigoPlugin" / "Contents" / "Server Plugin"
-_STYLESHEET_ID     = "1331356132"  # Known stylesheet present in Stylesheets/
+_STYLESHEET_ID     = "1331356132"  # Device ID used for the test stylesheet's filename
 _CSV_FILENAME      = "test_data.csv"
 
 _CSV_CONTENT = (
@@ -68,6 +68,44 @@ def _run_chart(script: str, payload: dict) -> Tuple[subprocess.CompletedProcess,
 # =============================================================================
 # Payload builders
 # =============================================================================
+
+def _write_stylesheet(directory: str) -> str:
+    """Write a stylesheet for the payload's 'stylesheet' key.
+
+    The plugin writes each device's stylesheet outside the bundle at refresh time, so none ship
+    with it and the tests must supply their own. The values mirror the rcParams the plugin always
+    overrides in charts_refresh() (using its default prefs), which the chart scripts rely on.
+
+    Args:
+        directory (str): Directory to write the stylesheet into.
+
+    Returns:
+        str: The absolute path to the stylesheet.
+    """
+    rc_params = {
+        'font.size':        8.0,
+        'font.style':       'normal',
+        'font.weight':      'normal',
+        'grid.linestyle':   ':',
+        'lines.linewidth':  1.0,
+        'savefig.dpi':      100,
+        'xtick.bottom':     True,
+        'xtick.labelsize':  8,
+        'xtick.major.size': 8,
+        'xtick.minor.size': 4.0,
+        'xtick.top':        False,
+        'ytick.labelsize':  8,
+        'ytick.left':       True,
+        'ytick.major.size': 8,
+        'ytick.minor.size': 4.0,
+        'ytick.right':      False,
+    }
+    stylesheet = os.path.join(directory, f"{_STYLESHEET_ID}_stylesheet")
+    with open(stylesheet, 'w', encoding='utf-8') as outfile:
+        for key, value in rc_params.items():
+            outfile.write(f"{key}: {value}\n")
+    return stylesheet
+
 
 def _base_payload(csv_dir: str, output_dir: str, output_filename: str) -> dict:
     """Build the keys shared by all chart payloads.
@@ -171,7 +209,9 @@ def _base_payload(csv_dir: str, output_dir: str, output_filename: str) -> dict:
         'k_minor_y':     {'reset': False, 'which': 'minor'},
     }
 
-    return {'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict}
+    return {
+        'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict, 'stylesheet': _write_stylesheet(csv_dir)
+    }
 
 
 def _make_area_payload(csv_dir: str, output_dir: str) -> dict:
@@ -307,6 +347,7 @@ def _make_bar_radial_payload(output_dir: str) -> dict:
         'k_dict': k_dict,
         'data':   75.0,
         'scale':  100.0,
+        'stylesheet': _write_stylesheet(output_dir),
     }
 
 
@@ -470,6 +511,7 @@ def _make_batteryhealth_payload(output_dir: str) -> dict:
         'p_dict': p_dict,
         'k_dict': k_dict,
         'data':   {'Alpha Device': 85, 'Beta Device': 42, 'Gamma Device': 15},
+        'stylesheet': _write_stylesheet(output_dir),
     }
 
 
@@ -520,7 +562,9 @@ def _make_calendar_payload(output_dir: str) -> dict:
         'k_plot_fig': {'facecolor': '#191919', 'edgecolor': '#191919', 'transparent': False},
     }
 
-    return {'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict}
+    return {
+        'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict, 'stylesheet': _write_stylesheet(output_dir)
+    }
 
 
 def _make_line_payload(csv_dir: str, output_dir: str) -> dict:
@@ -620,6 +664,7 @@ def _make_multiline_payload(output_dir: str) -> dict:
         'p_dict': p_dict,
         'k_dict': k_dict,
         'data':   'Partly cloudy with a high near 72. South wind around 10 mph.',
+        'stylesheet': _write_stylesheet(output_dir),
     }
 
 
@@ -689,7 +734,9 @@ def _make_polar_payload(csv_dir: str, output_dir: str) -> dict:
         'k_plot_fig':   {'facecolor': '#191919', 'edgecolor': '#191919', 'transparent': False},
     }
 
-    return {'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict}
+    return {
+        'prefs': prefs, 'props': props, 'p_dict': p_dict, 'k_dict': k_dict, 'stylesheet': _write_stylesheet(csv_dir)
+    }
 
 
 def _make_scatter_payload(csv_dir: str, output_dir: str) -> dict:
