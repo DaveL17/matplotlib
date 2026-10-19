@@ -86,7 +86,8 @@ try:
     )
 
     # ================================ Data Labels ================================
-    # Plot data labels inside or outside depending on bar length
+    # Plot data labels inside the bar for healthy levels and outside the bar for caution or warning levels (using the
+    # same threshold as the bar color logic above).
 
     for rect in rects:
         width = rect.get_width()  # horizontal width of bars
@@ -95,7 +96,7 @@ try:
 
         # With bbox.  We give a little extra room horizontally for the bbox.
         if show_level in ('true', 'True', True) and level_box:
-            if width >= caution_level:
+            if width > caution_level:
                 plt.annotate(
                     f"{width:.0f}",
                     xy=(width - 3, y + height / 2),
@@ -114,7 +115,7 @@ try:
 
         # Without bbox.
         elif show_level in ('true', 'True', True):
-            if width >= caution_level:
+            if width > caution_level:
                 plt.annotate(
                     f"{width:.0f}",
                     xy=(width - 2, y + height / 2),

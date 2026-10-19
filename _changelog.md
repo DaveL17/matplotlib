@@ -57,6 +57,9 @@
   get from their shared CSV-handling helpers.
 - Fixes `device_start_comm` logging "Starting chart device." for CSV Engine devices, which aren't
   charts, to "Starting device."
+- Fixes `chart_batteryhealth.py` drawing the battery level label inside the bar (unreadable) when a
+  device's level exactly equaled the caution threshold; labels for caution and warning levels are now
+  always drawn outside the bar.
 
 ### v2025.2.5 [released]
 - Fixes `settingsGroup` assigned a regex match object string representation instead of the captured
