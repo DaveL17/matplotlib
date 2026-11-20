@@ -1,4 +1,7 @@
 ### v2025.2.6
+- Fixes the CSV Engine logging a `KeyError` traceback when a data element's source device no longer has the
+  configured state (e.g., after replacing a device with a different model). It now logs a warning naming the
+  element, device, and state, and records `NaN`.
 - Adds a linear/logarithmic Y1/Y2 axis scale option to area, bar (flow), bar (stock), line,
   scatter, and weather forecast devices.
 - Fixes Theme Manager color and line weight values being written to plugin preferences without

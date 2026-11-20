@@ -550,7 +550,17 @@ def csv_refresh_process(dev: indigo.Device, csv_dict: dict, prefs: indigo.Dict, 
                     )
 
                 elif int(value[1]) in indigo.devices:
-                    state_to_write = f"{indigo.devices[int(value[1])].states[value[2]]}"
+                    source_dev = indigo.devices[int(value[1])]
+                    if value[2] in source_dev.states:
+                        state_to_write = f"{source_dev.states[value[2]]}"
+                    else:
+                        # The source device exists but lacks the configured state (e.g., the device was replaced
+                        # by a different model). Record NaN so the chart keeps updating, and say how to fix it.
+                        my_logger.warning(
+                            "[%s] CSV data element '%s': device '%s' has no state '%s'. Recording NaN. Edit the "
+                            "CSV Engine device to select a valid state.", dev.name, value[0], source_dev.name,
+                            value[2]
+                        )
 
                 elif int(value[1]) in indigo.variables:
                     state_to_write = f"{indigo.variables[int(value[1])].value}"
